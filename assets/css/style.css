@@ -1,0 +1,41 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  line-height: 1.6;
+  color: #222;
+  background: #fdfdfd;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  font-size: 2em;
+  margin-bottom: 5px;
+}
+
+header nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #0077cc;
+}
+
+header nav a:hover {
+  text-decoration: underline;
+}
+
+hr {
+  margin: 20px 0;
+}
+
+h2 {
+  color: #333;
+}
+
+ul li {
+  margin-bottom: 10px;
+}
