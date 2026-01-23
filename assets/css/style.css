@@ -39,3 +39,30 @@ h2 {
 ul li {
   margin-bottom: 10px;
 }
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  padding: 30px 40px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+header .tagline {
+  color: #555;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+footer {
+  text-align: center;
+  color: #777;
+  font-size: 0.9em;
+  margin-top: 50px;
+}
+
