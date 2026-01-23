@@ -65,4 +65,25 @@ footer {
   font-size: 0.9em;
   margin-top: 50px;
 }
+.post-card {
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  transition: box-shadow 0.2s ease-in-out;
+  background: #f9f9f9;
+}
+
+.post-card:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.post-card h2 {
+  margin: 0 0 5px 0;
+}
+
+.post-card .post-date {
+  font-size: 0.85em;
+  color: #555;
+}
 
