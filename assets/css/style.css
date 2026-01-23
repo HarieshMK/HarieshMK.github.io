@@ -5,6 +5,11 @@ body {
   line-height: 1.7;
   margin: 0;
 }
+main {
+  max-width: 720px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   max-width: 800px;
