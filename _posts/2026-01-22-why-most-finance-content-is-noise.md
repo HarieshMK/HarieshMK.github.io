@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Why most finance content is noise
+image: /assets/images/finance1.jpg
 ---
 
 Most personal finance content fails for one simple reason:
