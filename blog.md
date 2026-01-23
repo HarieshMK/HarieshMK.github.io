@@ -3,8 +3,8 @@ layout: default
 title: Blog
 ---
 
-## Blog diagnostics
+## Articles
 
-Total posts detected by Jekyll:
-
-**{{ site.posts | size }}**
+No daily posts.  
+No trends.  
+Only things worth reading twice.
