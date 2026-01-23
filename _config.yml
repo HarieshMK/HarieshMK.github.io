@@ -1,10 +1,12 @@
 title: Money Without Noise
 description: Real-life finance. No hype. No shortcuts.
 
-url: "https://moneywithoutnoise.github.io"
-baseurl: ""
-
 theme: jekyll-theme-minimal
+
+show_downloads: false
+github:
+  is_project_page: false
+  is_user_page: false
 
 plugins:
   - jekyll-feed
