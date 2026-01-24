@@ -88,9 +88,34 @@ ul li {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
+.post-title {
+  margin: 0 0 6px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-bottom: 2px solid #111;
+  display: inline-block;
+  padding-bottom: 4px;
+}
+
+.post-title a {
+  text-decoration: none;
+  color: #111;
+}
+
+.post-title a:hover {
+  text-decoration: underline;
+}
+
 .post-date {
-  font-size: 0.85em;
-  color: #666;
+  font-size: 0.8rem;
+  color: #777;
+  margin: 6px 0 10px;
+}
+
+.post-excerpt {
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
 }
 
 /* ===== Footer ===== */
