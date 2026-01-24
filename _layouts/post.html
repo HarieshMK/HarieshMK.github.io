@@ -1,10 +1,51 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
 
-<article class="post">
-  <h2>{{ page.title }}</h2>
-  <p class="post-date">{{ page.date | date: "%B %d, %Y" }}</p>
+<body>
+  <div class="container">
 
-  {{ content }}
-</article>
+    <header>
+      <h1><a href="/">{{ site.title }}</a></h1>
+      <p class="tagline">{{ site.description }}</p>
+      <nav>
+        <a href="/about">About</a> |
+        <a href="/blog">Blog</a>
+      </nav>
+    </header>
+
+    <main>
+      <article>
+        <h2>{{ page.title }}</h2>
+        <p class="post-date">
+          {{ page.date | date: "%B %d, %Y" }}
+        </p>
+
+        {{ content }}
+      </article>
+
+      <!-- Comments Section -->
+      <section class="comments">
+        <h3>Discussion</h3>
+        <script src="https://utteranc.es/client.js"
+          repo="HarieshMK/harieshmk.github.io"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+        </script>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; {{ "now" | date: "%Y" }} Money Without Noise</p>
+    </footer>
+
+  </div>
+</body>
+</html>
