@@ -51,7 +51,7 @@ Then act.
 
 ---
 
-Sponsored content is another trap.
+**Sponsored content** is another trap.
 
 Even if a product is good, don’t take recommendations from a single video or blog. Do your own research. If that research leads you to the same product, great — you’re making an informed decision, not blindly following someone’s advice.
 
