@@ -10,7 +10,6 @@
 <body>
   <div class="container">
 
-    <!-- ===== HEADER ===== -->
     <header>
       <h1><a href="/">{{ site.title }}</a></h1>
       <p class="tagline">{{ site.description }}</p>
@@ -21,24 +20,38 @@
       </nav>
     </header>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main>
       <article>
         <h2>{{ page.title }}</h2>
-        <p class="post-date">{{ page.date | date: "%B %d, %Y" }}</p>
+        <p class="post-date">
+          {{ page.date | date: "%B %d, %Y" }}
+        </p>
+
         {{ content }}
       </article>
 
-      <!-- ===== SUBSCRIBE SECTION ===== -->
-      {% include subscribe.html %}
+      <!-- ================= SUBSCRIBE SECTION ================= -->
+      <section class="subscribe-box">
+        <!-- Paste your MailerLite EMBED FORM CODE here -->
+      </section>
+      <!-- ===================================================== -->
 
-      <!-- ===== COMMENTS SECTION ===== -->
-      {% include comments.html %}
+      <!-- ================= COMMENTS SECTION ================= -->
+      <section class="comments">
+        <h3>Discussion</h3>
+        <script src="https://utteranc.es/client.js"
+          repo="HarieshMK/harieshmk.github.io"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+        </script>
+      </section>
+      <!-- ===================================================== -->
     </main>
 
-    <!-- ===== FOOTER ===== -->
     <footer>
-      <p>&copy; {{ site.title }} {{ "now" | date: "%Y" }}</p>
+      <p>&copy; {{ "now" | date: "%Y" }} Money Without Noise</p>
     </footer>
 
   </div>
