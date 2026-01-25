@@ -3,7 +3,7 @@
 body {
   background-color: #f2f4f6;
   color: #222;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.65;
   margin: 0;
 }
@@ -55,14 +55,18 @@ nav a:hover {
 }
 
 /* ===== Global Typography ===== */
-
-h1, h2, h3 {
-  color: #111;
-  line-height: 1.3;
+/* ===== Content Headings ===== */
+h1 {
+  font-size: 2.2rem;
+  line-height: 1.25;
 }
-
 h2 {
+  font-size: 1.5rem;
+  line-height: 1.35;
   margin-top: 1.6em;
+}
+h3 {
+  font-size: 1.2rem;
 }
 
 p {
@@ -72,7 +76,18 @@ p {
 ul li {
   margin-bottom: 8px;
 }
+/* ===== Content Links ===== */
 
+a {
+  color: #2a2a2a;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  opacity: 0.75;
+}
 /* ===== Blog List ===== */
 
 .post-card-link {
