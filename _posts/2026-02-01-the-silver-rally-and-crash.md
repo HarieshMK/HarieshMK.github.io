@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Silver Rally and Crash: A Lesson in Noise"
-date: 2026-02-01
+date: 2026-02-02
 categories: investing metals behavior
 ---
 
