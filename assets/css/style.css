@@ -209,7 +209,14 @@ footer {
   color: #999;
   font-size: 0.8rem;
 }
-
+/* Styling for the Disclaimer headings */
+.disclaimer-box {
+  border-left: 4px solid #0056b3;
+  padding: 10px 20px;
+  background: #f8f9fa;
+  font-style: italic;
+  margin-top: 40px;
+}
 /* Mobile Responsive */
 @media (max-width: 600px) {
   .footer-grid {
