@@ -156,15 +156,26 @@ header .tagline {
 .comments h3 { font-size: 1.2rem; color: #333; margin-bottom: 10px; }
 .comments p { font-size: 0.85rem; color: #666; margin-bottom: 25px; }
 
-/* Tighten the input fields to look more professional */
+/* ===== REFINED CUSDIS FIX ===== */
+/* 1. Target the iframe specifically to hide the scrollbar */
 #cusdis_thread iframe {
-  max-height: 400px; /* Limits the height of the 'Write a comment' area */
-  transition: max-height 0.3s ease;
+  width: 100% !important;
+  min-height: 480px; /* Increased slightly to ensure no clipping on small screens */
+  border: none !important;
+  overflow: hidden !important; 
 }
 
-/* If the user clicks to type, we want it to feel seamless */
+/* 2. Seamlessly expand when the user clicks to type */
 #cusdis_thread:focus-within iframe {
-  max-height: 1000px; 
+  min-height: 700px; 
+  transition: min-height 0.3s ease;
+}
+
+/* 3. Ensure the container doesn't clip the widget */
+.comments {
+  margin-top: 20px;
+  padding-top: 20px;
+  overflow: visible !important; 
 }
 
 /* ===== 6. FOOTER ===== */
