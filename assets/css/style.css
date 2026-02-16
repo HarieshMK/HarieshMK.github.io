@@ -1,4 +1,4 @@
-/* ===== Base Page & Typography ===== */
+/* ===== 1. CORE STYLES & TYPOGRAPHY ===== */
 body {
   background-color: #f4f7f9; 
   color: #2c3e50;            
@@ -9,7 +9,6 @@ body {
   padding: 0 15px;
 }
 
-/* ===== Layout ===== */
 .container {
   max-width: 800px;         
   margin: 40px auto;
@@ -19,7 +18,11 @@ body {
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* ===== Header & Navigation ===== */
+h1, h2, h3 { color: #1a1a1a; }
+p { margin-bottom: 1.5em; }
+img { max-width: 100%; height: auto; border-radius: 4px; }
+
+/* ===== 2. HEADER & NAVIGATION ===== */
 header {
   text-align: center;
   margin-bottom: 50px;
@@ -27,16 +30,8 @@ header {
   padding-bottom: 30px;
 }
 
-header h1 {
-  font-size: 2.4rem;
-  margin: 0;
-  letter-spacing: -1px;
-}
-
-header h1 a {
-  color: #1a1a1a;
-  text-decoration: none;
-}
+header h1 { font-size: 2.4rem; margin: 0; letter-spacing: -1px; }
+header h1 a { color: #1a1a1a; text-decoration: none; }
 
 header .tagline {
   color: #666;
@@ -69,28 +64,7 @@ header .tagline {
   border-bottom: 2px solid #0056b3;
 }
 
-/* ===== Content Structure ===== */
-main {
-  padding: 20px 0;
-}
-
-h2 {
-  font-size: 1.8rem;
-  color: #1a1a1a;
-  margin-top: 1.5em;
-}
-
-p {
-  margin-bottom: 1.5em;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-/* ===== Blog List (The Cards) ===== */
+/* ===== 3. BLOG CARDS (Archive & Home) ===== */
 .post-card-link {
   display: block;
   text-decoration: none;
@@ -112,37 +86,41 @@ img {
   border-color: #d1d9e0;
 }
 
-.post-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-  display: block;
-}
+.post-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; display: block; }
+.post-date { font-size: 0.85rem; color: #888; margin-bottom: 12px; display: block; }
 
-.post-date {
-  font-size: 0.85rem;
-  color: #888;
-  margin-bottom: 12px;
-  display: block;
-}
+/* Home-specific card overrides */
+.home-card { padding: 15px 20px !important; margin-bottom: 15px; }
+.home-card .post-title { font-size: 1.1rem !important; }
+.home-card .post-excerpt { font-size: 0.85rem; line-height: 1.4; }
 
-/* Home Page specific card sizing */
-.home-card {
-  padding: 15px 20px !important; 
+/* ===== 4. INDIVIDUAL POST CONTENT ===== */
+.post-header { margin-bottom: 40px; }
+.post-header h1 { font-size: 2.5rem; line-height: 1.2; margin: 10px 0; }
+.post-meta { color: #777; font-size: 0.95rem; }
+
+.back-link {
+  display: inline-block;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #0056b3;
   margin-bottom: 15px;
 }
 
-.home-card .post-title {
-  font-size: 1.1rem !important; 
+.entry-content { font-size: 1.1rem; line-height: 1.8; }
+.entry-content h2, .entry-content h3 { margin-top: 2em; }
+
+.entry-content blockquote, .disclaimer-box {
+  border-left: 4px solid #0056b3;
+  margin: 30px 0;
+  padding: 10px 25px;
+  background: #f9f9f9;
+  font-style: italic;
 }
 
-.home-card .post-excerpt {
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
+.section-divider { border: 0; border-top: 1px solid #eee; margin: 60px 0; }
 
-/* ===== Newsletter Box ===== */
+/* ===== 5. EXTRAS (Newsletter & Comments) ===== */
 .subscribe-box {
   margin: 60px 0 20px;
   padding: 40px;
@@ -152,7 +130,9 @@ img {
   text-align: center;
 }
 
-/* ===== Multi-Column Footer ===== */
+.comments h3 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+/* ===== 6. FOOTER ===== */
 footer {
   margin-top: 80px;
   padding-top: 40px;
@@ -169,38 +149,11 @@ footer {
   margin-bottom: 40px;
 }
 
-.footer-col h3 {
-  font-size: 1rem;
-  color: #1a1a1a;
-  margin-bottom: 15px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.footer-col p {
-  margin-bottom: 10px;
-  line-height: 1.5;
-}
-
-.footer-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-links li {
-  margin-bottom: 8px;
-}
-
-.footer-links li a, .footer-col a {
-  text-decoration: none; /* Keeps it clean */
-  color: #555;
-}
-
-.footer-links li a:hover, .footer-col a:hover {
-  color: #0056b3;
-  text-decoration: underline;
-}
+.footer-col h3 { font-size: 1rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+.footer-links { list-style: none; padding: 0; margin: 0; }
+.footer-links li { margin-bottom: 8px; }
+.footer-links li a, .footer-col a { text-decoration: none; color: #555; }
+.footer-links li a:hover, .footer-col a:hover { color: #0056b3; text-decoration: underline; }
 
 .footer-bottom {
   text-align: center;
@@ -209,18 +162,12 @@ footer {
   color: #999;
   font-size: 0.8rem;
 }
-/* Styling for the Disclaimer headings */
-.disclaimer-box {
-  border-left: 4px solid #0056b3;
-  padding: 10px 20px;
-  background: #f8f9fa;
-  font-style: italic;
-  margin-top: 40px;
-}
-/* Mobile Responsive */
+
+/* ===== 7. MOBILE RESPONSIVENESS ===== */
 @media (max-width: 600px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
+  .container { padding: 20px; margin: 20px auto; }
+  header h1 { font-size: 1.8rem; }
+  .nav-list { gap: 15px; flex-wrap: wrap; }
+  .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+  .post-header h1 { font-size: 1.8rem; }
 }
