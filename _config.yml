@@ -1,14 +1,14 @@
 # Site Settings
 title: Unexciting Money Club
 description: "Real-life personal finance for long-term thinkers. No hype, no shortcuts—just boring, practical money decisions."
-url: "https://yourusername.github.io" # Replace with your actual URL
+url: "https://harieshmk.github.io/" 
 baseurl: "" # Leave empty if your site is the main repository
 
 # Author Settings (Helps with Trust/E-E-A-T)
 author:
-  name: "Your Name"
-  email: "your-email@example.com"
-  twitter: "your_handle"
+  name: "Hariesh Murugan"
+  email: "itzhariesh@gmail.com"
+  instagram: "unexciting_money_club"
 
 # Build Settings
 permalink: /blog/:title/  # Simplified: shorter URLs usually rank better
