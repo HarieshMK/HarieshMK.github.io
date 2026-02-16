@@ -1,12 +1,27 @@
+# Site Settings
 title: Unexciting Money Club
-description: Real-life finance. No hype. No shortcuts.
+description: "Real-life personal finance for long-term thinkers. No hype, no shortcuts—just boring, practical money decisions."
+url: "https://yourusername.github.io" # Replace with your actual URL
+baseurl: "" # Leave empty if your site is the main repository
 
-show_downloads: false
-github:
-  is_project_page: false
-  is_user_page: false
+# Author Settings (Helps with Trust/E-E-A-T)
+author:
+  name: "Your Name"
+  email: "your-email@example.com"
+  twitter: "your_handle"
 
-permalink: /:year/:month/:day/:title/
+# Build Settings
+permalink: /blog/:title/  # Simplified: shorter URLs usually rank better
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
 
+# Plugins
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag # I highly recommend adding this one!
+
+# Future-proofing
+show_downloads: false
