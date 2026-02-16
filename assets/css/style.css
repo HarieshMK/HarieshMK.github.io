@@ -125,23 +125,26 @@ header .tagline {
 }
 
 /* ===== 5. REFINED NEWSLETTER & COMMENTS ===== */
-/* ===== The Seamless Signature Look ===== */
+/* ===== 5. REFINED NEWSLETTER (The Compact Version) ===== */
 .subscribe-box {
-  margin: 50px auto;
-  padding: 30px 0;
-  border-top: 1px solid #eee; /* Single clean line separator */
+  margin: 20px auto; /* Reduced from 50px to 20px */
+  padding: 10px 0;   /* Reduced from 30px to 10px */
+  border-top: 1px solid #eee; 
   border-bottom: 1px solid #eee;
   background: transparent !important; 
   text-align: center;
 }
 
-/* Force MailerLite's internal boxes to disappear */
+/* Force MailerLite's internal spacing to disappear */
 .ml-embedded, 
 .ml-form-embedWrapper, 
-.ml-form-embedBody {
+.ml-form-embedBody,
+.ml-form-embedContainer {
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  padding: 0 !important; /* This removes the inner white space */
+  margin: 0 !important;
 }
 
 /* Make the Discussion section feel closer to the content */
