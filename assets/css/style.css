@@ -22,6 +22,13 @@ h1, h2, h3 { color: #1a1a1a; }
 p { margin-bottom: 1.5em; }
 img { max-width: 100%; height: auto; border-radius: 4px; }
 
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 40px auto;
+  width: 50%; /* Subtle centered divider */
+}
+
 /* ===== 2. HEADER & NAVIGATION ===== */
 header {
   text-align: center;
@@ -89,7 +96,6 @@ header .tagline {
 .post-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; display: block; }
 .post-date { font-size: 0.85rem; color: #888; margin-bottom: 12px; display: block; }
 
-/* Home-specific card overrides */
 .home-card { padding: 15px 20px !important; margin-bottom: 15px; }
 .home-card .post-title { font-size: 1.1rem !important; }
 .home-card .post-excerpt { font-size: 0.85rem; line-height: 1.4; }
@@ -118,19 +124,35 @@ header .tagline {
   font-style: italic;
 }
 
-.section-divider { border: 0; border-top: 1px solid #eee; margin: 60px 0; }
-
-/* ===== 5. EXTRAS (Newsletter & Comments) ===== */
+/* ===== 5. REFINED NEWSLETTER & COMMENTS ===== */
 .subscribe-box {
-  margin: 60px 0 20px;
-  padding: 40px;
+  margin: 40px auto 20px;
+  padding: 20px 30px; /* Reduced top/bottom padding for a slimmer look */
   background: #f8f9fa;
   border: 1px solid #edeff2;
-  border-radius: 12px;
+  border-radius: 8px;
   text-align: center;
+  max-width: 600px;
 }
 
-.comments h3 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.subscribe-box h3 { font-size: 1.25rem; margin-bottom: 5px; }
+.subscribe-box p { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
+
+/* MailerLite Clean-up */
+.ml-embedded, .ml-form-embedWrapper, .ml-form-embedBody {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.comments {
+  margin-top: 50px;
+  border-top: 1px solid #eee;
+  padding-top: 30px;
+}
+
+.comments h3 { font-size: 1.2rem; color: #333; margin-bottom: 10px; }
+.comments p { font-size: 0.85rem; color: #666; margin-bottom: 25px; }
 
 /* ===== 6. FOOTER ===== */
 footer {
@@ -170,4 +192,5 @@ footer {
   .nav-list { gap: 15px; flex-wrap: wrap; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
   .post-header h1 { font-size: 1.8rem; }
+  hr { width: 80%; } /* Wider line on mobile for better visibility */
 }
