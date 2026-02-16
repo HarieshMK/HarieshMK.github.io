@@ -126,33 +126,30 @@ header .tagline {
 
 /* ===== 5. REFINED NEWSLETTER & COMMENTS ===== */
 .subscribe-box {
-  margin: 60px auto;
-  padding: 40px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  margin: 60px auto 40px;
+  padding: 30px 0;
+  border-top: 1px solid #eee; /* Just a simple line above */
   text-align: center;
-  max-width: 650px; /* Aligns with your text width */
-  background: transparent; /* Remove the grey box look */
+  max-width: 550px;
 }
 
 .subscribe-box h3 {
-  font-size: 1.25rem;
+  font-size: 1.1rem; /* Small, like a sub-heading */
+  font-weight: 600;
   margin-bottom: 5px;
-  color: #1a1a1a;
+  text-transform: none;
 }
 
 .subscribe-box p {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #666;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  font-style: italic; /* Makes it feel like a personal note */
 }
 
-/* Force the MailerLite Form to be invisible/flat */
-.ml-embedded, .ml-form-embedWrapper, .ml-form-embedBody, .ml-form-embedContainer {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+/* Make the MailerLite Form sit on one clean line */
+.ml-embedded {
+  max-width: 450px !important;
   margin: 0 auto !important;
 }
 
