@@ -41,7 +41,9 @@ header h1 a {
 header .tagline {
   color: #666;
   font-size: 1.1rem;
-  margin-top: 8px;
+  margin: 10px auto 0;
+  max-width: 500px; /* This forces the text to wrap beautifully */
+  line-height: 1.4;
 }
 
 /* New Navigation Styling */
