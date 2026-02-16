@@ -27,13 +27,16 @@ layout: default
 <section class="comments">
   <h3>Discussion</h3>
   <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">
-    Have a thought or a question? Share it below. (GitHub account required)
+    Have a thought or a question? Share it below. (No account required)
   </p>
-  <script src="https://utteranc.es/client.js"
-    repo="HarieshMK/harieshmk.github.io"
-    issue-term="pathname"
-    theme="github-light"
-    crossorigin="anonymous"
-    async>
-  </script>
+  
+  <div id="cusdis_thread"
+    data-host="https://cusdis.com"
+    data-app-id="078e37ac-a7c4-4015-a9ec-e3e1aa8ca3f0"
+    data-page-id="{{ page.url }}"
+    data-page-url="{{ site.url }}{{ page.url }}"
+    data-page-title="{{ page.title }}">
+  </div>
+  
+  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 </section>
