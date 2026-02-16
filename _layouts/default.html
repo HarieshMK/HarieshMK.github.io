@@ -43,8 +43,15 @@
       {{ content }}
     </main>
 
-    <footer>
-      <p>&copy; {{ "now" | date: "%Y" }} Unexciting Money Club</p>
+  <footer>
+      <div class="footer-author">
+        <p>Written by <strong>{{ site.author.name }}</strong></p>
+        <p>Contact: <a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
+        {% if site.author.instagram %}
+          <p>Follow: <a href="https://instagram.com/{{ site.author.instagram }}" target="_blank">@{{ site.author.instagram }}</a></p>
+        {% endif %}
+      </div>
+      <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }}</p>
     </footer>
   </div>
 </body>
