@@ -147,11 +147,6 @@ header .tagline {
   padding-bottom: 0 !important;
   background-color: transparent !important;
 }
-/* Kill the 'Ghost' space for empty titles/text in MailerLite */
-.ml-form-embedBody h4, 
-.ml-form-embedBody p {
-  display: none !important;
-}
 /* Make the Discussion section feel closer to the content */
 .comments {
   margin-top: 20px;
