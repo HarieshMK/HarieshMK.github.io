@@ -3,20 +3,20 @@ layout: default
 title: Blog
 ---
 
-<h1>Explore Our Money Guides:</h1>
+<h1 style="text-align: center; margin-bottom: 40px;">Explore Our Money Guides</h1>
 
 <div class="blog-list">
   {% for post in site.posts %}
-    <a href="{{ post.url }}" class="post-card-link">
+    <a href="{{ post.url | relative_url }}" class="post-card-link">
       <div class="post-card">
-        <h2 class="post-title">{{ post.title }}</h2>
+        <span class="post-title">{{ post.title }}</span>
 
-        <p class="post-date">
+        <span class="post-date">
           {{ post.date | date: "%B %d, %Y" }}
-        </p>
+        </span>
 
         <div class="post-excerpt">
-          {{ post.excerpt | strip_html | truncate: 160 }}
+          {{ post.excerpt | strip_html | truncate: 140 }}
         </div>
       </div>
     </a>
