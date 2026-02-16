@@ -1,7 +1,7 @@
 /* ===== Base Page & Typography ===== */
 body {
-  background-color: #f4f7f9; /* Slightly cooler grey-blue */
-  color: #2c3e50;            /* Dark slate for better readability */
+  background-color: #f4f7f9; 
+  color: #2c3e50;            
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 18px;
   line-height: 1.6;
@@ -11,7 +11,7 @@ body {
 
 /* ===== Layout ===== */
 .container {
-  max-width: 800px;         /* Narrower is actually easier to read */
+  max-width: 800px;         
   margin: 40px auto;
   background: #ffffff;
   padding: 40px;
@@ -42,11 +42,10 @@ header .tagline {
   color: #666;
   font-size: 1.1rem;
   margin: 10px auto 0;
-  max-width: 500px; /* This forces the text to wrap beautifully */
+  max-width: 500px; 
   line-height: 1.4;
 }
 
-/* New Navigation Styling */
 .nav-list {
   list-style: none;
   padding: 0;
@@ -58,7 +57,7 @@ header .tagline {
 
 .nav-list li a {
   text-decoration: none;
-  color: #0056b3; /* Professional blue */
+  color: #0056b3; 
   font-weight: 600;
   font-size: 0.95rem;
   text-transform: uppercase;
@@ -85,7 +84,6 @@ p {
   margin-bottom: 1.5em;
 }
 
-/* Ensure images don't overflow */
 img {
   max-width: 100%;
   height: auto;
@@ -129,6 +127,21 @@ img {
   display: block;
 }
 
+/* Home Page specific card sizing */
+.home-card {
+  padding: 15px 20px !important; 
+  margin-bottom: 15px;
+}
+
+.home-card .post-title {
+  font-size: 1.1rem !important; 
+}
+
+.home-card .post-excerpt {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
 /* ===== Newsletter Box ===== */
 .subscribe-box {
   margin: 60px 0 20px;
@@ -139,37 +152,68 @@ img {
   text-align: center;
 }
 
-/* ===== Footer ===== */
+/* ===== Multi-Column Footer ===== */
 footer {
-  text-align: center;
-  color: #999;
-  font-size: 0.85rem;
-  margin: 60px 0 20px;
-}
-/* Make Home Page Cards Smaller */
-.home-card {
-  padding: 15px 20px !important; /* Smaller padding */
-  margin-bottom: 15px;
+  margin-top: 80px;
+  padding-top: 40px;
+  border-top: 2px solid #eee;
+  color: #555;
+  font-size: 0.9rem;
 }
 
-.home-card .post-title {
-  font-size: 1.1rem !important; /* Smaller font */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr; 
+  gap: 40px;
+  text-align: left; 
+  margin-bottom: 40px;
 }
 
-.home-card .post-excerpt {
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-/* Author Section in Footer */
-.footer-author {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-  font-style: normal;
-  color: #444;
-}
-
-.footer-author strong {
+.footer-col h3 {
+  font-size: 1rem;
   color: #1a1a1a;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.footer-col p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 8px;
+}
+
+.footer-links li a, .footer-col a {
+  text-decoration: none; /* Keeps it clean */
+  color: #555;
+}
+
+.footer-links li a:hover, .footer-col a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 20px 0;
+  border-top: 1px solid #f0f0f0;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
 }
