@@ -44,15 +44,33 @@
     </main>
 
   <footer>
-      <div class="footer-author">
-        <p>Written by <strong>{{ site.author.name }}</strong></p>
-        <p>Contact: <a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
-        {% if site.author.instagram %}
-          <p>Follow: <a href="https://instagram.com/{{ site.author.instagram }}" target="_blank">@{{ site.author.instagram }}</a></p>
-        {% endif %}
-      </div>
-      <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }}</p>
-    </footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h3>{{ site.title }}</h3>
+      <p>Building wealth by avoiding stupidity. Practical finance for the long-term thinker.</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Explore</h3>
+      <ul class="footer-links">
+        <li><a href="{{ '/' | relative_url }}">Home</a></li>
+        <li><a href="{{ '/about' | relative_url }}">About the Club</a></li>
+        <li><a href="{{ '/blog' | relative_url }}">Writing</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Stay Connected</h3>
+      <p>Written by <strong>{{ site.author.name }}</strong></p>
+      <p><a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
+      <p><a href="https://instagram.com/{{ site.author.instagram }}" target="_blank">Instagram</a></p>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }} • Made for the long run.</p>
+  </div>
+</footer>
   </div>
 </body>
 </html>
