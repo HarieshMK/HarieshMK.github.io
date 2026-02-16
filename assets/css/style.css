@@ -157,24 +157,26 @@ header .tagline {
 .comments p { font-size: 0.85rem; color: #666; margin-bottom: 25px; }
 
 /* ===== REFINED CUSDIS FIX ===== */
-/* 1. Target the iframe specifically to hide the scrollbar */
+
+/* Target the iframe and kill the scrollbar for good */
 #cusdis_thread iframe {
   width: 100% !important;
-  min-height: 480px; /* Increased slightly to ensure no clipping on small screens */
+  min-height: 500px !important; /* Forces enough room for the guest form */
   border: none !important;
-  overflow: hidden !important; 
+  overflow: hidden !important; /* Removes scrollbar */
 }
 
-/* 2. Seamlessly expand when the user clicks to type */
+/* Smooth expansion when the user clicks to type */
 #cusdis_thread:focus-within iframe {
-  min-height: 700px; 
+  min-height: 750px !important; 
   transition: min-height 0.3s ease;
 }
 
-/* 3. Ensure the container doesn't clip the widget */
+/* Ensure the discussion container doesn't restrict height */
 .comments {
   margin-top: 20px;
   padding-top: 20px;
+  height: auto !important;
   overflow: visible !important; 
 }
 
