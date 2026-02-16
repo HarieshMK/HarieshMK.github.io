@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <title>{{ page.title }} | {{ site.title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <meta name="description" content="{{ site.description }}">
+  
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC2R2GWY43"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -15,7 +16,6 @@
     gtag('config', 'G-TC2R2GWY43');
   </script>
 
-  <!-- MailerLite Universal -->
   <script>
     (function(w,d,e,u,f,l,n){
       w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments);},
@@ -24,18 +24,18 @@
     })(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
     ml('account', '2062352');
   </script>
-  <!-- End MailerLite Universal -->
-
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>{{ site.title }}</h1>
+      <h1><a href="{{ '/' | relative_url }}" style="text-decoration: none; color: inherit;">{{ site.title }}</a></h1>
       <p class="tagline">{{ site.description }}</p>
       <nav>
-        <a href="/">Home</a> |
-        <a href="/about">About</a> |
-        <a href="/blog">Blog</a>
+        <ul class="nav-list">
+          <li><a href="{{ '/' | relative_url }}">Home</a></li>
+          <li><a href="{{ '/about' | relative_url }}">About</a></li>
+          <li><a href="{{ '/blog' | relative_url }}">Blog</a></li>
+        </ul>
       </nav>
     </header>
 
