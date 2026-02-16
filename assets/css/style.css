@@ -156,37 +156,28 @@ header .tagline {
 .comments h3 { font-size: 1.2rem; color: #333; margin-bottom: 10px; }
 .comments p { font-size: 0.85rem; color: #666; margin-bottom: 25px; }
 
-/* ===== REFINED CUSDIS FIX ===== */
+/* ===== REFINED CUSDIS FIX (No Extra Space) ===== */
 
-/* Target the iframe and kill the scrollbar for good */
+/* 1. Set a tighter starting height to reduce empty space */
 #cusdis_thread iframe {
   width: 100% !important;
-  min-height: 500px !important; /* Forces enough room for the guest form */
+  min-height: 380px !important; /* Shrunk from 500px to 380px */
   border: none !important;
-  overflow: hidden !important; /* Removes scrollbar */
+  overflow: hidden !important; 
+  display: block !important;
 }
 
-/* Smooth expansion when the user clicks to type */
+/* 2. Remove the massive expansion - let it grow naturally */
 #cusdis_thread:focus-within iframe {
-  min-height: 750px !important; 
-  transition: min-height 0.3s ease;
-}
-
-/* Ensure the discussion container doesn't restrict height */
-.comments {
-  margin-top: 20px;
-  padding-top: 20px;
-  height: auto !important;
-  overflow: visible !important; 
+  min-height: 450px !important; 
+  transition: min-height 0.2s ease;
 }
 
 /* ===== 6. FOOTER ===== */
 footer {
-  margin-top: 80px;
+  margin-top: 40px !important; /* Shrunk from 80px to 40px */
   padding-top: 40px;
   border-top: 2px solid #eee;
-  color: #555;
-  font-size: 0.9rem;
 }
 
 .footer-grid {
