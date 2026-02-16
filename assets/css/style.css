@@ -123,30 +123,35 @@ header .tagline {
   background: #f9f9f9;
   font-style: italic;
 }
+.entry-content > *:last-child { margin-bottom: 0; } 
 
-/* ===== 5. REFINED NEWSLETTER & COMMENTS ===== */
-/* ===== 5. REFINED NEWSLETTER (The Compact Version) ===== */
+/* ===== 5. REFINED NEWSLETTER (The Ultra-Compact Version) ===== */
 .subscribe-box {
-  margin: 20px auto; /* Reduced from 50px to 20px */
-  padding: 10px 0;   /* Reduced from 30px to 10px */
+  margin: 0 auto !important; /* Removes the massive outer gaps */
+  padding: 20px 0 !important; /* Tightens the internal space */
   border-top: 1px solid #eee; 
   border-bottom: 1px solid #eee;
   background: transparent !important; 
   text-align: center;
 }
 
-/* Force MailerLite's internal spacing to disappear */
+/* This targets the specific spacing MailerLite injects via Javascript */
 .ml-embedded, 
 .ml-form-embedWrapper, 
 .ml-form-embedBody,
-.ml-form-embedContainer {
+.ml-form-embedContainer,
+.ml-form-embedWrapper.embedDefault {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important; /* This removes the inner white space */
-  margin: 0 !important;
 }
-
+/* Kill the 'Ghost' space for empty titles/text in MailerLite */
+.ml-form-embedBody h4, 
+.ml-form-embedBody p {
+  display: none !important;
+}
 /* Make the Discussion section feel closer to the content */
 .comments {
   margin-top: 20px;
