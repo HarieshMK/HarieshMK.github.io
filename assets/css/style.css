@@ -156,6 +156,17 @@ header .tagline {
 .comments h3 { font-size: 1.2rem; color: #333; margin-bottom: 10px; }
 .comments p { font-size: 0.85rem; color: #666; margin-bottom: 25px; }
 
+/* Tighten the input fields to look more professional */
+#cusdis_thread iframe {
+  max-height: 400px; /* Limits the height of the 'Write a comment' area */
+  transition: max-height 0.3s ease;
+}
+
+/* If the user clicks to type, we want it to feel seamless */
+#cusdis_thread:focus-within iframe {
+  max-height: 1000px; 
+}
+
 /* ===== 6. FOOTER ===== */
 footer {
   margin-top: 80px;
