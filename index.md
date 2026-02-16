@@ -1,18 +1,33 @@
 ---
 layout: default
-title: Money Without Noise
+title: Home
 ---
 
 ## Real-life finance. No hype. No shortcuts.
 
-Most personal finance content is either:
-- Fake screenshots
-- Overpromises
-- Or straight-up noise
+Most personal finance content is either fake screenshots, overpromises, or straight-up noise. 
 
-This site is about:
+**This site is about:**
 - Boring but real money decisions
 - Long-term thinking
 - Avoiding financial stupidity
 
-If it’s not practical, it doesn’t belong here.
+---
+
+### 📝 Latest from the Club
+
+{% for post in site.posts limit:3 %}
+<a href="{{ post.url | relative_url }}" class="post-card-link">
+  <div class="post-card">
+    <span class="post-title">{{ post.title }}</span>
+    <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+    <div class="post-excerpt">
+      {{ post.excerpt | strip_html | truncatewords: 20 }}...
+    </div>
+  </div>
+</a>
+{% endfor %}
+
+<p style="text-align: center;">
+  <a href="{{ '/blog' | relative_url }}" style="font-weight: bold;">View All Articles →</a>
+</p>
