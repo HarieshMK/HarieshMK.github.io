@@ -211,41 +211,48 @@ footer {
   .post-header h1 { font-size: 1.8rem; }
   hr { width: 80%; } /* Wider line on mobile for better visibility */
 }
-/* --- DARK MODE STYLES --- */
+/* --- 8. REFINED DARK MODE (Clean & Professional) --- */
 
-/* Smooth switch transition */
-body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Dark Theme Overrides */
 .dark-theme body {
-    background-color: #0d0d0d !important;
-    color: #e0e0e0 !important;
+    background-color: #121212 !important; /* Deep charcoal, not pitch black */
+    color: #e0e0e0 !important; /* Soft white for easy reading */
 }
 
 .dark-theme .container {
-    background-color: #0d0d0d !important;
+    background-color: #121212 !important;
 }
 
-/* Headers and Links in Dark Mode */
-.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme .tagline {
+/* Titles: Pure White for maximum clarity */
+.dark-theme h1, 
+.dark-theme h2, 
+.dark-theme h3, 
+.dark-theme header h1 a {
     color: #ffffff !important;
 }
 
-.dark-theme a {
-    color: #ff4444 !important;
-}
-
-/* Navigation & Footer Adjustments */
-.dark-theme header, .dark-theme footer {
-    border-color: #333 !important;
-}
-
+/* Navigation: Grey that turns White on hover */
 .dark-theme .nav-list a {
-    color: #e0e0e0 !important;
+    color: #b0b0b0 !important;
 }
 
 .dark-theme .nav-list a:hover {
-    color: #ff4444 !important;
+    color: #ffffff !important;
+}
+
+/* The Blog Cards: Subtle grey border so they don't "float" in space */
+.dark-theme .post-card, 
+.dark-theme .footer-col {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+/* Tagline: Muted grey */
+.dark-theme .tagline {
+    color: #888888 !important;
+}
+
+/* Keep red ONLY for the "Alert" feel on actual links or accents */
+.dark-theme a {
+    color: #ff4444 !important; 
+    text-decoration: underline;
 }
