@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{ site.description }}">
   
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC2R2GWY43"></script>
@@ -38,20 +40,23 @@
   </script>
 </head>
 <body>
+  <div class="top-util-bar">
+    <button id="theme-toggle" aria-label="Toggle Dark Mode">
+      <span id="theme-icon">🌙</span>
+    </button>
+  </div>
+
   <div class="container">
     <header>
-      <h1><a href="{{ '/' | relative_url }}" style="text-decoration: none; color: inherit;">{{ site.title }}</a></h1>
-      <p class="tagline">{{ site.description }}</p>
+      <div class="brand-area">
+        <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
+        <p class="tagline">{{ site.description }}</p>
+      </div>
       <nav>
         <ul class="nav-list">
           <li><a href="{{ '/' | relative_url }}">Home</a></li>
           <li><a href="{{ '/about' | relative_url }}">About</a></li>
           <li><a href="{{ '/blog' | relative_url }}">Blog</a></li>
-          <li>
-            <button id="theme-toggle" style="cursor: pointer; background: none; border: none; font-size: 1.1rem; padding: 0; margin-left: 10px; vertical-align: middle;">
-              <span id="theme-icon">🌙</span>
-            </button>
-          </li>
         </ul>
       </nav>
     </header>
@@ -64,7 +69,7 @@
       <div class="footer-grid">
         <div class="footer-col">
           <h3>The Reality Check</h3>
-          <p>I’m not a financial advisor. This club is about sharing the journey of boring, disciplined wealth building. It’s a marathon, not a sprint. <a href="{{ '/disclaimer' | relative_url }}" style="text-decoration: underline;">Read the full disclaimer.</a></p>
+          <p>I’m not a financial advisor. This club is about sharing the journey of boring, disciplined wealth building. It’s a marathon, not a sprint. <a href="{{ '/disclaimer' | relative_url }}">Read the full disclaimer.</a></p>
         </div>
 
         <div class="footer-col">
@@ -76,14 +81,13 @@
           </ul>
         </div>
 
-      <div class="footer-col">
-  <h3>Stay Connected</h3>
-  <p style="margin-bottom: 2px; font-size: 0.85rem; opacity: 0.8;">Written by</p>
-  <p style="margin-top: 0;"><strong>{{ site.author.name }}</strong></p>
-  
-  <p><a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
-  <p><a href="https://instagram.com/{{ site.author.instagram }}" target="_blank">Instagram</a></p>
-</div>
+        <div class="footer-col">
+          <h3>Stay Connected</h3>
+          <p class="by-line">Written by</p>
+          <p class="author-name"><strong>{{ site.author.name }}</strong></p>
+          <p><a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
+          <p><a href="https://instagram.com/{{ site.author.instagram }}" target="_blank">Instagram</a></p>
+        </div>
       </div>
       
       <div class="footer-bottom">
@@ -97,7 +101,6 @@
     const icon = document.getElementById('theme-icon');
     const html = document.documentElement;
 
-    // Set icon based on current theme
     if (localStorage.getItem('theme') === 'dark') {
       icon.innerText = '☀️';
     }
