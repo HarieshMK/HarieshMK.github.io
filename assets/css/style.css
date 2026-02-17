@@ -182,16 +182,25 @@ footer {
   header h1 { font-size: 2rem; }
 }
 /* Newsletter Dark Mode Fix */
+.dark-theme .ml-embedded,
 .dark-theme .ml-form-embedWrapper {
-    background-color: #1e293b !important; /* Matches your blog cards */
+    background-color: #1e293b !important; /* Matches your Midnight Blog Cards */
     border: 1px solid #334155 !important;
 }
 
+/* Force the internal parts of the MailerLite form to be transparent */
 .dark-theme .ml-form-embedBody, 
-.dark-theme .ml-form-embedContainer {
+.dark-theme .ml-form-embedContainer,
+.dark-theme .ml-form-embedWrapper.embedDefault {
     background-color: transparent !important;
 }
 
+/* Make the text white inside the form */
+.dark-theme .ml-form-embedBody h4, 
+.dark-theme .ml-form-embedBody p,
+.dark-theme .ml-form-fieldRow label {
+    color: #ffffff !important;
+}
 /* This trick inverts the input fields and text to look "dark mode" */
 .dark-theme .ml-form-fieldRow input {
     background-color: #0f172a !important;
