@@ -217,7 +217,26 @@ footer {
 .dark-theme .comments p {
     color: #ffffff !important;
 }
+/* Fix for invisible Cusdis labels in Dark Mode */
+.dark-theme #cusdis_thread {
+    color: #ffffff !important;
+}
 
+/* This targets the internal labels if they are being rendered as standard text */
+.dark-theme .comments label,
+.dark-theme #cusdis_thread form label {
+    color: #cbd5e1 !important;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Ensure the text inputs have a subtle border so you can see where to click */
+.dark-theme #cusdis_thread input, 
+.dark-theme #cusdis_thread textarea {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #ffffff !important;
+}
 /* Force the Cusdis iframe to stay transparent */
 .dark-theme iframe[src*="cusdis"] {
     color-scheme: dark;
