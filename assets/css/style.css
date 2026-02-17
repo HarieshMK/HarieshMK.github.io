@@ -211,48 +211,57 @@ footer {
   .post-header h1 { font-size: 1.8rem; }
   hr { width: 80%; } /* Wider line on mobile for better visibility */
 }
-/* --- 8. REFINED DARK MODE (Clean & Professional) --- */
+/* --- REFINED DARK MODE (All White Text) --- */
 
-.dark-theme body {
-    background-color: #121212 !important; /* Deep charcoal, not pitch black */
-    color: #e0e0e0 !important; /* Soft white for easy reading */
-}
-
+.dark-theme body, 
 .dark-theme .container {
     background-color: #121212 !important;
-}
-
-/* Titles: Pure White for maximum clarity */
-.dark-theme h1, 
-.dark-theme h2, 
-.dark-theme h3, 
-.dark-theme header h1 a {
     color: #ffffff !important;
 }
 
-/* Navigation: Grey that turns White on hover */
+/* Force all headings and titles to White */
+.dark-theme h1, 
+.dark-theme h2, 
+.dark-theme h3, 
+.dark-theme h1 a,
+.dark-theme .post-card h3 a,
+.dark-theme .post-title {
+    color: #ffffff !important;
+}
+
+/* Target the Blog Card text specifically */
+.dark-theme .post-card, 
+.dark-theme .post-preview,
+.dark-theme .post-excerpt {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important; /* Slightly softer white for the summary text */
+    border-color: #333 !important;
+}
+
+/* Nav links: Light grey that turns White on hover */
 .dark-theme .nav-list a {
-    color: #b0b0b0 !important;
+    color: #cccccc !important;
 }
 
 .dark-theme .nav-list a:hover {
     color: #ffffff !important;
-}
-
-/* The Blog Cards: Subtle grey border so they don't "float" in space */
-.dark-theme .post-card, 
-.dark-theme .footer-col {
-    background-color: #1e1e1e !important;
-    border: 1px solid #333 !important;
-}
-
-/* Tagline: Muted grey */
-.dark-theme .tagline {
-    color: #888888 !important;
-}
-
-/* Keep red ONLY for the "Alert" feel on actual links or accents */
-.dark-theme a {
-    color: #ff4444 !important; 
     text-decoration: underline;
+}
+
+/* Footer columns */
+.dark-theme .footer-col, 
+.dark-theme .footer-col h3 {
+    color: #ffffff !important;
+}
+
+/* General links (like 'Read full disclaimer') */
+.dark-theme a {
+    color: #ffffff !important;
+    text-decoration: underline;
+}
+
+/* Tagline and dates */
+.dark-theme .tagline, 
+.dark-theme .post-date {
+    color: #aaaaaa !important;
 }
