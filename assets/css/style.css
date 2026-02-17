@@ -156,23 +156,38 @@ footer {
 .dark-theme body { background-color: #0f172a; color: #f8fafc; }
 .dark-theme .container { background: #0f172a; box-shadow: none; }
 
-.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h1 a { color: #ffffff !important; }
+/* Force ALL links and titles to be white, including home page cards */
+.dark-theme h1, .dark-theme h2, .dark-theme h3, 
+.dark-theme h1 a, .dark-theme .post-title, 
+.dark-theme .post-card h3, .dark-theme .post-card-link { 
+    color: #ffffff !important; 
+}
+
 .dark-theme .tagline { color: #94a3b8; }
 
-.dark-theme .post-card {
-  background: #1e293b !important;
-  border-color: #334155 !important;
+/* Ensure blog cards (and home cards) use the Navy background */
+.dark-theme .post-card, 
+.dark-theme .home-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Make card text white and remove any lingering red */
+.dark-theme .post-excerpt, 
+.dark-theme .post-content p {
+    color: #cbd5e1 !important;
 }
 
 .dark-theme .post-card:hover { border-color: #475569 !important; }
-.dark-theme .post-title { color: #ffffff !important; }
 
 .dark-theme #theme-toggle { background: #1e293b; border-color: #334155; }
 .dark-theme .nav-list li a { color: #94a3b8; }
 .dark-theme .nav-list li a:hover { color: #ffffff; }
 
 .dark-theme footer, .dark-theme .footer-bottom { border-color: #1e293b; }
-.dark-theme a { color: #38bdf8; } /* Premium soft blue links for dark mode */
+
+/* Premium soft blue links for standard body text */
+.dark-theme a { color: #38bdf8; }
 
 /* Mobile Tweaks */
 @media (max-width: 768px) {
@@ -183,32 +198,27 @@ footer {
 }
 /* Newsletter Dark Mode Fix */
 .dark-theme .ml-embedded,
-.dark-theme .ml-form-embedWrapper {
-    background-color: #1e293b !important; /* Matches your Midnight Blog Cards */
+.dark-theme .ml-form-embedWrapper,
+.dark-theme .ml-form-embedBody,
+.dark-theme .ml-form-embedContainer {
+    background-color: #1e293b !important; /* Matches your blog cards */
     border: 1px solid #334155 !important;
-}
-
-/* Force the internal parts of the MailerLite form to be transparent */
-.dark-theme .ml-form-embedBody, 
-.dark-theme .ml-form-embedContainer,
-.dark-theme .ml-form-embedWrapper.embedDefault {
-    background-color: transparent !important;
-}
-
-/* Make the text white inside the form */
-.dark-theme .ml-form-embedBody h4, 
-.dark-theme .ml-form-embedBody p,
-.dark-theme .ml-form-fieldRow label {
-    color: #ffffff !important;
-}
-/* This trick inverts the input fields and text to look "dark mode" */
-.dark-theme .ml-form-fieldRow input {
-    background-color: #0f172a !important;
-    color: #ffffff !important;
-    border-color: #334155 !important;
 }
 
 .dark-theme .ml-form-embedBody h4, 
 .dark-theme .ml-form-embedBody p {
     color: #ffffff !important;
+}
+
+/* Comments (Cusdis) Dark Mode Fix */
+/* This forces the 'Discussion' header to stay white in dark mode */
+.dark-theme #cusdis_thread,
+.dark-theme .comments h3,
+.dark-theme .comments p {
+    color: #ffffff !important;
+}
+
+/* Force the Cusdis iframe to stay transparent */
+.dark-theme iframe[src*="cusdis"] {
+    color-scheme: dark;
 }
