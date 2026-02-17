@@ -1,267 +1,183 @@
-/* ===== 1. CORE STYLES & TYPOGRAPHY ===== */
+/* ===== 1. CORE STYLES & PREMIUM TYPOGRAPHY ===== */
 body {
-  background-color: #f4f7f9; 
-  color: #2c3e50;            
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f8fafc; /* Lighter, cleaner background */
+  color: #334155; 
+  /* High-end font pairing */
+  font-family: 'Inter', -apple-system, sans-serif;
   font-size: 18px;
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0;
-  padding: 0 15px;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
-  max-width: 800px;         
-  margin: 40px auto;
+  max-width: 850px; /* Slightly wider for better reading breath */
+  margin: 0 auto;
   background: #ffffff;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 60px 50px; /* More white space = more premium */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
-h1, h2, h3 { color: #1a1a1a; }
-p { margin-bottom: 1.5em; }
-img { max-width: 100%; height: auto; border-radius: 4px; }
-
-hr {
-  border: 0;
-  border-top: 1px solid #eee;
-  margin: 40px auto;
-  width: 50%; /* Subtle centered divider */
+/* Financial Authority Font for Headings */
+h1, h2, h3 { 
+  font-family: 'Lora', serif; 
+  color: #0f172a; 
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
+
+p { margin-bottom: 1.6em; }
 
 /* ===== 2. HEADER & NAVIGATION ===== */
 header {
   text-align: center;
+  padding: 40px 0 30px 0;
+  border-bottom: 1px solid #f1f5f9;
   margin-bottom: 50px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 30px;
 }
 
-header h1 { font-size: 2.4rem; margin: 0; letter-spacing: -1px; }
-header h1 a { color: #1a1a1a; text-decoration: none; }
+header h1 { font-size: 2.8rem; margin: 0; }
+header h1 a { color: #0f172a; text-decoration: none; transition: color 0.2s; }
+header h1 a:hover { color: #ff4444; }
 
 header .tagline {
-  color: #666;
+  color: #64748b;
   font-size: 1.1rem;
-  margin: 10px auto 0;
-  max-width: 500px; 
-  line-height: 1.4;
+  font-style: italic;
+  margin: 10px auto 25px;
+  max-width: 550px;
+  line-height: 1.5;
+}
+
+/* Utility Bar (Theme Toggle) */
+.top-util-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 25px;
+  position: absolute;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#theme-toggle {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: 0.2s;
+}
+
+#theme-toggle:hover {
+  background: #e2e8f0;
+  transform: scale(1.1);
 }
 
 .nav-list {
   list-style: none;
   padding: 0;
-  margin: 25px 0 0;
+  margin: 0;
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 40px;
 }
 
 .nav-list li a {
   text-decoration: none;
-  color: #0056b3; 
+  color: #64748b;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  transition: 0.2s;
 }
 
 .nav-list li a:hover {
-  color: #003d7a;
-  border-bottom: 2px solid #0056b3;
+  color: #0f172a;
 }
 
-/* ===== 3. BLOG CARDS (Archive & Home) ===== */
+/* ===== 3. REFINED BLOG CARDS ===== */
 .post-card-link {
   display: block;
   text-decoration: none;
   color: inherit;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .post-card {
-  padding: 25px;
-  border: 1px solid #eef2f6;
-  border-radius: 10px;
+  padding: 30px;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px; /* Sharper corners = more modern/professional */
   background: #fff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-  border-color: #d1d9e0;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  border-color: #e2e8f0;
 }
 
-.post-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; display: block; }
-.post-date { font-size: 0.85rem; color: #888; margin-bottom: 12px; display: block; }
+.post-title { font-size: 1.4rem; margin-bottom: 10px; display: block; }
+.post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
-.home-card { padding: 15px 20px !important; margin-bottom: 15px; }
-.home-card .post-title { font-size: 1.1rem !important; }
-.home-card .post-excerpt { font-size: 0.85rem; line-height: 1.4; }
-
-/* ===== 4. INDIVIDUAL POST CONTENT ===== */
-.post-header { margin-bottom: 40px; }
-.post-header h1 { font-size: 2.5rem; line-height: 1.2; margin: 10px 0; }
-.post-meta { color: #777; font-size: 0.95rem; }
-
-.back-link {
-  display: inline-block;
-  font-size: 0.9rem;
-  text-decoration: none;
-  color: #0056b3;
-  margin-bottom: 15px;
-}
-
-.entry-content { font-size: 1.1rem; line-height: 1.8; }
-.entry-content h2, .entry-content h3 { margin-top: 2em; }
-
-.entry-content blockquote, .disclaimer-box {
-  border-left: 4px solid #0056b3;
-  margin: 30px 0;
-  padding: 10px 25px;
-  background: #f9f9f9;
-  font-style: italic;
-}
-.entry-content > *:last-child { margin-bottom: 0; } 
-
-/* ===== 5. REFINED NEWSLETTER (The Ultra-Compact Version) ===== */
-.subscribe-box {
-  margin: 0 auto !important; /* Removes the massive outer gaps */
-  padding: 20px 0 !important; /* Tightens the internal space */
-  border-top: 1px solid #eee; 
-  border-bottom: 1px solid #eee;
-  background: transparent !important; 
-  text-align: center;
-}
-
-/* This targets the specific spacing MailerLite injects via Javascript */
-.ml-embedded, 
-.ml-form-embedWrapper, 
-.ml-form-embedBody,
-.ml-form-embedContainer,
-.ml-form-embedWrapper.embedDefault {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  background-color: transparent !important;
-}
-/* Make the Discussion section feel closer to the content */
-.comments {
-  margin-top: 20px;
-  padding-top: 20px;
-}
-
-.comments h3 { font-size: 1.2rem; color: #333; margin-bottom: 10px; }
-.comments p { font-size: 0.85rem; color: #666; margin-bottom: 25px; }
-
-/* ===== REFINED CUSDIS FIX (No Extra Space) ===== */
-
-/* 1. Set a tighter starting height to reduce empty space */
-#cusdis_thread iframe {
-  width: 100% !important;
-  min-height: 380px !important; /* Shrunk from 500px to 380px */
-  border: none !important;
-  overflow: hidden !important; 
-  display: block !important;
-}
-
-/* 2. Remove the massive expansion - let it grow naturally */
-#cusdis_thread:focus-within iframe {
-  min-height: 450px !important; 
-  transition: min-height 0.2s ease;
-}
-
-/* ===== 6. FOOTER ===== */
+/* ===== 4. FOOTER (Stay Connected Fix) ===== */
 footer {
-  margin-top: 40px !important; /* Shrunk from 80px to 40px */
-  padding-top: 40px;
-  border-top: 2px solid #eee;
+  margin-top: 60px;
+  padding-top: 50px;
+  border-top: 1px solid #f1f5f9;
 }
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr; 
-  gap: 40px;
-  text-align: left; 
-  margin-bottom: 40px;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 50px;
+  margin-bottom: 50px;
 }
 
-.footer-col h3 { font-size: 1rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-.footer-links { list-style: none; padding: 0; margin: 0; }
-.footer-links li { margin-bottom: 8px; }
-.footer-links li a, .footer-col a { text-decoration: none; color: #555; }
-.footer-links li a:hover, .footer-col a:hover { color: #0056b3; text-decoration: underline; }
+.by-line { margin: 0; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+.author-name { margin-top: 0; font-size: 1.2rem; }
 
 .footer-bottom {
   text-align: center;
-  padding: 20px 0;
-  border-top: 1px solid #f0f0f0;
-  color: #999;
-  font-size: 0.8rem;
+  padding: 30px 0;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.85rem;
+  color: #94a3b8;
 }
 
-/* ===== 7. MOBILE RESPONSIVENESS ===== */
-@media (max-width: 600px) {
-  .container { padding: 20px; margin: 20px auto; }
-  header h1 { font-size: 1.8rem; }
-  .nav-list { gap: 15px; flex-wrap: wrap; }
+/* ===== 5. PREMIUM DARK MODE (Midnight) ===== */
+.dark-theme body { background-color: #0f172a; color: #f8fafc; }
+.dark-theme .container { background: #0f172a; box-shadow: none; }
+
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h1 a { color: #ffffff !important; }
+.dark-theme .tagline { color: #94a3b8; }
+
+.dark-theme .post-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark-theme .post-card:hover { border-color: #475569 !important; }
+.dark-theme .post-title { color: #ffffff !important; }
+
+.dark-theme #theme-toggle { background: #1e293b; border-color: #334155; }
+.dark-theme .nav-list li a { color: #94a3b8; }
+.dark-theme .nav-list li a:hover { color: #ffffff; }
+
+.dark-theme footer, .dark-theme .footer-bottom { border-color: #1e293b; }
+.dark-theme a { color: #38bdf8; } /* Premium soft blue links for dark mode */
+
+/* Mobile Tweaks */
+@media (max-width: 768px) {
+  .container { padding: 30px 20px; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
-  .post-header h1 { font-size: 1.8rem; }
-  hr { width: 80%; } /* Wider line on mobile for better visibility */
-}
-/* --- REFINED DARK MODE (All White Text) --- */
-
-.dark-theme body, 
-.dark-theme .container {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-}
-
-/* Force all headings and titles to White */
-.dark-theme h1, 
-.dark-theme h2, 
-.dark-theme h3, 
-.dark-theme h1 a,
-.dark-theme .post-card h3 a,
-.dark-theme .post-title {
-    color: #ffffff !important;
-}
-
-/* Target the Blog Card text specifically */
-.dark-theme .post-card, 
-.dark-theme .post-preview,
-.dark-theme .post-excerpt {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important; /* Slightly softer white for the summary text */
-    border-color: #333 !important;
-}
-
-/* Nav links: Light grey that turns White on hover */
-.dark-theme .nav-list a {
-    color: #cccccc !important;
-}
-
-.dark-theme .nav-list a:hover {
-    color: #ffffff !important;
-    text-decoration: underline;
-}
-
-/* Footer columns */
-.dark-theme .footer-col, 
-.dark-theme .footer-col h3 {
-    color: #ffffff !important;
-}
-
-/* General links (like 'Read full disclaimer') */
-.dark-theme a {
-    color: #ffffff !important;
-    text-decoration: underline;
-}
-
-/* Tagline and dates */
-.dark-theme .tagline, 
-.dark-theme .post-date {
-    color: #aaaaaa !important;
+  .top-util-bar { padding: 10px; }
+  header h1 { font-size: 2rem; }
 }
