@@ -1,8 +1,7 @@
 /* ===== 1. CORE STYLES & PREMIUM TYPOGRAPHY ===== */
 body {
-  background-color: #f8fafc; /* Lighter, cleaner background */
+  background-color: #f8fafc;
   color: #334155; 
-  /* High-end font pairing */
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 18px;
   line-height: 1.7;
@@ -12,14 +11,13 @@ body {
 }
 
 .container {
-  max-width: 850px; /* Slightly wider for better reading breath */
+  max-width: 850px;
   margin: 0 auto;
   background: #ffffff;
-  padding: 60px 50px; /* More white space = more premium */
+  padding: 60px 50px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
-/* Financial Authority Font for Headings */
 h1, h2, h3 { 
   font-family: 'Lora', serif; 
   color: #0f172a; 
@@ -50,7 +48,6 @@ header .tagline {
   line-height: 1.5;
 }
 
-/* Utility Bar (Theme Toggle) */
 .top-util-bar {
   display: flex;
   justify-content: flex-end;
@@ -58,6 +55,7 @@ header .tagline {
   position: absolute;
   width: 100%;
   box-sizing: border-box;
+  z-index: 10;
 }
 
 #theme-toggle {
@@ -72,11 +70,6 @@ header .tagline {
   cursor: pointer;
   font-size: 1.2rem;
   transition: 0.2s;
-}
-
-#theme-toggle:hover {
-  background: #e2e8f0;
-  transform: scale(1.1);
 }
 
 .nav-list {
@@ -95,11 +88,6 @@ header .tagline {
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  transition: 0.2s;
-}
-
-.nav-list li a:hover {
-  color: #0f172a;
 }
 
 /* ===== 3. REFINED BLOG CARDS ===== */
@@ -110,10 +98,10 @@ header .tagline {
   margin-bottom: 25px;
 }
 
-.post-card {
+.post-card, .home-card {
   padding: 30px;
   border: 1px solid #f1f5f9;
-  border-radius: 8px; /* Sharper corners = more modern/professional */
+  border-radius: 8px;
   background: #fff;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -121,13 +109,12 @@ header .tagline {
 .post-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0,0,0,0.06);
-  border-color: #e2e8f0;
 }
 
 .post-title { font-size: 1.4rem; margin-bottom: 10px; display: block; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
-/* ===== 4. FOOTER (Stay Connected Fix) ===== */
+/* ===== 4. FOOTER & STAY CONNECTED FIX ===== */
 footer {
   margin-top: 60px;
   padding-top: 50px;
@@ -141,8 +128,23 @@ footer {
   margin-bottom: 50px;
 }
 
-.by-line { margin: 0; font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-.author-name { margin-top: 0; font-size: 1.2rem; }
+/* Tighten footer vertical spacing */
+.footer-col p {
+    margin-bottom: 10px;
+}
+
+.by-line { 
+    margin: 0 !important; 
+    font-size: 0.75rem !important; 
+    color: #94a3b8; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}
+
+.author-name { 
+    margin: 0 0 12px 0 !important; 
+    font-size: 1.2rem; 
+}
 
 .footer-bottom {
   text-align: center;
@@ -156,52 +158,29 @@ footer {
 .dark-theme body { background-color: #0f172a; color: #f8fafc; }
 .dark-theme .container { background: #0f172a; box-shadow: none; }
 
-/* Force ALL links and titles to be white, including home page cards */
 .dark-theme h1, .dark-theme h2, .dark-theme h3, 
 .dark-theme h1 a, .dark-theme .post-title, 
 .dark-theme .post-card h3, .dark-theme .post-card-link { 
     color: #ffffff !important; 
 }
 
-.dark-theme .tagline { color: #94a3b8; }
-
-/* Ensure blog cards (and home cards) use the Navy background */
-.dark-theme .post-card, 
-.dark-theme .home-card {
+.dark-theme .post-card, .dark-theme .home-card {
     background: #1e293b !important;
     border-color: #334155 !important;
 }
 
-/* Make card text white and remove any lingering red */
-.dark-theme .post-excerpt, 
-.dark-theme .post-content p {
+.dark-theme .post-excerpt, .dark-theme .post-content p {
     color: #cbd5e1 !important;
 }
 
-.dark-theme .post-card:hover { border-color: #475569 !important; }
-
-.dark-theme #theme-toggle { background: #1e293b; border-color: #334155; }
-.dark-theme .nav-list li a { color: #94a3b8; }
-.dark-theme .nav-list li a:hover { color: #ffffff; }
-
-.dark-theme footer, .dark-theme .footer-bottom { border-color: #1e293b; }
-
-/* Premium soft blue links for standard body text */
 .dark-theme a { color: #38bdf8; }
 
-/* Mobile Tweaks */
-@media (max-width: 768px) {
-  .container { padding: 30px 20px; }
-  .footer-grid { grid-template-columns: 1fr; gap: 30px; }
-  .top-util-bar { padding: 10px; }
-  header h1 { font-size: 2rem; }
-}
-/* Newsletter Dark Mode Fix */
+/* Newsletter & Comments Dark Mode Fixes */
 .dark-theme .ml-embedded,
 .dark-theme .ml-form-embedWrapper,
 .dark-theme .ml-form-embedBody,
 .dark-theme .ml-form-embedContainer {
-    background-color: #1e293b !important; /* Matches your blog cards */
+    background-color: #1e293b !important;
     border: 1px solid #334155 !important;
 }
 
@@ -210,34 +189,29 @@ footer {
     color: #ffffff !important;
 }
 
-/* Comments (Cusdis) Dark Mode Fix */
-/* This forces the 'Discussion' header to stay white in dark mode */
-.dark-theme #cusdis_thread,
-.dark-theme .comments h3,
-.dark-theme .comments p {
-    color: #ffffff !important;
-}
-/* Fix for invisible Cusdis labels in Dark Mode */
-.dark-theme #cusdis_thread {
-    color: #ffffff !important;
-}
+/* Cusdis Labels & Inputs Fix */
+.dark-theme #cusdis_thread { color: #ffffff !important; }
 
-/* This targets the internal labels if they are being rendered as standard text */
 .dark-theme .comments label,
 .dark-theme #cusdis_thread form label {
     color: #cbd5e1 !important;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
 }
 
-/* Ensure the text inputs have a subtle border so you can see where to click */
 .dark-theme #cusdis_thread input, 
 .dark-theme #cusdis_thread textarea {
     background-color: #1e293b !important;
     border: 1px solid #334155 !important;
     color: #ffffff !important;
 }
-/* Force the Cusdis iframe to stay transparent */
-.dark-theme iframe[src*="cusdis"] {
-    color-scheme: dark;
+
+.dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
+
+/* Mobile Tweaks */
+@media (max-width: 768px) {
+  .container { padding: 30px 20px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+  header h1 { font-size: 2rem; }
 }
