@@ -105,16 +105,22 @@
       icon.innerText = '☀️';
     }
 
-    toggleBtn.onclick = function() {
-      html.classList.toggle('dark-theme');
-      if (html.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark');
-        icon.innerText = '☀️';
-      } else {
-        localStorage.setItem('theme', 'light');
-        icon.innerText = '🌙';
-      }
-    }
+  toggleBtn.onclick = function() {
+  html.classList.toggle('dark-theme');
+  
+  // New line to tell Cusdis to switch colors
+  if (window.CUSDIS) {
+    window.CUSDIS.setTheme(html.classList.contains('dark-theme') ? 'dark' : 'light');
+  }
+
+  if (html.classList.contains('dark-theme')) {
+    localStorage.setItem('theme', 'dark');
+    icon.innerText = '☀️';
+  } else {
+    localStorage.setItem('theme', 'light');
+    icon.innerText = '🌙';
+  }
+}
   </script>
 </body>
 </html>
