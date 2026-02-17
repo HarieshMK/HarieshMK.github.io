@@ -211,3 +211,41 @@ footer {
   .post-header h1 { font-size: 1.8rem; }
   hr { width: 80%; } /* Wider line on mobile for better visibility */
 }
+/* --- DARK MODE STYLES --- */
+
+/* Smooth switch transition */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Theme Overrides */
+.dark-theme body {
+    background-color: #0d0d0d !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .container {
+    background-color: #0d0d0d !important;
+}
+
+/* Headers and Links in Dark Mode */
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme .tagline {
+    color: #ffffff !important;
+}
+
+.dark-theme a {
+    color: #ff4444 !important;
+}
+
+/* Navigation & Footer Adjustments */
+.dark-theme header, .dark-theme footer {
+    border-color: #333 !important;
+}
+
+.dark-theme .nav-list a {
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .nav-list a:hover {
+    color: #ff4444 !important;
+}
