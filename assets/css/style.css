@@ -181,3 +181,25 @@ footer {
   .top-util-bar { padding: 10px; }
   header h1 { font-size: 2rem; }
 }
+/* Newsletter Dark Mode Fix */
+.dark-theme .ml-form-embedWrapper {
+    background-color: #1e293b !important; /* Matches your blog cards */
+    border: 1px solid #334155 !important;
+}
+
+.dark-theme .ml-form-embedBody, 
+.dark-theme .ml-form-embedContainer {
+    background-color: transparent !important;
+}
+
+/* This trick inverts the input fields and text to look "dark mode" */
+.dark-theme .ml-form-fieldRow input {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+}
+
+.dark-theme .ml-form-embedBody h4, 
+.dark-theme .ml-form-embedBody p {
+    color: #ffffff !important;
+}
