@@ -27,7 +27,7 @@ h1, h2, h3 {
 
 p { margin-bottom: 1.6em; }
 
-/* ===== 2. HEADER & INTERACTIVE NAVIGATION ===== */
+/* ===== 2. HEADER & ELEVATED NAVIGATION ===== */
 header {
   text-align: center;
   padding: 40px 0 30px 0;
@@ -76,31 +76,35 @@ header .tagline {
   margin: 0;
   display: flex;
   justify-content: center;
-  gap: 40px;
+  gap: 20px; /* Tighter gap for the tab look */
 }
 
 .nav-list li a {
   text-decoration: none;
   color: #64748b;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  padding-bottom: 4px;
-  border-bottom: 2px solid transparent; 
-  transition: all 0.3s ease;
+  letter-spacing: 1.2px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
 }
 
 .nav-list li a:hover {
   color: #38bdf8;
-  border-bottom: 2px solid #38bdf8;
-  transform: translateY(-1px);
+  background: #f1f5f9;
+  transform: translateY(-2px);
 }
 
-/* THE ACTIVE STATE - Highlights the current page */
+/* THE ACTIVE STATE - Mimics the blog card elevation effect */
 .nav-list li a.active {
-  color: #0f172a; 
-  border-bottom: 2px solid #38bdf8;
+  color: #0f172a !important;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* The lift effect */
+  border: 1px solid #e2e8f0;
+  transform: translateY(-2px);
   pointer-events: none;
 }
 
@@ -268,8 +272,15 @@ footer {
     border-radius: 8px;
 }
 
-.dark-theme .nav-list li a.active { color: #ffffff !important; border-bottom-color: #38bdf8; }
-.dark-theme .nav-list li a:hover { color: #38bdf8; border-bottom-color: #38bdf8; }
+/* Dark mode active state elevation */
+.dark-theme .nav-list li a.active { 
+    background: #1e293b !important; 
+    color: #ffffff !important; 
+    border-color: #475569 !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+}
+
+.dark-theme .nav-list li a:hover { color: #38bdf8; background: #1e293b; }
 
 .dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p, .dark-theme .ml-form-embedContent p, .dark-theme .ml-form-embedContent h4, .dark-theme .ml-form-successBody h4 { color: #ffffff !important; }
 
@@ -290,7 +301,6 @@ footer {
 .dark-theme .post-footer::before { color: #94a3b8; }
 
 /* DISCUSSION SECTION FIX */
-.dark-theme #cusdis_thread { color: #ffffff !important; }
 .dark-theme #cusdis_thread label, .dark-theme .comments label, .dark-theme #cusdis_thread span { color: #ffffff !important; opacity: 1 !important; }
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
 
@@ -307,11 +317,7 @@ footer {
 /* Mobile Tweaks */
 @media (max-width: 768px) {
   .container { padding: 30px 20px; }
-  .footer-grid { grid-template-columns: 1fr; gap: 20px; }
-  header h1 { font-size: 2rem; }
-  .nav-list { gap: 20px; }
-  .post-nav { flex-direction: column; }
-  .nav-prev, .nav-next { width: 100%; }
+  .nav-list { gap: 10px; }
 }
 
 #cusdis_thread button {
