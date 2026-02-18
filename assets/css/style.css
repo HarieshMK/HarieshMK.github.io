@@ -68,9 +68,7 @@ header .tagline {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-#theme-toggle:hover {
-  transform: scale(1.1) rotate(15deg);
-}
+#theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
 
 .nav-list {
   list-style: none;
@@ -128,10 +126,7 @@ footer {
   margin-bottom: 50px;
 }
 
-.footer-col p {
-    margin: 0 0 8px 0 !important; 
-    line-height: 1.4;
-}
+.footer-col p { margin: 0 0 8px 0 !important; line-height: 1.4; }
 
 .by-line { 
     margin: 0 0 2px 0 !important; 
@@ -142,18 +137,9 @@ footer {
     opacity: 0.7;
 }
 
-.author-name { 
-    margin: 0 0 12px 0 !important; 
-    font-size: 1.2rem; 
-    display: block;
-}
+.author-name { margin: 0 0 12px 0 !important; font-size: 1.2rem; display: block; }
 
-.footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
+.footer-links { list-style: none; padding: 0; margin: 0; }
 .footer-links li { margin-bottom: 8px; }
 
 .footer-bottom {
@@ -164,18 +150,31 @@ footer {
   color: #94a3b8;
 }
 
-/* ===== 5. POST NAVIGATION STYLES ===== */
+/* ===== 5. THE HOOK (Post Navigation & View All) ===== */
 .post-footer {
-  margin-top: 60px;
-  padding-top: 40px;
+  margin-top: 40px;
+  padding-top: 20px;
   border-top: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+/* Your custom hook header */
+.post-footer::before {
+    content: "Why stop now? More lessons below:";
+    display: block;
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 25px;
+    font-weight: 600;
+    font-style: italic;
 }
 
 .post-nav {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
+  text-align: left;
 }
 
 .nav-prev, .nav-next { flex: 1; width: 50%; }
@@ -212,83 +211,66 @@ footer {
   line-height: 1.3;
 }
 
+/* Clean "View All" Button Transition */
 .back-to-blog-container {
-  text-align: center;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 30px;
+  border-top: none; /* Removed the awkward line */
+  padding-top: 10px;
 }
 
-/* ===== 6. PREMIUM DARK MODE (Balanced Theme) ===== */
-.dark-theme body { 
-  background-color: #0b1120; 
-  color: #e2e8f0; 
+.back-to-blog-container a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0f172a;
+    border-bottom: 2px solid #38bdf8;
+    padding-bottom: 2px;
+    transition: all 0.3s ease;
 }
 
-.dark-theme .container { 
-  background: #0f172a; 
+.back-to-blog-container a:hover {
+    color: #38bdf8;
+    border-bottom-color: #0f172a;
 }
 
-.dark-theme .post-card, 
-.dark-theme .home-card,
-.dark-theme .nav-link,
-.dark-theme .ml-embedded,
-.dark-theme .ml-form-embedWrapper,
-.dark-theme .ml-form-embedBody,
-.dark-theme .ml-form-embedContainer {
+/* ===== 6. PREMIUM DARK MODE ===== */
+.dark-theme body { background-color: #0b1120; color: #e2e8f0; }
+.dark-theme .container { background: #0f172a; }
+
+.dark-theme .post-card, .dark-theme .home-card, .dark-theme .nav-link, .dark-theme .ml-embedded, .dark-theme .ml-form-embedWrapper, .dark-theme .ml-form-embedBody, .dark-theme .ml-form-embedContainer {
     background-color: #1e293b !important;
     border: 1px solid #334155 !important;
     border-radius: 8px;
 }
 
-/* Newsletter text visibility */
-.dark-theme .ml-form-embedBody h4, 
-.dark-theme .ml-form-embedBody p,
-.dark-theme .ml-form-embedContent p,
-.dark-theme .ml-form-embedContent h4,
-.dark-theme .ml-form-successBody h4 { 
-    color: #ffffff !important; 
-}
+.dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p, .dark-theme .ml-form-embedContent p, .dark-theme .ml-form-embedContent h4, .dark-theme .ml-form-successBody h4 { color: #ffffff !important; }
 
-/* Restoration of the White Email & Comment Input Boxes */
-.dark-theme .ml-form-embedBody .form-control,
-.dark-theme #cusdis_thread input, 
-.dark-theme #cusdis_thread textarea {
+.dark-theme .ml-form-embedBody .form-control, .dark-theme #cusdis_thread input, .dark-theme #cusdis_thread textarea {
     background-color: #ffffff !important;
     color: #0f172a !important; 
     border: 2px solid #38bdf8 !important;
 }
 
-.dark-theme h1, .dark-theme h2, .dark-theme h3, 
-.dark-theme h1 a, .dark-theme .post-title,
-.dark-theme .nav-title, .dark-theme strong { 
-    color: #ffffff !important; 
-}
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h1 a, .dark-theme .post-title, .dark-theme .nav-title, .dark-theme strong, .dark-theme .back-to-blog-container a { color: #ffffff !important; }
 
 .dark-theme a { color: #38bdf8; }
 .dark-theme .back-link { color: #cbd5e1; }
 .dark-theme .back-link:hover { color: #ffffff; }
 
-.dark-theme #theme-toggle {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(10px);
-    border-color: #475569;
-    color: #fbbf24;
-}
+.dark-theme #theme-toggle { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-color: #475569; color: #fbbf24; }
 
-/* DISCUSSION SECTION FIX - BRIGHT TEXT ON DARK BACKGROUND */
+.dark-theme .post-footer::before { color: #94a3b8; }
+
+/* DISCUSSION SECTION FIX */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
-.dark-theme #cusdis_thread label, 
-.dark-theme .comments label { 
-    color: #ffffff !important; /* Forces Nickname/Email/Reply labels to be white */
-    opacity: 1 !important;
-}
+.dark-theme #cusdis_thread label, .dark-theme .comments label { color: #ffffff !important; opacity: 1 !important; }
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
 
 #cusdis_thread iframe {
     width: 100% !important;
-    min-height: 450px !important; 
+    min-height: 200px !important; 
     border: none !important;
     display: block !important;
+    overflow: hidden !important;
 }
 
 /* Mobile Tweaks */
@@ -311,7 +293,4 @@ footer {
     transition: transform 0.2s ease !important;
 }
 
-#cusdis_thread button:hover {
-    transform: translateY(-2px) !important;
-    background: #ffffff !important;
-}
+#cusdis_thread button:hover { transform: translateY(-2px) !important; background: #ffffff !important; }
