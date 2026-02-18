@@ -215,3 +215,50 @@ footer {
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
   header h1 { font-size: 2rem; }
 }
+/* ===== 1. DISCUSSION SCROLLBAR FIX ===== */
+/* Remove the forced height that causes the scrollbar */
+#cusdis_thread iframe {
+    width: 100% !important;
+    min-height: 450px !important; 
+    border: none !important;
+    overflow: hidden !important; /* Prevents double scrollbars */
+    display: block !important;
+}
+
+/* ===== 2. FOOTER ALIGNMENT & SPACING FIX ===== */
+/* This targets the 'Stay Connected' column specifically to match the 'Explore' list */
+.footer-col p {
+    margin: 0 0 8px 0 !important; /* Reduces gap to match the list item spacing */
+    line-height: 1.4;
+}
+
+/* Remove the extra gap specifically after your name */
+.author-name {
+    margin-bottom: 5px !important;
+    display: block;
+}
+
+/* Align the "Written By" label perfectly */
+.by-line {
+    margin-bottom: 2px !important;
+    opacity: 0.7;
+    font-size: 0.75rem;
+}
+
+/* Ensure the Explore list doesn't have extra padding shifting it */
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 8px; /* Matches the 8px margin we gave the paragraphs */
+}
+
+/* ===== 3. MOBILE FOOTER FIX ===== */
+@media (max-width: 768px) {
+    .footer-grid {
+        gap: 20px; /* Reduces vertical gap between columns on mobile */
+    }
+}
