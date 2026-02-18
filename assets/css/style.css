@@ -1,6 +1,6 @@
 /* ===== 1. CORE STYLES & PREMIUM TYPOGRAPHY ===== */
 body {
-  background-color: #f8fafc; /* Light Grey background */
+  background-color: #f8fafc;
   color: #334155; 
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 18px;
@@ -13,7 +13,7 @@ body {
 .container {
   max-width: 850px;
   margin: 0 auto;
-  background: #ffffff; /* Pure White card pop */
+  background: #ffffff;
   padding: 60px 50px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
@@ -48,7 +48,6 @@ header .tagline {
   line-height: 1.5;
 }
 
-/* Floating Theme Toggle - Now accessible anywhere */
 #theme-toggle {
   position: fixed;
   bottom: 30px;
@@ -155,9 +154,7 @@ footer {
     margin: 0;
 }
 
-.footer-links li {
-    margin-bottom: 8px;
-}
+.footer-links li { margin-bottom: 8px; }
 
 .footer-bottom {
   text-align: center;
@@ -181,11 +178,7 @@ footer {
   margin-bottom: 40px;
 }
 
-.nav-prev, .nav-next {
-  flex: 1;
-  width: 50%;
-}
-
+.nav-prev, .nav-next { flex: 1; width: 50%; }
 .nav-next { text-align: right; }
 
 .nav-link {
@@ -225,59 +218,40 @@ footer {
   padding-top: 30px;
 }
 
-/* ===== 6. PREMIUM DARK MODE (Layered depth) ===== */
-/* Base site background - Darkest */
+/* ===== 6. PREMIUM DARK MODE (High Contrast Edition) ===== */
 .dark-theme body { 
   background-color: #0b1120; 
-  color: #94a3b8; 
+  color: #e2e8f0; /* Brighter Snowy Slate for blog and about text */
 }
 
-/* Main content area - Medium depth */
 .dark-theme .container { 
   background: #0f172a; 
   box-shadow: none; 
 }
 
-/* Cards & Secondary boxes - Lightest depth (The Pop) */
 .dark-theme .post-card, 
 .dark-theme .home-card,
 .dark-theme .nav-link,
-.dark-theme .ml-embedded,
-.dark-theme #cusdis_thread input, 
-.dark-theme #cusdis_thread textarea {
+.dark-theme .ml-embedded {
     background: #1e293b !important;
     border-color: #334155 !important;
-    color: #f8fafc !important;
 }
 
 .dark-theme h1, .dark-theme h2, .dark-theme h3, 
 .dark-theme h1 a, .dark-theme .post-title,
-.dark-theme .nav-title { 
+.dark-theme .nav-title, .dark-theme strong { 
     color: #ffffff !important; 
 }
 
-.dark-theme a { color: #38bdf8; }
-.dark-theme .back-link { color: #94a3b8; }
-.dark-theme .back-link:hover { color: #ffffff; }
-
-/* Adjusted Toggle for Dark Mode */
-.dark-theme #theme-toggle {
-    background: rgba(30, 41, 59, 0.7); /* Translucent glass */
-    backdrop-filter: blur(10px);
-    border-color: #475569;
-    color: #fbbf24;
+/* Restoration of the White Email & Comment Boxes */
+.dark-theme .ml-form-embedBody .form-control,
+.dark-theme #cusdis_thread input, 
+.dark-theme #cusdis_thread textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important; 
+    border: 2px solid #38bdf8 !important;
 }
 
-/* Misc Dark Mode Alignment */
-.dark-theme .post-footer, 
-.dark-theme .back-to-blog-container,
-.dark-theme header,
-.dark-theme footer,
-.dark-theme .footer-bottom { 
-    border-color: #1e293b !important; 
-}
-
-/* Newsletter Fix: Explicitly targeting MailerLite Text */
 .dark-theme .ml-form-embedBody h4, 
 .dark-theme .ml-form-embedBody p,
 .dark-theme .ml-form-embedContent p,
@@ -286,48 +260,27 @@ footer {
     color: #ffffff !important; 
 }
 
-/* Dark Mode Form Inputs */
-.dark-theme .ml-form-embedBody .form-control {
-    background-color: #0b1120 !important;
-    color: #ffffff !important;
-    border: 1px solid #334155 !important;
+.dark-theme a { color: #38bdf8; }
+.dark-theme .back-link { color: #cbd5e1; }
+.dark-theme .back-link:hover { color: #ffffff; }
+
+.dark-theme #theme-toggle {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border-color: #475569;
+    color: #fbbf24;
 }
 
-/* Discussion / Cusdis Dark Overrides */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
-.dark-theme .comments label { color: #cbd5e1 !important; }
+.dark-theme .comments label { color: #e2e8f0 !important; }
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
 
-/* Discussion Scrollbar Fix */
 #cusdis_thread iframe {
     width: 100% !important;
     min-height: 450px !important; 
     border: none !important;
     overflow: hidden !important;
     display: block !important;
-}
-/* Specific Fix for About Page Newsletter Embed */
-.dark-theme .ml-embedded,
-.dark-theme .ml-form-embedWrapper,
-.dark-theme .ml-form-embedBody,
-.dark-theme .ml-form-embedContainer,
-.dark-theme .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedContent {
-    background-color: #1e293b !important; /* Your "Pop" Layer color */
-    border: 1px solid #334155 !important;
-}
-
-/* Force the text inside the embed to be visible */
-.dark-theme .ml-form-embedBody h4, 
-.dark-theme .ml-form-embedBody p,
-.dark-theme .ml-form-successBody h4 {
-    color: #ffffff !important;
-}
-
-/* Fix the Input field inside the embed */
-.dark-theme .ml-form-embedBody .form-control {
-    background-color: #0f172a !important; /* Darker input */
-    color: #ffffff !important;
-    border: 1px solid #334155 !important;
 }
 
 /* Mobile Tweaks */
@@ -338,9 +291,10 @@ footer {
   .post-nav { flex-direction: column; }
   .nav-prev, .nav-next { width: 100%; }
 }
+
 /* Premium Button Styling for Comments */
 #cusdis_thread button {
-    background: #38bdf8 !important; /* Matches your blue link color */
+    background: #38bdf8 !important; 
     color: #0f172a !important;
     border: none !important;
     border-radius: 6px !important;
