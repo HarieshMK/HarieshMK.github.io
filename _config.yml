@@ -1,17 +1,17 @@
 # Site Settings
 title: Unexciting Money Club
-description: "Real-life finance for long-term thinkers. <br> No hype, no shortcuts—just boring decisions."
+description: "Real-life finance for long-term thinkers. No hype, no shortcuts—just boring decisions."
 url: "https://harieshmk.github.io/" 
-baseurl: "" # Leave empty if your site is the main repository
+baseurl: "" 
 
-# Author Settings (Helps with Trust/E-E-A-T)
+# Author Settings
 author:
   name: "Hariesh Murugan"
   email: "itzhariesh@gmail.com"
   instagram: "unexciting_money_club"
 
 # Build Settings
-permalink: /blog/:title/  # Simplified: shorter URLs usually rank better
+permalink: /blog/:title/
 exclude:
   - Gemfile
   - Gemfile.lock
@@ -21,7 +21,4 @@ exclude:
 # Plugins
 plugins:
   - jekyll-feed
-  - jekyll-seo-tag # I highly recommend adding this one!
-
-# Future-proofing
-show_downloads: false
+  - jekyll-seo-tag
