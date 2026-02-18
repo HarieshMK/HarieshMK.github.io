@@ -33,9 +33,9 @@ p { margin-bottom: 1.6em; }
 /* ===== 2. HEADER & ELEVATED NAVIGATION ===== */
 header {
   text-align: center;
-  padding: 40px 0 20px 0; /* Tightened */
+  padding: 40px 0 20px 0;
   border-bottom: 1px solid #f1f5f9;
-  margin-bottom: 40px; /* Reduced from 50px */
+  margin-bottom: 40px;
 }
 
 header h1 { font-size: 2.8rem; margin: 0; }
@@ -94,7 +94,6 @@ header .tagline {
   border: 1px solid transparent;
 }
 
-/* Nav Hover State Fix */
 .nav-list li a:hover {
   color: #38bdf8;
   background: #f8fafc;
@@ -108,7 +107,7 @@ header .tagline {
   transform: translateY(-3px);
 }
 
-/* ===== 3. BLOG CARDS & LISTS ===== */
+/* ===== 3. BLOG CARDS & LISTS (Uniform Hover Effect) ===== */
 .post-card-link {
   display: block;
   text-decoration: none !important;
@@ -124,25 +123,33 @@ header .tagline {
   transition: all 0.3s ease;
 }
 
-.post-card:hover {
+/* Light Mode Card Hover */
+.post-card-link:hover .post-card, 
+.post-card-link:hover .home-card {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  border-color: #38bdf8;
 }
 
-.post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; }
+/* Title turns blue on card hover for both modes */
+.post-card-link:hover .post-title {
+  color: #38bdf8 !important;
+}
+
+.post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; transition: color 0.3s ease; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
-/* ===== 4. FOOTER GRID (Significant Spacing Reduction) ===== */
+/* ===== 4. FOOTER GRID ===== */
 footer {
-  margin-top: 30px; /* Reduced from 40px */
-  padding-top: 30px; /* Reduced from 40px */
+  margin-top: 30px;
+  padding-top: 30px;
   border-top: 1px solid #f1f5f9;
 }
 
 .footer-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 30px; /* Reduced gap */
+  gap: 30px;
 }
 
 .footer-col h3 { font-size: 1.1rem; margin-top: 0; margin-bottom: 12px; color: #0f172a; }
@@ -153,7 +160,7 @@ footer {
 }
 
 .footer-links { list-style: none; padding: 0; }
-.footer-links li { margin-bottom: 6px; } /* Tightened further */
+.footer-links li { margin-bottom: 6px; }
 .footer-links a { 
   text-decoration: none; 
   color: #64748b; 
@@ -162,7 +169,6 @@ footer {
 }
 .footer-links a:hover { color: #38bdf8; }
 
-/* Icon Style Prep */
 .social-icons {
   display: flex;
   gap: 15px;
@@ -170,10 +176,10 @@ footer {
 }
 .social-icons a {
   font-size: 1.2rem;
-  color: #64748b;
+  color: #64748b !important; /* Forces grey icon */
   transition: color 0.3s ease;
 }
-.social-icons a:hover { color: #38bdf8; }
+.social-icons a:hover { color: #38bdf8 !important; }
 
 .by-line { 
   font-size: 0.75rem !important; 
@@ -186,8 +192,8 @@ footer {
 
 .footer-bottom {
   text-align: center;
-  padding: 20px 0; /* Tightened */
-  margin-top: 20px; /* Tightened */
+  padding: 20px 0;
+  margin-top: 20px;
   border-top: 1px solid #f1f5f9;
   font-size: 0.85rem;
   color: #94a3b8;
@@ -222,8 +228,10 @@ footer {
   box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 }
 
+.nav-link:hover .nav-title { color: #38bdf8 !important; }
+
 .nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
-.nav-title { font-weight: 700; color: #0f172a; font-size: 1rem; line-height: 1.4; }
+.nav-title { font-weight: 700; color: #0f172a; font-size: 1rem; line-height: 1.4; transition: color 0.3s; }
 
 .back-to-blog-container { text-align: center; margin-bottom: 40px; }
 .back-link { 
@@ -243,25 +251,26 @@ footer {
 }
 #cusdis_thread iframe { width: 100% !important; min-height: 500px; border: none !important; }
 
-/* ===== 6. PREMIUM DARK MODE OVERRIDES (Aggressive Link Fix) ===== */
+/* ===== 6. PREMIUM DARK MODE OVERRIDES ===== */
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
-/* KILL FLASHY BLUE: High specificity selector to force dark mode colors */
+/* KILL FLASHY BLUE on static links */
 .dark-theme a, 
 .dark-theme a:visited, 
 .dark-theme .back-link,
 .dark-theme .footer-links a,
 .dark-theme .footer-col a { 
   color: #94a3b8 !important; 
-  text-decoration: none !important;
 }
 
-/* Bright Blue only on HOVER for Dark Mode */
+/* Uniform Hover Colors for Dark Theme */
 .dark-theme a:hover, 
 .dark-theme .back-link:hover,
 .dark-theme .footer-links a:hover, 
-.dark-theme .footer-col a:hover { 
+.dark-theme .footer-col a:hover,
+.dark-theme .nav-link:hover .nav-title,
+.dark-theme .post-card-link:hover .post-title { 
   color: #38bdf8 !important; 
 }
 
@@ -270,11 +279,6 @@ footer {
 .dark-theme .post-title, .dark-theme .nav-title, 
 .dark-theme .footer-col h3 { 
   color: #ffffff !important; 
-}
-
-.dark-theme .nav-list li a:hover {
-  color: #38bdf8;
-  background: #1e293b;
 }
 
 .dark-theme .post-card, 
