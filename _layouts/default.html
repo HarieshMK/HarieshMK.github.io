@@ -5,11 +5,8 @@
   <title>{{ page.title }} | {{ site.title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{ site.description }}">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC2R2GWY43"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -17,7 +14,6 @@
     gtag('js', new Date());
     gtag('config', 'G-TC2R2GWY43');
   </script>
-
   <script>
     (function(w,d,e,u,f,l,n){
       w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments);},
@@ -26,13 +22,6 @@
     })(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
     ml('account', '2062352');
   </script>
-
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-
   <script>
     if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark-theme');
@@ -45,7 +34,6 @@
       <span id="theme-icon">🌙</span>
     </button>
   </div>
-
   <div class="container">
     <header>
       <div class="brand-area">
@@ -54,33 +42,19 @@
       </div>
       <nav>
         <ul class="nav-list">
-          <li>
-            <a href="{{ '/' | relative_url }}" 
-               class="{% if page.title == 'Home' %}active{% endif %}">Home</a>
-          </li>
-          <li>
-            <a href="{{ '/about' | relative_url }}" 
-               class="{% if page.title == 'About the Club' %}active{% endif %}">About</a>
-          </li>
-          <li>
-            <a href="{{ '/blog' | relative_url }}" 
-               class="{% if page.title == 'Blog' %}active{% endif %}">Blog</a>
-          </li>
+          <li><a href="{{ '/' | relative_url }}" class="{% if page.title == 'Home' %}active{% endif %}">Home</a></li>
+          <li><a href="{{ '/about' | relative_url }}" class="{% if page.title == 'About the Club' %}active{% endif %}">About</a></li>
+          <li><a href="{{ '/blog' | relative_url }}" class="{% if page.title == 'Blog' %}active{% endif %}">Blog</a></li>
         </ul>
       </nav>
     </header>
-
-    <main>
-      {{ content }}
-    </main>
-
+    <main>{{ content }}</main>
     <footer>
       <div class="footer-grid">
         <div class="footer-col">
           <h3>The Reality Check</h3>
           <p>I’m not a financial advisor. This club is about sharing the journey of boring, disciplined wealth building. It’s a marathon, not a sprint. <a href="{{ '/disclaimer' | relative_url }}">Read the full disclaimer.</a></p>
         </div>
-
         <div class="footer-col">
           <h3>Explore</h3>
           <ul class="footer-links">
@@ -89,7 +63,6 @@
             <li><a href="{{ '/blog' | relative_url }}">Writing</a></li>
           </ul>
         </div>
-
         <div class="footer-col">
           <h3>Stay Connected</h3>
           <p class="by-line">Written by</p>
@@ -98,35 +71,23 @@
           <p><a href="https://instagram.com/{{ site.author.instagram }}" target="_blank">Instagram</a></p>
         </div>
       </div>
-      
       <div class="footer-bottom">
         <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }} • Made for the long run.</p>
       </div>
     </footer>
   </div>
-
   <script>
     const toggleBtn = document.getElementById('theme-toggle');
     const icon = document.getElementById('theme-icon');
     const html = document.documentElement;
-
-    if (localStorage.getItem('theme') === 'dark') {
-      icon.innerText = '☀️';
-    }
-
+    if (localStorage.getItem('theme') === 'dark') { icon.innerText = '☀️'; }
     toggleBtn.onclick = function() {
       html.classList.toggle('dark-theme');
-      
-      if (window.CUSDIS) {
-        window.CUSDIS.setTheme(html.classList.contains('dark-theme') ? 'dark' : 'light');
-      }
-
+      if (window.CUSDIS) { window.CUSDIS.setTheme(html.classList.contains('dark-theme') ? 'dark' : 'light'); }
       if (html.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark');
-        icon.innerText = '☀️';
+        localStorage.setItem('theme', 'dark'); icon.innerText = '☀️';
       } else {
-        localStorage.setItem('theme', 'light');
-        icon.innerText = '🌙';
+        localStorage.setItem('theme', 'light'); icon.innerText = '🌙';
       }
     }
   </script>
