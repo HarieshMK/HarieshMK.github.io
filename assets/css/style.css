@@ -262,7 +262,8 @@ footer {
 
 /* Adjusted Toggle for Dark Mode */
 .dark-theme #theme-toggle {
-    background: rgba(30, 41, 59, 0.8);
+    background: rgba(30, 41, 59, 0.7); /* Translucent glass */
+    backdrop-filter: blur(10px);
     border-color: #475569;
     color: #fbbf24;
 }
@@ -276,9 +277,23 @@ footer {
     border-color: #1e293b !important; 
 }
 
-/* Discussion / Newsletter Dark Overrides */
+/* Newsletter Fix: Explicitly targeting MailerLite Text */
 .dark-theme .ml-form-embedBody h4, 
-.dark-theme .ml-form-embedBody p { color: #ffffff !important; }
+.dark-theme .ml-form-embedBody p,
+.dark-theme .ml-form-embedContent p,
+.dark-theme .ml-form-embedContent h4,
+.dark-theme .ml-form-successBody h4 { 
+    color: #ffffff !important; 
+}
+
+/* Dark Mode Form Inputs */
+.dark-theme .ml-form-embedBody .form-control {
+    background-color: #0b1120 !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Discussion / Cusdis Dark Overrides */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
 .dark-theme .comments label { color: #cbd5e1 !important; }
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
@@ -290,6 +305,29 @@ footer {
     border: none !important;
     overflow: hidden !important;
     display: block !important;
+}
+/* Specific Fix for About Page Newsletter Embed */
+.dark-theme .ml-embedded,
+.dark-theme .ml-form-embedWrapper,
+.dark-theme .ml-form-embedBody,
+.dark-theme .ml-form-embedContainer,
+.dark-theme .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedContent {
+    background-color: #1e293b !important; /* Your "Pop" Layer color */
+    border: 1px solid #334155 !important;
+}
+
+/* Force the text inside the embed to be visible */
+.dark-theme .ml-form-embedBody h4, 
+.dark-theme .ml-form-embedBody p,
+.dark-theme .ml-form-successBody h4 {
+    color: #ffffff !important;
+}
+
+/* Fix the Input field inside the embed */
+.dark-theme .ml-form-embedBody .form-control {
+    background-color: #0f172a !important; /* Darker input */
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
 }
 
 /* Mobile Tweaks */
