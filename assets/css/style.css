@@ -94,6 +94,12 @@ header .tagline {
   border: 1px solid transparent;
 }
 
+/* Fixed: Nav Hover State for Light Mode */
+.nav-list li a:hover {
+  color: #38bdf8;
+  background: #f8fafc;
+}
+
 .nav-list li a.active {
   color: #0f172a !important;
   background: #ffffff !important;
@@ -126,29 +132,28 @@ header .tagline {
 .post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
-/* ===== 4. FOOTER GRID (Modified for Uniformity) ===== */
+/* ===== 4. FOOTER GRID (Fixed Gaps) ===== */
 footer {
-  margin-top: 60px;
-  padding-top: 50px;
+  margin-top: 40px; /* Reduced from 60px */
+  padding-top: 40px; /* Reduced from 50px */
   border-top: 1px solid #f1f5f9;
 }
 
 .footer-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 50px;
+  gap: 40px; /* Slightly reduced for a tighter look */
 }
 
-.footer-col h3 { font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; color: #0f172a; }
+.footer-col h3 { font-size: 1.2rem; margin-top: 0; margin-bottom: 15px; color: #0f172a; }
 
-/* Uniform font size for all footer content */
 .footer-col p, .footer-links a, .footer-col a {
   font-size: 0.95rem;
   line-height: 1.6;
 }
 
 .footer-links { list-style: none; padding: 0; }
-.footer-links li { margin-bottom: 10px; }
+.footer-links li { margin-bottom: 8px; } /* Tighter list spacing */
 .footer-links a { 
   text-decoration: none; 
   color: #64748b; 
@@ -157,7 +162,6 @@ footer {
 }
 .footer-links a:hover { color: #38bdf8; }
 
-/* Stay Connected Column Spacing Fix */
 .by-line { 
   font-size: 0.75rem !important; 
   text-transform: uppercase; 
@@ -165,29 +169,26 @@ footer {
   color: #94a3b8; 
   margin-bottom: 4px !important; 
 }
-.author-name { font-size: 1.1rem !important; display: block; margin-bottom: 12px !important; }
+.author-name { font-size: 1.1rem !important; display: block; margin-bottom: 10px !important; }
 
 .footer-bottom {
   text-align: center;
-  padding: 30px 0;
-  margin-top: 40px;
+  padding: 25px 0;
+  margin-top: 30px;
   border-top: 1px solid #f1f5f9;
   font-size: 0.85rem;
   color: #94a3b8;
 }
 
 /* ===== 5. THE FIXES (Newsletter, Comments, Nav Cards) ===== */
-
-/* Newsletter Box */
 .ml-embedded { margin: 40px 0 !important; }
 .ml-form-embedWrapper { border-radius: 12px !important; border: 1px solid #f1f5f9 !important; background: #fff !important; }
 
-/* Next/Prev Navigation Cards & Gap Fix */
 .post-nav {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  margin: 0 0 40px 0; /* Changed from 40px 0 to reduce top gap */
+  margin: 0 0 40px 0;
 }
 
 .nav-link {
@@ -211,7 +212,6 @@ footer {
 .nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
 .nav-title { font-weight: 700; color: #0f172a; font-size: 1rem; line-height: 1.4; }
 
-/* Issue 3: View All Writing Link Indications - Centered and Clean */
 .back-to-blog-container { text-align: center; margin-bottom: 50px; }
 .back-link { 
   font-weight: 700; 
@@ -223,19 +223,17 @@ footer {
 }
 .back-link:hover { color: #38bdf8; }
 
-/* Issue 2: Discussion Section & Scrollbar & Gap Fix */
 #cusdis_thread { 
   margin-top: 30px; 
-  margin-bottom: -40px !important; /* Pulls cards up to reduce space */
+  margin-bottom: -40px !important; 
   overflow: hidden !important; 
 }
 #cusdis_thread iframe { width: 100% !important; min-height: 500px; border: none !important; }
 
-/* ===== 6. PREMIUM DARK MODE OVERRIDES (Issue 1 Fix) ===== */
+/* ===== 6. PREMIUM DARK MODE OVERRIDES ===== */
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
-/* Issue 1: Force ALL Headings visible */
 .dark-theme h1, .dark-theme h2, .dark-theme h3, 
 .dark-theme h4, .dark-theme h5, .dark-theme h6,
 .dark-theme .post-title, .dark-theme .nav-title, 
@@ -244,22 +242,31 @@ footer {
   text-decoration: none !important;
 }
 
-.dark-theme header h1 a { color: #ffffff; }
-
-/* Dark Mode Footer Link Fixes (Consistent & Not Flashy) */
-.dark-theme .post-excerpt, .dark-theme p, 
-.dark-theme .footer-col p, .dark-theme .footer-links a,
-.dark-theme .footer-col a { 
-  color: #94a3b8 !important; 
+/* Nav Hover for Dark Mode */
+.dark-theme .nav-list li a:hover {
+  color: #38bdf8;
+  background: #1e293b;
 }
 
+.dark-theme header h1 a { color: #ffffff; }
+
+/* Fixed: Forced muted color for all links to stop "Flashy Blue" */
+.dark-theme .post-excerpt, .dark-theme p, 
+.dark-theme .footer-col p, .dark-theme .footer-links a,
+.dark-theme .footer-col a, .dark-theme .back-link,
+.dark-theme a[href*="Writing"], .dark-theme a[href*="home"] { 
+  color: #94a3b8 !important; 
+  text-decoration: none !important;
+}
+
+/* Blue only on Hover */
 .dark-theme a:hover, 
 .dark-theme .footer-links a:hover, 
-.dark-theme .footer-col a:hover { 
+.dark-theme .footer-col a:hover,
+.dark-theme .back-link:hover { 
   color: #38bdf8 !important; 
 }
 
-/* Fix Broken Dark Boxes */
 .dark-theme .post-card, 
 .dark-theme .home-card, 
 .dark-theme .nav-link {
@@ -273,12 +280,10 @@ footer {
   color: #ffffff !important;
 }
 
-/* Dark Mode Form Fixes */
 .dark-theme .ml-form-embedWrapper { background-color: #1e293b !important; border-color: #334155 !important; }
 .dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p { color: #ffffff !important; }
 .dark-theme .ml-form-fieldRow input { background: #ffffff !important; color: #0f172a !important; }
 
-/* Mobile Tweaks */
 @media (max-width: 768px) {
   .container { padding: 30px 20px; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
