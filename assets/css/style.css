@@ -126,7 +126,7 @@ header .tagline {
 .post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
-/* ===== 4. FOOTER GRID (Issue 4 Fix) ===== */
+/* ===== 4. FOOTER GRID (Modified for Uniformity) ===== */
 footer {
   margin-top: 60px;
   padding-top: 50px;
@@ -139,18 +139,33 @@ footer {
   gap: 50px;
 }
 
-.footer-col h3 { font-size: 1.1rem; margin-top: 0; color: #0f172a; }
+.footer-col h3 { font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; color: #0f172a; }
+
+/* Uniform font size for all footer content */
+.footer-col p, .footer-links a, .footer-col a {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
 
 .footer-links { list-style: none; padding: 0; }
-.footer-links li { margin-bottom: 12px; }
+.footer-links li { margin-bottom: 10px; }
 .footer-links a { 
   text-decoration: none; 
   color: #64748b; 
-  font-size: 1rem; 
   font-weight: 500;
   transition: color 0.2s;
 }
 .footer-links a:hover { color: #38bdf8; }
+
+/* Stay Connected Column Spacing Fix */
+.by-line { 
+  font-size: 0.75rem !important; 
+  text-transform: uppercase; 
+  letter-spacing: 1px; 
+  color: #94a3b8; 
+  margin-bottom: 4px !important; 
+}
+.author-name { font-size: 1.1rem !important; display: block; margin-bottom: 12px !important; }
 
 .footer-bottom {
   text-align: center;
@@ -167,12 +182,12 @@ footer {
 .ml-embedded { margin: 40px 0 !important; }
 .ml-form-embedWrapper { border-radius: 12px !important; border: 1px solid #f1f5f9 !important; background: #fff !important; }
 
-/* Next/Prev Navigation Cards */
+/* Next/Prev Navigation Cards & Gap Fix */
 .post-nav {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  margin: 40px 0;
+  margin: 0 0 40px 0; /* Changed from 40px 0 to reduce top gap */
 }
 
 .nav-link {
@@ -196,21 +211,22 @@ footer {
 .nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
 .nav-title { font-weight: 700; color: #0f172a; font-size: 1rem; line-height: 1.4; }
 
-/* Issue 3: View All Writing Link Indications */
-.back-to-blog-container { text-align: center; margin-top: 40px; }
+/* Issue 3: View All Writing Link Indications - Centered and Clean */
+.back-to-blog-container { text-align: center; margin-bottom: 50px; }
 .back-link { 
   font-weight: 700; 
   color: #0f172a; 
   text-decoration: none; 
-  padding: 10px 20px;
   border-bottom: 2px solid #38bdf8;
+  padding-bottom: 4px;
   transition: all 0.2s;
 }
-.back-link:hover { background: #f0f9ff; color: #38bdf8; }
+.back-link:hover { color: #38bdf8; }
 
-/* Issue 2: Discussion Section & Scrollbar Fix */
+/* Issue 2: Discussion Section & Scrollbar & Gap Fix */
 #cusdis_thread { 
   margin-top: 30px; 
+  margin-bottom: -40px !important; /* Pulls cards up to reduce space */
   overflow: hidden !important; 
 }
 #cusdis_thread iframe { width: 100% !important; min-height: 500px; border: none !important; }
@@ -219,7 +235,7 @@ footer {
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
-/* Issue 1: Force ALL Headings (Sub-headings & Titles) to be visible */
+/* Issue 1: Force ALL Headings visible */
 .dark-theme h1, .dark-theme h2, .dark-theme h3, 
 .dark-theme h4, .dark-theme h5, .dark-theme h6,
 .dark-theme .post-title, .dark-theme .nav-title, 
@@ -229,7 +245,19 @@ footer {
 }
 
 .dark-theme header h1 a { color: #ffffff; }
-.dark-theme .post-excerpt, .dark-theme p { color: #94a3b8; }
+
+/* Dark Mode Footer Link Fixes (Consistent & Not Flashy) */
+.dark-theme .post-excerpt, .dark-theme p, 
+.dark-theme .footer-col p, .dark-theme .footer-links a,
+.dark-theme .footer-col a { 
+  color: #94a3b8 !important; 
+}
+
+.dark-theme a:hover, 
+.dark-theme .footer-links a:hover, 
+.dark-theme .footer-col a:hover { 
+  color: #38bdf8 !important; 
+}
 
 /* Fix Broken Dark Boxes */
 .dark-theme .post-card, 
