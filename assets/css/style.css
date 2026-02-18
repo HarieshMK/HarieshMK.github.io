@@ -221,14 +221,13 @@ footer {
 /* ===== 6. PREMIUM DARK MODE (Balanced Theme) ===== */
 .dark-theme body { 
   background-color: #0b1120; 
-  color: #e2e8f0; /* Brighter Snowy Slate */
+  color: #e2e8f0; 
 }
 
 .dark-theme .container { 
   background: #0f172a; 
 }
 
-/* Blue Card Pop - Applied to Blog Cards & Newsletter Section */
 .dark-theme .post-card, 
 .dark-theme .home-card,
 .dark-theme .nav-link,
@@ -241,7 +240,7 @@ footer {
     border-radius: 8px;
 }
 
-/* Force pure white text inside the newsletter blue cards */
+/* Newsletter text visibility */
 .dark-theme .ml-form-embedBody h4, 
 .dark-theme .ml-form-embedBody p,
 .dark-theme .ml-form-embedContent p,
@@ -250,7 +249,7 @@ footer {
     color: #ffffff !important; 
 }
 
-/* High-Contrast White Input Box for better usability */
+/* Restoration of the White Email & Comment Input Boxes */
 .dark-theme .ml-form-embedBody .form-control,
 .dark-theme #cusdis_thread input, 
 .dark-theme #cusdis_thread textarea {
@@ -276,8 +275,13 @@ footer {
     color: #fbbf24;
 }
 
+/* DISCUSSION SECTION FIX - BRIGHT TEXT ON DARK BACKGROUND */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
-.dark-theme .comments label { color: #e2e8f0 !important; }
+.dark-theme #cusdis_thread label, 
+.dark-theme .comments label { 
+    color: #ffffff !important; /* Forces Nickname/Email/Reply labels to be white */
+    opacity: 1 !important;
+}
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
 
 #cusdis_thread iframe {
