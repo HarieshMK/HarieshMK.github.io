@@ -218,54 +218,39 @@ footer {
   padding-top: 30px;
 }
 
-/* ===== 6. PREMIUM DARK MODE (High Contrast Edition) ===== */
+/* ===== 6. PREMIUM DARK MODE (Balanced Theme) ===== */
 .dark-theme body { 
   background-color: #0b1120; 
-  color: #e2e8f0; /* Brighter Snowy Slate for high-readability text */
+  color: #e2e8f0; /* Brighter Snowy Slate */
 }
 
 .dark-theme .container { 
   background: #0f172a; 
-  box-shadow: none; 
 }
 
-/* Post Cards & Secondary Elements */
+/* Blue Card Pop - Applied to Blog Cards & Newsletter Section */
 .dark-theme .post-card, 
 .dark-theme .home-card,
-.dark-theme .nav-link {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-
-/* Pure White for Headers */
-.dark-theme h1, .dark-theme h2, .dark-theme h3, 
-.dark-theme h1 a, .dark-theme .post-title,
-.dark-theme .nav-title, .dark-theme strong { 
-    color: #ffffff !important; 
-}
-
-/* CLEAN NEWSLETTER FIX 
-   Restores white card with dark text for maximum readability 
-*/
+.dark-theme .nav-link,
 .dark-theme .ml-embedded,
 .dark-theme .ml-form-embedWrapper,
 .dark-theme .ml-form-embedBody,
-.dark-theme .ml-form-embedContainer,
-.dark-theme .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedContent {
-    background-color: #ffffff !important;
+.dark-theme .ml-form-embedContainer {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
     border-radius: 8px;
 }
 
-/* Force dark text inside the white newsletter card */
+/* Force pure white text inside the newsletter blue cards */
 .dark-theme .ml-form-embedBody h4, 
 .dark-theme .ml-form-embedBody p,
 .dark-theme .ml-form-embedContent p,
 .dark-theme .ml-form-embedContent h4,
 .dark-theme .ml-form-successBody h4 { 
-    color: #0f172a !important; 
+    color: #ffffff !important; 
 }
 
-/* Restoration of the White Email & Comment Input Boxes */
+/* High-Contrast White Input Box for better usability */
 .dark-theme .ml-form-embedBody .form-control,
 .dark-theme #cusdis_thread input, 
 .dark-theme #cusdis_thread textarea {
@@ -274,7 +259,12 @@ footer {
     border: 2px solid #38bdf8 !important;
 }
 
-/* Links & Accents */
+.dark-theme h1, .dark-theme h2, .dark-theme h3, 
+.dark-theme h1 a, .dark-theme .post-title,
+.dark-theme .nav-title, .dark-theme strong { 
+    color: #ffffff !important; 
+}
+
 .dark-theme a { color: #38bdf8; }
 .dark-theme .back-link { color: #cbd5e1; }
 .dark-theme .back-link:hover { color: #ffffff; }
@@ -286,7 +276,6 @@ footer {
     color: #fbbf24;
 }
 
-/* Discussion / Cusdis Dark Overrides */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
 .dark-theme .comments label { color: #e2e8f0 !important; }
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
@@ -307,7 +296,6 @@ footer {
   .nav-prev, .nav-next { width: 100%; }
 }
 
-/* Premium Button Styling for Comments */
 #cusdis_thread button {
     background: #38bdf8 !important; 
     color: #0f172a !important;
