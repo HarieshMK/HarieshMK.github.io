@@ -216,7 +216,6 @@ footer {
   margin-bottom: 40px;
 }
 
-/* Scaled up the text size for better "hook" visibility */
 .back-to-blog-container a {
     text-decoration: none;
     font-weight: 700;
@@ -232,7 +231,7 @@ footer {
     border-bottom-color: #0f172a;
 }
 
-/* ===== 6. PREMIUM DARK MODE (Balanced Theme) ===== */
+/* ===== 6. PREMIUM DARK MODE & RESTORATIONS ===== */
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
@@ -260,9 +259,14 @@ footer {
 
 .dark-theme .post-footer::before { color: #94a3b8; }
 
-/* DISCUSSION SECTION FIX - SCROLLBAR REMOVAL */
+/* DISCUSSION SECTION FIX - RESTORING TEXT VISIBILITY */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
-.dark-theme #cusdis_thread label, .dark-theme .comments label { color: #ffffff !important; opacity: 1 !important; }
+.dark-theme #cusdis_thread label, 
+.dark-theme .comments label,
+.dark-theme #cusdis_thread span { 
+    color: #ffffff !important; 
+    opacity: 1 !important; 
+}
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
 
 #cusdis_thread {
@@ -272,11 +276,11 @@ footer {
 
 #cusdis_thread iframe {
     width: 100% !important;
-    min-height: 480px !important; /* Slightly increased to ensure room for the button */
+    min-height: 440px !important; 
     border: none !important;
     display: block !important;
     overflow: hidden !important; 
-    margin-bottom: -50px; /* Pulls the footer closer to the comment content */
+    margin-bottom: -40px; /* Reduced gap */
 }
 
 /* Mobile Tweaks */
