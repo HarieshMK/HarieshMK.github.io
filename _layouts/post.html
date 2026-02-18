@@ -4,7 +4,6 @@ layout: default
 
 <article class="post-content">
   <header class="post-header">
-    <a href="{{ '/blog' | relative_url }}" class="back-link">← Back to Writing</a>
     <h1>{{ page.title }}</h1>
     <div class="post-meta">
       <time>{{ page.date | date: "%B %d, %Y" }}</time>
@@ -24,6 +23,7 @@ layout: default
 <section class="subscribe-box">
    <div class="ml-embedded" data-form="TsxbQJ"></div>
 </section>
+
 <section class="comments">
   <h3>Discussion</h3>
   <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">
@@ -40,3 +40,7 @@ layout: default
   
   <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 </section>
+
+<div class="post-footer">
+  <a href="{{ '/blog' | relative_url }}" class="back-link">← Back to Blog</a>
+</div>
