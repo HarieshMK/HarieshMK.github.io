@@ -300,3 +300,19 @@ footer {
   .post-nav { flex-direction: column; }
   .nav-prev, .nav-next { width: 100%; }
 }
+/* Premium Button Styling for Comments */
+#cusdis_thread button {
+    background: #38bdf8 !important; /* Matches your blue link color */
+    color: #0f172a !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 8px 20px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease !important;
+}
+
+#cusdis_thread button:hover {
+    transform: translateY(-2px) !important;
+    background: #ffffff !important;
+}
