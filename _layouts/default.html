@@ -52,13 +52,30 @@
         <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
         <p class="tagline">{{ site.description }}</p>
       </div>
-      <nav>
-        <ul class="nav-list">
-          <li><a href="{{ '/' | relative_url }}">Home</a></li>
-          <li><a href="{{ '/about' | relative_url }}">About</a></li>
-          <li><a href="{{ '/blog' | relative_url }}">Blog</a></li>
-        </ul>
-      </nav>
+     <nav>
+  <ul class="nav-list">
+    <li>
+      <a href="{{ '/' | relative_url }}" 
+         class="{% if page.title == 'Home' %}active{% endif %}">Home</a>
+    </li>
+    <li>
+      <a href="{{ '/about' | relative_url }}" 
+         class="{% if page.title == 'About the Club' %}active{% endif %}">About</a>
+    </li>
+    <li>
+      <a href="{{ '/blog' | relative_url }}" 
+         class="{% if page.title == 'Blog' %}active{% endif %}">Blog</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="footer-col">
+  <h3>Explore</h3>
+  <ul class="footer-links">
+    <li><a href="{{ '/' | relative_url }}">Home</a></li>
+    <li><a href="{{ '/about' | relative_url }}">About the Club</a></li>
+    <li><a href="{{ '/blog' | relative_url }}">Blog</a></li> </ul>
+</div>
     </header>
 
     <main>
