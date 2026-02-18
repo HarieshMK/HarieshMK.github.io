@@ -18,11 +18,14 @@ body {
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
-h1, h2, h3 { 
+/* Base Headings - Light Mode */
+h1, h2, h3, h4, h5, h6 { 
   font-family: 'Lora', serif; 
   color: #0f172a; 
   font-weight: 700;
   letter-spacing: -0.02em;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
 }
 
 p { margin-bottom: 1.6em; }
@@ -123,7 +126,7 @@ header .tagline {
 .post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
-/* ===== 4. FOOTER GRID ===== */
+/* ===== 4. FOOTER GRID (Issue 4 Fix) ===== */
 footer {
   margin-top: 60px;
   padding-top: 50px;
@@ -136,10 +139,18 @@ footer {
   gap: 50px;
 }
 
+.footer-col h3 { font-size: 1.1rem; margin-top: 0; color: #0f172a; }
+
 .footer-links { list-style: none; padding: 0; }
-.footer-links li { margin-bottom: 8px; }
-.footer-links a { text-decoration: none; color: #64748b; font-size: 0.95rem; }
-.footer-links a:hover { color: #38bdf8; text-decoration: underline; }
+.footer-links li { margin-bottom: 12px; }
+.footer-links a { 
+  text-decoration: none; 
+  color: #64748b; 
+  font-size: 1rem; 
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: #38bdf8; }
 
 .footer-bottom {
   text-align: center;
@@ -154,7 +165,7 @@ footer {
 
 /* Newsletter Box */
 .ml-embedded { margin: 40px 0 !important; }
-.ml-form-embedWrapper { border-radius: 12px !important; border: 1px solid #f1f5f9 !important; }
+.ml-form-embedWrapper { border-radius: 12px !important; border: 1px solid #f1f5f9 !important; background: #fff !important; }
 
 /* Next/Prev Navigation Cards */
 .post-nav {
@@ -185,18 +196,39 @@ footer {
 .nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
 .nav-title { font-weight: 700; color: #0f172a; font-size: 1rem; line-height: 1.4; }
 
-/* Discussion Section */
-#cusdis_thread { margin-top: 20px; }
-#cusdis_thread iframe { width: 100% !important; border: none !important; }
+/* Issue 3: View All Writing Link Indications */
+.back-to-blog-container { text-align: center; margin-top: 40px; }
+.back-link { 
+  font-weight: 700; 
+  color: #0f172a; 
+  text-decoration: none; 
+  padding: 10px 20px;
+  border-bottom: 2px solid #38bdf8;
+  transition: all 0.2s;
+}
+.back-link:hover { background: #f0f9ff; color: #38bdf8; }
 
-/* ===== 6. PREMIUM DARK MODE OVERRIDES ===== */
+/* Issue 2: Discussion Section & Scrollbar Fix */
+#cusdis_thread { 
+  margin-top: 30px; 
+  overflow: hidden !important; 
+}
+#cusdis_thread iframe { width: 100% !important; min-height: 500px; border: none !important; }
+
+/* ===== 6. PREMIUM DARK MODE OVERRIDES (Issue 1 Fix) ===== */
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
-/* Fix Purple/Ugly Links */
-.dark-theme a, 
-.dark-theme .post-title, 
-.dark-theme .nav-title { color: #ffffff !important; text-decoration: none !important; }
+/* Issue 1: Force ALL Headings (Sub-headings & Titles) to be visible */
+.dark-theme h1, .dark-theme h2, .dark-theme h3, 
+.dark-theme h4, .dark-theme h5, .dark-theme h6,
+.dark-theme .post-title, .dark-theme .nav-title, 
+.dark-theme .footer-col h3, .dark-theme .back-link { 
+  color: #ffffff !important; 
+  text-decoration: none !important;
+}
+
+.dark-theme header h1 a { color: #ffffff; }
 .dark-theme .post-excerpt, .dark-theme p { color: #94a3b8; }
 
 /* Fix Broken Dark Boxes */
