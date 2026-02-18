@@ -221,7 +221,7 @@ footer {
 /* ===== 6. PREMIUM DARK MODE (High Contrast Edition) ===== */
 .dark-theme body { 
   background-color: #0b1120; 
-  color: #e2e8f0; /* Brighter Snowy Slate for blog and about text */
+  color: #e2e8f0; /* Brighter Snowy Slate for high-readability text */
 }
 
 .dark-theme .container { 
@@ -229,21 +229,43 @@ footer {
   box-shadow: none; 
 }
 
+/* Post Cards & Secondary Elements */
 .dark-theme .post-card, 
 .dark-theme .home-card,
-.dark-theme .nav-link,
-.dark-theme .ml-embedded {
+.dark-theme .nav-link {
     background: #1e293b !important;
     border-color: #334155 !important;
 }
 
+/* Pure White for Headers */
 .dark-theme h1, .dark-theme h2, .dark-theme h3, 
 .dark-theme h1 a, .dark-theme .post-title,
 .dark-theme .nav-title, .dark-theme strong { 
     color: #ffffff !important; 
 }
 
-/* Restoration of the White Email & Comment Boxes */
+/* CLEAN NEWSLETTER FIX 
+   Restores white card with dark text for maximum readability 
+*/
+.dark-theme .ml-embedded,
+.dark-theme .ml-form-embedWrapper,
+.dark-theme .ml-form-embedBody,
+.dark-theme .ml-form-embedContainer,
+.dark-theme .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedContent {
+    background-color: #ffffff !important;
+    border-radius: 8px;
+}
+
+/* Force dark text inside the white newsletter card */
+.dark-theme .ml-form-embedBody h4, 
+.dark-theme .ml-form-embedBody p,
+.dark-theme .ml-form-embedContent p,
+.dark-theme .ml-form-embedContent h4,
+.dark-theme .ml-form-successBody h4 { 
+    color: #0f172a !important; 
+}
+
+/* Restoration of the White Email & Comment Input Boxes */
 .dark-theme .ml-form-embedBody .form-control,
 .dark-theme #cusdis_thread input, 
 .dark-theme #cusdis_thread textarea {
@@ -252,14 +274,7 @@ footer {
     border: 2px solid #38bdf8 !important;
 }
 
-.dark-theme .ml-form-embedBody h4, 
-.dark-theme .ml-form-embedBody p,
-.dark-theme .ml-form-embedContent p,
-.dark-theme .ml-form-embedContent h4,
-.dark-theme .ml-form-successBody h4 { 
-    color: #ffffff !important; 
-}
-
+/* Links & Accents */
 .dark-theme a { color: #38bdf8; }
 .dark-theme .back-link { color: #cbd5e1; }
 .dark-theme .back-link:hover { color: #ffffff; }
@@ -271,6 +286,7 @@ footer {
     color: #fbbf24;
 }
 
+/* Discussion / Cusdis Dark Overrides */
 .dark-theme #cusdis_thread { color: #ffffff !important; }
 .dark-theme .comments label { color: #e2e8f0 !important; }
 .dark-theme iframe[src*="cusdis"] { color-scheme: dark; }
@@ -279,7 +295,6 @@ footer {
     width: 100% !important;
     min-height: 450px !important; 
     border: none !important;
-    overflow: hidden !important;
     display: block !important;
 }
 
