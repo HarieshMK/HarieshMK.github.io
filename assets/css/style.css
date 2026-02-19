@@ -222,12 +222,11 @@ footer {
 .nav-link {
   display: block;
   text-decoration: none !important;
-  padding: 15px; /* Tighter padding to fix size issue */
+  padding: 15px; /* Reduced padding for cleaner look */
   border: 1px solid #f1f5f9;
   border-radius: 12px;
   background: #ffffff;
   transition: all 0.3s ease;
-  height: 100%;
 }
 
 .nav-link:hover {
@@ -236,25 +235,28 @@ footer {
   box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 }
 
-.nav-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 5px; }
+.nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 5px; }
 
 .nav-title { 
   font-weight: 700; 
   color: #0f172a; 
   transition: color 0.3s;
-  line-height: 1.3;
-  font-size: 0.95rem; /* Slightly smaller for better fit */
+  line-height: 1.4;
+  font-size: 0.95rem; /* Tighter font for nav titles */
   display: block;
   word-wrap: break-word; 
 }
 
 .nav-link:hover .nav-title { color: #38bdf8 !important; }
 
-/* Comment Section Scroll Fix */
+/* Comment Section Fix (Kill Scrollbar) */
 #cusdis_thread {
   width: 100% !important;
-  min-height: 200px;
-  overflow: visible !important; 
+  overflow: visible !important;
+}
+#cusdis_thread iframe {
+  min-height: 500px !important;
+  border: none !important;
 }
 
 .back-link { 
@@ -301,11 +303,9 @@ footer {
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
-/* FIX: Ensure Header Title is white in Dark Mode */
-.dark-theme header h1 a,
-.dark-theme h1, .dark-theme h2, .dark-theme h3, 
-.dark-theme .post-title, .dark-theme .nav-title, 
-.dark-theme .footer-col h3, .dark-theme .back-link { 
+/* FIX 4: Make Website Title Visible */
+.dark-theme header h1 a, 
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme .post-title, .dark-theme .nav-title, .dark-theme .footer-col h3, .dark-theme .back-link { 
   color: #ffffff !important; 
 }
 
@@ -332,12 +332,13 @@ footer {
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
 
-/* FIX: MailerLite Input box visibility */
-.dark-theme .ml-form-embedBody input { 
-  background-color: #ffffff !important; 
-  color: #334155 !important; 
-}
+/* FIX 1: Newsletter Restoration */
+.dark-theme .ml-embedded { background: transparent !important; }
 .dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p { color: #ffffff !important; }
+.dark-theme .ml-form-embedBody .ml-form-fieldRow input { 
+  background-color: #ffffff !important; 
+  color: #0f172a !important; 
+}
 
 @media (max-width: 768px) {
   .container { padding: 30px 20px; }
