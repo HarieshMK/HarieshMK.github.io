@@ -64,4 +64,6 @@ If my story resonated with you, join the **Unexciting Money Club**. I send out o
 
 <div class="ml-embedded" data-form="TsxbQJ"></div>
 
-[← Back to Home]({{ '/' | relative_url }})
+<p style="text-align: center; margin-top: 30px;">
+  <a href="{{ '/' | relative_url }}" class="back-link">← Back to Home</a>
+</p>
