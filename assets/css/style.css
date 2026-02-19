@@ -252,6 +252,7 @@ footer {
   max-width: 850px;
   opacity: 0;
   transition: opacity 0.4s ease;
+  pointer-events: none; /* User can't click it */
 }
 
 .progress-bar-track {
@@ -268,16 +269,7 @@ footer {
   background: #0ea5e9; 
   width: 0%;
   border-radius: 0 10px 10px 0;
-}
-
-.dark-theme .progress-bar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark-theme .progress-bar {
-  background: #38bdf8; 
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  transition: width 0.2s ease-out; /* Honesty through smoother movement */
 }
 
 /* ===== 7. PREMIUM DARK MODE OVERRIDES ===== */
@@ -291,9 +283,27 @@ footer {
 .dark-theme a, .dark-theme .footer-links a { color: #94a3b8; }
 .dark-theme a:hover, .dark-theme .post-card-link:hover .post-title { color: #38bdf8 !important; }
 
-.dark-theme .post-card, .dark-theme .home-card, .dark-theme .nav-link, .dark-theme .nav-list li a.active {
+/* FIX: Ensure Active Nav Link text is visible in Dark Mode */
+.dark-theme .nav-list li a.active {
   background-color: #1e293b !important;
   border-color: #334155 !important;
+  color: #38bdf8 !important; /* Force visibility for active link */
+}
+
+.dark-theme .post-card, .dark-theme .home-card, .dark-theme .nav-link {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Progress Bar Dark Mode */
+.dark-theme .progress-bar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .progress-bar {
+  background: #38bdf8; 
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
 
 /* MailerLite Dark Mode Fixes */
@@ -304,5 +314,5 @@ footer {
   .container { padding: 30px 20px; }
   .footer-grid { grid-template-columns: 1fr; }
   .post-nav { flex-direction: column; }
-  .progress-container { top: 5px; width: 95%; } /* Better mobile spacing */
+  .progress-container { top: 5px; width: 95%; } 
 }
