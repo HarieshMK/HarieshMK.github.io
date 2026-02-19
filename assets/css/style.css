@@ -241,22 +241,30 @@ footer {
   transition: all 0.2s;
 }
 
-/* ===== 6. SCROLL PROGRESS BAR ===== */
+/* ===== 6. SCROLL PROGRESS BAR (Centered & Thicker) ===== */
 .progress-container {
   position: fixed;
   top: 0;
+  left: 50%;
+  transform: translateX(-50%); /* Centers the bar */
   z-index: 2000;
   width: 100%;
-  height: 4px;
+  max-width: 850px; /* Matches your reading area width */
+  height: 6px; /* Slightly thicker for a solid feel */
   background: transparent;
 }
 
 .progress-bar {
-  height: 4px;
+  height: 6px;
   background: #38bdf8;
   width: 0%;
   transition: width 0.1s ease;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+  border-radius: 0 4px 4px 0; /* Smooth rounded edge as it grows */
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.dark-theme .progress-bar {
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.7);
 }
 
 /* ===== 7. PREMIUM DARK MODE OVERRIDES ===== */
