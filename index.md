@@ -33,5 +33,5 @@ Most personal finance content is either fake screenshots, overpromises, or strai
 </div>
 
 <p style="text-align: center; margin-top: 30px;">
-  <a href="{{ '/blog' | relative_url }}" style="font-weight: bold;">View All Articles →</a>
+  <a href="{{ '/blogs' | relative_url }}" style="font-weight: bold;">View All Articles →</a>
 </p>
