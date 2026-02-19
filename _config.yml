@@ -1,14 +1,20 @@
 # Site Settings
 title: Unexciting Money Club
 description: "Real-life finance for long-term thinkers. No hype, no shortcuts—just boring decisions."
-url: "https://harieshmk.github.io/" 
+url: "https://harieshmk.github.io" 
 baseurl: "" 
 
-# Author Settings
+# Author & Social Settings (Helps Google "Knowledge Graph")
 author:
   name: "Hariesh Murugan"
   email: "itzhariesh@gmail.com"
+  twitter: "" # Leave blank or add handle if you have one
   instagram: "unexciting_money_club"
+
+social:
+  name: "Hariesh Murugan"
+  links:
+    - https://www.instagram.com/unexciting_money_club
 
 # Build Settings
 permalink: /blog/:title/
@@ -22,3 +28,4 @@ exclude:
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
