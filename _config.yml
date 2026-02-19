@@ -17,7 +17,7 @@ social:
     - https://www.instagram.com/unexciting_money_club
 
 # Build Settings
-permalink: /blog/:title/
+permalink: /blogs/:title/
 exclude:
   - Gemfile
   - Gemfile.lock
