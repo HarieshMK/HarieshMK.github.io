@@ -59,13 +59,7 @@ I’ve always loved teaching. I used to teach my friends the night before exams 
 
 I want to be your "Perumal Sir"—the person who ignites the spark and helps you realize that building wealth doesn't have to be exciting. It just has to be consistent.
 
-**Join the club. Let’s make your money unexcitingly reliable.**
----
 
-...
-Join the club. Let’s make your money unexcitingly reliable.
-
-### Ready to fix your "leak"?
 If my story resonated with you, join the **Unexciting Money Club**. I send out one "unexciting" lesson every week to help you build wealth without the noise.
 
 <div class="ml-embedded" data-form="TsxbQJ"></div>
