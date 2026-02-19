@@ -1,9 +1,11 @@
 ---
 layout: default
 title: Home
+description: "The Unexciting Money Club: A practical guide to boring, disciplined wealth building. Real-life finance lessons from Hariesh Murugan for long-term thinkers. No hype, just boring but useful decisions."
 ---
 
 ## Real-life finance. No hype. No shortcuts.
+...
 
 Most personal finance content is either fake screenshots, overpromises, or straight-up noise. 
 
