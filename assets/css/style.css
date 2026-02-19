@@ -101,13 +101,12 @@ header .tagline {
   background: #f8fafc;
 }
 
-/* Updated Active State for consistent Elevation */
 .nav-list li a.active {
   color: #0f172a !important;
   background: #ffffff !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #e2e8f0 !important;
-  transform: translateY(-3px) !important; /* Force elevation */
+  transform: translateY(-3px) !important;
 }
 
 /* ===== 3. BLOG CARDS & UNIFORM HOVER ===== */
@@ -153,7 +152,7 @@ header .tagline {
   text-transform: uppercase; 
 }
 
-/* ===== 4. FOOTER GRID ===== */
+/* ===== 4. FOOTER GRID & CENTERING FIX ===== */
 footer {
   margin-top: 50px;
   padding-top: 30px;
@@ -190,18 +189,19 @@ footer {
 }
 .social-icons a:hover { color: #38bdf8 !important; }
 
-.by-line { 
-  font-size: 0.75rem !important; 
-  text-transform: uppercase; 
-  letter-spacing: 1px; 
-  color: #94a3b8; 
-}
-
 .footer-bottom {
   text-align: center;
   padding: 40px 0;
   font-size: 0.85rem;
   color: #94a3b8;
+}
+
+/* Fix for centered link regardless of container */
+.back-to-blog-container {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100%;
+  margin: 40px 0;
 }
 
 /* ===== 5. POST NAVIGATION & COMMENT FIXES ===== */
@@ -210,16 +210,20 @@ footer {
   justify-content: space-between;
   gap: 20px;
   margin: 40px 0;
+  width: 100%;
 }
 
 .nav-link {
   flex: 1;
+  min-width: 0; /* Important: Fixes the overlap/overflow issue */
   text-decoration: none !important;
   padding: 20px;
   border: 1px solid #f1f5f9;
   border-radius: 12px;
   background: #ffffff;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .nav-link:hover {
@@ -228,15 +232,21 @@ footer {
   box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 }
 
+.nav-title { 
+  font-weight: 700; 
+  color: #0f172a; 
+  transition: color 0.3s;
+  white-space: normal; /* Allow text wrapping to prevent overlapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .nav-link:hover .nav-title { color: #38bdf8 !important; }
 
-.nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
-.nav-title { font-weight: 700; color: #0f172a; transition: color 0.3s; }
-
-/* Centered View All Writing */
-.back-to-blog-container {
-  text-align: center;
-  margin-top: 30px;
+/* Fix Comment Scrollbar */
+#commento-iframe, #disqus_thread {
+  width: 100% !important;
+  overflow: hidden !important;
 }
 
 .back-link { 
@@ -287,15 +297,11 @@ footer {
   color: #ffffff !important; 
 }
 
-.dark-theme a, .dark-theme .footer-links a { color: #94a3b8; }
-.dark-theme a:hover, .dark-theme .post-card-link:hover .post-title { color: #38bdf8 !important; }
-
-/* DARK MODE NAV ELEVATION - PREMIUM FIX */
 .dark-theme .nav-list li a.active {
   background-color: #1e293b !important;
-  border: 1px solid #38bdf8 !important; /* Blue border acts as highlight in dark mode */
-  color: #ffffff !important; /* Consistent white text */
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2) !important; /* Subtle blue glow */
+  border: 1px solid #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2) !important;
   transform: translateY(-3px) !important;
 }
 
@@ -313,9 +319,6 @@ footer {
   background: #38bdf8; 
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
-
-.dark-theme .ml-form-embedWrapper { background-color: #1e293b !important; border-color: #334155 !important; }
-.dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p { color: #ffffff !important; }
 
 @media (max-width: 768px) {
   .container { padding: 30px 20px; }
