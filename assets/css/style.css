@@ -101,12 +101,13 @@ header .tagline {
   background: #f8fafc;
 }
 
+/* Updated Active State for consistent Elevation */
 .nav-list li a.active {
   color: #0f172a !important;
   background: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #e2e8f0 !important;
-  transform: translateY(-3px);
+  transform: translateY(-3px) !important; /* Force elevation */
 }
 
 /* ===== 3. BLOG CARDS & UNIFORM HOVER ===== */
@@ -232,6 +233,12 @@ footer {
 .nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
 .nav-title { font-weight: 700; color: #0f172a; transition: color 0.3s; }
 
+/* Centered View All Writing */
+.back-to-blog-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
 .back-link { 
   font-weight: 700; 
   color: #0f172a; 
@@ -252,7 +259,7 @@ footer {
   max-width: 850px;
   opacity: 0;
   transition: opacity 0.4s ease;
-  pointer-events: none; /* User can't click it */
+  pointer-events: none;
 }
 
 .progress-bar-track {
@@ -269,25 +276,27 @@ footer {
   background: #0ea5e9; 
   width: 0%;
   border-radius: 0 10px 10px 0;
-  transition: width 0.2s ease-out; /* Honesty through smoother movement */
+  transition: width 0.2s ease-out;
 }
 
 /* ===== 7. PREMIUM DARK MODE OVERRIDES ===== */
 .dark-theme body { background-color: #0b1120; color: #e2e8f0; }
 .dark-theme .container { background: #0f172a; }
 
-.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme .post-title, .dark-theme .nav-title, .dark-theme .footer-col h3 { 
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme .post-title, .dark-theme .nav-title, .dark-theme .footer-col h3, .dark-theme .back-link { 
   color: #ffffff !important; 
 }
 
 .dark-theme a, .dark-theme .footer-links a { color: #94a3b8; }
 .dark-theme a:hover, .dark-theme .post-card-link:hover .post-title { color: #38bdf8 !important; }
 
-/* FIX: Ensure Active Nav Link text is visible in Dark Mode */
+/* DARK MODE NAV ELEVATION - PREMIUM FIX */
 .dark-theme .nav-list li a.active {
   background-color: #1e293b !important;
-  border-color: #334155 !important;
-  color: #38bdf8 !important; /* Force visibility for active link */
+  border: 1px solid #38bdf8 !important; /* Blue border acts as highlight in dark mode */
+  color: #ffffff !important; /* Consistent white text */
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2) !important; /* Subtle blue glow */
+  transform: translateY(-3px) !important;
 }
 
 .dark-theme .post-card, .dark-theme .home-card, .dark-theme .nav-link {
@@ -295,7 +304,6 @@ footer {
   border-color: #334155 !important;
 }
 
-/* Progress Bar Dark Mode */
 .dark-theme .progress-bar-track {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -306,7 +314,6 @@ footer {
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
 
-/* MailerLite Dark Mode Fixes */
 .dark-theme .ml-form-embedWrapper { background-color: #1e293b !important; border-color: #334155 !important; }
 .dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p { color: #ffffff !important; }
 
