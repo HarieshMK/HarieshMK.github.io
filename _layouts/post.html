@@ -79,20 +79,29 @@ window.onscroll = function() { moveProgressBar() };
 function moveProgressBar() {
   const barContainer = document.querySelector('.progress-container');
   const myBar = document.getElementById("myBar");
+  const article = document.querySelector('.entry-content');
   
-  if (!barContainer || !myBar) return;
+  if (!barContainer || !myBar || !article) return;
 
-  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const scrolled = (winScroll / height) * 100;
+  // Get the position of the actual blog content
+  const rect = article.getBoundingClientRect();
+  const articleHeight = article.offsetHeight;
+  
+  // Calculate how much of the article has passed the top of the screen
+  // We subtract window height to ensure it hits 100% at the bottom of the text
+  let progress = 0;
+  if (rect.top < 0) {
+    progress = (Math.abs(rect.top) / (articleHeight - window.innerHeight + 500)) * 100;
+  }
 
-  // ONLY SHOW AFTER 200px of scrolling (Past the header)
-  if (winScroll > 200) {
+  // Show bar only when reading the article
+  if (rect.top < 100 && rect.bottom > 0) {
     barContainer.style.opacity = "1";
   } else {
     barContainer.style.opacity = "0";
   }
 
-  myBar.style.width = scrolled + "%";
+  // Cap it at 100%
+  myBar.style.width = Math.min(progress, 100) + "%";
 }
 </script>
