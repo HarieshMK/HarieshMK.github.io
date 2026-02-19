@@ -27,7 +27,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 p { margin-bottom: 1.6em; }
 
-/* ===== 2. HEADER & NAVIGATION (HOVER FIX INCLUDED) ===== */
+/* ===== 2. HEADER & NAVIGATION (HOVER RE-ENABLED) ===== */
 header {
   text-align: center;
   padding: 40px 0 20px 0;
@@ -35,7 +35,7 @@ header {
   margin-bottom: 40px;
 }
 header h1 { font-size: 2.8rem; margin: 0; }
-header h1 a { color: #0f172a; text-decoration: none; transition: color 0.2s; }
+header h1 a { color: #0f172a; text-decoration: none; transition: color 0.3s ease; }
 header h1 a:hover { color: #38bdf8; }
 
 header .tagline {
@@ -63,6 +63,7 @@ header .tagline {
   cursor: pointer;
   z-index: 1000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
 }
 
 .nav-list {
@@ -81,17 +82,17 @@ header .tagline {
   text-transform: uppercase;
   padding: 10px 22px;
   border-radius: 10px;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; /* Critical for smooth hover */
   display: inline-block;
 }
 
-/* Hover effect for all nav links */
+/* FIX: Explicit Hover Effect for Nav Links */
 .nav-list li a:hover {
   color: #38bdf8 !important;
-  background-color: rgba(56, 189, 248, 0.1);
+  background-color: rgba(56, 189, 248, 0.08) !important;
+  transform: translateY(-1px);
 }
 
-/* Active link style */
 .nav-list li a.active {
   color: #0f172a !important;
   background: #ffffff !important;
@@ -102,15 +103,23 @@ header .tagline {
 /* ===== 3. BLOG CARDS & HOVER ===== */
 .post-card-link { display: block; text-decoration: none !important; color: inherit !important; margin-bottom: 25px; }
 .post-card, .home-card { padding: 30px; border: 1px solid #f1f5f9; border-radius: 12px; background: #fff; transition: all 0.3s ease; }
-.post-card-link:hover .post-card { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #38bdf8; }
-.post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; }
+
+.post-card-link:hover .post-card { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06); 
+  border-color: #38bdf8; 
+}
+.post-card-link:hover .post-title { color: #38bdf8; }
+
+.post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; transition: color 0.3s ease; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
 /* ===== 4. FOOTER & BACK LINKS ===== */
 footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f1f5f9; }
 .footer-col a { text-decoration: none; color: #64748b; transition: color 0.2s; }
 .back-to-blogs-container { display: flex !important; justify-content: center !important; margin: 50px 0 20px; }
-.back-link { font-weight: 700; color: #0f172a; text-decoration: none; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; }
+.back-link { font-weight: 700; color: #0f172a; text-decoration: none; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; transition: all 0.2s ease; }
+.back-link:hover { color: #38bdf8; border-color: #0f172a; }
 
 /* ===== 5. POST NAVIGATION ===== */
 .post-nav { display: flex; justify-content: space-between; gap: 20px; margin: 40px 0; width: 100%; }
@@ -121,16 +130,18 @@ footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f1f5f9; }
   border: 1px solid #f1f5f9;
   border-radius: 12px;
   background: #ffffff;
+  transition: all 0.3s ease;
 }
+.nav-link:hover { border-color: #38bdf8; transform: translateY(-2px); }
 .nav-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
 .nav-title { font-weight: 700; color: #0f172a; font-size: 0.9rem; line-height: 1.3; display: block; }
 
-/* ===== 6. PROGRESS BAR ===== */
-.progress-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 850px; opacity: 0; pointer-events: none; }
+/* ===== 6. SUBTLE PROGRESS BAR ===== */
+.progress-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 850px; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
 .progress-bar-track { width: 100%; height: 6px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden; }
-.progress-bar { height: 100%; background: #0ea5e9; width: 0%; }
+.progress-bar { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.2s ease-out; }
 
-/* ===== 7. DARK MODE OVERRIDES (FIXED HOVER & BLOCKS) ===== */
+/* ===== 7. DARK MODE OVERRIDES ===== */
 .dark-theme body { background-color: #0b1120 !important; color: #e2e8f0 !important; }
 .dark-theme .container { background: #0f172a !important; }
 
