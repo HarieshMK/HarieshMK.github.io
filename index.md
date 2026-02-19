@@ -5,7 +5,6 @@ description: "The Unexciting Money Club: A practical guide to boring, discipline
 ---
 
 ## Real-life finance. No hype. No shortcuts.
-...
 
 Most personal finance content is either fake screenshots, overpromises, or straight-up noise. 
 
