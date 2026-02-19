@@ -1,6 +1,7 @@
 ---
 layout: default
 title: About the Club
+description: "How a single question about a bank balance changed everything. Meet Hariesh Murugan and learn why the Unexciting Money Club exists to fix your financial leaks."
 ---
 
 # About the Club: Why I’m Here
