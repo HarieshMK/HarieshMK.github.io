@@ -114,7 +114,6 @@ footer {
   border-top: 1px solid #f1f5f9;
 }
 
-/* This creates the 3-column layout */
 .footer-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr; 
@@ -180,7 +179,7 @@ footer {
 .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4,
 .dark-theme .post-title, .dark-theme .nav-title, 
 .dark-theme header h1 a, .dark-theme .back-link,
-.dark-theme .footer-col h4 { 
+.dark-theme .footer-col h4, .dark-theme .generic-link { 
   color: #ffffff !important; 
 }
 
@@ -212,6 +211,22 @@ footer {
 /* DISCUSSION BOX (CUSDIS) FIX */
 #cusdis_thread { width: 100% !important; overflow: hidden !important; }
 #cusdis_thread iframe { border: none !important; width: 100% !important; min-height: 350px; }
+
+/* ===== 8. GLOBAL LINK RESET (FIXES THE UGLY BLUE) ===== */
+a:not(.nav-list li a):not(.post-card-link) {
+  color: #0f172a; /* Same as your headings */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:not(.nav-list li a):not(.post-card-link):hover {
+  color: #38bdf8; /* Turns Sky Blue on hover */
+}
+
+/* Ensure these links are white in Dark Mode */
+.dark-theme a:not(.nav-list li a):not(.post-card-link) {
+  color: #ffffff !important;
+}
 
 /* MOBILE RESPONSIVENESS */
 @media (max-width: 768px) {
