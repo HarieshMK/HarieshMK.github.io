@@ -74,6 +74,7 @@ layout: default
 </div>
 
 <script>
+// 1. PROGRESS BAR LOGIC
 window.onscroll = function() { moveProgressBar() };
 
 function moveProgressBar() {
@@ -83,25 +84,29 @@ function moveProgressBar() {
   
   if (!barContainer || !myBar || !article) return;
 
-  // Get the position of the actual blog content
   const rect = article.getBoundingClientRect();
   const articleHeight = article.offsetHeight;
   
-  // Calculate how much of the article has passed the top of the screen
-  // We subtract window height to ensure it hits 100% at the bottom of the text
   let progress = 0;
   if (rect.top < 0) {
     progress = (Math.abs(rect.top) / (articleHeight - window.innerHeight + 500)) * 100;
   }
 
-  // Show bar only when reading the article
   if (rect.top < 100 && rect.bottom > 0) {
     barContainer.style.opacity = "1";
   } else {
     barContainer.style.opacity = "0";
   }
 
-  // Cap it at 100%
   myBar.style.width = Math.min(progress, 100) + "%";
 }
+
+// 2. DARK MODE GLITCH FIX
+// This forces Cusdis to match the body's theme on load
+window.addEventListener('load', function() {
+  const isDark = document.body.classList.contains('dark-theme');
+  if (window.CUSDIS) {
+    window.CUSDIS.setTheme(isDark ? 'dark' : 'light');
+  }
+});
 </script>
