@@ -9,9 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC2R2GWY43"></script>
   <script>
-    
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
@@ -34,6 +34,10 @@
   </script>
 </head>
 <body>
+  <div class="progress-container">
+    <div class="progress-bar" id="myBar"></div>
+  </div>
+
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
@@ -86,7 +90,10 @@
         <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }} • Made for the long run.</p>
       </div>
     </footer>
-  </div> <script>
+  </div>
+
+  <script>
+    // Theme Toggle Logic
     const toggleBtn = document.getElementById('theme-toggle');
     const icon = document.getElementById('theme-icon');
     const html = document.documentElement;
@@ -102,9 +109,15 @@
         localStorage.setItem('theme', 'light'); icon.innerText = '🌙';
       }
     }
+
+    // Scroll Progress Bar Logic
+    window.onscroll = function() { moveProgressBar() };
+    function moveProgressBar() {
+      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrolled = (winScroll / height) * 100;
+      document.getElementById("myBar").style.width = scrolled + "%";
+    }
   </script>
 </body>
-  <div class="progress-container">
-  <div class="progress-bar" id="myBar"></div>
-</div>
 </html>
