@@ -34,10 +34,7 @@
   </script>
 </head>
 <body>
-  <div class="progress-container">
-    <div class="progress-bar" id="myBar"></div>
-  </div>
-
+ 
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
@@ -108,15 +105,6 @@
       } else {
         localStorage.setItem('theme', 'light'); icon.innerText = '🌙';
       }
-    }
-
-    // Scroll Progress Bar Logic
-    window.onscroll = function() { moveProgressBar() };
-    function moveProgressBar() {
-      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      var scrolled = (winScroll / height) * 100;
-      document.getElementById("myBar").style.width = scrolled + "%";
     }
   </script>
 </body>
