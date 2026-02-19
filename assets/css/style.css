@@ -1,6 +1,6 @@
 /* ===== 1. CORE STYLES & PREMIUM TYPOGRAPHY ===== */
 html {
-  scroll-behavior: smooth; /* Premium smooth sliding */
+  scroll-behavior: smooth;
 }
 
 body {
@@ -241,30 +241,43 @@ footer {
   transition: all 0.2s;
 }
 
-/* ===== 6. SCROLL PROGRESS BAR (Centered & Thicker) ===== */
+/* ===== 6. SUBTLE PROGRESS BAR (Post-Only) ===== */
 .progress-container {
   position: fixed;
-  top: 0;
+  top: 10px; 
   left: 50%;
-  transform: translateX(-50%); /* Centers the bar */
+  transform: translateX(-50%);
   z-index: 2000;
+  width: 90%;
+  max-width: 850px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.progress-bar-track {
   width: 100%;
-  max-width: 850px; /* Matches your reading area width */
-  height: 6px; /* Slightly thicker for a solid feel */
-  background: transparent;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.05); 
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .progress-bar {
-  height: 6px;
-  background: #38bdf8;
+  height: 100%;
+  background: #0ea5e9; 
   width: 0%;
-  transition: width 0.1s ease;
-  border-radius: 0 4px 4px 0; /* Smooth rounded edge as it grows */
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  border-radius: 0 10px 10px 0;
+}
+
+.dark-theme .progress-bar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dark-theme .progress-bar {
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.7);
+  background: #38bdf8; 
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
 }
 
 /* ===== 7. PREMIUM DARK MODE OVERRIDES ===== */
@@ -283,10 +296,6 @@ footer {
   border-color: #334155 !important;
 }
 
-.dark-theme .progress-bar {
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
-}
-
 /* MailerLite Dark Mode Fixes */
 .dark-theme .ml-form-embedWrapper { background-color: #1e293b !important; border-color: #334155 !important; }
 .dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p { color: #ffffff !important; }
@@ -295,4 +304,5 @@ footer {
   .container { padding: 30px 20px; }
   .footer-grid { grid-template-columns: 1fr; }
   .post-nav { flex-direction: column; }
+  .progress-container { top: 5px; width: 95%; } /* Better mobile spacing */
 }
