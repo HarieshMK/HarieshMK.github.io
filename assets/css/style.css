@@ -196,12 +196,13 @@ footer {
   color: #94a3b8;
 }
 
-/* Fix for centered link regardless of container */
-.back-to-blog-container {
+/* Center Writing Link - Applied to plural name found in your post.html */
+.back-to-blogs-container {
   display: flex !important;
   justify-content: center !important;
   width: 100%;
-  margin: 40px 0;
+  margin: 50px 0 20px;
+  clear: both;
 }
 
 /* ===== 5. POST NAVIGATION & COMMENT FIXES ===== */
@@ -213,17 +214,20 @@ footer {
   width: 100%;
 }
 
-.nav-link {
+.nav-prev, .nav-next {
   flex: 1;
-  min-width: 0; /* Important: Fixes the overlap/overflow issue */
+  min-width: 0; /* Prevents container from pushing out */
+}
+
+.nav-link {
+  display: block;
   text-decoration: none !important;
   padding: 20px;
   border: 1px solid #f1f5f9;
   border-radius: 12px;
   background: #ffffff;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  height: 100%; /* Make both boxes same height */
 }
 
 .nav-link:hover {
@@ -232,21 +236,24 @@ footer {
   box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 }
 
+.nav-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 5px; }
+
 .nav-title { 
   font-weight: 700; 
   color: #0f172a; 
   transition: color 0.3s;
-  white-space: normal; /* Allow text wrapping to prevent overlapping */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
+  display: block;
+  word-wrap: break-word; /* Prevents long titles from overlapping */
 }
 
 .nav-link:hover .nav-title { color: #38bdf8 !important; }
 
-/* Fix Comment Scrollbar */
-#commento-iframe, #disqus_thread {
+/* Comment Section Fix */
+#cusdis_thread {
   width: 100% !important;
-  overflow: hidden !important;
+  min-height: 200px;
+  overflow: visible !important; /* Removes internal scrollbar */
 }
 
 .back-link { 
@@ -258,7 +265,7 @@ footer {
   transition: all 0.2s;
 }
 
-/* ===== 6. SUBTLE PROGRESS BAR (Post-Only) ===== */
+/* ===== 6. SUBTLE PROGRESS BAR ===== */
 .progress-container {
   position: fixed;
   top: 10px; 
@@ -323,6 +330,6 @@ footer {
 @media (max-width: 768px) {
   .container { padding: 30px 20px; }
   .footer-grid { grid-template-columns: 1fr; }
-  .post-nav { flex-direction: column; }
+  .post-nav { flex-direction: column; gap: 15px; }
   .progress-container { top: 5px; width: 95%; } 
 }
