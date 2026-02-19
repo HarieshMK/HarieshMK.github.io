@@ -159,7 +159,7 @@ footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f1f5f9; }
 
 /* DISCUSSION BOX (CUSDIS) FIX */
 #cusdis_thread { width: 100% !important; overflow: hidden !important; }
-#cusdis_thread iframe { border: none !important; width: 100% !important; min-height: 375px; }
+#cusdis_thread iframe { border: none !important; width: 100% !important; min-height: 350px; }
 
 @media (max-width: 768px) {
   .post-nav { flex-direction: column; }
