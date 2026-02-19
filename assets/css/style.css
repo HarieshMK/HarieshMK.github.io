@@ -27,7 +27,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 p { margin-bottom: 1.6em; }
 
-/* ===== 2. HEADER & ELEVATED NAVIGATION ===== */
+/* ===== 2. HEADER & NAVIGATION (HOVER FIX INCLUDED) ===== */
 header {
   text-align: center;
   padding: 40px 0 20px 0;
@@ -61,8 +61,6 @@ header .tagline {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.4rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
@@ -84,25 +82,32 @@ header .tagline {
   padding: 10px 22px;
   border-radius: 10px;
   transition: all 0.3s ease;
+  display: inline-block;
 }
+
+/* Hover effect for all nav links */
+.nav-list li a:hover {
+  color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.1);
+}
+
+/* Active link style */
 .nav-list li a.active {
   color: #0f172a !important;
   background: #ffffff !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #e2e8f0 !important;
-  transform: translateY(-3px) !important;
 }
 
-/* ===== 3. BLOG CARDS & UNIFORM HOVER ===== */
+/* ===== 3. BLOG CARDS & HOVER ===== */
 .post-card-link { display: block; text-decoration: none !important; color: inherit !important; margin-bottom: 25px; }
 .post-card, .home-card { padding: 30px; border: 1px solid #f1f5f9; border-radius: 12px; background: #fff; transition: all 0.3s ease; }
-.post-card-link:hover .post-card, .post-card-link:hover .home-card { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #38bdf8; }
+.post-card-link:hover .post-card { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #38bdf8; }
 .post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; }
 .post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
 /* ===== 4. FOOTER & BACK LINKS ===== */
 footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f1f5f9; }
-.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 30px; }
 .footer-col a { text-decoration: none; color: #64748b; transition: color 0.2s; }
 .back-to-blogs-container { display: flex !important; justify-content: center !important; margin: 50px 0 20px; }
 .back-link { font-weight: 700; color: #0f172a; text-decoration: none; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; }
@@ -116,48 +121,49 @@ footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f1f5f9; }
   border: 1px solid #f1f5f9;
   border-radius: 12px;
   background: #ffffff;
-  transition: all 0.3s ease;
 }
 .nav-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 2px; }
 .nav-title { font-weight: 700; color: #0f172a; font-size: 0.9rem; line-height: 1.3; display: block; }
 
-/* ===== 6. SUBTLE PROGRESS BAR ===== */
-.progress-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 850px; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+/* ===== 6. PROGRESS BAR ===== */
+.progress-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 850px; opacity: 0; pointer-events: none; }
 .progress-bar-track { width: 100%; height: 6px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden; }
-.progress-bar { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.2s ease-out; }
+.progress-bar { height: 100%; background: #0ea5e9; width: 0%; }
 
-/* ===== 7. DARK MODE OVERRIDES (THE BATTLE ZONE) ===== */
+/* ===== 7. DARK MODE OVERRIDES (FIXED HOVER & BLOCKS) ===== */
 .dark-theme body { background-color: #0b1120 !important; color: #e2e8f0 !important; }
 .dark-theme .container { background: #0f172a !important; }
 
-/* Fix Website Title and Headings Visibility */
-.dark-theme header h1 a, 
+/* Text Visibility */
 .dark-theme h1, .dark-theme h2, .dark-theme h3, 
 .dark-theme .post-title, .dark-theme .nav-title, 
-.dark-theme .back-link, .dark-theme .nav-label { 
+.dark-theme header h1 a, .dark-theme .back-link { 
   color: #ffffff !important; 
 }
 
-/* Fix Blog Cards and Nav Links (The solid white block issue) */
+/* Nav Hover in Dark Mode */
+.dark-theme .nav-list li a:hover {
+  color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.15) !important;
+}
+.dark-theme .nav-list li a.active {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+/* Blog Cards Fix */
 .dark-theme .post-card, .dark-theme .home-card, .dark-theme .nav-link { 
   background-color: #1e293b !important; 
   border-color: #334155 !important; 
-  color: #e2e8f0 !important;
 }
 
-/* NEWSLETTER DARK MODE FIXES */
-.dark-theme .ml-embedded { background-color: transparent !important; }
+/* NEWSLETTER DARK MODE */
 .dark-theme .ml-form-embedWrapper, .dark-theme .ml-form-embedBody { background: transparent !important; }
 .dark-theme .ml-form-embedBody h4, .dark-theme .ml-form-embedBody p { color: #ffffff !important; }
-
-/* Newsletter Input and Button Fix */
 .dark-theme .ml-form-embedBody input { 
   background-color: #ffffff !important; 
   color: #0f172a !important; 
-}
-.dark-theme .ml-form-embedBody .ml-button-horizontal button { 
-  background-color: #38bdf8 !important; 
-  color: #ffffff !important; 
 }
 
 /* DISCUSSION BOX (CUSDIS) FIX */
@@ -166,5 +172,4 @@ footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f1f5f9; }
 
 @media (max-width: 768px) {
   .post-nav { flex-direction: column; }
-  .container { padding: 30px 20px; }
 }
