@@ -3,46 +3,53 @@ layout: default
 title: Blogs
 ---
 
-<header style="text-align: left; margin-bottom: 40px;">
-  <h1 style="font-size: 2rem; margin-bottom: 10px;">The Knowledge Base</h1>
-  <p style="color: #64748b; font-style: italic;">Boring but practical finance guides.</p>
+<header style="text-align: left; margin-bottom: 30px;">
+  <h1 style="font-size: 2.2rem; margin-bottom: 5px;">The Knowledge Base</h1>
+  <p style="color: #64748b; font-style: italic; margin-top: 0;">Boring but practical finance guides.</p>
 </header>
 
 <section class="category-section" style="margin-bottom: 50px;">
-  <span style="text-transform: uppercase; font-size: 0.75rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.1em;">Playlists</span>
-<div class="folder-grid">
-  {% assign categories = site.categories | sort %}
-  {% for category in categories %}
-    {% assign category_name = category[0] %}
-    {% assign posts = category[1] %}
-    
-    <a href="#{{ category_name | slugify }}" class="folder-card">
-      <div class="folder-icon">📂</div>
-      <div class="folder-info">
-        <span class="folder-name">
-          {% if category_name == "Noise" %}
-            How to stay away from noises?
-          {% elsif category_name == "Beginning" %}
-            Just beginning? click here!
-          {% else %}
-            {{ category_name }}
-          {% endif %}
-        </span>
-        <span class="folder-count">{{ posts | size }} Articles</span>
-      </div>
-    </a>
-  {% endfor %}
-</div>
+  <span style="text-transform: uppercase; font-size: 0.7rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.1em; display: block; margin-bottom: 15px;">Playlists</span>
+  <div class="folder-grid">
+    {% assign categories = site.categories | sort %}
+    {% for category in categories %}
+      {% assign category_name = category[0] %}
+      {% assign posts = category[1] %}
+      {% assign first_post = posts | first %}
+      
+      <a href="#{{ category_name | slugify }}" class="folder-card">
+        <div class="folder-icon">📂</div>
+        <div class="folder-info">
+          <span class="folder-name">
+            {% if first_post.folder_name %}
+              {{ first_post.folder_name }}
+            {% else %}
+              {{ category_name }}
+            {% endif %}
+          </span>
+          <span class="folder-count">{{ posts | size }} Articles</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
 </section>
 
 <div class="blogs-list">
   {% for category in categories %}
     {% assign category_name = category[0] %}
     {% assign posts = category[1] %}
+    {% assign first_post = posts | first %}
 
-    <div id="{{ category_name | slugify }}" class="playlist-group" style="margin-top: 60px;">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <h3 style="text-transform: capitalize;">{{ category_name }}</h3>
+    <div id="{{ category_name | slugify }}" class="playlist-group" style="margin-top: 50px; padding-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; margin-bottom: 20px; padding-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 1.4rem;">
+            {% if first_post.folder_name %}
+              {{ first_post.folder_name }}
+            {% else %}
+              {{ category_name }}
+            {% endif %}
+        </h3>
+        <a href="#{{ category_name | slugify }}" style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-decoration: none;">Section Top ↑</a>
       </div>
       
       {% for post in posts limit:3 %}
@@ -50,28 +57,10 @@ title: Blogs
           <div class="post-card">
             <span class="post-title">{{ post.title }}</span>
             <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-            <p>{{ post.excerpt | strip_html | truncate: 120 }}</p>
+            <p style="font-size: 0.95rem; color: #64748b; margin-top: 10px;">{{ post.excerpt | strip_html | truncate: 140 }}</p>
           </div>
         </a>
       {% endfor %}
     </div>
   {% endfor %}
-</div>
-
-  <div id="noise" class="playlist-group" style="margin-top: 60px;">
-    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-      <h3>Signal vs. Noise</h3>
-      <a href="/category/noise" style="font-size: 0.8rem; font-weight: 700;">View All →</a>
-    </div>
-    {% for post in site.categories.noise limit:3 %}
-      <a href="{{ post.url | relative_url }}" class="post-card-link">
-        <div class="post-card">
-          <span class="post-title">{{ post.title }}</span>
-          <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-          <p>{{ post.excerpt | strip_html | truncate: 120 }}</p>
-        </div>
-      </a>
-    {% endfor %}
-  </div>
-
 </div>
