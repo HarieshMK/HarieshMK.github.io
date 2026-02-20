@@ -53,14 +53,11 @@ title: Blogs
       </div>
       
       {% for post in posts limit:3 %}
-        <a href="{{ post.url | relative_url }}" class="post-card-link">
-          <div class="post-card">
-            <span class="post-title">{{ post.title }}</span>
-            <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-            <p style="font-size: 0.95rem; color: #64748b; margin-top: 10px;">{{ post.excerpt | strip_html | truncate: 140 }}</p>
-          </div>
-        </a>
-      {% endfor %}
+  <a href="{{ post.url | relative_url }}" class="premium-post-wrapper">
+    <div class="post-card">
+      <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+      <h2 class="post-title">{{ post.title }}</h2>
+      <p class="post-summary">{{ post.excerpt | strip_html | truncate: 160 }}</p>
     </div>
-  {% endfor %}
-</div>
+  </a>
+{% endfor %}
