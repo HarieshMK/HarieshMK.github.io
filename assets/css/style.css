@@ -233,3 +233,52 @@ a:not(.nav-list li a):not(.post-card-link):hover {
   .post-nav { flex-direction: column; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
 }
+/* ===== 9. FOLDER LAYOUT STYLES ===== */
+.category-section {
+  margin-bottom: 50px;
+}
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.folder-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.3s ease;
+}
+.folder-card:hover {
+  border-color: #38bdf8;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+.folder-icon {
+  font-size: 1.5rem;
+}
+.folder-name {
+  display: block;
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+.folder-count {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Dark Mode support for Folders */
+.dark-theme .folder-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+.dark-theme .folder-name {
+  color: #ffffff !important;
+}
