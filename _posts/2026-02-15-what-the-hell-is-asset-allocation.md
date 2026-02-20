@@ -2,7 +2,7 @@
 layout: post
 title: "What the Hell Is Asset Allocation? And Why It Matters"
 date: 2026-02-15
-category: Beginners
+category: beginners
 ---
 
 ## What the hell is asset allocation?  
