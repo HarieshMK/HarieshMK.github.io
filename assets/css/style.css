@@ -282,3 +282,49 @@ a:not(.nav-list li a):not(.post-card-link):hover {
 .dark-theme .folder-name {
   color: #ffffff !important;
 }
+/* ===== 10. PREMIUM POLISH & DARK MODE REFINEMENT ===== */
+
+/* Soften the lines */
+hr, .playlist-group div {
+  border-color: rgba(226, 232, 240, 0.5) !important;
+}
+
+/* Fix Folder Grid Spacing */
+.category-section span {
+  margin-bottom: 20px !important;
+  opacity: 0.8;
+}
+
+/* Smooth out the Folder Cards */
+.folder-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+  border: 1px solid #eef2f6 !important;
+}
+
+/* Section Top Link Polish */
+a[href^="#"] {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+a[href^="#"]:hover {
+  opacity: 1;
+}
+
+/* DARK MODE SPECIFIC REFINEMENTS */
+.dark-theme .folder-card, 
+.dark-theme .post-card {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important; /* Subtle border instead of bright white */
+  background: #111827 !important; /* Slightly deeper than the container */
+}
+
+.dark-theme hr, 
+.dark-theme .playlist-group div {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-theme .folder-name {
+  color: #f1f5f9 !important;
+}
