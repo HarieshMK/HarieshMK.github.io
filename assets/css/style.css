@@ -305,3 +305,13 @@ a[href^="#"]:hover { transform: scale(1.1); color: #0f172a !important; }
 
 .dark-theme .post-card-link:hover .post-card { border-color: #38bdf8 !important; }
 .dark-theme hr, .dark-theme .playlist-group div { border-color: rgba(255, 255, 255, 0.05) !important; }
+
+/* Force Playlists to stay at the top of the Knowledge Base */
+.playlists-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    position: relative !important; /* Prevents floating */
+    margin-bottom: 2rem !important;
+    clear: both !important;
+}
