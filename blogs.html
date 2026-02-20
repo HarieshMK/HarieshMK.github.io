@@ -1,23 +1,22 @@
 ---
 layout: default
 title: Blogs
-description: "Explore practical guides on asset allocation, market risks, and disciplined investing. Real-world money strategies for the unexcitingly wealthy."
 ---
 
-<h1 style="text-align: center; margin-bottom: 10px;">Explore Our Money Guides</h1>
-<p style="text-align: center; color: #64748b; margin-bottom: 40px;">Real-world finance for the long-term thinker.</p>
+<header style="text-align: left; margin-bottom: 40px;">
+  <h1 style="font-size: 2rem; margin-bottom: 10px;">The Knowledge Base</h1>
+  <p style="color: #64748b; font-style: italic;">Boring but practical finance guides.</p>
+</header>
 
-<section class="category-section">
-  <h2 style="margin-bottom: 5px;">Explore by Topic</h2>
-  <p style="margin-top: 0; color: #64748b; font-style: italic; font-size: 0.9rem;">Boring but practical.</p>
-  
+<section class="category-section" style="margin-bottom: 50px;">
+  <span style="text-transform: uppercase; font-size: 0.75rem; font-weight: 800; color: #94a3b8; letter-spacing: 0.1em;">Playlists</span>
   <div class="folder-grid">
     
     <a href="#beginners" class="folder-card">
       <div class="folder-icon">📂</div>
       <div class="folder-info">
         <span class="folder-name">Beginner's Blueprint</span>
-        <span class="folder-count">2 Articles</span>
+        <span class="folder-count">{{ site.categories.beginners | size }} Articles</span>
       </div>
     </a>
 
@@ -25,15 +24,7 @@ description: "Explore practical guides on asset allocation, market risks, and di
       <div class="folder-icon">📂</div>
       <div class="folder-info">
         <span class="folder-name">Signal vs. Noise</span>
-        <span class="folder-count">2 Articles</span>
-      </div>
-    </a>
-
-    <a href="#market" class="folder-card">
-      <div class="folder-icon">📂</div>
-      <div class="folder-info">
-        <span class="folder-name">Market Realities</span>
-        <span class="folder-count">Coming Soon</span>
+        <span class="folder-count">{{ site.categories.noise | size }} Articles</span>
       </div>
     </a>
 
@@ -42,30 +33,36 @@ description: "Explore practical guides on asset allocation, market risks, and di
 
 <div class="blogs-list">
 
-  <h3 id="beginners" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; color: #0f172a;">Beginner's Blueprint</h3>
-  {% for post in site.posts %}
-    {% if post.title contains "Invest" or post.title contains "Allocation" %}
+  <div id="beginners" class="playlist-group">
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <h3>Beginner's Blueprint</h3>
+      <a href="/category/beginners" style="font-size: 0.8rem; font-weight: 700;">View All →</a>
+    </div>
+    {% for post in site.categories.beginners limit:3 %}
       <a href="{{ post.url | relative_url }}" class="post-card-link">
         <div class="post-card">
           <span class="post-title">{{ post.title }}</span>
           <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-          <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
+          <p>{{ post.excerpt | strip_html | truncate: 120 }}</p>
         </div>
       </a>
-    {% endif %}
-  {% endfor %}
+    {% endfor %}
+  </div>
 
-  <h3 id="noise" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; color: #0f172a;">Signal vs. Noise</h3>
-  {% for post in site.posts %}
-    {% if post.title contains "noise" or post.title contains "Silver" %}
+  <div id="noise" class="playlist-group" style="margin-top: 60px;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <h3>Signal vs. Noise</h3>
+      <a href="/category/noise" style="font-size: 0.8rem; font-weight: 700;">View All →</a>
+    </div>
+    {% for post in site.categories.noise limit:3 %}
       <a href="{{ post.url | relative_url }}" class="post-card-link">
         <div class="post-card">
           <span class="post-title">{{ post.title }}</span>
           <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-          <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
+          <p>{{ post.excerpt | strip_html | truncate: 120 }}</p>
         </div>
       </a>
-    {% endif %}
-  {% endfor %}
+    {% endfor %}
+  </div>
 
 </div>
