@@ -246,102 +246,114 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
   a[href^="#"] { position: static !important; display: block; text-align: right; }
 }
 
-/* ===== 9. CLEAN VERTICAL LAYOUT (FOLDERS & BLOGS) ===== */
-.category-section { margin-bottom: 50px; }
-
-/* Force folders and blogs to stack vertically (one per line) */
-.folder-grid, .home-posts, .playlists-container, .playlist-group {
+/* ===== 9. HORIZONTAL PLAYLISTS (FOLDERS) ===== */
+.playlists-container, .folder-grid, .playlist-group {
   display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  margin-top: 20px !important;
-  position: relative !important;
-  transform: none !important;
+  flex-direction: row !important; /* Side by side */
+  overflow-x: auto !important;    /* Enables horizontal scroll */
+  gap: 15px !important;
+  padding: 10px 5px 20px 5px !important;
+  scrollbar-width: thin;          /* Slim scrollbar for Firefox */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Card Styling for both Folders and Posts */
-.folder-card, .post-card {
+/* Hide scrollbar for Chrome/Safari to keep it clean */
+.playlists-container::-webkit-scrollbar {
+  height: 4px;
+}
+.playlists-container::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+  border-radius: 10px;
+}
+
+.folder-card {
+  flex: 0 0 280px; /* Fixed width so they don't shrink */
   background: #ffffff;
   border: 1px solid #eef2f6 !important;
-  border-radius: 12px;
-  padding: 18px 25px;
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Aligns content to the left */
-  gap: 15px;
+  gap: 12px;
   transition: all 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 
-.folder-card:hover, .post-card:hover {
+.folder-card:hover {
   border-color: #38bdf8 !important;
-  transform: translateX(8px); /* Subtle slide to the right on hover */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(56, 189, 248, 0.1);
 }
 
-.folder-name, .post-title {
-  font-weight: 700;
+/* ===== 10. PREMIUM BLOG CARDS (CLEAN & INTEGRATED) ===== */
+.home-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.post-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 16px;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: 1fr auto; /* Title/Excerpt on left, Date on right */
+  gap: 10px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.post-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: #38bdf8;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.post-card:hover {
+  border-color: transparent !important;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+  transform: scale(1.01);
+}
+
+.post-card:hover::before {
+  opacity: 1;
+}
+
+.post-title {
+  grid-column: 1;
+  font-size: 1.35rem;
+  font-family: 'Lora', serif;
   color: #0f172a;
-  font-size: 1.1rem;
-  margin: 0;
+  margin-bottom: 8px;
+  line-height: 1.3;
 }
 
-.folder-count, .post-date {
-  font-size: 0.8rem;
+.post-date {
+  grid-column: 2;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: #94a3b8;
-  margin-left: auto; /* Pushes date/count to the far right */
-  font-weight: 600;
-}
-
-/* ===== 10. CLEAN UP & NAVIGATION FIXES ===== */
-
-/* FIX: Removes the floating "folders" logic that was stuck in the bottom right */
-a[href^="#"] {
-  position: static !important;
-  display: inline-block;
-  font-size: 0.85rem;
   font-weight: 700;
-  color: #38bdf8 !important;
-  margin: 5px 0;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 0 !important;
 }
 
-/* Fix for the Theme Toggle visibility */
-#theme-toggle {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 1000;
+.post-excerpt {
+  grid-column: 1 / span 2; /* Spans across the card */
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
 }
 
-/* Dark Mode Adjustments for Cards */
-.dark-theme .folder-card, .dark-theme .post-card { 
-  background: #1e293b !important; 
-  border-color: rgba(255, 255, 255, 0.1) !important; 
+/* Dark Mode Polish */
+.dark-theme .folder-card, .dark-theme .post-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
 }
-.dark-theme .folder-name, .dark-theme .post-title { color: #ffffff !important; }
-
-/* ===== 11. FOOTER & LINK POLISH ===== */
-.generic-link, .back-link {
-  color: #0f172a;
-  text-decoration: none;
-  border-bottom: 2px solid #38bdf8;
-  padding-bottom: 2px;
-  transition: all 0.2s ease;
-}
-
-.generic-link:hover, .back-link:hover {
-  color: #38bdf8;
-}
-
-.dark-theme .generic-link, .dark-theme .back-link {
-  color: #ffffff !important;
-}
-
-.dark-theme .footer-col a:hover {
-  color: #38bdf8 !important;
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-}
+.dark-theme .post-title { color: #ffffff !important; }
+.dark-theme .post-card:hover { background: #243147 !important; }
