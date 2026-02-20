@@ -246,101 +246,119 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
   a[href^="#"] { position: static !important; display: block; text-align: right; }
 }
 
-/* ===== 9. HORIZONTAL PLAYLISTS (FOLDERS) ===== */
-.playlists-container, .folder-grid, .playlist-group {
+/* ===== 9. HORIZONTAL FOLDERS (SWIPEABLE) ===== */
+.folder-grid {
   display: flex !important;
   flex-direction: row !important; /* Side by side */
-  overflow-x: auto !important;    /* Enables horizontal scroll */
+  overflow-x: auto !important;    /* Allows swiping */
   gap: 15px !important;
-  padding: 10px 5px 20px 5px !important;
-  scrollbar-width: thin;          /* Slim scrollbar for Firefox */
-  -webkit-overflow-scrolling: touch;
+  padding: 10px 0 25px 0 !important;
+  
+  /* Hide scrollbar logic */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  -webkit-overflow-scrolling: touch; /* Smooth swipe on iPhone */
 }
 
-/* Hide scrollbar for Chrome/Safari to keep it clean */
-.playlists-container::-webkit-scrollbar {
-  height: 4px;
-}
-.playlists-container::-webkit-scrollbar-thumb {
-  background: #38bdf8;
-  border-radius: 10px;
+.folder-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .folder-card {
-  flex: 0 0 280px; /* Fixed width so they don't shrink */
+  flex: 0 0 280px; /* Fixed width so they don't squish */
   background: #ffffff;
-  border: 1px solid #eef2f6 !important;
-  border-radius: 16px;
-  padding: 20px;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 12px;
+  padding: 15px 20px;
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none !important;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
 .folder-card:hover {
   border-color: #38bdf8 !important;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(56, 189, 248, 0.1);
+  transform: translateY(-3px);
 }
 
-/* ===== 10. PREMIUM BLOG CARDS (CLEAN & INTEGRATED) ===== */
-.home-posts {
+.folder-info {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+}
+
+.folder-name {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.folder-count {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* ===== 10. VERTICAL BLOG LIST (PREMIUM EDITORIAL) ===== */
+.playlist-group {
+  display: flex;
+  flex-direction: column; /* Stacked one by one */
+  gap: 0px; /* Controlled by card padding */
+}
+
+.post-card-link {
+  text-decoration: none !important;
+  display: block;
 }
 
 .post-card {
-  background: #ffffff;
-  border: 1px solid #f1f5f9 !important;
-  border-radius: 16px;
-  padding: 30px;
-  display: grid;
-  grid-template-columns: 1fr auto; /* Title/Excerpt on left, Date on right */
-  gap: 10px;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.post-card::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 4px;
-  background: #38bdf8;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  background: transparent;
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding: 25px 0; /* Vertical spacing between articles */
+  transition: all 0.3s ease;
 }
 
 .post-card:hover {
-  border-color: transparent !important;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
-  transform: scale(1.01);
-}
-
-.post-card:hover::before {
-  opacity: 1;
+  opacity: 0.7;
 }
 
 .post-title {
-  grid-column: 1;
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-family: 'Lora', serif;
   color: #0f172a;
-  margin-bottom: 8px;
-  line-height: 1.3;
+  display: block; /* Title gets its own line */
+  margin-bottom: 5px;
+  line-height: 1.2;
 }
 
 .post-date {
-  grid-column: 2;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.7rem;
   color: #94a3b8;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.post-card p {
+  font-size: 1rem !important;
+  color: #64748b !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+}
+
+/* Dark Mode Fixes */
+.dark-theme .folder-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark-theme .folder-name, .dark-theme .post-title {
+  color: #ffffff !important;
+}
+.dark-theme .post-card {
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .post-excerpt {
