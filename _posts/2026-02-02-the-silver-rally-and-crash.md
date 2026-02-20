@@ -3,6 +3,7 @@ layout: post
 title: "The Silver Rally and Crash: A Lesson in Noise"
 date: 2026-02-02
 category: noise
+folder_name: "How to stay away from noises?"
 ---
 
 You’ve probably noticed the sharp rise in gold and silver over the past year. And if you’re honest, you probably felt the FOMO—the urge to buy because prices were running away.
