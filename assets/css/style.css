@@ -246,102 +246,102 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
   a[href^="#"] { position: static !important; display: block; text-align: right; }
 }
 
-/* ===== 9. FOLDER LAYOUT STYLES ===== */
+/* ===== 9. CLEAN VERTICAL LAYOUT (FOLDERS & BLOGS) ===== */
 .category-section { margin-bottom: 50px; }
-.folder-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+
+/* Force folders and blogs to stack vertically (one per line) */
+.folder-grid, .home-posts, .playlists-container, .playlist-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  margin-top: 20px !important;
+  position: relative !important;
+  transform: none !important;
 }
-.folder-card {
+
+/* Card Styling for both Folders and Posts */
+.folder-card, .post-card {
   background: #ffffff;
   border: 1px solid #eef2f6 !important;
-  border-radius: 15px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 18px 25px;
   display: flex;
   align-items: center;
+  justify-content: flex-start; /* Aligns content to the left */
   gap: 15px;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-.folder-card:hover {
-  border-color: #38bdf8 !important; /* Premium Blue Border */
-  transform: translateY(-5px); /* Increased lift slightly */
-  box-shadow: 0 12px 20px rgba(0,0,0,0.08); /* Stronger shadow */
-}
-.folder-icon { font-size: 1.5rem; }
-.folder-name { display: block; font-weight: 700; color: #0f172a; font-size: 0.95rem; }
-.folder-count { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
-
-.dark-theme .folder-card { background: #111827 !important; border-color: rgba(255, 255, 255, 0.1) !important; }
-.dark-theme .folder-card:hover { border-color: #38bdf8 !important; }
-.dark-theme .folder-name { color: #f1f5f9 !important; }
-
-/* ===== 10. PREMIUM POLISH & STICKY NAVIGATION ===== */
-hr, .playlist-group div { border-color: rgba(226, 232, 240, 0.5) !important; }
-.category-section span { margin-bottom: 20px !important; opacity: 0.8; }
-
-/* THE TRUE FLOATING LINK FIX */
-a[href^="#"] {
-  font-size: 0.75rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.05em;
-  color: #38bdf8 !important;
-  text-decoration: none;
-  /* Floating Logic */
-  position: fixed; 
-  bottom: 100px; /* Sits above theme toggle */
-  right: 38px;
-  z-index: 999;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 8px 12px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  backdrop-filter: blur(4px);
   transition: all 0.3s ease;
-}
-.dark-theme a[href^="#"] { background: rgba(30, 41, 59, 0.8); }
-a[href^="#"]:hover { transform: scale(1.1); color: #0f172a !important; }
-
-.dark-theme .post-card-link:hover .post-card { border-color: #38bdf8 !important; }
-.dark-theme hr, .dark-theme .playlist-group div { border-color: rgba(255, 255, 255, 0.05) !important; }
-
-/* ===== 11. FINAL SURGICAL FIXES ===== */
-
-/* 1. Resetting Playlists: Ensures they stay in line at the top */
-.playlists-container, .folder-grid, .playlist-group {
-    position: relative !important;
-    display: grid !important; /* Matches your Section 9 grid */
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-    gap: 20px !important;
-    margin-bottom: 40px !important;
-    transform: none !important;
-    clear: both !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* 2. Logic for Footer Links & View All Articles (Glow & Underline) */
-/* This targets the actual footer links and the generic links like 'View All' */
-.dark-theme .footer-col a, 
-.dark-theme .generic-link, 
-.dark-theme .back-link {
-    text-decoration: none !important;
-    transition: all 0.3s ease-in-out !important; 
+.folder-card:hover, .post-card:hover {
+  border-color: #38bdf8 !important;
+  transform: translateX(8px); /* Subtle slide to the right on hover */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-.dark-theme .footer-col a:hover, 
-.dark-theme .generic-link:hover, 
-.dark-theme .back-link:hover {
-    color: #38bdf8 !important; /* Shifting to Blue */
-    text-decoration: underline !important; /* Adding Underline */
-    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important; /* The Glow Effect */
-    border-color: #ffffff !important; /* Keeps underline white/bright in dark mode */
+.folder-name, .post-title {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1.1rem;
+  margin: 0;
 }
 
-/* 3. Re-Syncing the 'View All' Button color logic for Light Mode */
-.generic-link {
-    color: #0f172a; /* Black in normal mode */
+.folder-count, .post-date {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-left: auto; /* Pushes date/count to the far right */
+  font-weight: 600;
 }
-.generic-link:hover {
-    color: #38bdf8; /* Blue on hover */
-    border-color: #0f172a; /* Underline changes to black */
+
+/* ===== 10. CLEAN UP & NAVIGATION FIXES ===== */
+
+/* FIX: Removes the floating "folders" logic that was stuck in the bottom right */
+a[href^="#"] {
+  position: static !important;
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #38bdf8 !important;
+  margin: 5px 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Fix for the Theme Toggle visibility */
+#theme-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+}
+
+/* Dark Mode Adjustments for Cards */
+.dark-theme .folder-card, .dark-theme .post-card { 
+  background: #1e293b !important; 
+  border-color: rgba(255, 255, 255, 0.1) !important; 
+}
+.dark-theme .folder-name, .dark-theme .post-title { color: #ffffff !important; }
+
+/* ===== 11. FOOTER & LINK POLISH ===== */
+.generic-link, .back-link {
+  color: #0f172a;
+  text-decoration: none;
+  border-bottom: 2px solid #38bdf8;
+  padding-bottom: 2px;
+  transition: all 0.2s ease;
+}
+
+.generic-link:hover, .back-link:hover {
+  color: #38bdf8;
+}
+
+.dark-theme .generic-link, .dark-theme .back-link {
+  color: #ffffff !important;
+}
+
+.dark-theme .footer-col a:hover {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
 }
