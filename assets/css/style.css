@@ -290,67 +290,80 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
   letter-spacing: 0.05em;
 }
 
-/* ===== 10. PREMIUM EDITORIAL BLOG LIST (WITH BREATHING ROOM) ===== */
+/* ===== 10. PREMIUM EDITORIAL LIST (THE FIX) ===== */
+
+/* This container ensures the cards don't stretch too wide or stay too narrow */
 .playlist-group {
-  display: flex;
-  flex-direction: column;
-  gap: 32px; /* Increased gap between blog posts */
-  margin-top: 40px;
+  display: block !important; /* Force vertical stack */
+  max-width: 800px;
+  margin: 40px auto 0 auto;
 }
 
-.post-card-link {
+.premium-post-wrapper {
   text-decoration: none !important;
   display: block;
+  margin-bottom: 30px; /* Space between the cards */
 }
 
 .post-card {
-  background: rgba(255, 255, 255, 0.03); /* Extremely subtle tint for depth */
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 16px;
-  /* THE FIX: Significant internal padding so text doesn't touch the edges */
-  padding: 40px !important; 
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  /* BACKGROUND & BORDER */
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  
+  /* THE MAIN FIX: MASSIVE INTERNAL PADDING */
+  padding: 50px 60px !important; /* 50px top/bottom, 60px sides */
+  
+  display: flex !important;
+  flex-direction: column !important;
+  text-align: left !important;
+  transition: all 0.4s ease;
+  box-sizing: border-box !important;
 }
 
 .post-card:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07) !important;
   border-color: #38bdf8 !important;
-  transform: translateY(-4px);
-}
-
-.post-title {
-  font-size: 1.8rem;
-  font-family: 'Lora', serif;
-  color: #ffffff; /* Contrast for Dark Mode */
-  line-height: 1.3;
-  margin-bottom: 12px !important;
-  display: block;
+  transform: translateY(-5px);
 }
 
 .post-date {
-  font-size: 0.75rem;
-  color: #38bdf8;
-  font-weight: 800;
+  font-size: 0.75rem !important;
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 20px;
+  letter-spacing: 0.15em;
+  margin-bottom: 15px !important;
   display: block;
 }
 
-.post-card p {
-  font-size: 1.05rem !important;
-  color: #94a3b8 !important; /* Muted slate for excerpts */
-  line-height: 1.8 !important; /* Increased line height for readability */
-  max-width: 100%; 
+.post-title {
+  font-size: 1.85rem !important;
+  font-family: 'Lora', serif !important;
+  color: #ffffff !important;
+  line-height: 1.3 !important;
+  margin: 0 0 20px 0 !important;
+  font-weight: 700 !important;
+}
+
+.post-summary {
+  font-size: 1.1rem !important;
+  color: #94a3b8 !important;
+  line-height: 1.8 !important;
   margin: 0 !important;
 }
 
-/* Light Theme Overrides (to keep it consistent) */
+/* Light Mode Support */
 body:not(.dark-theme) .post-card {
-  background: #ffffff;
-  border: 1px solid #f1f5f9 !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  background: #ffffff !important;
+  border: 1px solid #eef2f6 !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
 }
+body:not(.dark-theme) .post-title { color: #0f172a !important; }
+body:not(.dark-theme) .post-summary { color: #475569 !important; }
 
-body:not(.dark-theme) .post-title { color: #0f172a; }
-body:not(.dark-theme) .post-card p { color: #475569 !important; }
+/* Mobile Adjustment: Reduce padding slightly for small screens */
+@media (max-width: 768px) {
+  .post-card { padding: 30px !important; }
+  .post-title { font-size: 1.5rem !important; }
+}
