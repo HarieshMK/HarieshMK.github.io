@@ -85,11 +85,13 @@ header .tagline {
   transition: all 0.3s ease;
   display: inline-block;
 }
+
 .nav-list li a:hover {
   color: #38bdf8 !important;
   background-color: rgba(56, 189, 248, 0.08) !important;
   transform: translateY(-1px);
 }
+
 .nav-list li a.active {
   color: #0f172a !important;
   background: #ffffff !important;
@@ -131,7 +133,7 @@ footer {
 }
 .footer-col a:hover { color: #38bdf8 !important; }
 
-/* UNIFIED LINK STYLE (FOR BACK-TO-HOME & VIEW-ALL) */
+/* RE-SYNCED BACK-LINK & VIEW ALL LOGIC */
 .back-to-blogs-container { display: flex !important; justify-content: center !important; margin: 50px 0 20px; }
 .back-link, .generic-link { 
   font-weight: 700; 
@@ -143,6 +145,17 @@ footer {
   display: inline-block;
 }
 .back-link:hover, .generic-link:hover { color: #38bdf8; border-color: #0f172a; }
+
+/* PREMIUM GENERIC LINK (IMAGE 4 STYLE) */
+.generic-link { 
+  font-weight: 700; 
+  color: #38bdf8; 
+  text-decoration: none; 
+  border-bottom: 2px solid #38bdf8; 
+  padding-bottom: 4px; 
+  transition: all 0.2s ease; 
+}
+.generic-link:hover { color: #0f172a; border-color: #0f172a; }
 
 /* ===== 5. POST NAVIGATION ===== */
 .post-nav { display: flex; justify-content: space-between; gap: 20px; margin: 40px 0; width: 100%; }
@@ -168,6 +181,7 @@ footer {
 .dark-theme body { background-color: #0b1120 !important; color: #e2e8f0 !important; }
 .dark-theme .container { background: #0f172a !important; }
 
+/* Text Visibility */
 .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4,
 .dark-theme .post-title, .dark-theme .nav-title, 
 .dark-theme header h1 a, .dark-theme .back-link, .dark-theme .generic-link,
@@ -175,20 +189,25 @@ footer {
   color: #ffffff !important; 
 }
 
+/* Nav Hover in Dark Mode */
 .dark-theme .nav-list li a:hover {
   color: #38bdf8 !important;
   background-color: rgba(56, 189, 248, 0.15) !important;
-}
+  }
 .dark-theme .nav-list li a.active {
   background-color: #1e293b !important;
   border-color: #334155 !important;
   color: #ffffff !important;
 }
 
+/* Blog Cards Fix */
 .dark-theme .post-card, .dark-theme .home-card, .dark-theme .nav-link { 
   background-color: #1e293b !important; 
   border-color: #334155 !important; 
 }
+
+/* Dark Mode Hover Color Swap for Links */
+.dark-theme .generic-link:hover { color: #38bdf8 !important; border-color: #ffffff !important; }
 
 /* Footer & Back Link Dark Hover Fix */
 .dark-theme .footer-col a:hover { color: #38bdf8 !important; }
@@ -223,6 +242,7 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
 @media (max-width: 768px) {
   .post-nav { flex-direction: column; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+  /* Ensure floating link doesn't cover text on tiny screens */
   a[href^="#"] { position: static !important; display: block; text-align: right; }
 }
 
@@ -245,9 +265,9 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .folder-card:hover {
-  border-color: #38bdf8 !important; 
-  transform: translateY(-5px); 
-  box-shadow: 0 12px 24px rgba(0,0,0,0.08); 
+  border-color: #38bdf8 !important; /* Premium Blue Border */
+  transform: translateY(-5px); /* Increased lift slightly */
+  box-shadow: 0 12px 20px rgba(0,0,0,0.08); /* Stronger shadow */
 }
 .folder-icon { font-size: 1.5rem; }
 .folder-name { display: block; font-weight: 700; color: #0f172a; font-size: 0.95rem; }
@@ -257,19 +277,20 @@ a:not(.nav-list li a):not(.post-card-link):not(.back-link):not(.generic-link):ho
 .dark-theme .folder-card:hover { border-color: #38bdf8 !important; }
 .dark-theme .folder-name { color: #f1f5f9 !important; }
 
-/* ===== 10. PREMIUM POLISH & FLOATING NAVIGATION ===== */
+/* ===== 10. PREMIUM POLISH & STICKY NAVIGATION ===== */
 hr, .playlist-group div { border-color: rgba(226, 232, 240, 0.5) !important; }
 .category-section span { margin-bottom: 20px !important; opacity: 0.8; }
 
-/* THE FLOATING LINK FIX */
+/* THE TRUE FLOATING LINK FIX */
 a[href^="#"] {
   font-size: 0.75rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.05em;
   color: #38bdf8 !important;
   text-decoration: none;
+  /* Floating Logic */
   position: fixed; 
-  bottom: 100px; 
+  bottom: 100px; /* Sits above theme toggle */
   right: 38px;
   z-index: 999;
   background: rgba(255, 255, 255, 0.9);
