@@ -306,12 +306,42 @@ a[href^="#"]:hover { transform: scale(1.1); color: #0f172a !important; }
 .dark-theme .post-card-link:hover .post-card { border-color: #38bdf8 !important; }
 .dark-theme hr, .dark-theme .playlist-group div { border-color: rgba(255, 255, 255, 0.05) !important; }
 
-/* Force Playlists to stay at the top of the Knowledge Base */
-.playlists-container {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 1rem !important;
-    position: relative !important; /* Prevents floating */
-    margin-bottom: 2rem !important;
+/* ===== 11. FINAL SURGICAL FIXES ===== */
+
+/* 1. Resetting Playlists: Ensures they stay in line at the top */
+.playlists-container, .folder-grid, .playlist-group {
+    position: relative !important;
+    display: grid !important; /* Matches your Section 9 grid */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    margin-bottom: 40px !important;
+    transform: none !important;
     clear: both !important;
+}
+
+/* 2. Logic for Footer Links & View All Articles (Glow & Underline) */
+/* This targets the actual footer links and the generic links like 'View All' */
+.dark-theme .footer-col a, 
+.dark-theme .generic-link, 
+.dark-theme .back-link {
+    text-decoration: none !important;
+    transition: all 0.3s ease-in-out !important; 
+}
+
+.dark-theme .footer-col a:hover, 
+.dark-theme .generic-link:hover, 
+.dark-theme .back-link:hover {
+    color: #38bdf8 !important; /* Shifting to Blue */
+    text-decoration: underline !important; /* Adding Underline */
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important; /* The Glow Effect */
+    border-color: #ffffff !important; /* Keeps underline white/bright in dark mode */
+}
+
+/* 3. Re-Syncing the 'View All' Button color logic for Light Mode */
+.generic-link {
+    color: #0f172a; /* Black in normal mode */
+}
+.generic-link:hover {
+    color: #38bdf8; /* Blue on hover */
+    border-color: #0f172a; /* Underline changes to black */
 }
