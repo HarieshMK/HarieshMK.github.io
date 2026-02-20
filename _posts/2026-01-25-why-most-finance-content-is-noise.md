@@ -2,7 +2,7 @@
 layout: post
 title: "Why most finance content is noise"
 date: 2026-01-24
-category: noise
+category: How to stay away from noises?
 ---
 
 Scrolling through personal finance content can feel overwhelming most of the time — so much advice, so little usable guidance.
