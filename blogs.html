@@ -6,20 +6,63 @@ description: "Explore practical guides on asset allocation, market risks, and di
 
 <h1 style="text-align: center; margin-bottom: 40px;">Explore Our Money Guides</h1>
 
-<div class="blogs-list">
-  {% for post in site.posts %}
-    <a href="{{ post.url | relative_url }}" class="post-card-link">
-      <div class="post-card">
-        <span class="post-title">{{ post.title }}</span>
-
-        <span class="post-date">
-          {{ post.date | date: "%B %d, %Y" }}
-        </span>
-
-        <div class="post-excerpt">
-          {{ post.excerpt | strip_html | truncate: 140 }}
-        </div>
+<section class="category-section">
+  <h3>Browse by Playlist</h3>
+  <div class="folder-grid">
+    
+    <a href="#beginners" class="folder-card">
+      <div class="folder-icon">📂</div>
+      <div class="folder-info">
+        <span class="folder-name">Beginner's Blueprint</span>
+        <span class="folder-count">2 Articles</span>
       </div>
     </a>
+
+    <a href="#noise" class="folder-card">
+      <div class="folder-icon">📂</div>
+      <div class="folder-info">
+        <span class="folder-name">Signal vs. Noise</span>
+        <span class="folder-count">2 Articles</span>
+      </div>
+    </a>
+
+    <a href="#market" class="folder-card">
+      <div class="folder-icon">📂</div>
+      <div class="folder-info">
+        <span class="folder-name">Market Realities</span>
+        <span class="folder-count">Coming Soon</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<div class="blogs-list">
+
+  <h2 id="beginners" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">Beginner's Blueprint</h2>
+  {% for post in site.posts %}
+    {% if post.title contains "Invest" or post.title contains "Allocation" %}
+      <a href="{{ post.url | relative_url }}" class="post-card-link">
+        <div class="post-card">
+          <span class="post-title">{{ post.title }}</span>
+          <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+          <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
+        </div>
+      </a>
+    {% endif %}
   {% endfor %}
+
+  <h2 id="noise" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">Signal vs. Noise</h2>
+  {% for post in site.posts %}
+    {% if post.title contains "noise" or post.title contains "Silver" %}
+      <a href="{{ post.url | relative_url }}" class="post-card-link">
+        <div class="post-card">
+          <span class="post-title">{{ post.title }}</span>
+          <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+          <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
+        </div>
+      </a>
+    {% endif %}
+  {% endfor %}
+
 </div>
