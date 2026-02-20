@@ -40,24 +40,27 @@ title: Blogs
     {% assign posts = category[1] %}
     {% assign first_post = posts | first %}
 
-    <div id="{{ category_name | slugify }}" class="playlist-group" style="margin-top: 50px; padding-top: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; margin-bottom: 20px; padding-bottom: 10px;">
-        <h3 style="margin: 0; font-size: 1.4rem;">
+    <div id="{{ category_name | slugify }}" class="playlist-group">
+      <div class="category-header">
+        <h3 class="category-title">
             {% if first_post.folder_name %}
               {{ first_post.folder_name }}
             {% else %}
               {{ category_name }}
             {% endif %}
         </h3>
-        <a href="#{{ category_name | slugify }}" style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-decoration: none;">Section Top ↑</a>
+        <a href="#" class="section-top">Section Top ↑</a>
       </div>
       
-      {% for post in posts limit:3 %}
-  <a href="{{ post.url | relative_url }}" class="premium-post-wrapper">
-    <div class="post-card">
-      <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-      <h2 class="post-title">{{ post.title }}</h2>
-      <p class="post-summary">{{ post.excerpt | strip_html | truncate: 160 }}</p>
-    </div>
-  </a>
-{% endfor %}
+      <div class="posts-stack">
+        {% for post in posts limit:3 %}
+          <a href="{{ post.url | relative_url }}" class="premium-post-wrapper">
+            <div class="post-card">
+              <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+              <h2 class="post-title">{{ post.title }}</h2>
+              <p class="post-summary">{{ post.excerpt | strip_html | truncate: 160 }}</p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div> {% endfor %} </div>
