@@ -4,10 +4,13 @@ title: Blogs
 description: "Explore practical guides on asset allocation, market risks, and disciplined investing. Real-world money strategies for the unexcitingly wealthy."
 ---
 
-<h1 style="text-align: center; margin-bottom: 40px;">Explore Our Money Guides</h1>
+<h1 style="text-align: center; margin-bottom: 10px;">Explore Our Money Guides</h1>
+<p style="text-align: center; color: #64748b; margin-bottom: 40px;">Real-world finance for the long-term thinker.</p>
 
 <section class="category-section">
-  <h3>Browse by Playlist</h3>
+  <h2 style="margin-bottom: 5px;">Explore by Topic</h2>
+  <p style="margin-top: 0; color: #64748b; font-style: italic; font-size: 0.9rem;">Boring but practical.</p>
+  
   <div class="folder-grid">
     
     <a href="#beginners" class="folder-card">
@@ -39,7 +42,7 @@ description: "Explore practical guides on asset allocation, market risks, and di
 
 <div class="blogs-list">
 
-  <h2 id="beginners" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">Beginner's Blueprint</h2>
+  <h3 id="beginners" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; color: #0f172a;">Beginner's Blueprint</h3>
   {% for post in site.posts %}
     {% if post.title contains "Invest" or post.title contains "Allocation" %}
       <a href="{{ post.url | relative_url }}" class="post-card-link">
@@ -52,7 +55,7 @@ description: "Explore practical guides on asset allocation, market risks, and di
     {% endif %}
   {% endfor %}
 
-  <h2 id="noise" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">Signal vs. Noise</h2>
+  <h3 id="noise" style="margin-top: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; color: #0f172a;">Signal vs. Noise</h3>
   {% for post in site.posts %}
     {% if post.title contains "noise" or post.title contains "Silver" %}
       <a href="{{ post.url | relative_url }}" class="post-card-link">
