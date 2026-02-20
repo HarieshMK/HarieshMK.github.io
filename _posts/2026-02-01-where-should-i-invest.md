@@ -2,7 +2,7 @@
 layout: post
 title: "Where Should I Invest? (For Beginners Who Want Clarity, Not Noise)"
 date: 2026-02-01
-category: Beginners
+category: beginners
 ---
 
 One of the most common—and most misunderstood—questions in personal finance:  
