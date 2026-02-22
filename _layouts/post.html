@@ -74,35 +74,35 @@ layout: default
 </div>
 
 <script>
-// 1. PROGRESS BAR LOGIC
-window.onscroll = function() { moveProgressBar() };
+window.onscroll = function() {
+  // FIXED: Changed '.container' to '.entry-content' to match your HTML above
+  var article = document.querySelector('.entry-content'); 
+  var bar = document.querySelector('.progress-bar');
+  var container = document.querySelector('.progress-container');
 
-function moveProgressBar() {
-  const barContainer = document.querySelector('.progress-container');
-  const myBar = document.getElementById("myBar");
-  const article = document.querySelector('.entry-content');
-  
-  if (!barContainer || !myBar || !article) return;
+  if (article && bar) {
+    var articleTop = article.offsetTop;
+    var articleHeight = article.offsetHeight;
+    var windowHeight = window.innerHeight;
+    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-  const rect = article.getBoundingClientRect();
-  const articleHeight = article.offsetHeight;
-  
-  let progress = 0;
-  if (rect.top < 0) {
-    progress = (Math.abs(rect.top) / (articleHeight - window.innerHeight + 500)) * 100;
+    // Show bar when user reaches the content, hide it at the header/footer
+    // We use 100px as a buffer so it appears right as they start reading
+    if (scrollTop > (articleTop - 100)) {
+        container.style.opacity = "1";
+    } else {
+        container.style.opacity = "0";
+    }
+
+    // Accurate math: Progress = (Distance Scrolled / Total Scrollable Area of Article)
+    var scrolled = ((scrollTop - articleTop) / (articleHeight - windowHeight)) * 100;
+    
+    // Safety check: Keep it between 0% and 100%
+    bar.style.width = Math.min(Math.max(scrolled, 0), 100) + "%";
   }
-
-  if (rect.top < 100 && rect.bottom > 0) {
-    barContainer.style.opacity = "1";
-  } else {
-    barContainer.style.opacity = "0";
-  }
-
-  myBar.style.width = Math.min(progress, 100) + "%";
 }
 
 // 2. DARK MODE GLITCH FIX
-// This forces Cusdis to match the body's theme on load
 window.addEventListener('load', function() {
   const isDark = document.body.classList.contains('dark-theme');
   if (window.CUSDIS) {
