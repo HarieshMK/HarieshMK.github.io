@@ -328,50 +328,47 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. STRICT DYNAMIC TABLE LOGIC ===== */
+/* ===== 11. IMPROVED MOBILE TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; /* Enables horizontal swipe on mobile */
   margin: 25px 0;
-  border-radius: 8px;
-  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0; /* Soft border around the scroll area */
+  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iPhone */
+}
+
+/* Add a subtle indicator that the table is scrollable */
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }
 
 table {
-  width: 100% !important;
-  table-layout: auto;
+  width: 100%;
+  min-width: 700px; /* FORCES the table to stay wide enough to be readable */
   border-collapse: collapse;
-  font-size: 0.82rem;
-  word-wrap: break-word;
+  font-size: 0.85rem;
 }
 
 table th, table td {
+  padding: 12px 15px;
   border: 1px solid #e2e8f0;
-  padding: 10px 10px;
-  text-align: left;
-  vertical-align: middle;
-  /* Content Logic: Adjusts to text, wraps at 180px */
-  min-width: 40px; 
-  max-width: 180px; 
-  white-space: normal !important; /* Forces wrapping for both content AND headers */
-  line-height: 1.3;
+  white-space: nowrap; /* Prevents text from wrapping into ugly thin lines */
 }
 
-/* STYLES SPECIFICALLY FOR HEADINGS */
-table th {
-  background-color: #f8fafc;
-  font-weight: 700;
-  color: #0f172a;
-  /* Strict restriction: Headers cannot be wider than 120px unless necessary */
-  max-width: 120px; 
-  word-break: break-word; 
+/* Allow ONLY the Remarks column to wrap if needed */
+table td:nth-child(3) {
+  white-space: normal;
+  min-width: 200px;
 }
 
-/* Dark Mode Support */
-.dark-theme table th, 
-.dark-theme table td {
-  border: 1px solid #334155 !important;
-}
+/* Dark Mode Refinements */
+.dark-theme .table-wrapper { border-color: #334155; }
+.dark-theme table th, .dark-theme table td { border-color: #334155; }
 
 .dark-theme table th {
   background-color: #1e293b !important;
