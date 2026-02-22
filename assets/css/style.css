@@ -328,30 +328,46 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. FIXED TABLE STYLES (NO OVERFLOW) ===== */
-table {
-  display: block;        /* This allows the table to become a scrollable container */
-  width: 100% !important;
-  max-width: 100%;
-  overflow-x: auto;      /* This creates the scrollbar if the table is too wide */
-  border-collapse: collapse;
+/* ===== 11. OPTIMIZED TABLE STYLES ===== */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* Adds the scrollbar only when content is too wide */
+  -webkit-overflow-scrolling: touch;
   margin: 25px 0;
-  font-size: 0.85rem;    /* Slightly smaller font to fit more columns */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iPhones */
+  border-radius: 8px;
+}
+
+table {
+  width: 100% !important;
+  border-collapse: collapse;
+  font-size: 0.82rem; /* Slightly smaller to fit more data on one screen */
+  table-layout: auto;
 }
 
 table th, table td {
   border: 1px solid #e2e8f0;
-  padding: 10px 12px;
+  padding: 10px 8px; /* Tighter padding to save horizontal space */
   text-align: left;
   vertical-align: top;
-  min-width: 100px;      /* Prevents columns from getting squashed too small */
+  line-height: 1.4;
 }
 
-/* Specific fix for your long transaction remarks */
+/* SQUEEZING THE SMALL COLUMNS */
+table th:first-child, 
+table td:first-child {
+  width: 40px !important; /* Forces S No. to be tiny */
+  text-align: center;
+}
+
+table th:nth-child(2), 
+table td:nth-child(2) {
+  width: 90px !important; /* Tightens the Date column */
+}
+
+/* GIVING SPACE TO REMARKS */
 table td:nth-child(3) {
-  min-width: 180px;
-  white-space: normal;   /* Forces text wrapping within the cell */
+  min-width: 160px;
+  white-space: normal; /* Ensures long text wraps to new lines */
 }
 
 table th {
@@ -360,7 +376,7 @@ table th {
   color: #0f172a;
 }
 
-/* Dark Mode Borders for Tables */
+/* Dark Mode Refinement */
 .dark-theme table th, 
 .dark-theme table td {
   border: 1px solid #334155 !important;
