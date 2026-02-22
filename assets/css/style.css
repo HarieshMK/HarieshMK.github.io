@@ -328,3 +328,31 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
+/* ===== TABLE BORDERS & SPACING ===== */
+table {
+  width: 100%;
+  border-collapse: collapse; /* Ensures single lines instead of double borders */
+  margin: 25px 0;
+  font-size: 0.95rem;
+}
+
+table th, table td {
+  border: 1px solid #e2e8f0; /* Light grey border for Light Mode */
+  padding: 12px 15px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f8fafc; /* Subtle highlight for the header row */
+  font-weight: 700;
+}
+
+/* Dark Mode Borders */
+.dark-theme table th, 
+.dark-theme table td {
+  border: 1px solid #334155; /* Darker blue/grey border for Dark Mode */
+}
+
+.dark-theme table th {
+  background-color: #1e293b; /* Darker header background for Dark Mode */
+}
