@@ -43,15 +43,15 @@ Unless you know where your money is leaking, you can never reach your full poten
 | 4 | 18-01-2026 | UPI/HP Pay Dir/ | ₹ 500 | ₹ 0.00 | Petrol | Petrol |
 | 5 | 21-01-2026 | ADPRULIFEIMOB | ₹ 1,160.00 | ₹ 0.00 | Term insurance | Investment |
 | 6 | 28-01-2026 | BIL/INFT/ | ₹ 15,000.00 | ₹ 0.00 | Rent | Rent |
-| 7 | 12-Jan-26 | DR/ AMANULLA/YES/Snacks | ₹ 110.00 | | Snacks | Tea and snacks |
-| 8 | 15-Jan-26 | DR/VAIKUNDA PERUM/YES/Tea | ₹ 24.00 | | Tea | Tea and snacks |
-| 9 | 19-Jan-26 | DR/J ENOCH JOTHIR/CNR/Tablet | ₹ 18.00 | | Tablets | Medical |
-| 10 | 22-Jan-26 | DR/ARUN CHICKEN C/YES/Chicken | ₹ 150.00 | | Chicken | Food |
-| 11 | 27-Jan-26 | DR/KALPANADEVAKUM/YES/Breakfast | ₹ 100.00 | | Outside food | Food |
-| 12 | 28-Jan-26 | Loan PAY 28-01-2026 ITB | ₹ 15,000.00 | | Car EMI | Loan |
-| 13 | 31-Jan-26 | DR/MUNEES SUPER M/YES/Milk | ₹ 38.00 | | Dairy | Food |
-| 14 | 10-01-2026 | UPI-MUNEES SUPER MARKET-GROCERY | ₹ 108.00 | | Groceries | Food |
-| 15 | 31-01-2026 | UPI-VENKATESH E-BANANA | ₹ 85.00 | | Fruits | Food |
+| 7 | 12-Jan-26 | DR/ AMANULLA/YES/Snacks | ₹ 110.00 | ₹ 0.00 | Snacks | Tea and snacks |
+| 8 | 15-Jan-26 | DR/VAIKUNDA PERUM/YES/Tea | ₹ 24.00 | ₹ 0.00 | Tea | Tea and snacks |
+| 9 | 19-Jan-26 | DR/J ENOCH JOTHIR/CNR/Tablet | ₹ 18.00 | ₹ 0.00 | Tablets | Medical |
+| 10 | 22-Jan-26 | DR/ARUN CHICKEN C/YES/Chicken | ₹ 150.00 | ₹ 0.00 | Chicken | Food |
+| 11 | 27-Jan-26 | DR/KALPANADEVAKUM/YES/Breakfast | ₹ 100.00 | ₹ 0.00 | Outside food | Food |
+| 12 | 28-Jan-26 | Loan PAY 28-01-2026 ITB | ₹ 15,000.00 | ₹ 0.00 | Car EMI | Loan |
+| 13 | 31-Jan-26 | DR/MUNEES SUPER M/YES/Milk | ₹ 38.00 | ₹ 0.00 | Dairy | Food |
+| 14 | 10-01-2026 | UPI-MUNEES SUPER MARKET-GROCERY | ₹ 108.00 | ₹ 0.00 | Groceries | Food |
+| 15 | 31-01-2026 | UPI-VENKATESH E-BANANA | ₹ 85.00 | ₹ 0.00 | Fruits | Food |
 
 4. **The New Budget:** Once you've audited, create a plan. List your mandatory expenses and add a 10–15% buffer.
 
