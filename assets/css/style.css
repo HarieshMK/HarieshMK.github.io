@@ -328,46 +328,45 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. OPTIMIZED TABLE STYLES ===== */
+/* ===== 11. SMART "EXCEL-STYLE" TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto; /* Adds the scrollbar only when content is too wide */
-  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
   margin: 25px 0;
   border-radius: 8px;
 }
 
 table {
   width: 100% !important;
+  table-layout: fixed; /* This is the key to controlling column widths */
   border-collapse: collapse;
-  font-size: 0.82rem; /* Slightly smaller to fit more data on one screen */
-  table-layout: auto;
+  font-size: 0.82rem;
+  word-wrap: break-word;
 }
 
 table th, table td {
   border: 1px solid #e2e8f0;
-  padding: 10px 8px; /* Tighter padding to save horizontal space */
+  padding: 10px 8px;
   text-align: left;
   vertical-align: top;
-  line-height: 1.4;
+  overflow: hidden; /* Keeps text from bleeding out of cells */
 }
 
-/* SQUEEZING THE SMALL COLUMNS */
-table th:first-child, 
-table td:first-child {
-  width: 40px !important; /* Forces S No. to be tiny */
-  text-align: center;
-}
+/* 1. SQUEEZE THE SMALL DATA (S No. and Date) */
+table th:nth-child(1), table td:nth-child(1) { width: 45px; text-align: center; }
+table th:nth-child(2), table td:nth-child(2) { width: 95px; }
 
-table th:nth-child(2), 
-table td:nth-child(2) {
-  width: 90px !important; /* Tightens the Date column */
-}
+/* 2. FLEXIBLE MIDDLE (Transaction Remarks / Expense Names) */
+/* We give this column a larger % so it stays readable */
+table th:nth-child(3), table td:nth-child(3) { width: 35%; white-space: normal; }
 
-/* GIVING SPACE TO REMARKS */
-table td:nth-child(3) {
-  min-width: 160px;
-  white-space: normal; /* Ensures long text wraps to new lines */
+/* 3. SHRINK THE EMPTY/SMALL VALUE COLUMNS */
+/* These columns will share the remaining space equally */
+table th:nth-child(4), table td:nth-child(4),
+table th:nth-child(5), table td:nth-child(5),
+table th:nth-child(6), table td:nth-child(6),
+table th:nth-child(7), table td:nth-child(7) { 
+  width: auto; 
 }
 
 table th {
@@ -376,13 +375,6 @@ table th {
   color: #0f172a;
 }
 
-/* Dark Mode Refinement */
-.dark-theme table th, 
-.dark-theme table td {
-  border: 1px solid #334155 !important;
-}
-
-.dark-theme table th {
-  background-color: #1e293b !important;
-  color: #ffffff !important;
-}
+/* Dark Mode Support */
+.dark-theme table th, .dark-theme table td { border: 1px solid #334155 !important; }
+.dark-theme table th { background-color: #1e293b !important; color: #ffffff !important; }
