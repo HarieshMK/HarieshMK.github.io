@@ -2,8 +2,8 @@
 layout: post
 title: "How Should I Start My Investment Journey?"
 date: 2026-02-22
-categories: [Investment]
-folder_name: "Finance Basics"
+categories: [beginners]
+folder_name: "Just beginning? Click here!"
 ---
 
 Most people spend years 'planning' to invest but never actually start. Why? Because the internet makes it look like rocket science. It’s not. Here’s why.
