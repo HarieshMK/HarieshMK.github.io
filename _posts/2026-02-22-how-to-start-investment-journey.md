@@ -53,7 +53,7 @@ Unless you know where your money is leaking, you can never reach your full poten
 | 14 | 10-01-2026 | UPI-MUNEES SUPER MARKET-GROCERY | ₹ 108.00 | ₹ 0.00 | Groceries | Food |
 | 15 | 31-01-2026 | UPI-VENKATESH E-BANANA | ₹ 85.00 | ₹ 0.00 | Fruits | Food |
 
-4. **The New Budget:** Once you've audited, create a plan. List your mandatory expenses and add a 10–15% buffer.
+4\. **The New Budget:** Once you've audited, create a plan. List your mandatory expenses and add a 10–15% buffer.
 
 **Sample Budget Plan:**
 
@@ -86,7 +86,7 @@ Unless you know where your money is leaking, you can never reach your full poten
 
 *These tables are sample. You can customize it according to you.*
 
-5.  **Find your "Power":** Income minus (Expenses + Buffer) = What you can actually invest.
+5\.  **Find your "Power":** Income minus (Expenses + Buffer) = What you can actually invest.
 
 **Pro Tip:** Don’t wait until month-end. Set your SIP date within 3 days of your salary hitting your account. As shown in the snippet above, this level of detail is what changes your relationship with money.
 
