@@ -328,10 +328,10 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. STRICT DYNAMIC TABLE LOGIC ===== */
+/* ===== 11. DYNAMIC CONTENT-BASED TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; /* Safety scrollbar for very small mobile screens */
   margin: 25px 0;
   border-radius: 8px;
   -webkit-overflow-scrolling: touch;
@@ -339,7 +339,7 @@ a[href^="#"]:hover {
 
 table {
   width: 100% !important;
-  table-layout: auto;
+  table-layout: auto; /* This allows columns to shrink/grow based on text size */
   border-collapse: collapse;
   font-size: 0.82rem;
   word-wrap: break-word;
@@ -347,24 +347,25 @@ table {
 
 table th, table td {
   border: 1px solid #e2e8f0;
-  padding: 10px 10px;
+  padding: 10px 12px;
   text-align: left;
   vertical-align: middle;
-  /* Content Logic: Adjusts to text, wraps at 180px */
-  min-width: 40px; 
-  max-width: 180px; 
-  white-space: normal !important; /* Forces wrapping for both content AND headers */
-  line-height: 1.3;
+  /* THE LOGIC: Shrink to fit content, but wrap if text exceeds 200px */
+  min-width: 50px; 
+  max-width: 200px; 
+  white-space: normal; /* Allows wrapping like 'Health insurance premium' */
 }
 
-/* STYLES SPECIFICALLY FOR HEADINGS */
+/* Ensure numerical/short columns stay as tight as possible */
+table td {
+  width: auto;
+}
+
 table th {
   background-color: #f8fafc;
   font-weight: 700;
   color: #0f172a;
-  /* Strict restriction: Headers cannot be wider than 120px unless necessary */
-  max-width: 120px; 
-  word-break: break-word; 
+  white-space: nowrap; /* Keeps headers on one line unless the screen is tiny */
 }
 
 /* Dark Mode Support */
