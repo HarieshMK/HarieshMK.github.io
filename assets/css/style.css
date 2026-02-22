@@ -328,47 +328,67 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. IMPROVED MOBILE TABLE LOGIC ===== */
+/* ===== 11. RESPONSIVE STACK LOGIC (TABLE TO CARDS) ===== */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto; /* Enables horizontal swipe on mobile */
   margin: 25px 0;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0; /* Soft border around the scroll area */
-  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iPhone */
-}
-
-/* Add a subtle indicator that the table is scrollable */
-.table-wrapper::-webkit-scrollbar {
-  height: 6px;
-}
-.table-wrapper::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
 }
 
 table {
-  width: 100%;
-  min-width: 700px; /* FORCES the table to stay wide enough to be readable */
+  width: 100% !important;
   border-collapse: collapse;
-  font-size: 0.85rem;
 }
 
+/* DESKTOP STYLES (Looks normal on PC) */
 table th, table td {
-  padding: 12px 15px;
   border: 1px solid #e2e8f0;
-  white-space: nowrap; /* Prevents text from wrapping into ugly thin lines */
+  padding: 12px;
+  text-align: left;
 }
 
-/* Allow ONLY the Remarks column to wrap if needed */
-table td:nth-child(3) {
-  white-space: normal;
-  min-width: 200px;
-}
+/* MOBILE STYLES (The magic happens here) */
+@media (max-width: 600px) {
+  /* Hide the table headers completely */
+  table thead {
+    display: none;
+  }
 
-/* Dark Mode Refinements */
-.dark-theme .table-wrapper { border-color: #334155; }
-.dark-theme table th, .dark-theme table td { border-color: #334155; }
+  table, table tbody, table tr, table td {
+    display: block;
+    width: 100%;
+  }
+
+  table tr {
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    background: #ffffff;
+  }
+
+  .dark-theme table tr {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  table td {
+    border: none !important;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  /* This adds a label before every piece of data so you know what it is */
+  table td::before {
+    content: attr(data-label); /* This requires a small change to your HTML */
+    font-weight: 700;
+    text-align: left;
+    color: #64748b;
+    margin-right: 10px;
+  }
+}
 
 .dark-theme table th {
   background-color: #1e293b !important;
