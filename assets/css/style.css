@@ -328,66 +328,49 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. RESPONSIVE STACK LOGIC (TABLE TO CARDS) ===== */
+/* ===== 11. STRICT DYNAMIC TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
+  overflow-x: auto;
   margin: 25px 0;
+  border-radius: 8px;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
   width: 100% !important;
+  table-layout: auto;
   border-collapse: collapse;
+  font-size: 0.82rem;
+  word-wrap: break-word;
 }
 
-/* DESKTOP STYLES (Looks normal on PC) */
 table th, table td {
   border: 1px solid #e2e8f0;
-  padding: 12px;
+  padding: 10px 10px;
   text-align: left;
+  vertical-align: middle;
+  /* Content Logic: Adjusts to text, wraps at 180px */
+  min-width: 40px; 
+  max-width: 180px; 
+  white-space: normal !important; /* Forces wrapping for both content AND headers */
+  line-height: 1.3;
 }
 
-/* MOBILE STYLES (The magic happens here) */
-@media (max-width: 600px) {
-  /* Hide the table headers completely */
-  table thead {
-    display: none;
-  }
+/* STYLES SPECIFICALLY FOR HEADINGS */
+table th {
+  background-color: #f8fafc;
+  font-weight: 700;
+  color: #0f172a;
+  /* Strict restriction: Headers cannot be wider than 120px unless necessary */
+  max-width: 120px; 
+  word-break: break-word; 
+}
 
-  table, table tbody, table tr, table td {
-    display: block;
-    width: 100%;
-  }
-
-  table tr {
-    margin-bottom: 15px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px;
-    background: #ffffff;
-  }
-
-  .dark-theme table tr {
-    background: #1e293b;
-    border-color: #334155;
-  }
-
-  table td {
-    border: none !important;
-    padding: 5px 10px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    text-align: right;
-  }
-
-  /* This adds a label before every piece of data so you know what it is */
-  table td::before {
-    content: attr(data-label); /* This requires a small change to your HTML */
-    font-weight: 700;
-    text-align: left;
-    color: #64748b;
-    margin-right: 10px;
-  }
+/* Dark Mode Support */
+.dark-theme table th, 
+.dark-theme table td {
+  border: 1px solid #334155 !important;
 }
 
 .dark-theme table th {
