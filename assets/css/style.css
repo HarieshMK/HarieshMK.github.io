@@ -328,31 +328,45 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== TABLE BORDERS & SPACING ===== */
+/* ===== 11. FIXED TABLE STYLES (NO OVERFLOW) ===== */
 table {
-  width: 100%;
-  border-collapse: collapse; /* Ensures single lines instead of double borders */
+  display: block;        /* This allows the table to become a scrollable container */
+  width: 100% !important;
+  max-width: 100%;
+  overflow-x: auto;      /* This creates the scrollbar if the table is too wide */
+  border-collapse: collapse;
   margin: 25px 0;
-  font-size: 0.95rem;
+  font-size: 0.85rem;    /* Slightly smaller font to fit more columns */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iPhones */
 }
 
 table th, table td {
-  border: 1px solid #e2e8f0; /* Light grey border for Light Mode */
-  padding: 12px 15px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 12px;
   text-align: left;
+  vertical-align: top;
+  min-width: 100px;      /* Prevents columns from getting squashed too small */
+}
+
+/* Specific fix for your long transaction remarks */
+table td:nth-child(3) {
+  min-width: 180px;
+  white-space: normal;   /* Forces text wrapping within the cell */
 }
 
 table th {
-  background-color: #f8fafc; /* Subtle highlight for the header row */
+  background-color: #f8fafc;
   font-weight: 700;
+  color: #0f172a;
 }
 
-/* Dark Mode Borders */
+/* Dark Mode Borders for Tables */
 .dark-theme table th, 
 .dark-theme table td {
-  border: 1px solid #334155; /* Darker blue/grey border for Dark Mode */
+  border: 1px solid #334155 !important;
 }
 
 .dark-theme table th {
-  background-color: #1e293b; /* Darker header background for Dark Mode */
+  background-color: #1e293b !important;
+  color: #ffffff !important;
 }
