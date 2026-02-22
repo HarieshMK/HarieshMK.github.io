@@ -328,17 +328,18 @@ a[href^="#"]:hover {
 .dark-theme .folder-name {
   color: #f1f5f9 !important;
 }
-/* ===== 11. SMART "EXCEL-STYLE" TABLE LOGIC ===== */
+/* ===== 11. DYNAMIC CONTENT-BASED TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; /* Safety scrollbar for very small mobile screens */
   margin: 25px 0;
   border-radius: 8px;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
   width: 100% !important;
-  table-layout: fixed; /* This is the key to controlling column widths */
+  table-layout: auto; /* This allows columns to shrink/grow based on text size */
   border-collapse: collapse;
   font-size: 0.82rem;
   word-wrap: break-word;
@@ -346,35 +347,34 @@ table {
 
 table th, table td {
   border: 1px solid #e2e8f0;
-  padding: 10px 8px;
+  padding: 10px 12px;
   text-align: left;
-  vertical-align: top;
-  overflow: hidden; /* Keeps text from bleeding out of cells */
+  vertical-align: middle;
+  /* THE LOGIC: Shrink to fit content, but wrap if text exceeds 200px */
+  min-width: 50px; 
+  max-width: 200px; 
+  white-space: normal; /* Allows wrapping like 'Health insurance premium' */
 }
 
-/* 1. SQUEEZE THE SMALL DATA (S No. and Date) */
-table th:nth-child(1), table td:nth-child(1) { width: 45px; text-align: center; }
-table th:nth-child(2), table td:nth-child(2) { width: 95px; }
-
-/* 2. FLEXIBLE MIDDLE (Transaction Remarks / Expense Names) */
-/* We give this column a larger % so it stays readable */
-table th:nth-child(3), table td:nth-child(3) { width: 35%; white-space: normal; }
-
-/* 3. SHRINK THE EMPTY/SMALL VALUE COLUMNS */
-/* These columns will share the remaining space equally */
-table th:nth-child(4), table td:nth-child(4),
-table th:nth-child(5), table td:nth-child(5),
-table th:nth-child(6), table td:nth-child(6),
-table th:nth-child(7), table td:nth-child(7) { 
-  width: auto; 
+/* Ensure numerical/short columns stay as tight as possible */
+table td {
+  width: auto;
 }
 
 table th {
   background-color: #f8fafc;
   font-weight: 700;
   color: #0f172a;
+  white-space: nowrap; /* Keeps headers on one line unless the screen is tiny */
 }
 
 /* Dark Mode Support */
-.dark-theme table th, .dark-theme table td { border: 1px solid #334155 !important; }
-.dark-theme table th { background-color: #1e293b !important; color: #ffffff !important; }
+.dark-theme table th, 
+.dark-theme table td {
+  border: 1px solid #334155 !important;
+}
+
+.dark-theme table th {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
