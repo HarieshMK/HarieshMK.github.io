@@ -75,34 +75,37 @@ layout: default
 
 <script>
 window.onscroll = function() {
-  // FIXED: Changed '.container' to '.entry-content' to match your HTML above
-  var article = document.querySelector('.entry-content'); 
-  var bar = document.querySelector('.progress-bar');
-  var container = document.querySelector('.progress-container');
+  const bar = document.getElementById("myBar");
+  const container = document.querySelector('.progress-container');
+  const article = document.querySelector('.entry-content');
+  
+  if (!bar || !article) return;
 
-  if (article && bar) {
-    var articleTop = article.offsetTop;
-    var articleHeight = article.offsetHeight;
-    var windowHeight = window.innerHeight;
-    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const rect = article.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+  
+  // 1. Calculate how much of the article has passed the top of the screen
+  // Math: (Pixels scrolled past top) / (Total height of article - your screen height)
+  const totalScrollable = rect.height - windowHeight;
+  let progress = (Math.abs(rect.top) / totalScrollable) * 100;
 
-    // Show bar when user reaches the content, hide it at the header/footer
-    // We use 100px as a buffer so it appears right as they start reading
-    if (scrollTop > (articleTop - 100)) {
-        container.style.opacity = "1";
-    } else {
-        container.style.opacity = "0";
-    }
-
-    // Accurate math: Progress = (Distance Scrolled / Total Scrollable Area of Article)
-    var scrolled = ((scrollTop - articleTop) / (articleHeight - windowHeight)) * 100;
-    
-    // Safety check: Keep it between 0% and 100%
-    bar.style.width = Math.min(Math.max(scrolled, 0), 100) + "%";
+  // 2. Logic for Start/End
+  if (rect.top > 0) {
+    progress = 0; // Haven't reached the article yet
   }
-}
+  
+  // 3. Visibility: Only show when the article is actually on screen
+  if (rect.top < 100 && rect.bottom > 0) {
+    container.style.opacity = "1";
+  } else {
+    container.style.opacity = "0";
+  }
 
-// 2. DARK MODE GLITCH FIX
+  // 4. Set the width (capped between 0 and 100)
+  bar.style.width = Math.min(Math.max(progress, 0), 100) + "%";
+};
+
+// Dark Mode Glitch Fix remains the same
 window.addEventListener('load', function() {
   const isDark = document.body.classList.contains('dark-theme');
   if (window.CUSDIS) {
