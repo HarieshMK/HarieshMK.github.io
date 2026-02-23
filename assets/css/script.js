@@ -1,29 +1,40 @@
 /* ==========================================
-   1. THEME TOGGLE LOGIC
+   1. THEME TOGGLE & PERSISTENCE
    ========================================== */
 const toggleBtn = document.getElementById('theme-toggle');
 const icon = document.getElementById('theme-icon');
 const html = document.documentElement;
 
+// Function to set theme
+function setTheme(theme) {
+    if (theme === 'dark') {
+        html.classList.add('dark-theme');
+        if (icon) icon.innerText = '☀️';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        html.classList.remove('dark-theme');
+        if (icon) icon.innerText = '🌙';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Check for saved theme on load
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    setTheme(savedTheme);
+}
+
+// Toggle click event
 if (toggleBtn) {
     toggleBtn.onclick = function() {
-        html.classList.toggle('dark-theme');
         const isDark = html.classList.contains('dark-theme');
+        setTheme(isDark ? 'light' : 'dark');
         
-        // Update Cusdis Theme
-        if (window.CUSDIS) { 
-            window.CUSDIS.setTheme(isDark ? 'dark' : 'light'); 
+        // Update Cusdis if it exists
+        if (window.CUSDIS) {
+            window.CUSDIS.setTheme(html.classList.contains('dark-theme') ? 'dark' : 'light');
         }
-        
-        // Save Preference & Update Icon
-        if (isDark) {
-            localStorage.setItem('theme', 'dark');
-            icon.innerText = '☀️';
-        } else {
-            localStorage.setItem('theme', 'light');
-            icon.innerText = '🌙';
-        }
-    }
+    };
 }
 
 /* ==========================================
