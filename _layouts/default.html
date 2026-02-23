@@ -10,8 +10,29 @@
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC2R2GWY43"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TC2R2GWY43');
+  </script>
+  
+  <script>
+    (function(w,d,e,u,f,l,n){
+      w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments);},
+      l=d.createElement(e); l.async=1; l.src=u;
+      n=d.getElementsByTagName(e)[0]; n.parentNode.insertBefore(l,n);
+    })(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2062352');
+  </script>
+  
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+    }
+  </script>
 </head>
-  <script src="{{ '/assets/script.js' | relative_url }}"></script>
 <body>
  
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
@@ -68,23 +89,6 @@
     </footer>
   </div>
 
-  <script>
-    // Theme Toggle Logic
-    const toggleBtn = document.getElementById('theme-toggle');
-    const icon = document.getElementById('theme-icon');
-    const html = document.documentElement;
-    
-    if (localStorage.getItem('theme') === 'dark') { icon.innerText = '☀️'; }
-    
-    toggleBtn.onclick = function() {
-      html.classList.toggle('dark-theme');
-      if (window.CUSDIS) { window.CUSDIS.setTheme(html.classList.contains('dark-theme') ? 'dark' : 'light'); }
-      if (html.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark'); icon.innerText = '☀️';
-      } else {
-        localStorage.setItem('theme', 'light'); icon.innerText = '🌙';
-      }
-    }
-  </script>
+  <script src="{{ '/assets/script.js' | relative_url }}"></script>
 </body>
 </html>
