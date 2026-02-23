@@ -282,6 +282,9 @@ a:not(.nav-list li a):not(.post-card-link):hover {
 .dark-theme .folder-name {
   color: #ffffff !important;
 }
+.dark-theme table td {
+  color: #cbd5e1 !important; /* Makes table text light gray/white in dark mode */
+}
 /* ===== 10. PREMIUM POLISH & DARK MODE REFINEMENT ===== */
 
 /* Soften the lines */
