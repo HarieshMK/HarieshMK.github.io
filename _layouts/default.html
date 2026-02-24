@@ -29,15 +29,16 @@
 </head>
 <body>
  
-  <body>
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
 
   <div class="container">
     <header>
-      <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
-      <p class="tagline">{{ site.description }}</p>
+      <div class="brand-area">
+        <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
+        <p class="tagline">{{ site.description }}</p>
+      </div>
       <nav>
         <ul class="nav-list">
           <li><a href="{{ '/' | relative_url }}" class="{% if page.title == 'Home' %}active{% endif %}">Home</a></li>
@@ -50,8 +51,38 @@
     <main>{{ content }}</main>
 
     <footer>
-       <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }}</p>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>The Reality Check</h3>
+          <p>I’m not a financial advisor. This club is about sharing the journey of boring, disciplined wealth building. It’s a marathon, not a sprint. <a href="{{ '/disclaimer' | relative_url }}">Read the full disclaimer.</a></p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Explore</h3>
+          <ul class="footer-links">
+            <li><a href="{{ '/' | relative_url }}">Home</a></li>
+            <li><a href="{{ '/about' | relative_url }}">About the Club</a></li>
+            <li><a href="{{ '/blogs' | relative_url }}">Blogs</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Stay Connected</h3>
+          <p class="by-line">Written by</p>
+          <strong class="author-name">Hariesh Murugan</strong>
+          <div class="social-icons">
+            <a href="mailto:itzhariesh@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="https://www.instagram.com/unexciting_money_club/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }} • Made for the long run.</p>
+      </div>
     </footer>
-  </div> <script src="{{ '/assets/script.js' | relative_url }}"></script>
+  </div>
+
+  <script src="{{ '/assets/script.js' | relative_url }}"></script>
 </body>
 </html>
