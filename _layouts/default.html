@@ -29,27 +29,29 @@
 </head>
 <body>
  
+  <body>
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
 
   <div class="container">
     <header>
-        <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
-        <p class="tagline">{{ site.description }}</p>
-        <nav>
-          <ul class="nav-list">
-            <li><a href="{{ '/' | relative_url }}" class="{% if page.title == 'Home' %}active{% endif %}">Home</a></li>
-            <li><a href="{{ '/about' | relative_url }}" class="{% if page.title == 'About the Club' %}active{% endif %}">About</a></li>
-            <li><a href="{{ '/blogs' | relative_url }}" class="{% if page.title == 'Blogs' %}active{% endif %}">Blogs</a></li>
-          </ul>
-        </nav>
+      <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
+      <p class="tagline">{{ site.description }}</p>
+      <nav>
+        <ul class="nav-list">
+          <li><a href="{{ '/' | relative_url }}" class="{% if page.title == 'Home' %}active{% endif %}">Home</a></li>
+          <li><a href="{{ '/about' | relative_url }}" class="{% if page.title == 'About the Club' %}active{% endif %}">About</a></li>
+          <li><a href="{{ '/blogs' | relative_url }}" class="{% if page.title == 'Blogs' %}active{% endif %}">Blogs</a></li>
+        </ul>
+      </nav>
     </header>
 
     <main>{{ content }}</main>
 
-    </div>
-
-  <script src="{{ '/assets/script.js' | relative_url }}"></script>
+    <footer>
+       <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }}</p>
+    </footer>
+  </div> <script src="{{ '/assets/script.js' | relative_url }}"></script>
 </body>
 </html>
