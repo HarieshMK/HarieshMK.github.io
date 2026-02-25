@@ -110,7 +110,6 @@ header .tagline {
   transform: scale(1.1); /* Adds a subtle "pop" when you hover over it */
 }
 /* ===== 3. BLOG CARDS & HOVER ===== */
-/* ===== 3. BLOG CARDS & HOVER ===== */
 .post-card-link { 
   display: block; 
   text-decoration: none !important; 
@@ -118,35 +117,37 @@ header .tagline {
   margin-bottom: 25px; 
 }
 
-/* Apply the base styles to both types of cards */
-.post-card, .home-card { 
+/* Base styles for all card types */
+.post-card, .home-card, .folder-card { 
   padding: 30px; 
   border: 1px solid #f1f5f9; 
   border-radius: 12px; 
   background: #fff; 
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother animation curve */
+  /* Critical: Transition must include transform and box-shadow */
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              box-shadow 0.3s ease, 
+              border-color 0.3s ease;
 }
 
-/* TRIGGER THE LIFT: Works if the card is hovered directly or via its parent link */
+/* THE LIFT TRIGGER */
 .post-card-link:hover .post-card,
 .post-card:hover, 
-.home-card:hover { 
-  transform: translateY(-6px); /* Slightly more pronounced lift */
-  box-shadow: 0 12px 24px rgba(0,0,0,0.06); 
-  border-color: #38bdf8; 
+.home-card:hover,
+.folder-card:hover { 
+  transform: translateY(-8px) !important; /* Increased for visibility */
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; 
+  border-color: #38bdf8 !important; 
+  z-index: 10;
+  position: relative;
 }
 
 .post-card-link:hover .post-title,
-.post-card:hover .post-title { 
-  color: #38bdf8; 
+.post-card:hover .post-title,
+.folder-card:hover .folder-name { 
+  color: #38bdf8 !important; 
 }
 
-.post-title { 
-  font-size: 1.4rem; 
-  font-weight: 700; 
-  color: #0f172a; 
-  margin-bottom: 8px; 
-  display: block; 
+.post-title, .folder-name { 
   transition: color 0.3s ease; 
 }
 
