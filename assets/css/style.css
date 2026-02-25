@@ -129,6 +129,21 @@ header .tagline {
               box-shadow 0.3s ease, 
               border-color 0.3s ease;
 }
+/* TIGHTEN INTERNAL TEXT SPACING */
+/* Target the Date */
+.post-card p:first-of-type, .home-card p:first-of-type {
+  font-size: 0.85rem; 
+  font-style: italic; /* Makes it look like a metadata stamp */
+  color: #64748b; 
+  margin-bottom: 0.2em !important; /* Pulls the title UP */
+}
+
+/* Target the Title */
+.post-card h2, .home-card h2 {
+  margin-top: 0 !important; 
+  margin-bottom: 0.4em !important; /* Pulls the summary UP */
+  line-height: 1.3;
+}
 
 /* THE LIFT TRIGGER */
 .post-card-link:hover .post-card,
