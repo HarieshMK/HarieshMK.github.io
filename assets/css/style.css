@@ -120,6 +120,7 @@ header .tagline {
 /* Base styles for all card types */
 .post-card, .home-card, .folder-card { 
   padding: 30px; 
+  margin-bottom: 24px !important; /* Forces a physical gap between the boxes */
   border: 1px solid #f1f5f9; 
   border-radius: 12px; 
   background: #fff; 
@@ -295,31 +296,36 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
 }
 
-/* ===== 9. FOLDER LAYOUT STYLES (HOME PAGE LOGIC) ===== */
+/* ===== 9. FOLDER LAYOUT STYLES ===== */
 .category-section {
-  margin-bottom: 50px;
+  margin-bottom: 50px; /* Keep this! It separates the playlist area from the blog area */
 }
 
 .folder-grid {
-  display: block !important; 
+  display: flex !important; /* Restore side-by-side look */
+  flex-wrap: wrap; /* Allows them to stack on small phone screens */
+  gap: 20px; /* Space between side-by-side folders */
   margin-top: 20px;
 }
 
 .folder-card {
+  flex: 1 1 300px; /* Restores the premium side-by-side behavior */
   background: #ffffff;
-  border: 1px solid #eef2f6 !important; /* Merged from Section 10 */
+  border: 1px solid #eef2f6 !important;
   border-radius: 15px;
   padding: 24px;
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 25px !important; 
-  width: 100%;
+  margin-bottom: 20px !important; /* FORCES the gap when they stack */
   box-sizing: border-box;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01); /* Merged from Section 10 */
 }
 
-.folder-icon { font-size: 1.5rem; }
+/* FIX FOR INDEPENDENT BLOG POSTS */
+.post-card {
+  margin-bottom: 25px !important; /* THIS is what stops them from touching in your screenshot */
+}
+.folder-icon { font-size: 2rem; }
 
 .folder-name {
   display: block;
