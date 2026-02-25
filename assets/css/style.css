@@ -26,6 +26,11 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5em;
 }
 p { margin-bottom: 1.6em; }
+/* Custom highlight color when you select text with your mouse */
+::selection {
+  background: rgba(56, 189, 248, 0.2); 
+  color: #0f172a;
+}
 
 /* ===== 2. HEADER & NAVIGATION ===== */
 header {
@@ -108,6 +113,14 @@ header .tagline {
 
 #theme-toggle:hover #theme-icon {
   transform: scale(1.1); /* Adds a subtle "pop" when you hover over it */
+}
+#theme-icon svg {
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+#theme-toggle:hover #theme-icon svg {
+  transform: rotate(20deg) scale(1.1); /* Adds a playful rotation on hover */
 }
 /* ===== 3. BLOG CARDS & HOVER ===== */
 .post-card-link { 
