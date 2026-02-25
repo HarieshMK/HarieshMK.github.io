@@ -129,13 +129,21 @@ header .tagline {
               box-shadow 0.3s ease, 
               border-color 0.3s ease;
 }
-/* TIGHTEN INTERNAL TEXT SPACING */
-/* Target the Date */
-.post-card p:first-of-type, .home-card p:first-of-type {
-  font-size: 0.85rem; 
-  font-style: italic; /* Makes it look like a metadata stamp */
-  color: #64748b; 
+/* Target the Date - Force Smaller & Italic */
+.post-card p:first-of-type, 
+.home-card p:first-of-type {
+  font-size: 0.85rem !important; /* Forces smaller size */
+  font-style: italic !important; /* Forces italic */
+  color: #64748b !important; 
   margin-bottom: 0.2em !important; /* Pulls the title UP */
+  margin-top: 0;
+}
+/* Keep the Summary text normal */
+.post-card p:last-of-type, 
+.home-card p:last-of-type {
+  font-style: normal !important;
+  font-size: 0.95rem;
+  color: #334155;
 }
 
 /* Target the Title */
