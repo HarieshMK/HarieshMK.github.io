@@ -301,6 +301,18 @@ footer {
 /* DISCUSSION BOX (CUSDIS) FIX */
 #cusdis_thread { width: 100% !important; overflow: hidden !important; }
 #cusdis_thread iframe { border: none !important; width: 100% !important; min-height: 350px; }
+/* Make the italic date readable in Dark Mode */
+.dark-theme .post-card span, 
+.dark-theme .home-card span,
+.dark-theme .post-card-link span {
+  color: #94a3b8 !important; /* Lighter blue-grey for the date */
+}
+
+/* Make the summary/excerpt text readable in Dark Mode */
+.dark-theme .post-card p, 
+.dark-theme .home-card p {
+  color: #cbd5e1 !important; /* Soft white/grey for the summary */
+}
 
 /* ===== 8. GLOBAL LINK RESET ===== */
 /* Base link style for body/footer */
