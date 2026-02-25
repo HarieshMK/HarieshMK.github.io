@@ -355,15 +355,6 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 hr, .playlist-group div { border-color: rgba(226, 232, 240, 0.5) !important; }
 .dark-theme hr { border-color: rgba(255, 255, 255, 0.05) !important; }
 
-/* Section Top Link Polish */
-a[href^="#"] {
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.02em;
-  opacity: 0.6;
-}
-a[href^="#"]:hover { opacity: 1; }
-
 /* ===== 11. DYNAMIC CONTENT-BASED TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
