@@ -129,14 +129,21 @@ header .tagline {
               box-shadow 0.3s ease, 
               border-color 0.3s ease;
 }
-/* Target the Date - Force Smaller & Italic */
-.post-card p:first-of-type, 
-.home-card p:first-of-type {
-  font-size: 0.85rem !important; /* Forces smaller size */
-  font-style: italic !important; /* Forces italic */
+/* Target the Date - Updated for SPAN tags */
+.post-card span, 
+.home-card span,
+.post-card-link span {
+  font-size: 0.82rem !important; 
+  font-style: italic !important; /* This will now work on the span */
   color: #64748b !important; 
-  margin-bottom: 0.2em !important; /* Pulls the title UP */
-  margin-top: 0;
+  display: block !important; /* Ensures it sits on its own line */
+  margin-bottom: 8px !important; /* Space between date and title */
+  transition: color 0.3s ease;
+}
+
+/* Ensure the span doesn't turn blue/black from the Global Link Reset */
+.post-card-link:hover span {
+  color: #38bdf8 !important; /* Optional: date turns blue when you hover the whole card */
 }
 /* Keep the Summary text normal */
 .post-card p:last-of-type, 
