@@ -310,11 +310,9 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   display: flex;
   align-items: center;
   gap: 15px;
-  transition: all 0.3s ease;
 }
 .folder-card:hover {
   border-color: #38bdf8;
-  transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
 .folder-icon {
@@ -369,7 +367,6 @@ a[href^="#"] {
   font-weight: 600 !important;
   letter-spacing: 0.02em;
   opacity: 0.6;
-  transition: opacity 0.2s;
 }
 a[href^="#"]:hover {
   opacity: 1;
