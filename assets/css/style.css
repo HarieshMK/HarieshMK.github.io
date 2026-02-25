@@ -142,15 +142,15 @@ header .tagline {
               box-shadow 0.3s ease, 
               border-color 0.3s ease;
 }
-/* Target the Date - Updated for SPAN tags */
+/* Target the Date - Using the specific class from your Markdown */
+.post-date, 
 .post-card span, 
-.home-card span,
-.post-card-link span {
+.home-card span {
   font-size: 0.82rem !important; 
-  font-style: italic !important; /* This will now work on the span */
+  font-style: italic !important; 
   color: #64748b !important; 
-  display: block !important; /* Ensures it sits on its own line */
-  margin-bottom: 8px !important; /* Space between date and title */
+  display: block !important; 
+  margin-bottom: 8px !important; 
   transition: color 0.3s ease;
 }
 
