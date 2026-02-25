@@ -301,7 +301,7 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 .folder-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  gap: 32px; /* INCREASED: This creates the horizontal and vertical space */
   margin-top: 20px;
 }
 
@@ -309,11 +309,11 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 15px;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 20px; /* NEW: Fixes the stacking/overlapping issue */
+  margin-bottom: 10px; /* FALLBACK: Keeps them apart on mobile/stacked views */
 }
 
 /* Redundant hover removed - Section 3 now handles the lift for .folder-card */
