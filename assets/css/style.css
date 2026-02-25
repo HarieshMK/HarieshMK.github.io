@@ -222,20 +222,22 @@ footer {
 #cusdis_thread { width: 100% !important; overflow: hidden !important; }
 #cusdis_thread iframe { border: none !important; width: 100% !important; min-height: 350px; }
 
-/* ===== 8. GLOBAL LINK RESET (FIXES THE UGLY BLUE) ===== */
-a:not(.nav-list li a):not(.post-card-link) {
-  color: #0f172a; /* Same as your headings */
+/* ===== 8. GLOBAL LINK RESET ===== */
+/* Base link style for body/footer */
+a:not(.nav-list li a):not(.post-card-link):not(.nav-link) {
+  color: #0f172a; 
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-a:not(.nav-list li a):not(.post-card-link):hover {
-  color: #38bdf8; /* Turns Sky Blue on hover */
+/* Hover style (Both Modes) */
+a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
+  color: #38bdf8 !important; /* Forces the blue on hover */
 }
 
-/* Ensure these links are white in Dark Mode */
-.dark-theme a:not(.nav-list li a):not(.post-card-link) {
-  color: #ffffff !important;
+/* Dark Mode base color */
+.dark-theme a:not(.nav-list li a):not(.post-card-link):not(.nav-link) {
+  color: #ffffff; /* Removed !important here so hover can work */
 }
 
 /* MOBILE RESPONSIVENESS */
