@@ -98,7 +98,17 @@ header .tagline {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #e2e8f0 !important;
 }
+#theme-icon {
+  font-size: 1.5rem; /* This makes the emoji/icon bigger */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
 
+#theme-toggle:hover #theme-icon {
+  transform: scale(1.1); /* Adds a subtle "pop" when you hover over it */
+}
 /* ===== 3. BLOG CARDS & HOVER ===== */
 .post-card-link { display: block; text-decoration: none !important; color: inherit !important; margin-bottom: 25px; }
 .post-card, .home-card { padding: 30px; border: 1px solid #f1f5f9; border-radius: 12px; background: #fff; transition: all 0.3s ease; }
