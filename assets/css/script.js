@@ -1,41 +1,44 @@
 /* ==========================================
    1. THEME TOGGLE & PERSISTENCE
    ========================================== */
-const toggleBtn = document.getElementById('theme-toggle');
-const icon = document.getElementById('theme-icon');
-const html = document.documentElement;
+// We wrap this in a function that waits for the DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+    const html = document.documentElement;
 
-// Function to set theme
-function setTheme(theme) {
-    if (theme === 'dark') {
-        html.classList.add('dark-theme');
-        if (icon) icon.innerText = '☀️';
-        localStorage.setItem('theme', 'dark');
-    } else {
-        html.classList.remove('dark-theme');
-        if (icon) icon.innerText = '🌙';
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-// Check for saved theme on load
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-    setTheme(savedTheme);
-}
-
-// Toggle click event
-if (toggleBtn) {
-    toggleBtn.onclick = function() {
-        const isDark = html.classList.contains('dark-theme');
-        setTheme(isDark ? 'light' : 'dark');
+    // 1. Function to apply theme
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            html.classList.add('dark-theme');
+            if (icon) icon.innerText = '☀️';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            html.classList.remove('dark-theme');
+            if (icon) icon.innerText = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
         
         // Update Cusdis if it exists
         if (window.CUSDIS) {
-            window.CUSDIS.setTheme(html.classList.contains('dark-theme') ? 'dark' : 'light');
+            window.CUSDIS.setTheme(theme);
         }
-    };
-}
+    }
+
+    // 2. Check for saved theme immediately on load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    // 3. Toggle click event
+    if (toggleBtn) {
+        toggleBtn.onclick = function() {
+            const isDark = html.classList.contains('dark-theme');
+            applyTheme(isDark ? 'light' : 'dark');
+        };
+    }
+});
 
 /* ==========================================
    2. PROGRESS BAR LOGIC
