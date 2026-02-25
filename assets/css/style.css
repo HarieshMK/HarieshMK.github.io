@@ -135,10 +135,12 @@ header .tagline {
 .home-card:hover,
 .folder-card:hover { 
   transform: translateY(-8px) !important;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; 
-  border-color: #38bdf8 !important; 
-  z-index: 10; /* Ensures the lifting card stays visually on top of others */
-  position: relative; /* Required for z-index to work */
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+  border-color: #38bdf8 !important;
+  
+  /* These two lines make the lifting card "float" above the others */
+  position: relative !important;
+  z-index: 10 !important;
 }
 
 .post-card-link:hover .post-title,
@@ -293,37 +295,31 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
 }
 
-/* ===== 9. FOLDER LAYOUT STYLES ===== */
+/* ===== 9. FOLDER LAYOUT STYLES (HOME PAGE LOGIC) ===== */
 .category-section {
   margin-bottom: 50px;
 }
 
 .folder-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 32px; /* INCREASED: This creates the horizontal and vertical space */
+  display: block !important; 
   margin-top: 20px;
 }
 
-/* ===== 9. FOLDER LAYOUT STYLES ===== */
 .folder-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #eef2f6 !important; /* Merged from Section 10 */
   border-radius: 15px;
   padding: 24px;
   display: flex;
   align-items: center;
   gap: 15px;
-  /* FORCE the gap here */
-  margin-top: 10px !important;
-  margin-bottom: 20px !important; 
+  margin-bottom: 25px !important; 
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01); /* Merged from Section 10 */
 }
 
-/* Redundant hover removed - Section 3 now handles the lift for .folder-card */
-
-.folder-icon {
-  font-size: 1.5rem;
-}
+.folder-icon { font-size: 1.5rem; }
 
 .folder-name {
   display: block;
@@ -341,35 +337,17 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 
 /* Dark Mode support for Folders */
 .dark-theme .folder-card {
-  background: #1e293b !important;
-  border-color: #334155 !important;
+  background: #111827 !important; /* Deepest dark for contrast */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.dark-theme .folder-name {
-  color: #ffffff !important;
-}
+.dark-theme .folder-name { color: #f1f5f9 !important; }
 
-.dark-theme table td {
-  color: #cbd5e1 !important; 
-}
-/* ===== 10. PREMIUM POLISH & DARK MODE REFINEMENT ===== */
+/* ===== 10. PREMIUM POLISH & TABLES ===== */
 
-/* Soften the lines */
-hr, .playlist-group div {
-  border-color: rgba(226, 232, 240, 0.5) !important;
-}
-
-/* Fix Folder Grid Spacing */
-.category-section span {
-  margin-bottom: 20px !important;
-  opacity: 0.8;
-}
-
-/* Smooth out the Folder Cards */
-.folder-card {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-  border: 1px solid #eef2f6 !important;
-}
+/* Soften lines */
+hr, .playlist-group div { border-color: rgba(226, 232, 240, 0.5) !important; }
+.dark-theme hr { border-color: rgba(255, 255, 255, 0.05) !important; }
 
 /* Section Top Link Polish */
 a[href^="#"] {
@@ -378,25 +356,8 @@ a[href^="#"] {
   letter-spacing: 0.02em;
   opacity: 0.6;
 }
-a[href^="#"]:hover {
-  opacity: 1;
-}
+a[href^="#"]:hover { opacity: 1; }
 
-/* DARK MODE SPECIFIC REFINEMENTS */
-.dark-theme .folder-card, 
-.dark-theme .post-card {
-  border: 1px solid rgba(255, 255, 255, 0.1) !important; /* Subtle border instead of bright white */
-  background: #111827 !important; /* Slightly deeper than the container */
-}
-
-.dark-theme hr, 
-.dark-theme .playlist-group div {
-  border-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-.dark-theme .folder-name {
-  color: #f1f5f9 !important;
-}
 /* ===== 11. DYNAMIC CONTENT-BASED TABLE LOGIC ===== */
 .table-wrapper {
   width: 100%;
