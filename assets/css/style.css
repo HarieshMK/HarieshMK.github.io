@@ -305,6 +305,7 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   margin-top: 20px;
 }
 
+/* ===== 9. FOLDER LAYOUT STYLES ===== */
 .folder-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -313,7 +314,9 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 10px; /* FALLBACK: Keeps them apart on mobile/stacked views */
+  /* FORCE the gap here */
+  margin-top: 10px !important;
+  margin-bottom: 20px !important; 
 }
 
 /* Redundant hover removed - Section 3 now handles the lift for .folder-card */
