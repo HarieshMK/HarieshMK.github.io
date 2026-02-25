@@ -119,8 +119,8 @@ header .tagline {
 
 /* Base styles for all card types */
 .post-card, .home-card, .folder-card { 
-  padding: 30px; 
-  margin-bottom: 24px !important; /* Forces a physical gap between the boxes */
+ padding: 22px 25px; /* Reduced from 30px */
+  margin-bottom: 15px !important; /* Slightly tighter gap between cards */
   border: 1px solid #f1f5f9; 
   border-radius: 12px; 
   background: #fff; 
