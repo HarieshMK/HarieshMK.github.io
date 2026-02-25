@@ -110,12 +110,45 @@ header .tagline {
   transform: scale(1.1); /* Adds a subtle "pop" when you hover over it */
 }
 /* ===== 3. BLOG CARDS & HOVER ===== */
-.post-card-link { display: block; text-decoration: none !important; color: inherit !important; margin-bottom: 25px; }
-.post-card, .home-card { padding: 30px; border: 1px solid #f1f5f9; border-radius: 12px; background: #fff; transition: all 0.3s ease; }
-.post-card-link:hover .post-card { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: #38bdf8; }
-.post-card-link:hover .post-title { color: #38bdf8; }
-.post-title { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: block; transition: color 0.3s ease; }
-.post-date { font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+/* ===== 3. BLOG CARDS & HOVER ===== */
+.post-card-link { 
+  display: block; 
+  text-decoration: none !important; 
+  color: inherit !important; 
+  margin-bottom: 25px; 
+}
+
+/* Apply the base styles to both types of cards */
+.post-card, .home-card { 
+  padding: 30px; 
+  border: 1px solid #f1f5f9; 
+  border-radius: 12px; 
+  background: #fff; 
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother animation curve */
+}
+
+/* TRIGGER THE LIFT: Works if the card is hovered directly or via its parent link */
+.post-card-link:hover .post-card,
+.post-card:hover, 
+.home-card:hover { 
+  transform: translateY(-6px); /* Slightly more pronounced lift */
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06); 
+  border-color: #38bdf8; 
+}
+
+.post-card-link:hover .post-title,
+.post-card:hover .post-title { 
+  color: #38bdf8; 
+}
+
+.post-title { 
+  font-size: 1.4rem; 
+  font-weight: 700; 
+  color: #0f172a; 
+  margin-bottom: 8px; 
+  display: block; 
+  transition: color 0.3s ease; 
+}
 
 /* ===== 4. FOOTER SECTION (FIXED & RESTORED) ===== */
 footer {
