@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
    ========================================== */
 window.onscroll = function() {
     const bar = document.getElementById("myBar");
+   if (!bar) return;
     const container = document.querySelector('.progress-container');
     const article = document.querySelector('.entry-content');
     
