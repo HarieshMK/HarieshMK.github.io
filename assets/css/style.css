@@ -117,7 +117,7 @@ header .tagline {
 }
 
 #theme-toggle:hover #theme-icon {
-  transform: scale(1.3); /* Adds a subtle "pop" when you hover over it */
+  transform: scale(1.2) rotate(15deg); /* This works for emojis! */
 }
 #theme-icon svg {
   display: block;
@@ -148,24 +148,36 @@ header .tagline {
               border-color 0.3s ease;
 }
 /* Target the Date - Using the specific class from your Markdown */
-.post-date, 
-.post-card span, 
-.home-card span {
+span.post-date, 
+.post-card-link .post-card > span {
   font-size: 0.82rem !important; 
   font-style: italic !important; 
   color: #64748b !important; 
   display: block !important; 
-  margin-bottom: 8px !important; 
+  margin-bottom: 8px !important;
   transition: color 0.3s ease;
 }
 
+/* Force Titles to stay Bold and Normal (Non-italic) */
+/* Force Titles to stay Bold and Normal (Non-italic) */
+.post-title, .home-card h2, .post-card h2 {
+  font-style: normal !important;
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+  display: block !important;
+  color: inherit;
+}
+
 /* Ensure the span doesn't turn blue/black from the Global Link Reset */
+/* LIGHT MODE HOVER */
 .post-card-link:hover .post-card,
-.post-card:hover { 
+.post-card:hover, .home-card:hover, .folder-card:hover { 
   transform: translateY(-8px) !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
+  background: rgba(255, 255, 255, 1) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
   border-color: #38bdf8 !important;
+  position: relative !important;
+  z-index: 10 !important;
 }
 /* Keep the Summary text normal */
 .post-card p:last-of-type, 
@@ -354,6 +366,15 @@ footer {
   backdrop-filter: blur(8px);
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
+/* DARK MODE HOVER FIX (Add this to Section 7) */
+.dark-theme .post-card-link:hover .post-card,
+.dark-theme .post-card:hover, 
+.dark-theme .home-card:hover,
+.dark-theme .folder-card:hover {
+  background: #232f46 !important; /* Slightly lighter navy, NOT white */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+  border-color: #38bdf8 !important;
+}
 
 /* ===== 8. GLOBAL LINK RESET ===== */
 /* Base link style for body/footer */
@@ -425,13 +446,6 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 }
 
 /* Dark Mode support for Folders */
-.dark-theme .folder-card {
-  background: #111827 !important; /* Deepest dark for contrast */
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.dark-theme .folder-name { color: #f1f5f9 !important; }
-
 .dark-theme .folder-card {
   background: rgba(255, 255, 255, 0.03) !important;
   backdrop-filter: blur(12px);
