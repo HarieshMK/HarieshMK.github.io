@@ -337,6 +337,18 @@ footer {
   backdrop-filter: blur(8px); /* Adds a premium frosted glass effect */
 }
 
+.dark-theme .nav-list li a.active {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+.dark-theme .nav-link {
+  background: rgba(30, 41, 59, 0.7) !important; /* Semi-transparent navy */
+  backdrop-filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
 /* ===== 8. GLOBAL LINK RESET ===== */
 /* Base link style for body/footer */
 a:not(.nav-list li a):not(.post-card-link):not(.nav-link) {
@@ -413,6 +425,12 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 }
 
 .dark-theme .folder-name { color: #f1f5f9 !important; }
+
+.dark-theme .folder-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
 
 /* ===== 10. PREMIUM POLISH & TABLES ===== */
 
