@@ -161,7 +161,7 @@ span.post-date,
 .post-card-link h2 {
   font-style: normal !important; /* This kills the italic leak */
   font-family: 'Lora', serif !important;
-  font-size: 2rem !important; 
+  font-size: 5rem !important; 
   font-weight: 700 !important;
   color: #0f172a !important; 
   display: block !important;
