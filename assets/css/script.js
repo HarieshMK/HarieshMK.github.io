@@ -80,3 +80,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 });
+/* ===== 4. COPY LINK TO CLIPBOARD ===== */
+const copyBtn = document.getElementById('copy-link-btn');
+if (copyBtn) {
+    copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => { this.innerHTML = originalText; }, 2000);
+        });
+    });
+}
