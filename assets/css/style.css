@@ -154,23 +154,21 @@ span.post-date,
   transition: color 0.3s ease;
 }
 
-/* TARGET THE TITLE ONLY - Forces it to be Bold, Large, and NOT Italic */
-.post-title, 
+/* This targets the actual text link inside the card which often overrides everything */
 .post-card h2, 
+.post-card a, 
+.post-card-link h2, 
+.post-card-link .post-title,
 .home-card h2,
-.post-card-link h2 {
-  font-style: normal !important; /* This kills the italic leak */
+.home-card a {
+  font-style: normal !important;
+  font-size: 2.2rem !important; /* Forces a very large size to test */
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
   font-family: 'Lora', serif !important;
-  font-size: 5rem !important; 
-  font-weight: 700 !important;
-  color: #0f172a !important; 
+  text-decoration: none !important;
   display: block !important;
-  margin-top: 0 !important;
-  margin-bottom: 0.4em !important;
-  line-height: 1.3 !important;
-  transition: color 0.3s ease;
 }
-
 /* Summary text styling */
 .post-card p, .home-card p {
   font-style: normal !important;
