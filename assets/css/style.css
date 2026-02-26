@@ -56,10 +56,10 @@ header .tagline {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  border: 1px solid #e2e8f0;
-  border-radius: 50%;
+  /* Glass effect for Light Mode */
+  background: rgba(255, 255, 255, 0.7); 
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   width: 50px;
   height: 50px;
   display: flex;
@@ -67,7 +67,8 @@ header .tagline {
   justify-content: center;
   cursor: pointer;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); /* Softer shadow */
   transition: all 0.3s ease;
 }
 
@@ -99,9 +100,10 @@ header .tagline {
 
 .nav-list li a.active {
   color: #0f172a !important;
-  background: #ffffff !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid #e2e8f0 !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 #theme-icon {
   font-size: 1.5rem; /* This makes the emoji/icon bigger */
@@ -158,8 +160,12 @@ header .tagline {
 }
 
 /* Ensure the span doesn't turn blue/black from the Global Link Reset */
-.post-card-link:hover span {
-  color: #38bdf8 !important; /* Optional: date turns blue when you hover the whole card */
+.post-card-link:hover .post-card,
+.post-card:hover { 
+  transform: translateY(-8px) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
+  border-color: #38bdf8 !important;
 }
 /* Keep the Summary text normal */
 .post-card p:last-of-type, 
