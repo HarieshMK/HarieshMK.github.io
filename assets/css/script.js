@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-/* PROGRESS BAR LOGIC */
+/* 2. PROGRESS BAR LOGIC */
 window.onscroll = function() {
     const bar = document.getElementById("myBar");
     if (!bar) return;
@@ -65,4 +65,18 @@ window.addEventListener('load', function() {
         const isDark = document.documentElement.classList.contains('dark-theme');
         window.CUSDIS.setTheme(isDark ? 'dark' : 'light');
     }
+});
+/* =====3. AUTOMATIC TABLE WRAPPER ===== */
+// This script finds every table in your posts and wraps it in a scrollable div
+document.addEventListener("DOMContentLoaded", function() {
+  var tables = document.querySelectorAll('main table');
+  tables.forEach(function(table) {
+    // Check if the table is already wrapped to avoid doing it twice
+    if (!table.parentNode.classList.contains('table-wrapper')) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'table-wrapper';
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    }
+  });
 });
