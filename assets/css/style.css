@@ -119,7 +119,7 @@ header .tagline {
 #theme-toggle:hover #theme-icon {
   transform: scale(1.2) rotate(15deg); /* This works for emojis! */
 }
-/* ===== 3. BLOG CARDS & HOVER (PROTECTED VERSION) ===== */
+/* ===== 3. BLOG CARDS & HOVER (CLEAN & FIXED) ===== */
 .post-card-link { 
   display: block; 
   text-decoration: none !important; 
@@ -130,54 +130,52 @@ header .tagline {
 /* Base styles for all card types */
 .post-card, .home-card, .folder-card { 
   padding: 22px 25px;
-  margin-bottom: 25px !important; /* Space between cards */
+  margin-bottom: 25px !important;
   border: 1px solid #f1f5f9; 
   border-radius: 12px; 
   background: #fff; 
-  /* Transitions for smooth lifting */
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              box-shadow 0.3s ease, 
-              border-color 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
   z-index: 1;
 }
 
-/* TARGET THE DATE ONLY - Keeps it italic and small */
-span.post-date, 
-.post-card > span:first-child,
-.home-card > span:first-child {
+/* ROOT FIX 1: Target the Date by Class only. 
+   We removed ":first-child" so it stops stealing the Title. */
+.post-date, span.post-date {
   font-size: 0.82rem !important; 
   font-style: italic !important; 
   color: #64748b !important; 
   display: block !important; 
   margin-bottom: 8px !important;
-  transition: color 0.3s ease;
 }
 
-/* This targets the actual text link inside the card which often overrides everything */
+/* ROOT FIX 2: Target the Title strictly. 
+   This ensures it is always Big, Bold, and Not Italic. */
+.post-title, 
 .post-card h2, 
-.post-card a, 
-.post-card-link h2, 
-.post-card-link .post-title,
 .home-card h2,
-.home-card a {
+.post-card-link h2,
+.post-card h2 a {
   font-style: normal !important;
-  font-size: 2.2rem !important; /* Forces a very large size to test */
+  font-size: 1.85rem !important; 
   font-weight: 800 !important;
   line-height: 1.2 !important;
   font-family: 'Lora', serif !important;
+  color: #0f172a !important;
   text-decoration: none !important;
   display: block !important;
+  margin-top: 0 !important;
+  margin-bottom: 10px !important;
 }
+
 /* Summary text styling */
 .post-card p, .home-card p {
   font-style: normal !important;
-  font-size: 0.95rem;
-  color: #334155;
-  margin-bottom: 0;
+  font-size: 0.95rem !important;
+  color: #334155 !important;
 }
 
-/* HOVER EFFECTS (Both Modes handled) */
+/* HOVER EFFECTS */
 .post-card-link:hover .post-card,
 .post-card:hover, .home-card:hover, .folder-card:hover { 
   transform: translateY(-8px) !important;
@@ -187,11 +185,11 @@ span.post-date,
 }
 
 .post-card-link:hover .post-title,
-.post-card:hover h2, 
-.home-card:hover h2,
+.post-card-link:hover h2,
 .folder-card:hover .folder-name { 
   color: #38bdf8 !important; 
 }
+
 .post-title, .folder-name { 
   transition: color 0.3s ease; 
 }
