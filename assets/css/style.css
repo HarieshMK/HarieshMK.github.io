@@ -330,6 +330,13 @@ footer {
   color: #cbd5e1 !important; /* Soft white/grey for the summary */
 }
 
+/* Update your dark mode toggle button style */
+.dark-theme #theme-toggle {
+  background: rgba(255, 255, 255, 0.1) !important; /* Subtle glass look */
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(8px); /* Adds a premium frosted glass effect */
+}
+
 /* ===== 8. GLOBAL LINK RESET ===== */
 /* Base link style for body/footer */
 a:not(.nav-list li a):not(.post-card-link):not(.nav-link) {
