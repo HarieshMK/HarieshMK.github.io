@@ -1,24 +1,22 @@
 ---
 layout: default
 title: Financial Calculators
-description: Simple, unexciting tools to help you plan your wealth-building journey.
 permalink: /calculators/
 ---
 
 # Wealth Building Tools
-These tools are designed to keep your expectations grounded and your strategy disciplined.
 
 <div class="calculator-grid">
 
-  <a href="/calculators/sip" class="calc-card">
+  <a href="{{ '/calculators/sip' | relative_url }}" class="calc-card">
     <div class="calc-icon">📈</div>
     <div class="calc-content">
       <h3>SIP Calculator</h3>
-      <p>Calculate how much your monthly investments will grow over time.</p>
+      <p>Calculate how much your monthly investments will grow.</p>
     </div>
   </a>
 
-  <a href="/calculators/compound-interest" class="calc-card">
+  <a href="{{ '/calculators/compound-interest' | relative_url }}" class="calc-card">
     <div class="calc-icon">⏳</div>
     <div class="calc-content">
       <h3>Compound Interest</h3>
@@ -26,7 +24,7 @@ These tools are designed to keep your expectations grounded and your strategy di
     </div>
   </a>
 
-  <a href="/calculators/fire" class="calc-card">
+  <a href="{{ '/calculators/fire' | relative_url }}" class="calc-card">
     <div class="calc-icon">🔥</div>
     <div class="calc-content">
       <h3>FIRE Calculator</h3>
