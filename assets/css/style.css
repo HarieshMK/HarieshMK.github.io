@@ -115,11 +115,12 @@ header .tagline {
   transform: scale(1.1); /* Adds a subtle "pop" when you hover over it */
 }
 #theme-icon svg {
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: block;
+  transition: transform 0.3s ease;
 }
 
-#theme-toggle:active #theme-icon svg {
-    transform: scale(0.8); /* Shrinks slightly when clicked for a "button" feel */
+#theme-toggle:hover #theme-icon svg {
+  transform: rotate(20deg) scale(1.1); /* Adds a playful rotation on hover */
 }
 /* ===== 3. BLOG CARDS & HOVER ===== */
 .post-card-link { 
