@@ -436,54 +436,59 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 hr, .playlist-group div { border-color: rgba(226, 232, 240, 0.5) !important; } /* Lightens horizontal lines */
 .dark-theme hr { border-color: rgba(255, 255, 255, 0.05) !important; } /* Dark mode line color */
  
-/* ===== 11. DYNAMIC CONTENT-BASED TABLE LOGIC ===== */
+/* ===== 11. AUTOMATIC TABLE LOGIC (FIXED) ===== */
 .table-wrapper {
-  width: 100%; /* Ensures the wrapper is exactly as wide as the card */
-  overflow-x: auto; /* Adds the horizontal scrollbar only if the table is too wide */
-  margin: 25px 0; /* Vertical spacing to separate the table from text */
-  border-radius: 8px; /* Rounds the corners of the table area */
-  -webkit-overflow-scrolling: touch; /* Makes scrolling smooth on iPhones/iPads */
-  border: 1px solid #e2e8f0; /* Adds a light border around the scrollable area */
+  width: 100%;                  /* Fits exactly inside the card container */
+  overflow-x: auto;             /* Enables horizontal scroll for wide tables */
+  margin: 25px 0;               /* Spacing above and below the table */
+  border-radius: 8px;           /* Rounds the table area corners */
+  border: 1px solid #f1f5f9;    /* Subtle outer border for the scrollable area */
+  -webkit-overflow-scrolling: touch; /* Enables smooth 'momentum' scrolling on iPhones */
 }
 
 table {
-  width: 100% !important; /* Table tries to fit the card first */
-  min-width: 600px; /* On mobile, this forces the scrollbar so columns don't squash too much */
-  table-layout: auto; /* Allows columns to adjust width based on the text inside */
-  border-collapse: collapse; /* Removes the double-border look */
-  font-size: 0.85rem; /* Slightly smaller text to help more data fit naturally */
-  margin: 0; /* Removes any default table margins */
+  width: 100%;                  /* Tries to fill the card width first */
+  min-width: 600px;             /* FORCES scrollbar on mobile so text doesn't squash */
+  border-collapse: collapse;    /* Merges borders for a clean, single-line look */
+  font-size: 0.9rem;            /* Professional table font size for readability */
+  background: #ffffff;          /* Ensures table background is clean white in light mode */
 }
 
 table th, table td {
-  border: 1px solid #e2e8f0; /* Sets the line color between cells */
-  padding: 12px; /* Adds breathing room inside each cell */
-  text-align: left; /* Aligns text to the left */
-  vertical-align: top; /* Keeps text at the top if one cell is taller than others */
-  word-wrap: break-word; /* Prevents long words from breaking the layout */
+  border: 1px solid #f1f5f9;    /* Light cell borders for a clean grid */
+  padding: 12px 15px;           /* Comfortable breathing room inside each cell */
+  text-align: left;             /* Aligns all table data to the left */
 }
 
 table th {
-  background-color: #f8fafc; /* Light grey background for the header row */
-  font-weight: 700; /* Makes header text bold */
-  color: #0f172a; /* Darker color for header text */
-  white-space: nowrap; /* Keeps headers on one line for a cleaner look */
+  background-color: #f8fafc;    /* Distinct light grey background for the header row */
+  font-weight: 700;             /* Makes header text bold */
+  color: #0f172a;               /* Darker navy color for header text */
+  white-space: nowrap;          /* Keeps headers on one line so they don't wrap weirdly */
 }
 
-/* Dark Mode Table Support */
-.dark-theme .table-wrapper {
-  border-color: #334155 !important; /* Changes wrapper border for dark mode */
+/* Dark Mode Support for Tables */
+.dark-theme .table-wrapper { 
+  border-color: #334155 !important; /* Darker border for the wrapper in dark mode */
+}
+
+.dark-theme table { 
+  background: #1e293b !important; /* Dark navy background for the table body */
 }
 
 .dark-theme table th, 
-.dark-theme table td {
-  border: 1px solid #334155 !important; /* Darker borders for cells in dark mode */
+.dark-theme table td { 
+  border-color: #334155 !important; /* Darker borders between cells for dark mode */
 }
 
-.dark-theme table th {
-  background-color: #1e293b !important; /* Dark navy background for headers */
-  color: #ffffff !important; /* White text for headers */
-}  
+.dark-theme table th { 
+  background-color: #0f172a !important; /* Deepest navy/black for the header background */
+  color: #ffffff !important;           /* White text for headers in dark mode */
+}
+
+.dark-theme table td { 
+  color: #cbd5e1 !important;           /* Soft grey/white for data text in dark mode */
+}
 /* ===== 12. IMAGE SAFETY ===== */
 img { 
   max-width: 100%; /* Ensures images never grow wider than their container */
