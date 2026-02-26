@@ -9,6 +9,8 @@ body {
   margin: 0; /* Removes default browser margin */
   padding: 0; /* Removes default browser padding */
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme switching */
+ -webkit-font-smoothing: antialiased; /* Makes text look sharper on Chrome/Safari */
+ -moz-osx-font-smoothing: grayscale; /* Makes text look sharper on Firefox */
 }
 .container {
   max-width: 850px; /* Limits the content width */
@@ -482,4 +484,10 @@ table th {
 .dark-theme table th {
   background-color: #1e293b !important; /* Dark mode header background */
   color: #ffffff !important; /* White text for dark headers */
+}
+/* ===== 12. IMAGE SAFETY ===== */
+img { 
+  max-width: 100%; /* Ensures images never grow wider than their container */
+  height: auto; /* Maintains the correct proportions */
+  border-radius: 8px; /* Matches your card design */
 }
