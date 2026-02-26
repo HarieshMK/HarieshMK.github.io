@@ -495,3 +495,34 @@ img {
   height: auto; /* Maintains the correct proportions */
   border-radius: 8px; /* Matches your card design */
 }
+
+/* ===== 13. SHARE BUTTON STYLES ===== */
+.share-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.share-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: #64748b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background: #f1f5f9;
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.dark-theme .share-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
