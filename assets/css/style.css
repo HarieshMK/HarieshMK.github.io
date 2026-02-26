@@ -438,53 +438,52 @@ hr, .playlist-group div { border-color: rgba(226, 232, 240, 0.5) !important; } /
  
 /* ===== 11. DYNAMIC CONTENT-BASED TABLE LOGIC ===== */
 .table-wrapper {
-  width: 100%; /* Full width wrapper */
-  overflow-x: auto; /* Horizontal scroll for mobile tables */
-  margin: 25px 0; /* Space around tables */
-  border-radius: 8px; /* Rounded table corners */
-  -webkit-overflow-scrolling: touch; /* Smooth touch scrolling on iOS */
+  width: 100%; /* Ensures the wrapper is exactly as wide as the card */
+  overflow-x: auto; /* Adds the horizontal scrollbar only if the table is too wide */
+  margin: 25px 0; /* Vertical spacing to separate the table from text */
+  border-radius: 8px; /* Rounds the corners of the table area */
+  -webkit-overflow-scrolling: touch; /* Makes scrolling smooth on iPhones/iPads */
+  border: 1px solid #e2e8f0; /* Adds a light border around the scrollable area */
 }
- 
+
 table {
-  width: 100% !important; /* Full table width */
-  table-layout: auto; /* Columns adapt to content size */
-  border-collapse: collapse; /* Merges cell borders */
-  font-size: 0.82rem; /* Font size for table content */
-  word-wrap: break-word; /* Allows long words to break */
+  width: 100% !important; /* Table tries to fit the card first */
+  min-width: 600px; /* On mobile, this forces the scrollbar so columns don't squash too much */
+  table-layout: auto; /* Allows columns to adjust width based on the text inside */
+  border-collapse: collapse; /* Removes the double-border look */
+  font-size: 0.85rem; /* Slightly smaller text to help more data fit naturally */
+  margin: 0; /* Removes any default table margins */
 }
- 
+
 table th, table td {
-  border: 1px solid #e2e8f0; /* Cell border style */
-  padding: 10px 12px; /* Spacing inside cells */
-  text-align: left; /* Align text left in cells */
-  vertical-align: middle; /* Align content middle vertically */
-  min-width: 50px; /* Minimum cell width */
-  max-width: 200px; /* Maximum cell width before wrapping */
-  white-space: normal; /* Allows text to wrap in cells */
+  border: 1px solid #e2e8f0; /* Sets the line color between cells */
+  padding: 12px; /* Adds breathing room inside each cell */
+  text-align: left; /* Aligns text to the left */
+  vertical-align: top; /* Keeps text at the top if one cell is taller than others */
+  word-wrap: break-word; /* Prevents long words from breaking the layout */
 }
- 
-/* Ensure numerical/short columns stay as tight as possible */
-table td {
-  width: auto; /* Adapts cell width to content */
-}
- 
+
 table th {
-  background-color: #f8fafc; /* Table header background */
-  font-weight: 700; /* Bold table headers */
-  color: #0f172a; /* Header text color */
-  white-space: nowrap; /* Prevents header text from wrapping */
+  background-color: #f8fafc; /* Light grey background for the header row */
+  font-weight: 700; /* Makes header text bold */
+  color: #0f172a; /* Darker color for header text */
+  white-space: nowrap; /* Keeps headers on one line for a cleaner look */
 }
- 
-/* Dark Mode Support for Tables */
+
+/* Dark Mode Table Support */
+.dark-theme .table-wrapper {
+  border-color: #334155 !important; /* Changes wrapper border for dark mode */
+}
+
 .dark-theme table th, 
 .dark-theme table td {
-  border: 1px solid #334155 !important; /* Dark mode cell borders */
+  border: 1px solid #334155 !important; /* Darker borders for cells in dark mode */
 }
- 
+
 .dark-theme table th {
-  background-color: #1e293b !important; /* Dark mode header background */
-  color: #ffffff !important; /* White text for dark headers */
-}
+  background-color: #1e293b !important; /* Dark navy background for headers */
+  color: #ffffff !important; /* White text for headers */
+}  
 /* ===== 12. IMAGE SAFETY ===== */
 img { 
   max-width: 100%; /* Ensures images never grow wider than their container */
