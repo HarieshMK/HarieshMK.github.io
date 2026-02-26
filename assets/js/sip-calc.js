@@ -7,51 +7,55 @@ document.addEventListener('DOMContentLoaded', function() {
     const investedDisplay = document.getElementById('total-invested');
     const returnsDisplay = document.getElementById('total-returns');
     const valueDisplay = document.getElementById('total-value');
-    const tenureDisplay = document.getElementById('display-tenure');
+    
+    // Progress IDs
+    const progressSection = document.getElementById('current-progress');
+    const completedTenure = document.getElementById('completed-tenure');
+    const valueTodayDisplay = document.getElementById('value-today');
 
     function calculateSIP() {
         let P = parseFloat(monthlyInput.value); 
         let annualRate = parseFloat(rateInput.value); 
+        let yearsGoal = parseFloat(yearsInput.value);
         let i = annualRate / 100 / 12; 
-        let n; // total months
-        
-        const startDateValue = dateInput.value;
 
+        if (isNaN(P) || isNaN(annualRate) || isNaN(yearsGoal) || i === 0) return;
+
+        // 1. FUTURE PROJECTION (Always calculated based on "Time Period")
+        let nGoal = yearsGoal * 12;
+        let finalValue = P * ((Math.pow(1 + i, nGoal) - 1) / i) * (1 + i);
+        let totalInvested = P * nGoal;
+        let totalReturns = finalValue - totalInvested;
+
+        // 2. CURRENT PROGRESS (Only if Date is selected)
+        const startDateValue = dateInput.value;
         if (startDateValue) {
-            // Calculate months based on Calendar
             let start = new Date(startDateValue);
             let today = new Date();
-            let diffMonths = (today.getFullYear() - start.getFullYear()) * 12;
-            diffMonths += today.getMonth() - start.getMonth();
-            
-            // If the date is today or in the future, fallback to 1 month or years input
-            n = diffMonths > 0 ? diffMonths : parseFloat(yearsInput.value) * 12;
-            
-            // Update the Duration display text
-            let displayY = Math.floor(n / 12);
-            let displayM = n % 12;
-            tenureDisplay.innerText = `${displayY}y ${displayM}m (${n} months)`;
+            // Calculate total months difference
+            let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
+
+            if (nPassed > 0) {
+                progressSection.style.display = 'block';
+                let valueToday = P * ((Math.pow(1 + i, nPassed) - 1) / i) * (1 + i);
+                let yPassed = Math.floor(nPassed / 12);
+                let mPassed = nPassed % 12;
+                
+                completedTenure.innerText = `${yPassed}y ${mPassed}m`;
+                valueTodayDisplay.innerText = "₹" + Math.round(valueToday).toLocaleString('en-IN');
+            } else {
+                progressSection.style.display = 'none';
+            }
         } else {
-            // Use the Years input
-            let years = parseFloat(yearsInput.value);
-            n = years * 12;
-            tenureDisplay.innerText = years + " Years";
+            progressSection.style.display = 'none';
         }
 
-        if (isNaN(P) || isNaN(annualRate) || isNaN(n) || i === 0) return;
-
-        // SIP Formula (Annuity Due to match Groww/Industry Standards)
-        let totalValue = P * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
-        let totalInvested = P * n;
-        let totalReturns = totalValue - totalInvested;
-
-        // Formatting
+        // Update Future Results
         investedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
         returnsDisplay.innerText = "₹" + Math.round(totalReturns).toLocaleString('en-IN');
-        valueDisplay.innerText = "₹" + Math.round(totalValue).toLocaleString('en-IN');
+        valueDisplay.innerText = "₹" + Math.round(finalValue).toLocaleString('en-IN');
     }
 
-    // Listen to all inputs
     [monthlyInput, rateInput, yearsInput, dateInput].forEach(input => {
         input.addEventListener('input', calculateSIP);
     });
