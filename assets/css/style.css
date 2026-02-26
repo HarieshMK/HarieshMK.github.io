@@ -585,3 +585,77 @@ img {
 .dark-theme .calc-icon { background: #0f172a; }
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
+
+/* ===== 15. CALCULATOR INTERFACE ===== */
+.calculator-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .calculator-container { grid-template-columns: 1fr; }
+}
+
+/* Inputs */
+.input-group { margin-bottom: 25px; }
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #475569;
+}
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #f1f5f9;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+.input-group input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+/* Results Display */
+.calc-results {
+  background: #f8fafc;
+  padding: 30px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.result-item span { color: #64748b; }
+.result-item strong { font-size: 1.2rem; color: #0f172a; }
+
+.result-item.highlight {
+  border-bottom: none;
+  margin-top: 10px;
+  padding: 20px;
+  background: #38bdf8;
+  border-radius: 10px;
+}
+.result-item.highlight span { color: #ffffff; font-weight: 600; }
+.result-item.highlight strong { color: #ffffff; font-size: 1.8rem; }
+
+/* Dark Mode for Calculator */
+.dark-theme .calculator-container { background: #1e293b; border-color: #334155; }
+.dark-theme .input-group label { color: #94a3b8; }
+.dark-theme .input-group input { background: #0f172a; border-color: #334155; color: white; }
+.dark-theme .calc-results { background: #0f172a; }
+.dark-theme .result-item { border-bottom-color: #334155; }
+.dark-theme .result-item strong { color: white; }
