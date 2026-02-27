@@ -674,14 +674,14 @@ img {
 }
 
 .input-header {
-  font-size: 0.7rem;             /* Header text size (e.g., FUTURE PROJECTION) */
+  font-size: 1rem;             /* Header text size (e.g., FUTURE PROJECTION) */
   font-weight: 800; 
   text-transform: uppercase; 
   letter-spacing: 0.12em;        /* Space between letters in header */
   color: #94a3b8; 
-  margin-bottom: 20px;           /* Vertical space after the header */
+  margin-bottom: 10px;           /* Vertical space after the header */
   border-bottom: 1px solid #e2e8f0; /* Underline below the header */
-  padding-bottom: 8px;           /* Gap between header text and its underline */
+  padding-bottom: 2px;           /* Gap between header text and its underline */
 }
 
 .result-item {
