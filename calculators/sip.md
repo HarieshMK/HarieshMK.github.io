@@ -61,37 +61,36 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
   </div>
 
   <div class="calc-results">
-    <div id="current-progress" style="display: none; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px dashed #e2e8f0;">
-      <h4 class="input-header">Current Progress</h4>
+    <div id="current-progress" style="display: none;">
+      <h4 class="input-header">Investment So Far</h4>
       <div class="result-item">
-        <span>Duration Completed</span>
+        <span>Time Invested</span>
         <strong id="completed-tenure">0y 0m</strong>
       </div>
       <div class="result-item">
-        <span>Value Today</span>
+        <span>Estimated Value Today</span>
         <strong id="value-today">₹0</strong>
       </div>
-      <div class="result-item">
-        <span>Real Value (Adj.)</span>
-        <strong id="real-value-today">₹0</strong>
-      </div>
+      <hr style="border: 0; border-top: 2px dashed #e2e8f0; margin: 15px 0;">
     </div>
 
-    <h4 class="input-header">Future Projection</h4>
+    <h4 class="input-header">Wealth Projection</h4>
     <div class="result-item">
-      <span>Total Invested</span>
+      <span>Total Money Invested</span>
       <strong id="total-invested">₹0</strong>
     </div>
     <div class="result-item">
-      <span>Est. Wealth Gain</span>
+      <span>Estimated Returns (Profit)</span>
       <strong id="total-returns">₹0</strong>
     </div>
+    
     <div class="result-item highlight">
-      <span>Target Portfolio Value</span>
+      <span>Total Wealth Created</span>
       <strong id="total-value">₹0</strong>
     </div>
+
     <div class="result-item">
-      <span>Future Purchasing Power</span>
+      <span>Value in Today's Terms</span>
       <strong id="real-future-value">₹0</strong>
     </div>
   </div>
