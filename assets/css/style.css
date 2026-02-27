@@ -628,10 +628,8 @@ img {
   border-radius: 10px;
   background: #f8fafc;
   color: #0f172a;
-  font-size: 1rem;
 }
 
-/* --- Slider Style --- */
 .slider {
   -webkit-appearance: none;
   width: 100%;
@@ -639,7 +637,6 @@ img {
   background: #e2e8f0;
   border-radius: 5px;
   outline: none;
-  margin: 5px 0 15px 0;
 }
 
 .slider::-webkit-slider-thumb {
@@ -647,9 +644,9 @@ img {
   width: 22px;
   height: 22px;
   background: #38bdf8;
-  cursor: pointer;
   border-radius: 50%;
   border: 3px solid #fff;
+  cursor: pointer;
 }
 
 /* --- Results Column (Stacked Layout) --- */
@@ -665,14 +662,12 @@ img {
 .input-header {
   font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #94a3b8;
   margin: 10px 0 5px 0;
   border-bottom: 1px dashed #e2e8f0;
   padding-bottom: 5px;
 }
 
-/* STACKED: Label on top, number below. This stops the jumping! */
 .result-item {
   display: flex;
   flex-direction: column; 
@@ -681,20 +676,14 @@ img {
   border-bottom: 1px solid rgba(226, 232, 240, 0.6);
 }
 
-.result-item span { 
-  color: #64748b; 
-  font-size: 0.8rem; 
-  margin-bottom: 4px;
-}
-
+.result-item span { color: #64748b; font-size: 0.8rem; margin-bottom: 4px; }
 .result-item strong { 
   font-size: 1.2rem;
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
-  word-break: break-all; /* Prevents long numbers from escaping */
+  word-break: break-all;
 }
 
-/* Target Portfolio Value (Big Blue Box) */
 .result-item.highlight {
   border-bottom: none;
   margin-top: 10px;
@@ -703,29 +692,12 @@ img {
   border-radius: 12px;
 }
 
-.result-item.highlight span { color: rgba(255, 255, 255, 0.9); font-weight: 600; }
-.result-item.highlight strong { 
-  color: #ffffff !important; 
-  font-size: 1.5rem; 
-}
+.result-item.highlight span { color: #ffffff; opacity: 0.9; }
+.result-item.highlight strong { color: #ffffff !important; font-size: 1.5rem; }
 
-/* --- Dark Mode Overrides (Stronger Colors) --- */
+/* Dark Mode Overrides */
 .dark-theme .calculator-container { background: #1e293b; border-color: #334155; }
-.dark-theme .label-row label { color: #94a3b8; }
-.dark-theme .label-row input[type="number"], 
-.dark-theme #start-date { 
-  background: #0f172a; 
-  border-color: #334155; 
-  color: #38bdf8; 
-}
-
+.dark-theme .label-row input[type="number"], .dark-theme #start-date { background: #0f172a; color: #38bdf8; border-color: #334155; }
 .dark-theme .calc-results { background: #0f172a; }
-.dark-theme .result-item { border-bottom-color: #1e293b; }
+.dark-theme .result-item strong { color: #f8fafc !important; }
 .dark-theme .result-item span { color: #64748b; }
-
-/* FIX: This makes the "Value Today" and all result numbers pop in Dark Mode */
-.dark-theme .result-item strong { 
-  color: #f8fafc !important; 
-}
-
-.dark-theme .input-header { color: #475569; border-color: #1e293b; }
