@@ -596,54 +596,45 @@ img {
   border-radius: 20px;
   border: 1px solid #e2e8f0;
   margin-top: 20px;
-  align-items: start; /* FIX 1: Keeps container stable when heights change */
+  align-items: start;
 }
 
 @media (max-width: 768px) {
   .calculator-container { grid-template-columns: 1fr; padding: 20px; }
 }
 
-/* Input Groups */
+/* Input Group Styles */
 .input-group { margin-bottom: 20px; }
+.label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.label-row label { font-weight: 600; color: #475569; margin: 0; }
 
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.label-row label {
-  font-weight: 600;
-  color: #475569;
-  margin: 0;
-}
-
-/* Small Number Box inside Label Row */
+/* FIX: Larger Input Numbers */
 .label-row input[type="number"] {
-  width: 100px; /* FIX 2: Slightly wider to prevent internal text shifting */
+  width: 110px; 
   text-align: right;
-  padding: 6px 12px;
+  padding: 8px 12px;
   border: 2px solid #f1f5f9;
   border-radius: 8px;
   font-weight: 700;
   color: #0ea5e9;
-  /* FIX 3: Monospace prevents characters from vibrating while scrolling */
-  font-family: 'JetBrains Mono', 'Fira Code', monospace; 
+  font-size: 1.1rem; /* Made it larger */
+  font-family: 'JetBrains Mono', monospace; 
   background: #f8fafc;
 }
 
-/* Full width for Date picker */
+/* FIX: Date Selector Visibility */
 #start-date {
   width: 100%;
   padding: 12px;
   border: 2px solid #f1f5f9;
   border-radius: 10px;
   background: #f8fafc;
+  color: #0f172a;
   font-family: inherit;
+  font-size: 1rem;
 }
 
-/* Range Slider Styling */
+/* Slider Track */
 .slider {
   -webkit-appearance: none;
   width: 100%;
@@ -652,30 +643,25 @@ img {
   border-radius: 5px;
   outline: none;
   margin: 5px 0 15px 0;
-  transition: none !important; /* FIX 4: Removes lag during dragging */
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
   width: 22px;
   height: 22px;
   background: #38bdf8;
   cursor: pointer;
   border-radius: 50%;
   border: 3px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 /* Results Display */
 .calc-results {
   background: #f8fafc;
-  padding: 30px;
+  padding: 25px;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  height: fit-content;
-  min-width: 300px; /* FIX 5: Prevents the whole column from resizing */
 }
 
 .input-header {
@@ -683,7 +669,7 @@ img {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #94a3b8;
-  margin: 0 0 15px 0;
+  margin: 15px 0 10px 0;
 }
 
 .result-item {
@@ -694,31 +680,38 @@ img {
   border-bottom: 1px solid #e2e8f0;
 }
 
-.result-item span { 
-  color: #64748b; 
-  font-size: 0.95rem;
-  white-space: nowrap; /* FIX 6: Prevents labels from wrapping and jumping */
-}
+.result-item span { color: #64748b; font-size: 0.9rem; }
 
+/* FIX: Results font and stability */
 .result-item strong { 
   font-size: 1.1rem; 
   color: #0f172a;
-  /* FIX 7: Monospace for results ensures numbers don't "wiggle" */
-  font-family: 'JetBrains Mono', 'Fira Code', monospace; 
+  font-family: 'JetBrains Mono', monospace;
+  text-align: right;
 }
 
+/* FIX: Target Portfolio Value Overflow */
 .result-item.highlight {
   border-bottom: none;
   margin-top: 15px;
   padding: 20px;
   background: #0ea5e9;
   border-radius: 12px;
+  flex-direction: column; /* Stacked so big numbers don't push out */
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .result-item.highlight span { color: #ffffff; font-weight: 600; }
-.result-item.highlight strong { color: #ffffff; font-size: 1.6rem; }
+.result-item.highlight strong { 
+  color: #ffffff; 
+  font-size: 1.4rem; /* Slightly smaller to fit */
+  width: 100%;
+  text-align: left; /* Aligned left for easier reading of long numbers */
+  word-break: break-all;
+}
 
-/* Dark Mode for Calculator */
+/* Dark Mode Overrides */
 .dark-theme .calculator-container { background: #1e293b; border-color: #334155; }
 .dark-theme .label-row label { color: #94a3b8; }
 .dark-theme .label-row input[type="number"], 
@@ -727,8 +720,8 @@ img {
   border-color: #334155; 
   color: #38bdf8; 
 }
-.dark-theme .slider { background: #334155; }
 .dark-theme .calc-results { background: #0f172a; }
 .dark-theme .result-item { border-bottom-color: #334155; }
 .dark-theme .result-item strong { color: white; }
 .dark-theme .input-header { color: #64748b; }
+.dark-theme .result-item span { color: #94a3b8; }
