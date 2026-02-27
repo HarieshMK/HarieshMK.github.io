@@ -52,34 +52,33 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalInvested = P * nGoal;
         let totalReturns = finalValue - totalInvested;
 
-   // 2. CURRENT PROGRESS (Only if Date is selected)
+   // 2. CURRENT PROGRESS LOGIC
 const startDateValue = dateInput.value;
+const selectedTenureMonths = parseInt(yearsInput.value) * 12; // Cap limit
+
 if (startDateValue) {
     let start = new Date(startDateValue);
     let today = new Date();
     
-    // Improved Month Calculation: total months from year 0 to now
+    // Total months passed since start date
     let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
 
-    // Only show if the date is actually in the past
     if (nPassed > 0) {
         progressSection.style.display = 'block';
         
-        // Ensure i is not zero before power calculation to avoid "Infinity" errors
-        let valueToday = P * ((Math.pow(1 + i, nPassed) - 1) / i) * (1 + i);
+        // PROPOSAL FIX: Cap nPassed so it doesn't exceed the selected Time Period
+        let effectivePassed = Math.min(nPassed, selectedTenureMonths);
         
-        let yPassed = Math.floor(nPassed / 12);
-        let mPassed = nPassed % 12;
+        let valueToday = P * ((Math.pow(1 + i, effectivePassed) - 1) / i) * (1 + i);
         
-        // Update the UI
-        completedTenure.innerText = `${yPassed}y ${mPassed}m`;
-        // Explicitly target the ID to ensure it finds the element
+        let yPassed = Math.floor(effectivePassed / 12);
+        let mPassed = effectivePassed % 12;
+        
+        completedTenure.innerText = `${yPassed}y ${mPassed}m` + (nPassed > selectedTenureMonths ? " (Max)" : "");
         document.getElementById('value-today').innerText = "₹" + Math.round(valueToday).toLocaleString('en-IN');
     } else {
         progressSection.style.display = 'none';
     }
-} else {
-    progressSection.style.display = 'none';
 }
 
         // Update Future Results
