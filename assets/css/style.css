@@ -589,13 +589,14 @@ img {
 /* ===== 15. CALCULATOR INTERFACE ===== */
 .calculator-container {
   display: grid;
-  grid-template-columns: 1.5fr 1fr; /* Give inputs slightly more room */
+  grid-template-columns: 1.5fr 1fr;
   gap: 40px;
   background: #ffffff;
   padding: 30px;
   border-radius: 20px;
   border: 1px solid #e2e8f0;
   margin-top: 20px;
+  align-items: start; /* FIX 1: Keeps container stable when heights change */
 }
 
 @media (max-width: 768px) {
@@ -620,14 +621,15 @@ img {
 
 /* Small Number Box inside Label Row */
 .label-row input[type="number"] {
-  width: 90px;
+  width: 100px; /* FIX 2: Slightly wider to prevent internal text shifting */
   text-align: right;
   padding: 6px 12px;
   border: 2px solid #f1f5f9;
   border-radius: 8px;
   font-weight: 700;
   color: #0ea5e9;
-  font-family: 'Inter', sans-serif;
+  /* FIX 3: Monospace prevents characters from vibrating while scrolling */
+  font-family: 'JetBrains Mono', 'Fira Code', monospace; 
   background: #f8fafc;
 }
 
@@ -650,6 +652,7 @@ img {
   border-radius: 5px;
   outline: none;
   margin: 5px 0 15px 0;
+  transition: none !important; /* FIX 4: Removes lag during dragging */
 }
 
 .slider::-webkit-slider-thumb {
@@ -662,11 +665,6 @@ img {
   border-radius: 50%;
   border: 3px solid #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.1s ease;
-}
-
-.slider::-webkit-slider-thumb:active {
-  transform: scale(1.2);
 }
 
 /* Results Display */
@@ -677,6 +675,7 @@ img {
   display: flex;
   flex-direction: column;
   height: fit-content;
+  min-width: 300px; /* FIX 5: Prevents the whole column from resizing */
 }
 
 .input-header {
@@ -695,8 +694,18 @@ img {
   border-bottom: 1px solid #e2e8f0;
 }
 
-.result-item span { color: #64748b; font-size: 0.95rem; }
-.result-item strong { font-size: 1.1rem; color: #0f172a; }
+.result-item span { 
+  color: #64748b; 
+  font-size: 0.95rem;
+  white-space: nowrap; /* FIX 6: Prevents labels from wrapping and jumping */
+}
+
+.result-item strong { 
+  font-size: 1.1rem; 
+  color: #0f172a;
+  /* FIX 7: Monospace for results ensures numbers don't "wiggle" */
+  font-family: 'JetBrains Mono', 'Fira Code', monospace; 
+}
 
 .result-item.highlight {
   border-bottom: none;
