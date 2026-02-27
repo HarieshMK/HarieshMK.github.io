@@ -1,92 +1,88 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Input Fields
-    const monthlyInput = document.getElementById('monthly-sip');
-    const monthlySlider = document.getElementById('monthly-sip-slider'); // Added
-    const rateInput = document.getElementById('return-rate');
-    const rateSlider = document.getElementById('return-rate-slider'); // Added
+    // Inputs
+    const monthlySIP = document.getElementById('monthly-sip');
+    const monthlySlider = document.getElementById('monthly-sip-slider');
+    const returnRate = document.getElementById('return-rate');
+    const returnSlider = document.getElementById('return-rate-slider');
     const yearsInput = document.getElementById('years');
-    const yearsSlider = document.getElementById('years-slider'); // Added
+    const yearsSlider = document.getElementById('years-slider');
+    const lumpSumInput = document.getElementById('initial-lump-sum');
+    const lumpSumSlider = document.getElementById('lump-sum-slider');
+    const inflationInput = document.getElementById('inflation-rate');
+    const inflationSlider = document.getElementById('inflation-slider');
     const dateInput = document.getElementById('start-date');
 
-    // Display Elements
-    const investedDisplay = document.getElementById('total-invested');
-    const returnsDisplay = document.getElementById('total-returns');
-    const valueDisplay = document.getElementById('total-value');
+    // Outputs
+    const totalInvestedDisplay = document.getElementById('total-invested');
+    const totalReturnsDisplay = document.getElementById('total-returns');
+    const totalValueDisplay = document.getElementById('total-value');
+    const realFutureDisplay = document.getElementById('real-future-value');
+    
     const progressSection = document.getElementById('current-progress');
     const completedTenure = document.getElementById('completed-tenure');
     const valueTodayDisplay = document.getElementById('value-today');
+    const realValueTodayDisplay = document.getElementById('real-value-today');
 
-    // NEW: Helper function to sync Sliders and Inputs
-    function sync(input, slider) {
-        // When slider moves, update input and recalculate
-        slider.addEventListener('input', () => {
-            input.value = slider.value;
-            calculateSIP();
-        });
-        // When input text changes, update slider and recalculate
-        input.addEventListener('input', () => {
-            slider.value = input.value;
-            calculateSIP();
-        });
+    function syncInputs(input, slider) {
+        input.addEventListener('input', () => { slider.value = input.value; calculateSIP(); });
+        slider.addEventListener('input', () => { input.value = slider.value; calculateSIP(); });
     }
 
-    // Initialize Syncing
-    sync(monthlyInput, monthlySlider);
-    sync(rateInput, rateSlider);
-    sync(yearsInput, yearsSlider);
-    
-    // Date doesn't have a slider, so just listen for change
-    dateInput.addEventListener('input', calculateSIP);
+    syncInputs(monthlySIP, monthlySlider);
+    syncInputs(returnRate, returnSlider);
+    syncInputs(yearsInput, yearsSlider);
+    syncInputs(lumpSumInput, lumpSumSlider);
+    syncInputs(inflationInput, inflationSlider);
+    dateInput.addEventListener('change', calculateSIP);
 
     function calculateSIP() {
-        let P = parseFloat(monthlyInput.value); 
-        let annualRate = parseFloat(rateInput.value); 
-        let yearsGoal = parseFloat(yearsInput.value);
-        let i = annualRate / 100 / 12; 
+        const P = parseFloat(monthlySIP.value) || 0;
+        const L = parseFloat(lumpSumInput.value) || 0;
+        const r = parseFloat(returnRate.value) / 100 / 12;
+        const n = parseFloat(yearsInput.value) * 12;
+        const inf = parseFloat(inflationInput.value) / 100;
 
-        if (isNaN(P) || isNaN(annualRate) || isNaN(yearsGoal) || i === 0) return;
+        // Future Calculation
+        const futureValueSIP = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        const futureValueLump = L * Math.pow(1 + r, n);
+        const totalValue = futureValueSIP + futureValueLump;
+        const totalInvested = (P * n) + L;
+        const realFutureValue = totalValue / Math.pow(1 + inf, parseFloat(yearsInput.value));
 
-        // 1. FUTURE PROJECTION (Always calculated based on "Time Period")
-        let nGoal = yearsGoal * 12;
-        let finalValue = P * ((Math.pow(1 + i, nGoal) - 1) / i) * (1 + i);
-        let totalInvested = P * nGoal;
-        let totalReturns = finalValue - totalInvested;
+        // Update Future UI
+        totalInvestedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
+        totalReturnsDisplay.innerText = "₹" + Math.round(totalValue - totalInvested).toLocaleString('en-IN');
+        totalValueDisplay.innerText = "₹" + Math.round(totalValue).toLocaleString('en-IN');
+        realFutureDisplay.innerText = "₹" + Math.round(realFutureValue).toLocaleString('en-IN');
 
-   // 2. CURRENT PROGRESS LOGIC
-const startDateValue = dateInput.value;
-const selectedTenureMonths = parseInt(yearsInput.value) * 12; // Cap limit
+        // Current Progress Logic
+        const startDateValue = dateInput.value;
+        if (startDateValue) {
+            let start = new Date(startDateValue);
+            let today = new Date();
+            let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
+            
+            // Proposal Fix: Cap the calculation to selected Tenure
+            let effectivePassed = Math.max(0, Math.min(nPassed, n));
 
-if (startDateValue) {
-    let start = new Date(startDateValue);
-    let today = new Date();
-    
-    // Total months passed since start date
-    let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
+            if (effectivePassed > 0) {
+                progressSection.style.display = 'block';
+                let valTodaySIP = P * ((Math.pow(1 + r, effectivePassed) - 1) / r) * (1 + r);
+                let valTodayLump = L * Math.pow(1 + r, effectivePassed);
+                let totalToday = valTodaySIP + valTodayLump;
+                
+                let realValToday = totalToday / Math.pow(1 + inf, effectivePassed / 12);
 
-    if (nPassed > 0) {
-        progressSection.style.display = 'block';
-        
-        // PROPOSAL FIX: Cap nPassed so it doesn't exceed the selected Time Period
-        let effectivePassed = Math.min(nPassed, selectedTenureMonths);
-        
-        let valueToday = P * ((Math.pow(1 + i, effectivePassed) - 1) / i) * (1 + i);
-        
-        let yPassed = Math.floor(effectivePassed / 12);
-        let mPassed = effectivePassed % 12;
-        
-        completedTenure.innerText = `${yPassed}y ${mPassed}m` + (nPassed > selectedTenureMonths ? " (Max)" : "");
-        document.getElementById('value-today').innerText = "₹" + Math.round(valueToday).toLocaleString('en-IN');
-    } else {
-        progressSection.style.display = 'none';
+                completedTenure.innerText = `${Math.floor(effectivePassed / 12)}y ${effectivePassed % 12}m` + (nPassed > n ? " (Max)" : "");
+                valueTodayDisplay.innerText = "₹" + Math.round(totalToday).toLocaleString('en-IN');
+                realValueTodayDisplay.innerText = "₹" + Math.round(realValToday).toLocaleString('en-IN');
+            } else {
+                progressSection.style.display = 'none';
+            }
+        } else {
+            progressSection.style.display = 'none';
+        }
     }
-}
 
-        // Update Future Results
-        investedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
-        returnsDisplay.innerText = "₹" + Math.round(totalReturns).toLocaleString('en-IN');
-        valueDisplay.innerText = "₹" + Math.round(finalValue).toLocaleString('en-IN');
-    }
-
-    // Run once on load
     calculateSIP();
 });
