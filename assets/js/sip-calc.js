@@ -1,17 +1,42 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Input Fields
     const monthlyInput = document.getElementById('monthly-sip');
+    const monthlySlider = document.getElementById('monthly-sip-slider'); // Added
     const rateInput = document.getElementById('return-rate');
+    const rateSlider = document.getElementById('return-rate-slider'); // Added
     const yearsInput = document.getElementById('years');
+    const yearsSlider = document.getElementById('years-slider'); // Added
     const dateInput = document.getElementById('start-date');
 
+    // Display Elements
     const investedDisplay = document.getElementById('total-invested');
     const returnsDisplay = document.getElementById('total-returns');
     const valueDisplay = document.getElementById('total-value');
-    
-    // Progress IDs
     const progressSection = document.getElementById('current-progress');
     const completedTenure = document.getElementById('completed-tenure');
     const valueTodayDisplay = document.getElementById('value-today');
+
+    // NEW: Helper function to sync Sliders and Inputs
+    function sync(input, slider) {
+        // When slider moves, update input and recalculate
+        slider.addEventListener('input', () => {
+            input.value = slider.value;
+            calculateSIP();
+        });
+        // When input text changes, update slider and recalculate
+        input.addEventListener('input', () => {
+            slider.value = input.value;
+            calculateSIP();
+        });
+    }
+
+    // Initialize Syncing
+    sync(monthlyInput, monthlySlider);
+    sync(rateInput, rateSlider);
+    sync(yearsInput, yearsSlider);
+    
+    // Date doesn't have a slider, so just listen for change
+    dateInput.addEventListener('input', calculateSIP);
 
     function calculateSIP() {
         let P = parseFloat(monthlyInput.value); 
@@ -32,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (startDateValue) {
             let start = new Date(startDateValue);
             let today = new Date();
-            // Calculate total months difference
             let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
 
             if (nPassed > 0) {
@@ -56,9 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
         valueDisplay.innerText = "₹" + Math.round(finalValue).toLocaleString('en-IN');
     }
 
-    [monthlyInput, rateInput, yearsInput, dateInput].forEach(input => {
-        input.addEventListener('input', calculateSIP);
-    });
-
+    // Run once on load
     calculateSIP();
 });
