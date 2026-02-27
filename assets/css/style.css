@@ -586,160 +586,163 @@ img {
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
 
-/* ===== 15. CALCULATOR INTERFACE (STABILITY & PREMIUM) ===== */
+/* ===== 15. CALCULATOR INTERFACE (ADJUSTABLE PRESET) ===== */
 .calculator-container {
   display: grid;
-  /* Fixed column ratios to prevent squashing */
-  grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 1fr);
-  gap: 40px;
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 24px;
-  border: 1px solid #e2e8f0;
-  margin-top: 20px;
-  align-items: start;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  /* Width Control: Adjust 320px or 280px to change minimum column widths */
+  grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 1fr); 
+  gap: 40px;                     /* Horizontal space between Left and Right columns */
+  background: #ffffff;           /* Container background */
+  padding: 40px;                 /* Internal breathing room around the whole tool */
+  border-radius: 24px;           /* Roundness of the outer corners */
+  border: 1px solid #e2e8f0;     /* Border thickness and color */
+  margin-top: 20px;              /* Vertical space above the calculator */
+  align-items: start;            /* Keeps columns at the top; 'stretch' would make them equal height */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); /* Outer shadow depth */
 }
 
 @media (max-width: 992px) {
   .calculator-container { 
-    grid-template-columns: 1fr; 
-    padding: 25px;
-    gap: 30px;
+    grid-template-columns: 1fr;  /* Switches to single column on small screens */
+    padding: 25px;               /* Shrinks internal padding on mobile */
+    gap: 20px;                   /* Shrinks vertical gap between stacked columns */
   }
 }
 
-/* --- Input Section Fixes --- */
+/* --- Input Section --- */
 .calc-inputs {
-  width: 100%;
+  width: 100%;                   /* Ensures inputs fill the left column */
 }
 
 .input-group { 
-  margin-bottom: 28px; 
+  margin-bottom: 28px;           /* Vertical space between each slider/input set */
 }
 
 .label-row { 
   display: flex; 
-  justify-content: space-between; 
+  justify-content: space-between; /* Pushes text to left and number-box to right */
   align-items: center; 
-  margin-bottom: 15px; 
+  margin-bottom: 15px;           /* Vertical space between the label text and the slider bar */
 }
 
 .label-row label {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 0.95rem;
+  font-weight: 700;              /* Thickness of the label font */
+  color: #1e293b;                /* Text color */
+  font-size: 0.95rem;            /* Text size */
 }
 
 .label-row input[type="number"] {
-  width: 140px; /* Increased width for larger numbers */
-  padding: 10px 14px;
-  border: 2px solid #f1f5f9;
-  border-radius: 10px;
-  font-weight: 700;
+  width: 140px;                  /* Horizontal width of the number box */
+  padding: 10px 14px;            /* Internal padding inside the number box (Top/Bottom Left/Right) */
+  border: 2px solid #f1f5f9;     /* Border around the number box */
+  border-radius: 10px;           /* Roundness of the number box */
+  font-weight: 700; 
   color: #0369a1; 
   font-size: 1.1rem; 
   font-family: 'JetBrains Mono', monospace; 
   background: #f8fafc;
 }
 
-/* Slider Fix: Prevent clipping */
+/* Slider Bar Styling */
 .slider {
   -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: #e2e8f0;
-  border-radius: 10px;
-  margin: 10px 0;
+  width: 100%; 
+  height: 6px;                   /* Thickness of the slider track line */
+  background: #e2e8f0; 
+  border-radius: 10px; 
+  margin: 10px 0;                /* Vertical margin around the slider bar */
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #0ea5e9;
-  border-radius: 50%;
-  border: 3px solid #fff;
+  width: 20px;                   /* Diameter of the slider handle circle */
+  height: 20px;                  /* Diameter of the slider handle circle */
+  background: #0ea5e9; 
+  border-radius: 50%;            /* Makes the handle a perfect circle */
+  border: 3px solid #fff;        /* White ring around the handle */
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* --- Results Column (The "Non-Squashable" Side) --- */
+/* --- Results Column --- */
 .calc-results {
-  background: #f8fafc;
-  padding: 30px;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* Ensure it fills the grid row */
+  background: #f8fafc;           /* Light grey background for results area */
+  padding: 30px;                 /* Internal padding inside the results box */
+  border-radius: 20px;           /* Roundness of the results box */
+  display: flex; 
+  flex-direction: column;        /* Stacks results vertically */
+  height: auto;                  /* '100%' makes it equal to left side, 'auto' makes it compact */
 }
 
 .input-header {
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #94a3b8;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 8px;
+  font-size: 0.7rem;             /* Header text size (e.g., FUTURE PROJECTION) */
+  font-weight: 800; 
+  text-transform: uppercase; 
+  letter-spacing: 0.12em;        /* Space between letters in header */
+  color: #94a3b8; 
+  margin-bottom: 20px;           /* Vertical space after the header */
+  border-bottom: 1px solid #e2e8f0; /* Underline below the header */
+  padding-bottom: 8px;           /* Gap between header text and its underline */
 }
 
 .result-item {
-  display: flex;
-  flex-direction: column;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex; 
+  flex-direction: column; 
+  padding: 16px 0;               /* Vertical space for each result row (Adjust this to reduce height!) */
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8); /* Divider line between results */
 }
 
 .result-item span { 
   color: #64748b; 
-  font-size: 0.8rem; 
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-size: 0.8rem;             /* Result label size (e.g., "Total Invested") */
+  font-weight: 600; 
+  margin-bottom: 6px;            /* Vertical gap between label and the actual amount */
 }
 
 .result-item strong { 
-  font-size: 1.35rem;
-  color: #0f172a;
-  font-family: 'JetBrains Mono', monospace;
-  word-wrap: break-word; /* Ensure huge numbers wrap instead of pushing width */
+  font-size: 1.35rem;            /* Result number size */
+  color: #0f172a; 
+  font-family: 'JetBrains Mono', monospace; 
+  word-wrap: break-word;         /* Force huge numbers to wrap if they are too wide */
 }
 
-/* Premium Results Card */
+/* Target Portfolio Card (The Highlight Box) */
 .result-item.highlight {
-  margin: 20px 0;
-  padding: 24px;
-  background: #0c4a6e; /* Deep Navy Blue */
-  border-radius: 16px;
+  margin: 20px 0;                /* Vertical margin outside the highlighted blue box */
+  padding: 24px;                 /* Internal padding inside the highlighted blue box */
+  background: #0c4a6e;           /* Highlight box color */
+  border-radius: 16px;           /* Roundness of the highlight box */
   border: none;
 }
 
-.result-item.highlight span { color: #bae6fd; font-weight: 700; }
-.result-item.highlight strong { 
-  color: #ffffff !important; 
-  font-size: 1.6rem;
+.result-item.highlight span { 
+  color: #bae6fd; 
+  font-weight: 700; 
 }
 
-/* Disclaimer Fix */
+.result-item.highlight strong { 
+  color: #ffffff !important; 
+  font-size: 1.6rem;             /* Font size of the main target value */
+}
+
+/* Disclaimer Box */
 .calc-disclaimer {
-  margin-top: 35px;
-  padding: 18px;
-  background: #fffbeb;
-  border-radius: 14px;
-  border-left: 5px solid #f59e0b;
+  margin-top: 35px;              /* Space between the last input and the disclaimer box */
+  padding: 18px;                 /* Internal padding inside the yellow box */
+  background: #fffbeb; 
+  border-radius: 14px; 
+  border-left: 5px solid #f59e0b; /* Thick accent bar on the left */
 }
 
 .calc-disclaimer p {
-  font-size: 0.75rem;
-  color: #92400e;
-  line-height: 1.6;
+  font-size: 0.75rem; 
+  color: #92400e; 
+  line-height: 1.6;              /* Space between lines of text */
   margin: 0;
 }
 
 /* --- Dark Mode Optimizations --- */
 .dark-theme .calculator-container { background: #0f172a; border-color: #1e293b; }
-.dark-theme .calc-results { background: #1e293b; }
+.dark-theme .calc-results { background: #1e293b; } /* Results background in dark mode */
 .dark-theme .label-row label { color: #f1f5f9; }
 .dark-theme .result-item span { color: #94a3b8; }
 .dark-theme .result-item strong { color: #f8fafc !important; }
