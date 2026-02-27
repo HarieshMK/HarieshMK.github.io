@@ -52,11 +52,11 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     <div class="input-group">
       <label>Start Date (Optional)</label>
       <input type="date" id="start-date">
-      <small style="display: block; margin-top: 5px; color: #94a3b8;">Calculate progress from a past date until today.</small>
+      <small style="display: block; margin-top: 5px; color: #94a3b8;">Shows progress from start date until today.</small>
     </div>
 
     <div class="calc-disclaimer">
-      <p><strong>Disclaimer:</strong> This calculator is for illustrative purposes only. Actual returns may vary based on market performance, taxation, and individual fund expenses. Please consult a financial advisor before making investment decisions.</p>
+      <p><strong>Disclaimer:</strong> This calculator is for illustrative purposes only. Actual returns may vary based on market performance, taxation, and individual fund expenses.</p>
     </div>
   </div>
 
