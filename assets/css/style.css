@@ -707,8 +707,8 @@ img {
 
 /* Target Portfolio Card (The Highlight Box) */
 .result-item.highlight {
-  margin: 20px 0;                /* Vertical margin outside the highlighted blue box */
-  padding: 24px;                 /* Internal padding inside the highlighted blue box */
+  margin: 10px 0;                /* Vertical margin outside the highlighted blue box */
+  padding: 15px;                 /* Internal padding inside the highlighted blue box */
   background: #0c4a6e;           /* Highlight box color */
   border-radius: 16px;           /* Roundness of the highlight box */
   border: none;
