@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let valTodayLump = L * Math.pow(1 + r, effectivePassed);
                 let totalToday = valTodaySIP + valTodayLump;
                 
-                let realValToday = totalToday / Math.pow(1 + inf, effectivePassed / 12);
+                let realValToday = inf > 0 ? totalToday / Math.pow(1 + inf, effectivePassed / 12) : totalToday;
 
                 completedTenure.innerText = `${Math.floor(effectivePassed / 12)}y ${effectivePassed % 12}m` + (nPassed > n ? " (Max)" : "");
                 valueTodayDisplay.innerText = "₹" + Math.round(totalToday).toLocaleString('en-IN');
