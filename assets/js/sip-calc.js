@@ -52,27 +52,35 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalInvested = P * nGoal;
         let totalReturns = finalValue - totalInvested;
 
-        // 2. CURRENT PROGRESS (Only if Date is selected)
-        const startDateValue = dateInput.value;
-        if (startDateValue) {
-            let start = new Date(startDateValue);
-            let today = new Date();
-            let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
+   // 2. CURRENT PROGRESS (Only if Date is selected)
+const startDateValue = dateInput.value;
+if (startDateValue) {
+    let start = new Date(startDateValue);
+    let today = new Date();
+    
+    // Improved Month Calculation: total months from year 0 to now
+    let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
 
-            if (nPassed > 0) {
-                progressSection.style.display = 'block';
-                let valueToday = P * ((Math.pow(1 + i, nPassed) - 1) / i) * (1 + i);
-                let yPassed = Math.floor(nPassed / 12);
-                let mPassed = nPassed % 12;
-                
-                completedTenure.innerText = `${yPassed}y ${mPassed}m`;
-                valueTodayDisplay.innerText = "₹" + Math.round(valueToday).toLocaleString('en-IN');
-            } else {
-                progressSection.style.display = 'none';
-            }
-        } else {
-            progressSection.style.display = 'none';
-        }
+    // Only show if the date is actually in the past
+    if (nPassed > 0) {
+        progressSection.style.display = 'block';
+        
+        // Ensure i is not zero before power calculation to avoid "Infinity" errors
+        let valueToday = P * ((Math.pow(1 + i, nPassed) - 1) / i) * (1 + i);
+        
+        let yPassed = Math.floor(nPassed / 12);
+        let mPassed = nPassed % 12;
+        
+        // Update the UI
+        completedTenure.innerText = `${yPassed}y ${mPassed}m`;
+        // Explicitly target the ID to ensure it finds the element
+        document.getElementById('value-today').innerText = "₹" + Math.round(valueToday).toLocaleString('en-IN');
+    } else {
+        progressSection.style.display = 'none';
+    }
+} else {
+    progressSection.style.display = 'none';
+}
 
         // Update Future Results
         investedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
