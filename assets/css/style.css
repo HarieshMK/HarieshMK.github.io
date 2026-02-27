@@ -605,7 +605,7 @@ img {
   .calculator-container { 
     grid-template-columns: 1fr;  /* Switches to single column on small screens */
     padding: 25px;               /* Shrinks internal padding on mobile */
-    gap: 20px;                   /* Shrinks vertical gap between stacked columns */
+    gap: 30px;                   /* Shrinks vertical gap between stacked columns */
   }
 }
 
@@ -666,7 +666,7 @@ img {
 /* --- Results Column --- */
 .calc-results {
   background: #f8fafc;           /* Light grey background for results area */
-  padding: 30px;                 /* Internal padding inside the results box */
+  padding: 20px;                 /* Internal padding inside the results box */
   border-radius: 20px;           /* Roundness of the results box */
   display: flex; 
   flex-direction: column;        /* Stacks results vertically */
@@ -687,7 +687,7 @@ img {
 .result-item {
   display: flex; 
   flex-direction: column; 
-  padding: 16px 0;               /* Vertical space for each result row (Adjust this to reduce height!) */
+  padding: 10px 0;               /* Vertical space for each result row (Adjust this to reduce height!) */
   border-bottom: 1px solid rgba(226, 232, 240, 0.8); /* Divider line between results */
 }
 
