@@ -1,4 +1,3 @@
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 ---
 layout: default
 title: SIP Calculator
@@ -35,26 +34,46 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     </div>
 
     <div class="input-group">
+      <div class="label-row">
+        <label>Existing Corpus (Optional)</label>
+        <input type="number" id="initial-lump-sum" value="0">
+      </div>
+      <input type="range" class="slider" id="lump-sum-slider" min="0" max="10000000" step="50000" value="0">
+    </div>
+
+    <div class="input-group">
+      <div class="label-row">
+        <label>Expected Inflation (%)</label>
+        <input type="number" id="inflation-rate" value="6">
+      </div>
+      <input type="range" class="slider" id="inflation-slider" min="0" max="15" step="0.5" value="6">
+    </div>
+
+    <div class="input-group">
       <label>Start Date (Optional)</label>
       <input type="date" id="start-date">
-      <small style="display: block; margin-top: 5px; color: #94a3b8;">Shows progress from start date until today.</small>
+      <small style="display: block; margin-top: 5px; color: #94a3b8;">Calculate progress from a past date until today.</small>
     </div>
   </div>
 
   <div class="calc-results">
-    <div id="current-progress" style="display: none; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px dashed #e2e8f0;">
-      <h4 class="input-header">Current Progress (Until Today)</h4>
+    <div id="current-progress" style="display: none; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #e2e8f0;">
+      <h4 class="input-header">Current Progress</h4>
       <div class="result-item">
         <span>Duration Completed</span>
         <strong id="completed-tenure">0y 0m</strong>
       </div>
       <div class="result-item">
-        <span>Projected Value Today</span>
-        <strong id="value-today" style="color: #0f172a;">₹0</strong>
+        <span>Value Today</span>
+        <strong id="value-today">₹0</strong>
+      </div>
+      <div class="result-item">
+        <span>Real Value (Adj.)</span>
+        <strong id="real-value-today">₹0</strong>
       </div>
     </div>
 
-    <h4 class="input-header">Future Projection (End of Tenure)</h4>
+    <h4 class="input-header">Future Projection</h4>
     <div class="result-item">
       <span>Total Invested</span>
       <strong id="total-invested">₹0</strong>
@@ -66,6 +85,10 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     <div class="result-item highlight">
       <span>Target Portfolio Value</span>
       <strong id="total-value">₹0</strong>
+    </div>
+    <div class="result-item">
+      <span>Future Purchasing Power</span>
+      <strong id="real-future-value">₹0</strong>
     </div>
   </div>
 </div>
