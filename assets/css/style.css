@@ -36,89 +36,105 @@ p { margin-bottom: 1.6em; } /* Space between paragraphs */
  
 /* ===== 2. HEADER & NAVIGATION ===== */
 header {
-  text-align: center; /* Centers header content */
-  padding: 40px 0 20px 0; /* Padding inside the header */
-  border-bottom: 1px solid #f1f5f9; /* Bottom separator line */
-  margin-bottom: 40px; /* Space after the header section */
+  text-align: center;
+  padding: 40px 0 20px 0;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 40px;
 }
-header h1 { font-size: 2.8rem; margin: 0; } /* Styling for main site title */
-header h1 a { color: #0f172a; text-decoration: none; transition: color 0.3s ease; } /* Link styling for site title */
-header h1 a:hover { color: #38bdf8; } /* Color change on hover for site title */
- 
+header h1 { font-size: 2.8rem; margin: 0; }
+header h1 a { color: #0f172a; text-decoration: none; transition: color 0.3s ease; }
+header h1 a:hover { color: #38bdf8; }
+
 header .tagline {
-  color: #64748b; /* Tagline text color */
-  font-size: 1.1rem; /* Tagline font size */
-  font-style: italic; /* Makes tagline italic */
-  margin: 10px auto 25px; /* Spacing around tagline */
-  max-width: 550px; /* Prevents tagline from being too wide */
-  line-height: 1.5; /* Line height for tagline */
+  color: #64748b;
+  font-size: 1.1rem;
+  font-style: italic;
+  margin: 10px auto 25px;
+  max-width: 550px;
+  line-height: 1.5;
 }
- 
+
 #theme-toggle {
-  position: fixed; /* Keeps button in place while scrolling */
-  bottom: 30px; /* Distance from bottom of screen */
-  right: 30px; /* Distance from right of screen */
-  background: rgba(255, 255, 255, 0.7); /* Light mode background */
-  backdrop-filter: blur(10px); /* Blur effect for the button */
-  border: 1px solid rgba(255, 255, 255, 0.4); /* Button border */
-  width: 50px; /* Button width */
-  height: 50px; /* Button height */
-  display: flex; /* Centers the icon */
-  align-items: center; /* Vertical alignment */
-  justify-content: center; /* Horizontal alignment */
-  cursor: pointer; /* Change cursor to pointer on hover */
-  z-index: 1000; /* Keeps button above other elements */
-  border-radius: 50%; /* Makes the button circular */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); /* Soft button shadow */
-  transition: all 0.3s ease; /* Transition for button hover effects */
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
- 
-.nav-list {
-  list-style: none; /* Removes list bullets */
-  padding: 0; /* Removes default padding */
-  margin: 0; /* Removes default margin */
-  display: flex; /* Horizontal nav items */
-  justify-content: center; /* Centers the nav menu */
-  gap: 15px; /* Space between nav items */
-}
-.nav-list li a {
-  text-decoration: none; /* Removes link underline */
-  color: #64748b; /* Nav link color */
-  font-weight: 700; /* Bold nav links */
-  font-size: 0.85rem; /* Nav link font size */
-  text-transform: uppercase; /* Uppercase nav text */
-  padding: 10px 22px; /* Spacing inside nav links */
-  border-radius: 10px; /* Rounds corners of nav link background */
-  transition: all 0.3s ease; /* Smooth hover transition */
-  display: inline-block; /* Allows padding to apply correctly */
-}
- 
-.nav-list li a:hover {
-  color: #38bdf8 !important; /* Changes text to blue on hover */
-  background-color: rgba(56, 189, 248, 0.08) !important; /* Light blue background on hover */
-  transform: translateY(-1px); /* Slight upward lift on hover */
-}
- 
-.nav-list li a.active {
-  color: #0f172a !important; /* Text color for the active page link */
-  background: rgba(255, 255, 255, 0.5) !important; /* Active link background */
-  backdrop-filter: blur(4px); /* Blur for the active link item */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important; /* Shadow for active link */
-  border: 1px solid rgba(226, 232, 240, 0.8) !important; /* Border for active link */
-}
+
 #theme-icon {
-  font-size: 1.5rem; /* Icon size inside toggle button */
-  display: flex; /* Flexbox for centering */
-  align-items: center; /* Vertical alignment */
-  justify-content: center; /* Horizontal alignment */
-  width: 100%; /* Full button width */
-  height: 100%; /* Full button height */
-  line-height: 1; /* Centers text/emoji vertically */
-  transition: transform 0.3s ease; /* Smooth rotation transition */
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  transition: transform 0.3s ease;
 }
- 
+
 #theme-toggle:hover #theme-icon {
-  transform: scale(1.2) rotate(15deg); /* Scale and rotate icon on hover */
+  transform: scale(1.2) rotate(15deg);
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;         /* PC: Horizontal */
+  flex-wrap: wrap;       /* Mobile: Allows stacking */
+  justify-content: center; 
+  gap: 10px;
+  width: 100%;
+}
+
+.nav-list li a {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  display: inline-block; /* Helps with hover effects on PC */
+}
+
+.nav-list li a:hover {
+  color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+.nav-list li a.active {
+  color: #0f172a !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+/* MOBILE NAV OVERRIDE */
+@media (max-width: 480px) {
+  .nav-list li {
+    width: 100%; /* Stacks the buttons vertically */
+  }
+  .nav-list li a {
+    display: block; /* Makes the whole button clickable across the screen */
+    text-align: center;
+    padding: 12px;
+  }
 }
 /* ===== 3. BLOG CARDS & HOVER (CLEAN & FIXED) ===== */
 .post-card-link { 
@@ -404,13 +420,6 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
 
   .result-item strong {
     font-size: 1.4rem; /* Make numbers big and readable */
-  }
-
-  /* 5. Handle huge numbers (preventing overflow) */
-  strong {
-    word-break: break-all;
-    display: block;
-    line-height: 1.2;
   }
 }
  
@@ -734,11 +743,16 @@ img {
   margin-bottom: 6px;            /* Vertical gap between label and the actual amount */
 }
 
-.result-item strong { 
-  font-size: 1.35rem;            /* Result number size */
-  color: #0f172a; 
-  font-family: 'JetBrains Mono', monospace; 
-  word-wrap: break-word;         /* Force huge numbers to wrap if they are too wide */
+.result-item strong {
+  font-size: 1.35rem;
+  color: #0f172a;
+  font-family: 'JetBrains Mono', monospace;
+  /* These lines ensure the "Single Line" rule */
+  display: block;
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds '...' if the number is somehow still too long */
+  transition: font-size 0.2s ease; 
 }
 
 /* Target Portfolio Card (The Highlight Box) */
