@@ -437,10 +437,6 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
     box-sizing: border-box !important;
   }
 }
-  /* Special font size for the large number in the blue box on mobile */
-  .result-item.highlight strong {
-    font-size: 1.35rem !important; /* Still the biggest, but fits the screen */
-  }
 /* ===== 9. FOLDER LAYOUT STYLES ===== */
 .category-section {
   margin-bottom: 50px; /* Separates the playlist area from the blog area */
