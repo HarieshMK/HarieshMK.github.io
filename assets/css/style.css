@@ -423,12 +423,13 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   }
 
   /* Force numbers to respect the box width */
-  .result-item strong {
+.result-item strong {
     max-width: 100% !important;
-    display: block !important;
-    overflow: hidden !important; /* Changed from visible to hidden */
-    text-overflow: ellipsis; 
+    display: inline-block !important; /* Changed from block to inline-block */
+    overflow: visible !important;     /* Changed from hidden to visible */
+    text-overflow: clip !important;   /* Remove ellipsis */
     white-space: nowrap !important;
+    width: auto !important;           /* Allow JS to measure width accurately */
   }
 
   .result-item.highlight {
