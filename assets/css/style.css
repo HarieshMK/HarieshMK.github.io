@@ -744,14 +744,23 @@ img {
 }
 
 .result-item strong {
-  display: block;
-  width: 100%;
+  display: inline-block; /* Crucial: Allows JS to measure width accurately */
+  width: auto;           /* Let it grow/shrink naturally */
+  max-width: 100%;       /* Stay inside the box */
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
-  white-space: nowrap;   /* Force single line */
-  overflow: hidden;      /* Hide overflow during calculation */
+  white-space: nowrap;   /* No wrapping */
+  overflow: visible;     /* DO NOT hide the end of the number */
   line-height: 1.2;
-  text-align: right;     /* Calculator style alignment */
+  text-align: center;    /* Keeps it centered as it shrinks */
+}
+
+/* Ensure the parent item centers the content */
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* Keeps the number in the middle of the row */
+  overflow: hidden;      /* The parent keeps everything tidy */
 }
 
 /* Target Portfolio Card (The Highlight Box) */
