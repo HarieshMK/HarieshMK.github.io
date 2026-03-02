@@ -774,9 +774,9 @@ img {
 
 .result-item.highlight {
   margin: 15px 0;
-  padding: 15px 10px;     /* Reduced side padding to 10px for more number room */
+  padding: 15px 4px !important;     /* Reduced side padding to 10px for more number room */
   background: #0c4a6e;
-  border-radius: 16px;
+  border-radius: 10px;
   border: none;
   width: 100%;            /* Force it to fill the column */
   box-sizing: border-box;
