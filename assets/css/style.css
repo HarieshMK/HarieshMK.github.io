@@ -374,8 +374,44 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
  
 /* MOBILE RESPONSIVENESS */
 @media (max-width: 768px) {
-  .post-nav { flex-direction: column; } /* Vertical navigation for mobile */
-  .footer-grid { grid-template-columns: 1fr; gap: 30px; } /* Single column footer for mobile */
+  /* 1. Stack the columns */
+  .calculator-container {
+    grid-template-columns: 1fr !important; 
+    padding: 15px; /* Less padding to give more room for numbers */
+    gap: 20px;
+  }
+
+  /* 2. Fix the Input Labels */
+  .label-row {
+    flex-direction: column; /* Stack label above the number box */
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* 3. Make number boxes full width or larger for touch */
+  .label-row input[type="number"] {
+    width: 100% !important; 
+    box-sizing: border-box;
+    text-align: left;
+    padding: 12px; /* Bigger touch target */
+  }
+
+  /* 4. Improve the Blue Result Card for Mobile */
+  .result-item.highlight {
+    padding: 20px 15px;
+    margin: 15px 0;
+  }
+
+  .result-item strong {
+    font-size: 1.4rem; /* Make numbers big and readable */
+  }
+
+  /* 5. Handle huge numbers (preventing overflow) */
+  strong {
+    word-break: break-all;
+    display: block;
+    line-height: 1.2;
+  }
 }
  
 /* ===== 9. FOLDER LAYOUT STYLES ===== */
