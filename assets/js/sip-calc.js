@@ -38,40 +38,37 @@ document.addEventListener('DOMContentLoaded', function() {
     syncInputs(monthlySIP, monthlySlider);
     syncInputs(returnRate, returnSlider);
     syncInputs(yearsInput, yearsSlider);
-    syncInputs(lumpSumInput, lumpSumSlider);
+    syncInputs(lumpSumInput, lumpSumSlider);    
     syncInputs(inflationInput, inflationSlider);
     if(dateInput) dateInput.addEventListener('change', calculateSIP);
 
     // --- ENHANCED FONT SIZE ADJUSTMENT LOGIC ---
 function autoScaleNumbers() {
     const numbersToScale = document.querySelectorAll('.result-item strong');
-    // Reference the stable container to get the absolute maximum width allowed
     const resultsContainer = document.querySelector('.calc-results');
     if (!resultsContainer) return;
 
-    // Use the main sidebar width minus padding as the ultimate limit
-    const maxAllowedWidth = resultsContainer.getBoundingClientRect().width - 40; 
+    // Use getBoundingClientRect for the most accurate width measurement
+    const containerWidth = resultsContainer.getBoundingClientRect().width;
+    // Leave 20px buffer for internal padding/margins
+    const maxAllowedWidth = containerWidth - 20; 
 
     numbersToScale.forEach(num => {
-        // Reset to default starting point
         let maxFontSize = num.closest('.highlight') ? 32 : 24; 
         let fontSize = maxFontSize;
         
+        // Reset to measure fresh
+        num.style.fontSize = fontSize + 'px';
         num.style.display = 'inline-block';
         num.style.whiteSpace = 'nowrap';
-        num.style.fontSize = maxFontSize + 'px';
 
-        // Shrink loop: Use a while loop for absolute reliability with giant numbers
-        // This forces the number to fit inside the results column, no matter what
+        // Shrink loop: Step down until it fits the container width
         if (num.scrollWidth > maxAllowedWidth) {
-            while (num.scrollWidth > maxAllowedWidth && fontSize > 6) {
-                fontSize -= 0.5; // Fine-tuned scaling
+            while (num.scrollWidth > maxAllowedWidth && fontSize > 8) {
+                fontSize -= 0.5;
                 num.style.fontSize = fontSize + 'px';
             }
         }
-        
-        // Ensure the parent doesn't hide our measurement by clipping
-        num.parentElement.style.overflow = 'visible';
     });
 }
     function calculateSIP() {
