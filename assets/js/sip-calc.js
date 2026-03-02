@@ -43,47 +43,37 @@ document.addEventListener('DOMContentLoaded', function() {
     if(dateInput) dateInput.addEventListener('change', calculateSIP);
 
     // --- ENHANCED FONT SIZE ADJUSTMENT LOGIC ---
-  function autoScaleNumbers() {
+function autoScaleNumbers() {
     const numbersToScale = document.querySelectorAll('.result-item strong');
-    
+    // Reference the stable container to get the absolute maximum width allowed
+    const resultsContainer = document.querySelector('.calc-results');
+    if (!resultsContainer) return;
+
+    // Use the main sidebar width minus padding as the ultimate limit
+    const maxAllowedWidth = resultsContainer.getBoundingClientRect().width - 40; 
+
     numbersToScale.forEach(num => {
-        const parent = num.parentElement;
-        // Use getBoundingClientRect for sub-pixel accuracy 
-        // We subtract 15px to ensure a safe "gap" from the box edges
-        const targetWidth = parent.getBoundingClientRect().width - 15; 
+        // Reset to default starting point
+        let maxFontSize = num.closest('.highlight') ? 32 : 24; 
+        let fontSize = maxFontSize;
         
-        // Reset styles for a fresh measurement
         num.style.display = 'inline-block';
         num.style.whiteSpace = 'nowrap';
-        
-        let maxFontSize = num.closest('.highlight') ? 32 : 24; 
-        let minFontSize = 6; 
-        let fontSize = maxFontSize;
-
         num.style.fontSize = maxFontSize + 'px';
 
-        // If the number is wider than our target (the box minus 15px)
-        if (num.scrollWidth > targetWidth) {
-            let low = minFontSize;
-            let high = maxFontSize;
-            
-            // Binary search to find the perfect size to fit inside targetWidth
-            for (let i = 0; i < 12; i++) {
-                let mid = (low + high) / 2;
-                num.style.fontSize = mid + 'px';
-                
-                if (num.scrollWidth <= targetWidth) {
-                    fontSize = mid;
-                    low = mid;
-                } else {
-                    high = mid;
-                }
+        // Shrink loop: Use a while loop for absolute reliability with giant numbers
+        // This forces the number to fit inside the results column, no matter what
+        if (num.scrollWidth > maxAllowedWidth) {
+            while (num.scrollWidth > maxAllowedWidth && fontSize > 6) {
+                fontSize -= 0.5; // Fine-tuned scaling
+                num.style.fontSize = fontSize + 'px';
             }
-            num.style.fontSize = fontSize + 'px';
         }
+        
+        // Ensure the parent doesn't hide our measurement by clipping
+        num.parentElement.style.overflow = 'visible';
     });
 }
-
     function calculateSIP() {
         const P = parseFloat(monthlySIP.value) || 0;
         const L = parseFloat(lumpSumInput.value) || 0;
