@@ -12,23 +12,23 @@ permalink: /calculators/
     <div class="calc-icon">📈</div>
     <div class="calc-content">
       <h3>SIP Calculator</h3>
-      <p>Calculate how much your monthly investments will grow.</p>
+      <p>Calculate how much your monthly investments will grow over time.</p>
     </div>
   </a>
 
-  <a href="{{ '/calculators/compound-interest' | relative_url }}" class="calc-card">
-    <div class="calc-icon">⏳</div>
+  <a href="{{ '/calculators/goal-planner' | relative_url }}" class="calc-card">
+    <div class="calc-icon">🎯</div>
     <div class="calc-content">
-      <h3>Compound Interest</h3>
-      <p>See the "Eighth Wonder of the World" in action with a lump sum.</p>
+      <h3>Smart Goal Planner</h3>
+      <p>Reverse-engineer your goals. Find out exactly how much to save for your dream home or education.</p>
     </div>
   </a>
 
-  <a href="{{ '/calculators/fire' | relative_url }}" class="calc-card">
-    <div class="calc-icon">🔥</div>
+  <div class="calc-card" style="opacity: 0.7; cursor: default; border-style: dashed;">
+    <div class="calc-icon" style="filter: grayscale(1);">⏳</div>
     <div class="calc-content">
-      <h3>FIRE Calculator</h3>
-      <p>Find out exactly when you can choose to stop working.</p>
+      <h3>More Tools Coming</h3>
+      <p>We are building FIRE, Step-Up, and Portfolio trackers. Stay tuned for updates!</p>
     </div>
   </a>
 
