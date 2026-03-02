@@ -747,7 +747,7 @@ img {
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   width: 100%;            /* Ensure it takes full width of calc-results */
   box-sizing: border-box;
-  overflow: hidden;      /* Changed to visible so digits aren't clipped during scaling */
+  overflow: visible;      /* Changed to visible so digits aren't clipped during scaling */
 }
 
 .result-item span { 
@@ -764,7 +764,7 @@ img {
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
   white-space: nowrap;    /* Keep on one line */
-  overflow: hidden;      /* Prevent the browser from clipping the last digit */
+  overflow: visible;      /* Prevent the browser from clipping the last digit */
   line-height: 1.1;       /* Tighter line height for better vertical centering */
   text-align: center;
   /* Remove fixed font-size here so JS takes full control */
