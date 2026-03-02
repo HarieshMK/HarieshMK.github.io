@@ -48,29 +48,31 @@ function autoScaleNumbers() {
     const resultsContainer = document.querySelector('.calc-results');
     if (!resultsContainer) return;
 
-    // Use getBoundingClientRect for the most accurate width measurement
-    const containerWidth = resultsContainer.getBoundingClientRect().width;
-    // Leave 20px buffer for internal padding/margins
-    const maxAllowedWidth = containerWidth - 20; 
+    // Use the sidebar's actual width minus a safety margin for padding
+    const maxAllowedWidth = resultsContainer.getBoundingClientRect().width - 30; 
 
     numbersToScale.forEach(num => {
+        // Start at the maximum allowed size
         let maxFontSize = num.closest('.highlight') ? 32 : 24; 
         let fontSize = maxFontSize;
         
-        // Reset to measure fresh
         num.style.fontSize = fontSize + 'px';
         num.style.display = 'inline-block';
         num.style.whiteSpace = 'nowrap';
 
-        // Shrink loop: Step down until it fits the container width
+        // Aggressive shrink loop for those massive numbers
         if (num.scrollWidth > maxAllowedWidth) {
-            while (num.scrollWidth > maxAllowedWidth && fontSize > 8) {
-                fontSize -= 0.5;
+            while (num.scrollWidth > maxAllowedWidth && fontSize > 6) {
+                fontSize -= 0.5; // Fine-tuning for a perfect fit
                 num.style.fontSize = fontSize + 'px';
             }
         }
+        
+        // Ensure the container doesn't clip the numbers while scaling
+        num.parentElement.style.overflow = 'visible';
     });
 }
+    
     function calculateSIP() {
         const P = parseFloat(monthlySIP.value) || 0;
         const L = parseFloat(lumpSumInput.value) || 0;
