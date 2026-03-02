@@ -33,6 +33,10 @@ p { margin-bottom: 1.6em; } /* Space between paragraphs */
   background: rgba(56, 189, 248, 0.2); 
   color: #0f172a;
 }
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
  
 /* ===== 2. HEADER & NAVIGATION ===== */
 header {
@@ -388,34 +392,50 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   color: #ffffff; /* White link color for dark mode */
 }
  
-/* MOBILE RESPONSIVENESS */
+/* ===== FIXED MOBILE RESPONSIVENESS ===== */
 @media (max-width: 768px) {
-  /* 1. Stack the columns */
+  /* 1. Stack the columns and prevent horizontal scroll */
   .calculator-container {
     grid-template-columns: 1fr !important; 
-    padding: 15px; /* Less padding to give more room for numbers */
+    padding: 15px !important; 
     gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent internal stretching */
   }
 
   /* 2. Fix the Input Labels */
   .label-row {
-    flex-direction: column; /* Stack label above the number box */
+    flex-direction: column; 
     align-items: flex-start;
     gap: 8px;
+    width: 100%;
   }
 
-  /* 3. Make number boxes full width or larger for touch */
+  /* 3. Make number boxes full width */
   .label-row input[type="number"] {
     width: 100% !important; 
+    max-width: 100%;
     box-sizing: border-box;
     text-align: left;
-    padding: 12px; /* Bigger touch target */
+    padding: 12px;
   }
 
-  /* 4. Improve the Blue Result Card for Mobile */
+  /* 4. Force Numbers to Stay Inside the Box */
+  .result-item strong {
+    max-width: 100%;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds ... if number is physically too long */
+    word-break: break-all;
+  }
+
+  /* 5. Improve the Blue Result Card */
   .result-item.highlight {
-    padding: 20px 15px;
+    padding: 20px 10px;
     margin: 15px 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
  
@@ -631,7 +651,7 @@ img {
 .calculator-container {
   display: grid;
   /* Width Control: Adjust 320px or 280px to change minimum column widths */
-  grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 1fr); 
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 40px;                     /* Horizontal space between Left and Right columns */
   background: #ffffff;           /* Container background */
   padding: 40px;                 /* Internal breathing room around the whole tool */
@@ -640,14 +660,6 @@ img {
   margin-top: 20px;              /* Vertical space above the calculator */
   align-items: start;            /* Keeps columns at the top; 'stretch' would make them equal height */
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); /* Outer shadow depth */
-}
-
-@media (max-width: 992px) {
-  .calculator-container { 
-    grid-template-columns: 1fr;  /* Switches to single column on small screens */
-    padding: 25px;               /* Shrinks internal padding on mobile */
-    gap: 30px;                   /* Shrinks vertical gap between stacked columns */
-  }
 }
 
 /* --- Input Section --- */
