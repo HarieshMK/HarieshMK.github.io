@@ -89,8 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalValue = futureValueSIP + futureValueLump;
         const totalInvested = (P * n) + L;
         const estimatedReturns = totalValue - totalInvested;
-        
-        const realFutureValue = totalValue / Math.pow(1 + inf, parseFloat(yearsInput.value));
+
+        // Safety check for inflation division
+    const inflationYears = parseFloat(yearsInput.value) || 0;
+    const inflationDivisor = Math.pow(1 + inf, inflationYears);
+    const realFutureValue = inflationDivisor !== 0 ? totalValue / inflationDivisor : totalValue;
 
         totalInvestedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
         totalReturnsDisplay.innerText = "₹" + Math.round(estimatedReturns).toLocaleString('en-IN');
@@ -125,6 +128,13 @@ document.addEventListener('DOMContentLoaded', function() {
         autoScaleNumbers();
     }
 
-    calculateSIP();
-    window.addEventListener('resize', autoScaleNumbers);
-});
+ calculateSIP();
+    requestAnimationFrame(() => {
+        autoScaleNumbers();
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(autoScaleNumbers, 100);
+    });
