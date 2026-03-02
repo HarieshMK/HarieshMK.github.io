@@ -44,37 +44,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- ENHANCED FONT SIZE ADJUSTMENT LOGIC ---
     function autoScaleNumbers() {
-        const numbersToScale = document.querySelectorAll('.result-item strong');
+    const numbersToScale = document.querySelectorAll('.result-item strong');
+    
+    numbersToScale.forEach(num => {
+        const parent = num.parentElement;
+        // FIX: Ensure we never exceed the parent width OR the screen width
+        const screenLimit = window.innerWidth - 60; // 60px buffer for container padding
+        const targetWidth = Math.min(parent.clientWidth - 10, screenLimit); 
         
-        numbersToScale.forEach(num => {
-            const parent = num.parentElement;
-            // Measure the actual usable space inside the padding
-            const targetWidth = parent.clientWidth - 10; 
-            
-            let maxFontSize = num.closest('.highlight') ? 32 : 24; 
-            let minFontSize = 2; // Lower floor for astronomical numbers
-            let fontSize = maxFontSize;
+        // Start with a smaller base for mobile to prevent the initial "jump"
+        let isMobile = window.innerWidth < 768;
+        let maxFontSize = num.closest('.highlight') ? (isMobile ? 26 : 32) : (isMobile ? 20 : 24); 
+        let minFontSize = 8; 
+        let fontSize = maxFontSize;
 
-            // Reset to max to measure correctly
-            num.style.fontSize = maxFontSize + 'px';
+        num.style.fontSize = maxFontSize + 'px';
 
-            // Binary search using scrollWidth (actual content width)
-            if (num.scrollWidth > targetWidth) {
-                for (let i = 0; i < 15; i++) { // 15 iterations for pixel-perfect precision
-                    let mid = (minFontSize + maxFontSize) / 2;
-                    num.style.fontSize = mid + 'px';
-                    
-                    if (num.scrollWidth <= targetWidth) {
-                        fontSize = mid;
-                        minFontSize = mid;
-                    } else {
-                        maxFontSize = mid;
-                    }
+        // If the number is still too wide for the targetWidth
+        if (num.scrollWidth > targetWidth) {
+            for (let i = 0; i < 10; i++) { 
+                let mid = (minFontSize + maxFontSize) / 2;
+                num.style.fontSize = mid + 'px';
+                
+                if (num.scrollWidth <= targetWidth) {
+                    fontSize = mid;
+                    minFontSize = mid;
+                } else {
+                    maxFontSize = mid;
                 }
-                num.style.fontSize = fontSize + 'px';
             }
-        });
-    }
+            num.style.fontSize = Math.floor(fontSize) + 'px';
+        } else {
+            // If it fits, keep it at maxFontSize
+            num.style.fontSize = maxFontSize + 'px';
+        }
+    });
+}
 
     function calculateSIP() {
         const P = parseFloat(monthlySIP.value) || 0;
