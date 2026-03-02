@@ -42,38 +42,39 @@ document.addEventListener('DOMContentLoaded', function() {
     syncInputs(inflationInput, inflationSlider);
     if(dateInput) dateInput.addEventListener('change', calculateSIP);
 
-    // --- FONT SIZE ADJUSTMENT LOGIC ---
-function autoScaleNumbers() {
-    const numbersToScale = document.querySelectorAll('.result-item strong');
-    
-    numbersToScale.forEach(num => {
-        const parent = num.parentElement;
-        const padding = 20; // Safety gap
-        const targetWidth = parent.offsetWidth - padding;
+    // --- ENHANCED FONT SIZE ADJUSTMENT LOGIC ---
+    function autoScaleNumbers() {
+        const numbersToScale = document.querySelectorAll('.result-item strong');
         
-        // 1. Start with the "Ideal" large size
-        let maxFontSize = num.closest('.highlight') ? 32 : 24; 
-        let minFontSize = 4; // Absolute minimum (will be tiny but visible)
-        let fontSize = maxFontSize;
-
-        // 2. Binary search for the perfect fit
-        for (let i = 0; i < 12; i++) {
-            let mid = (minFontSize + maxFontSize) / 2;
-            num.style.fontSize = mid + 'px';
+        numbersToScale.forEach(num => {
+            const parent = num.parentElement;
+            // Measure the actual usable space inside the padding
+            const targetWidth = parent.clientWidth - 10; 
             
-            // Check if the number fits
-            if (num.offsetWidth <= targetWidth) {
-                fontSize = mid;
-                minFontSize = mid;
-            } else {
-                maxFontSize = mid;
-            }
-        }
+            let maxFontSize = num.closest('.highlight') ? 32 : 24; 
+            let minFontSize = 2; // Lower floor for astronomical numbers
+            let fontSize = maxFontSize;
 
-        // 3. Final Apply
-        num.style.fontSize = fontSize + 'px';
-    });
-}
+            // Reset to max to measure correctly
+            num.style.fontSize = maxFontSize + 'px';
+
+            // Binary search using scrollWidth (actual content width)
+            if (num.scrollWidth > targetWidth) {
+                for (let i = 0; i < 15; i++) { // 15 iterations for pixel-perfect precision
+                    let mid = (minFontSize + maxFontSize) / 2;
+                    num.style.fontSize = mid + 'px';
+                    
+                    if (num.scrollWidth <= targetWidth) {
+                        fontSize = mid;
+                        minFontSize = mid;
+                    } else {
+                        maxFontSize = mid;
+                    }
+                }
+                num.style.fontSize = fontSize + 'px';
+            }
+        });
+    }
 
     function calculateSIP() {
         const P = parseFloat(monthlySIP.value) || 0;
@@ -82,7 +83,6 @@ function autoScaleNumbers() {
         const n = parseFloat(yearsInput.value) * 12;
         const inf = parseFloat(inflationInput.value) / 100;
 
-        // Formula for SIP: P × ({[1 + r]^n – 1} / r) × (1 + r)
         const futureValueSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n;
         const futureValueLump = L * Math.pow(1 + r, n);
         
@@ -90,10 +90,8 @@ function autoScaleNumbers() {
         const totalInvested = (P * n) + L;
         const estimatedReturns = totalValue - totalInvested;
         
-        // Adjust for Inflation (Real Value)
         const realFutureValue = totalValue / Math.pow(1 + inf, parseFloat(yearsInput.value));
 
-        // Update UI with en-IN formatting
         totalInvestedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
         totalReturnsDisplay.innerText = "₹" + Math.round(estimatedReturns).toLocaleString('en-IN');
         totalValueDisplay.innerText = "₹" + Math.round(totalValue).toLocaleString('en-IN');
@@ -102,7 +100,6 @@ function autoScaleNumbers() {
             realFutureDisplay.innerText = "₹" + Math.round(realFutureValue).toLocaleString('en-IN');
         }
 
-        // --- Progress Calculation (If Start Date exists) ---
         if (dateInput && dateInput.value) {
             let start = new Date(dateInput.value);
             let today = new Date();
@@ -125,13 +122,9 @@ function autoScaleNumbers() {
             }
         }
 
-        // Run the auto-scaler after numbers update
         autoScaleNumbers();
     }
 
-    // Initial calculation
     calculateSIP();
-    
-    // Recalculate if window is resized (important for responsive font scaling)
     window.addEventListener('resize', autoScaleNumbers);
 });
