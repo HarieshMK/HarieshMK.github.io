@@ -394,14 +394,14 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
  
 /* ===== FIXED MOBILE RESPONSIVENESS ===== */
 @media (max-width: 768px) {
-  /* 1. Stack the columns and prevent horizontal scroll */
+  /* 1. Stack the columns and prevent horizontal dragging */
   .calculator-container {
     grid-template-columns: 1fr !important; 
     padding: 15px !important; 
     gap: 20px;
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden; /* Prevent internal stretching */
+    overflow-x: hidden !important; /* HARD FIX for the screen dragging issue */
   }
 
   /* 2. Fix the Input Labels */
@@ -421,24 +421,30 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
     padding: 12px;
   }
 
-  /* 4. Force Numbers to Stay Inside the Box */
+  /* 4. Force Numbers to Stay Inside the Box & Prevent Stretching */
   .result-item strong {
-    max-width: 100%;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Adds ... if number is physically too long */
-    word-break: break-all;
+    max-width: 100% !important;
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important; /* Adds ... if number is too long */
+    white-space: nowrap !important; /* Keeps number on one line */
+    font-size: 1.15rem !important; /* Smaller size ONLY for mobile */
+    text-align: center;
   }
 
   /* 5. Improve the Blue Result Card */
   .result-item.highlight {
-    padding: 20px 10px;
-    margin: 15px 0;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 20px 10px !important;
+    margin: 15px 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Special font size for the large number in the blue box on mobile */
+  .result-item.highlight strong {
+    font-size: 1.35rem !important; /* Still the biggest, but fits the screen */
   }
 }
- 
 /* ===== 9. FOLDER LAYOUT STYLES ===== */
 .category-section {
   margin-bottom: 50px; /* Separates the playlist area from the blog area */
