@@ -43,23 +43,35 @@ document.addEventListener('DOMContentLoaded', function() {
     if(dateInput) dateInput.addEventListener('change', calculateSIP);
 
     // --- FONT SIZE ADJUSTMENT LOGIC ---
-    function autoScaleNumbers() {
-        const numbersToScale = document.querySelectorAll('.result-item strong');
-        numbersToScale.forEach(num => {
-            const parent = num.parentElement;
-            const parentWidth = parent.clientWidth - 20; // Subtract padding
-            const isHighlight = num.closest('.highlight');
-            let currentSize = isHighlight ? 1.6 : 1.35; // Matches CSS base
+function autoScaleNumbers() {
+    const numbersToScale = document.querySelectorAll('.result-item strong');
+    
+    numbersToScale.forEach(num => {
+        const container = num.parentElement;
+        // Get the actual usable width (subtracting a tiny bit of padding)
+        const targetWidth = container.clientWidth - 15; 
+        
+        let minFont = 5;   // Tiny (in pixels)
+        let maxFont = 32;  // Maximum starting size (2rem approx)
+        let perfectSize = maxFont;
+
+        // Binary Search for the perfect pixel size
+        // This runs extremely fast (usually 5-6 iterations)
+        for (let i = 0; i < 10; i++) {
+            let mid = (minFont + maxFont) / 2;
+            num.style.fontSize = mid + 'px';
             
-            num.style.fontSize = currentSize + 'rem';
-            
-            // Shrink loop
-            while (num.scrollWidth > parentWidth && currentSize > 0.7) {
-                currentSize -= 0.05;
-                num.style.fontSize = currentSize + 'rem';
+            if (num.scrollWidth <= targetWidth) {
+                perfectSize = mid;
+                minFont = mid;
+            } else {
+                maxFont = mid;
             }
-        });
-    }
+        }
+
+        num.style.fontSize = perfectSize + 'px';
+    });
+}
 
     function calculateSIP() {
         const P = parseFloat(monthlySIP.value) || 0;
