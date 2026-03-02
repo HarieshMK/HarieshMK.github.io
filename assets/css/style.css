@@ -784,6 +784,7 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: visible !important;
 }
 
 .result-item.highlight span { 
@@ -793,8 +794,12 @@ img {
 }
 
 .result-item.highlight strong { 
-  color: #ffffff !important;
-  /* Remove the fixed 1.6rem; let the JS determine the best fit */
+color: #ffffff !important;
+    display: inline-block !important;
+    max-width: 100% !important;
+    /* Ensure the browser doesn't clip the right edge of the font */
+    overflow: visible !important; 
+    white-space: nowrap !important;
 }
 /* Remove border from the last item to keep it clean */
 .calc-results .result-item:last-child {
