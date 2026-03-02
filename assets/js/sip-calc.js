@@ -48,27 +48,33 @@ document.addEventListener('DOMContentLoaded', function() {
         
         numbersToScale.forEach(num => {
             const parent = num.parentElement;
-            // Measure the actual usable space inside the padding
-            const targetWidth = parent.clientWidth - 10; 
+            // Get the exact width of the container, minus a safety margin
+            const targetWidth = parent.getBoundingClientRect().width - 24; 
             
             let maxFontSize = num.closest('.highlight') ? 32 : 24; 
-            let minFontSize = 2; // Lower floor for astronomical numbers
+            let minFontSize = 8; // Don't go so small that it's unreadable
             let fontSize = maxFontSize;
 
-            // Reset to max to measure correctly
+            // CRITICAL: Ensure the number is treated as a single long line for measurement
+            num.style.whiteSpace = 'nowrap';
+            num.style.display = 'inline-block';
             num.style.fontSize = maxFontSize + 'px';
 
-            // Binary search using scrollWidth (actual content width)
+            // Only shrink if it actually exceeds the box
             if (num.scrollWidth > targetWidth) {
-                for (let i = 0; i < 15; i++) { // 15 iterations for pixel-perfect precision
-                    let mid = (minFontSize + maxFontSize) / 2;
+                // Binary search for the perfect fit
+                let low = minFontSize;
+                let high = maxFontSize;
+                
+                for (let i = 0; i < 10; i++) {
+                    let mid = (low + high) / 2;
                     num.style.fontSize = mid + 'px';
                     
                     if (num.scrollWidth <= targetWidth) {
                         fontSize = mid;
-                        minFontSize = mid;
+                        low = mid;
                     } else {
-                        maxFontSize = mid;
+                        high = mid;
                     }
                 }
                 num.style.fontSize = fontSize + 'px';
