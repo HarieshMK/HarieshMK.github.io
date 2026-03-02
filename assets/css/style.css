@@ -394,57 +394,53 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
  
 /* ===== FIXED MOBILE RESPONSIVENESS ===== */
 @media (max-width: 768px) {
-  /* 1. Stack the columns and prevent horizontal dragging */
-  .calculator-container {
-    grid-template-columns: 1fr !important; 
-    padding: 15px !important; 
-    gap: 20px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow-x: hidden !important; /* HARD FIX for the screen dragging issue */
+  /* Prevent any horizontal "play" or dragging on the whole page */
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden !important;
+    position: relative;
   }
 
-  /* 2. Fix the Input Labels */
+  .calculator-container {
+    grid-template-columns: 1fr !important; 
+    padding: 20px 15px !important; 
+    gap: 20px;
+    width: 100% !important;
+    box-sizing: border-box;
+    overflow-x: hidden !important; /* Forces content to stay inside */
+  }
+
   .label-row {
     flex-direction: column; 
     align-items: flex-start;
     gap: 8px;
-    width: 100%;
   }
 
-  /* 3. Make number boxes full width */
   .label-row input[type="number"] {
     width: 100% !important; 
-    max-width: 100%;
     box-sizing: border-box;
     text-align: left;
-    padding: 12px;
   }
 
-  /* 4. Force Numbers to Stay Inside the Box & Prevent Stretching */
+  /* Force numbers to respect the box width */
   .result-item strong {
     max-width: 100% !important;
     display: block !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important; /* Adds ... if number is too long */
-    white-space: nowrap !important; /* Keeps number on one line */
-    font-size: 1.15rem !important; /* Smaller size ONLY for mobile */
-    text-align: center;
+    overflow: hidden !important; /* Changed from visible to hidden */
+    text-overflow: ellipsis; 
+    white-space: nowrap !important;
   }
 
-  /* 5. Improve the Blue Result Card */
   .result-item.highlight {
     padding: 20px 10px !important;
-    margin: 15px 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
-
+}
   /* Special font size for the large number in the blue box on mobile */
   .result-item.highlight strong {
     font-size: 1.35rem !important; /* Still the biggest, but fits the screen */
   }
-}
 /* ===== 9. FOLDER LAYOUT STYLES ===== */
 .category-section {
   margin-bottom: 50px; /* Separates the playlist area from the blog area */
@@ -751,7 +747,7 @@ img {
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   width: 100%;            /* Ensure it takes full width of calc-results */
   box-sizing: border-box;
-  overflow: visible;      /* Changed to visible so digits aren't clipped during scaling */
+  overflow: hidden;      /* Changed to visible so digits aren't clipped during scaling */
 }
 
 .result-item span { 
@@ -768,7 +764,7 @@ img {
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
   white-space: nowrap;    /* Keep on one line */
-  overflow: visible;      /* Prevent the browser from clipping the last digit */
+  overflow: hidden;      /* Prevent the browser from clipping the last digit */
   line-height: 1.1;       /* Tighter line height for better vertical centering */
   text-align: center;
   /* Remove fixed font-size here so JS takes full control */
