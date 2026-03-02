@@ -1,35 +1,115 @@
----
-layout: default
-title: Financial Calculators
-permalink: /calculators/
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }} | {{ site.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ site.description }}">
+  <meta name="google-site-verification" content="e6EpGOk8cuF4WFQ3d3xcEiGgboMHxt4PCp3xXBQw8vE" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="{{ '/favicon-96x96.png' | relative_url }}" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}" />
+  <link rel="shortcut icon" href="{{ '/favicon.ico' | relative_url }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
-# Wealth Building Tools
-
-<div class="calculator-grid">
-
-  <a href="{{ '/calculators/sip' | relative_url }}" class="calc-card">
-    <div class="calc-icon">📈</div>
-    <div class="calc-content">
-      <h3>SIP Calculator</h3>
-      <p>Calculate how much your monthly investments will grow over time.</p>
-    </div>
-  </a>
-
-  <a href="{{ '/calculators/goal-planner' | relative_url }}" class="calc-card">
-    <div class="calc-icon">🎯</div>
-    <div class="calc-content">
-      <h3>Smart Goal Planner</h3>
-      <p>Reverse-engineer your goals. Find out exactly how much to save for your dream home or education.</p>
-    </div>
-  </a>
-
-  <div class="calc-card" style="opacity: 0.7; cursor: default; border-style: dashed;">
-    <div class="calc-icon" style="filter: grayscale(1);">⏳</div>
-    <div class="calc-content">
-      <h3>More Tools Coming</h3>
-      <p>We are building FIRE, Step-Up, and Portfolio trackers. Stay tuned for updates!</p>
-    </div>
-  </a>
-
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+    }
+  </script>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC2R2GWY43"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TC2R2GWY43');
+  </script>
+  
+  <script>
+    (function(w,d,e,u,f,l,n){
+      w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments);},
+      l=d.createElement(e); l.async=1; l.src=u;
+      n=d.getElementsByTagName(e)[0]; n.parentNode.insertBefore(l,n);
+    })(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+    ml('account', '2062352');
+  </script>
+</head>
+<body>
+ 
+  <button id="theme-toggle" aria-label="Toggle Dark Mode">
+    <span id="theme-icon">🌙</span>
+  </button>
+  
+  {% if page.layout == "post" %}
+<div class="share-section">
+  <button id="copy-link-btn" class="share-btn">
+    <i class="fas fa-link"></i> Copy Link
+  </button>
 </div>
+{% endif %}
+
+  <div class="container">
+    <header>
+      <div class="brand-area">
+        <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
+        <p class="tagline">{{ site.description }}</p>
+      </div>
+      <nav>
+        <ul class="nav-list">
+          <li><a href="{{ '/' | relative_url }}" class="{% if page.title == 'Home' %}active{% endif %}">Home</a></li>
+          <li><a href="{{ '/about' | relative_url }}" class="{% if page.title == 'About the Club' %}active{% endif %}">About</a></li>
+          <li><a href="{{ '/blogs' | relative_url }}" class="{% if page.title == 'Blogs' %}active{% endif %}">Blogs</a></li>
+          <li><a href="{{ '/calculators' | relative_url }}" class="{% if page.url contains 'calculators' %}active{% endif %}">Calculators</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>{{ content }}</main>
+<div class="share-section">
+  <button id="copy-link-btn" class="share-btn">
+    <i class="fas fa-link"></i> Copy Link
+  </button>
+</div>
+    
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>The Reality Check</h3>
+          <p>I’m not a financial advisor. This club is about sharing the journey of boring, disciplined wealth building. It’s a marathon, not a sprint. <a href="{{ '/disclaimer' | relative_url }}">Read the full disclaimer.</a></p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Explore</h3>
+          <ul class="footer-links">
+            <li><a href="{{ '/' | relative_url }}">Home</a></li>
+            <li><a href="{{ '/about' | relative_url }}">About the Club</a></li>
+            <li><a href="{{ '/blogs' | relative_url }}">Blogs</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Stay Connected</h3>
+          <p class="by-line">Written by</p>
+          <strong class="author-name">Hariesh Murugan</strong>
+          <div class="social-icons">
+            <a href="mailto:itzhariesh@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="https://www.instagram.com/unexciting_money_club/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }} • Made for the long run.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="{{ '/assets/css/script.js' | relative_url }}"></script>
+</body>
+</html>
