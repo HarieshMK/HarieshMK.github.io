@@ -28,8 +28,7 @@ permalink: /calculators/
     <div class="calc-icon" style="filter: grayscale(1);">⏳</div>
     <div class="calc-content">
       <h3>More Tools Coming</h3>
-      <p>We are building FIRE, Step-Up, and Portfolio trackers. Stay tuned for updates!</p>
+      <p>We are building Step-Up SIP, Home loan planner, Gold loan planner and more. Stay tuned for updates!</p>
     </div>
-  </a>
 
 </div>
