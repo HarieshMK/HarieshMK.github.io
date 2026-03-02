@@ -417,10 +417,6 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
     padding: 20px 15px;
     margin: 15px 0;
   }
-
-  .result-item strong {
-    font-size: 1.4rem; /* Make numbers big and readable */
-  }
 }
  
 /* ===== 9. FOLDER LAYOUT STYLES ===== */
@@ -730,10 +726,14 @@ img {
 }
 
 .result-item {
-  display: flex; 
-  flex-direction: column; 
-  padding: 10px 0;               /* Vertical space for each result row (Adjust this to reduce height!) */
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8); /* Divider line between results */
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* Center the number horizontally */
+  padding: 12px 0;        /* Consistent vertical spacing */
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  width: 100%;            /* Ensure it takes full width of calc-results */
+  box-sizing: border-box;
+  overflow: visible;      /* Changed to visible so digits aren't clipped during scaling */
 }
 
 .result-item span { 
@@ -744,42 +744,47 @@ img {
 }
 
 .result-item strong {
-  display: inline-block; /* Crucial: Allows JS to measure width accurately */
-  width: auto;           /* Let it grow/shrink naturally */
-  max-width: 100%;       /* Stay inside the box */
+  display: inline-block;  /* Essential for JS to measure pixel width */
+  width: auto;            /* Allow it to be its true size for measurement */
+  max-width: 100%;        /* Constrain to parent width */
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
-  white-space: nowrap;   /* No wrapping */
-  overflow: visible;     /* DO NOT hide the end of the number */
-  line-height: 1.2;
-  text-align: center;    /* Keeps it centered as it shrinks */
+  white-space: nowrap;    /* Keep on one line */
+  overflow: visible;      /* Prevent the browser from clipping the last digit */
+  line-height: 1.1;       /* Tighter line height for better vertical centering */
+  text-align: center;
+  /* Remove fixed font-size here so JS takes full control */
 }
 
-/* Ensure the parent item centers the content */
-.result-item {
+/* --- Target Portfolio Card (The Blue Box) Fixes --- */
+
+.result-item.highlight {
+  margin: 15px 0;
+  padding: 15px 10px;     /* Reduced side padding to 10px for more number room */
+  background: #0c4a6e;
+  border-radius: 16px;
+  border: none;
+  width: 100%;            /* Force it to fill the column */
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;   /* Keeps the number in the middle of the row */
-  overflow: hidden;      /* The parent keeps everything tidy */
-}
-
-/* Target Portfolio Card (The Highlight Box) */
-.result-item.highlight {
-  margin: 10px 0;                /* Vertical margin outside the highlighted blue box */
-  padding: 15px;                 /* Internal padding inside the highlighted blue box */
-  background: #0c4a6e;           /* Highlight box color */
-  border-radius: 16px;           /* Roundness of the highlight box */
-  border: none;
+  align-items: center;
+  justify-content: center;
 }
 
 .result-item.highlight span { 
   color: #bae6fd; 
-  font-weight: 700; 
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
 .result-item.highlight strong { 
-  color: #ffffff !important; 
-  font-size: 1.6rem;             /* Font size of the main target value */
+  color: #ffffff !important;
+  /* Remove the fixed 1.6rem; let the JS determine the best fit */
+}
+/* Remove border from the last item to keep it clean */
+.calc-results .result-item:last-child {
+  border-bottom: none;
 }
 
 /* Disclaimer Box */
