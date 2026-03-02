@@ -24,91 +24,100 @@ document.addEventListener('DOMContentLoaded', function() {
     const realValueTodayDisplay = document.getElementById('real-value-today');
 
     function syncInputs(input, slider) {
-        input.addEventListener('input', () => { slider.value = input.value; calculateSIP(); });
-        slider.addEventListener('input', () => { input.value = slider.value; calculateSIP(); });
+        input.addEventListener('input', () => { 
+            slider.value = input.value; 
+            calculateSIP(); 
+        });
+        slider.addEventListener('input', () => { 
+            input.value = slider.value; 
+            calculateSIP(); 
+        });
     }
 
+    // Initialize Sync
     syncInputs(monthlySIP, monthlySlider);
     syncInputs(returnRate, returnSlider);
     syncInputs(yearsInput, yearsSlider);
     syncInputs(lumpSumInput, lumpSumSlider);
     syncInputs(inflationInput, inflationSlider);
-    dateInput.addEventListener('change', calculateSIP);
+    if(dateInput) dateInput.addEventListener('change', calculateSIP);
+
+    // --- FONT SIZE ADJUSTMENT LOGIC ---
+    function autoScaleNumbers() {
+        const numbersToScale = document.querySelectorAll('.result-item strong');
+        numbersToScale.forEach(num => {
+            const parent = num.parentElement;
+            const parentWidth = parent.clientWidth - 20; // Subtract padding
+            const isHighlight = num.closest('.highlight');
+            let currentSize = isHighlight ? 1.6 : 1.35; // Matches CSS base
+            
+            num.style.fontSize = currentSize + 'rem';
+            
+            // Shrink loop
+            while (num.scrollWidth > parentWidth && currentSize > 0.7) {
+                currentSize -= 0.05;
+                num.style.fontSize = currentSize + 'rem';
+            }
+        });
+    }
 
     function calculateSIP() {
         const P = parseFloat(monthlySIP.value) || 0;
         const L = parseFloat(lumpSumInput.value) || 0;
-        const r = parseFloat(returnRate.value) / 100 / 12;
+        const r = (parseFloat(returnRate.value) / 100) / 12;
         const n = parseFloat(yearsInput.value) * 12;
         const inf = parseFloat(inflationInput.value) / 100;
 
-        // Future Calculation
-        const futureValueSIP = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        // Formula for SIP: P × ({[1 + r]^n – 1} / r) × (1 + r)
+        const futureValueSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n;
         const futureValueLump = L * Math.pow(1 + r, n);
+        
         const totalValue = futureValueSIP + futureValueLump;
         const totalInvested = (P * n) + L;
+        const estimatedReturns = totalValue - totalInvested;
+        
+        // Adjust for Inflation (Real Value)
         const realFutureValue = totalValue / Math.pow(1 + inf, parseFloat(yearsInput.value));
 
-        // Update Future UI
+        // Update UI with en-IN formatting
         totalInvestedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
-        totalReturnsDisplay.innerText = "₹" + Math.round(totalValue - totalInvested).toLocaleString('en-IN');
+        totalReturnsDisplay.innerText = "₹" + Math.round(estimatedReturns).toLocaleString('en-IN');
         totalValueDisplay.innerText = "₹" + Math.round(totalValue).toLocaleString('en-IN');
-        realFutureDisplay.innerText = "₹" + Math.round(realFutureValue).toLocaleString('en-IN');
+        
+        if (realFutureDisplay) {
+            realFutureDisplay.innerText = "₹" + Math.round(realFutureValue).toLocaleString('en-IN');
+        }
 
-        // Current Progress Logic
-        const startDateValue = dateInput.value;
-        if (startDateValue) {
-            let start = new Date(startDateValue);
+        // --- Progress Calculation (If Start Date exists) ---
+        if (dateInput && dateInput.value) {
+            let start = new Date(dateInput.value);
             let today = new Date();
             let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
-            
-            // Proposal Fix: Cap the calculation to selected Tenure
             let effectivePassed = Math.max(0, Math.min(nPassed, n));
 
             if (effectivePassed > 0) {
-                progressSection.style.display = 'block';
-                let valTodaySIP = P * ((Math.pow(1 + r, effectivePassed) - 1) / r) * (1 + r);
+                if (progressSection) progressSection.style.display = 'block';
+                
+                let valTodaySIP = r > 0 ? P * ((Math.pow(1 + r, effectivePassed) - 1) / r) * (1 + r) : P * effectivePassed;
                 let valTodayLump = L * Math.pow(1 + r, effectivePassed);
                 let totalToday = valTodaySIP + valTodayLump;
-                
-                let realValToday = inf > 0 ? totalToday / Math.pow(1 + inf, effectivePassed / 12) : totalToday;
+                let realValToday = totalToday / Math.pow(1 + inf, effectivePassed / 12);
 
-                completedTenure.innerText = `${Math.floor(effectivePassed / 12)}y ${effectivePassed % 12}m` + (nPassed > n ? " (Max)" : "");
-                valueTodayDisplay.innerText = "₹" + Math.round(totalToday).toLocaleString('en-IN');
-                realValueTodayDisplay.innerText = "₹" + Math.round(realValToday).toLocaleString('en-IN');
+                if (completedTenure) completedTenure.innerText = `${Math.floor(effectivePassed / 12)}y ${effectivePassed % 12}m`;
+                if (valueTodayDisplay) valueTodayDisplay.innerText = "₹" + Math.round(totalToday).toLocaleString('en-IN');
+                if (realValueTodayDisplay) realValueTodayDisplay.innerText = "₹" + Math.round(realValToday).toLocaleString('en-IN');
             } else {
-                progressSection.style.display = 'none';
+                if (progressSection) progressSection.style.display = 'none';
             }
-        } else {
-            progressSection.style.display = 'none';
         }
+
+        // Run the auto-scaler after numbers update
+        autoScaleNumbers();
     }
 
+    // Initial calculation
     calculateSIP();
+    
+    // Recalculate if window is resized (important for responsive font scaling)
+    window.addEventListener('resize', autoScaleNumbers);
 });
-
-function adjustFontSize(element, originalSize) {
-    const parentWidth = element.parentElement.clientWidth;
-    let currentSize = originalSize;
-    
-    // Reset to original first to recalculate
-    element.style.fontSize = originalSize + 'rem';
-    
-    // While the number is wider than the box, reduce font size
-    while (element.scrollWidth > parentWidth && currentSize > 0.6) {
-        currentSize -= 0.05;
-        element.style.fontSize = currentSize + 'rem';
-    }
-}
-
-// Update your existing updateResults() function to call this:
-function updateUI() {
-    // ... your existing calculation code ...
-
-    const numbersToScale = document.querySelectorAll('.result-item strong');
-    numbersToScale.forEach(num => {
-        // Use 1.6rem for the highlight box, 1.35rem for others
-        const baseSize = num.closest('.highlight') ? 1.6 : 1.35;
-        adjustFontSize(num, baseSize);
-    });
-}
