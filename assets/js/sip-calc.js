@@ -47,29 +47,31 @@ function autoScaleNumbers() {
     const numbersToScale = document.querySelectorAll('.result-item strong');
     
     numbersToScale.forEach(num => {
-        const container = num.parentElement;
-        // Get the actual usable width (subtracting a tiny bit of padding)
-        const targetWidth = container.clientWidth - 15; 
+        const parent = num.parentElement;
+        const padding = 20; // Safety gap
+        const targetWidth = parent.offsetWidth - padding;
         
-        let minFont = 5;   // Tiny (in pixels)
-        let maxFont = 32;  // Maximum starting size (2rem approx)
-        let perfectSize = maxFont;
+        // 1. Start with the "Ideal" large size
+        let maxFontSize = num.closest('.highlight') ? 32 : 24; 
+        let minFontSize = 4; // Absolute minimum (will be tiny but visible)
+        let fontSize = maxFontSize;
 
-        // Binary Search for the perfect pixel size
-        // This runs extremely fast (usually 5-6 iterations)
-        for (let i = 0; i < 10; i++) {
-            let mid = (minFont + maxFont) / 2;
+        // 2. Binary search for the perfect fit
+        for (let i = 0; i < 12; i++) {
+            let mid = (minFontSize + maxFontSize) / 2;
             num.style.fontSize = mid + 'px';
             
-            if (num.scrollWidth <= targetWidth) {
-                perfectSize = mid;
-                minFont = mid;
+            // Check if the number fits
+            if (num.offsetWidth <= targetWidth) {
+                fontSize = mid;
+                minFontSize = mid;
             } else {
-                maxFont = mid;
+                maxFontSize = mid;
             }
         }
 
-        num.style.fontSize = perfectSize + 'px';
+        // 3. Final Apply
+        num.style.fontSize = fontSize + 'px';
     });
 }
 
