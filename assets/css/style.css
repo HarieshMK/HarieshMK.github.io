@@ -392,9 +392,8 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
   color: #ffffff; /* White link color for dark mode */
 }
  
-/* ===== FIXED MOBILE RESPONSIVENESS ===== */
+/* ===== 8. FIXED MOBILE RESPONSIVENESS ===== */
 @media (max-width: 768px) {
-  /* Prevent any horizontal "play" or dragging on the whole page */
   html, body {
     max-width: 100%;
     overflow-x: hidden !important;
@@ -407,7 +406,10 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
     gap: 20px;
     width: 100% !important;
     box-sizing: border-box;
-    overflow-x: hidden !important; /* Forces content to stay inside */
+  }
+
+  .calc-results {
+    padding: 15px 10px !important; 
   }
 
   .label-row {
@@ -422,18 +424,16 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover {
     text-align: left;
   }
 
-  /* Force numbers to respect the box width */
-.result-item strong {
+  .result-item strong {
     max-width: 100% !important;
-    display: inline-block !important; /* Changed from block to inline-block */
-    overflow: visible !important;     /* Changed from hidden to visible */
-    text-overflow: clip !important;   /* Remove ellipsis */
+    display: inline-block !important; 
+    overflow: visible !important; 
     white-space: nowrap !important;
-    width: auto !important;           /* Allow JS to measure width accurately */
+    width: auto !important;
   }
 
   .result-item.highlight {
-    padding: 20px 10px !important;
+    padding: 20px 5px !important; 
     width: 100% !important;
     box-sizing: border-box !important;
   }
@@ -649,25 +649,22 @@ img {
 /* ===== 15. CALCULATOR INTERFACE (ADJUSTABLE PRESET) ===== */
 .calculator-container {
   display: grid;
-  /* Width Control: Adjust 320px or 280px to change minimum column widths */
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 40px;                     /* Horizontal space between Left and Right columns */
-  background: #ffffff;           /* Container background */
-  padding: 40px;                 /* Internal breathing room around the whole tool */
-  border-radius: 24px;           /* Roundness of the outer corners */
-  border: 1px solid #e2e8f0;     /* Border thickness and color */
-  margin-top: 20px;              /* Vertical space above the calculator */
-  align-items: start;            /* Keeps columns at the top; 'stretch' would make them equal height */
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); /* Outer shadow depth */
+  gap: 40px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  margin-top: 20px;
+  align-items: start;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
 /* --- Input Section --- */
-.calc-inputs {
-  width: 100%;                   /* Ensures inputs fill the left column */
+.calc-inputs { width: 100%;                   /* Ensures inputs fill the left column */
 }
 
-.input-group { 
-  margin-bottom: 28px;           /* Vertical space between each slider/input set */
+.input-group {  margin-bottom: 28px;           /* Vertical space between each slider/input set */
 }
 
 .label-row { 
@@ -717,12 +714,14 @@ img {
 
 /* --- Results Column --- */
 .calc-results {
-  background: #f8fafc;           /* Light grey background for results area */
-  padding: 20px;                 /* Internal padding inside the results box */
-  border-radius: 20px;           /* Roundness of the results box */
-  display: flex; 
-  flex-direction: column;        /* Stacks results vertically */
-  height: auto;                  /* '100%' makes it equal to left side, 'auto' makes it compact */
+  background: #f8fafc;
+  padding: 20px 15px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* Clips any overflow that the JS missed */
 }
 
 .input-header {
