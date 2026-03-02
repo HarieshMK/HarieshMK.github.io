@@ -744,15 +744,14 @@ img {
 }
 
 .result-item strong {
-  font-size: 1.35rem;
+  display: block;
+  width: 100%;
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
-  /* These lines ensure the "Single Line" rule */
-  display: block;
-  white-space: nowrap; 
-  overflow: hidden;
-  text-overflow: ellipsis; /* Adds '...' if the number is somehow still too long */
-  transition: font-size 0.2s ease; 
+  white-space: nowrap;   /* Force single line */
+  overflow: hidden;      /* Hide overflow during calculation */
+  line-height: 1.2;
+  text-align: right;     /* Calculator style alignment */
 }
 
 /* Target Portfolio Card (The Highlight Box) */
