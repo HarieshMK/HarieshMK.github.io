@@ -86,3 +86,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calculateSIP();
 });
+
+function adjustFontSize(element, originalSize) {
+    const parentWidth = element.parentElement.clientWidth;
+    let currentSize = originalSize;
+    
+    // Reset to original first to recalculate
+    element.style.fontSize = originalSize + 'rem';
+    
+    // While the number is wider than the box, reduce font size
+    while (element.scrollWidth > parentWidth && currentSize > 0.6) {
+        currentSize -= 0.05;
+        element.style.fontSize = currentSize + 'rem';
+    }
+}
+
+// Update your existing updateResults() function to call this:
+function updateUI() {
+    // ... your existing calculation code ...
+
+    const numbersToScale = document.querySelectorAll('.result-item strong');
+    numbersToScale.forEach(num => {
+        // Use 1.6rem for the highlight box, 1.35rem for others
+        const baseSize = num.closest('.highlight') ? 1.6 : 1.35;
+        adjustFontSize(num, baseSize);
+    });
+}
