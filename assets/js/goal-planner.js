@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const corpusGapDisplay = document.getElementById('corpus-gap');
     const requiredSIPDisplay = document.getElementById('required-sip');
 
-    // 2. PRESETS DATA (Matches your MD list exactly)
+    // 2. PRESETS DATA
     const presets = {
         "Dream House": { price: 10000000, years: 15, returns: 12, inflation: 7 },
         "House Downpayment": { price: 2000000, years: 5, returns: 12, inflation: 6 },
@@ -101,9 +101,10 @@ document.addEventListener('DOMContentLoaded', function() {
         updateWordLabel(currentPriceInput.value, 'current-price-words');
         updateWordLabel(existingCorpusInput.value, 'existing-corpus-words');
 
-        // Dynamic "Start BOSS" Nudge
         const goalName = goalNameInput.value || "this dream";
-        const nudgeElement = document.querySelector('.calc-disclaimer p:nth-child(2)');
+        
+        // Updated Nudge Logic (Variable shadowing fixed)
+        const nudgeElement = document.querySelector('.calc-disclaimer p[style*="color: #b45309"]'); 
         if (nudgeElement) {
             nudgeElement.innerHTML = `Don’t just look at the numbers, start BOSS! Your <strong>${goalName}</strong> isn't getting any cheaper. :P`;
         }
@@ -137,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         autoScaleNumbers();
     }
 
-    // Initialize
+    // Initialize Sync
     syncInputs(currentPriceInput, currentPriceSlider);
     syncInputs(yearsInput, yearsSlider);
     syncInputs(inflationInput, inflationSlider);
