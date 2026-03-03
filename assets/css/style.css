@@ -866,3 +866,42 @@ color: #ffffff !important;
     order: 3; /* Places it below the label and input on very small screens */
   }
 }
+/* Specific layout fix ONLY for Goal Planner */
+.calculator-container:has(.preset-group) {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 30px !important;
+    align-items: flex-start !important;
+}
+
+/* Ensure the input side doesn't squash the results on Goal Planner */
+.calculator-container:has(.preset-group) .calc-inputs {
+    flex: 1.2 !important;
+    min-width: 320px !important;
+}
+
+.calculator-container:has(.preset-group) .calc-results {
+    flex: 1 !important;
+    min-width: 320px !important;
+    height: auto !important;
+}
+
+/* Fix for the Goal Name box spacing */
+.preset-group {
+    margin-bottom: 35px !important;
+}
+
+.preset-group .label-row {
+    margin-bottom: 0 !important;
+}
+
+/* Ensure the datalist input looks premium */
+#goal-name {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    transition: border-color 0.2s ease;
+}
+
+#goal-name:focus {
+    border-color: #38bdf8 !important;
+    outline: none;
+}
