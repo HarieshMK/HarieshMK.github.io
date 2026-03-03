@@ -1,7 +1,6 @@
 (function() {
     const init = function() {
         const getEl = (id) => document.getElementById(id);
-        
         const els = {
             goal: getEl('goal-name'),
             price: getEl('current-price'),
@@ -18,11 +17,12 @@
         };
 
         const config = {
-            "Dream House": { p: 10000000, y: 15, i: 7, r: 12, m: "A big house needs a solid plan! 🏠" },
+            "Dream House": { p: 10000000, y: 15, i: 7, r: 12, m: "A big house needs a big plan! 🏠" },
             "New Car": { p: 1500000, y: 5, i: 5, r: 10, m: "Time to get those wheels rolling! 🚗" },
-            "Child Education": { p: 2500000, y: 12, i: 10, r: 12, m: "Investing in their future is the best ROI. 🎓" },
-            "Foreign Vacation": { p: 700000, y: 3, i: 8, r: 8, m: "Pack your bags, the world is waiting! ✈️" },
-            "Retirement Fund": { p: 50000000, y: 25, i: 6, r: 12, m: "Future you will thank current you! 🏝️" }
+            "Child Education": { p: 3000000, y: 12, i: 10, r: 12, m: "The best investment is their future. 🎓" },
+            "Foreign Vacation": { p: 800000, y: 3, i: 8, r: 8, m: "The world is waiting for you! ✈️" },
+            "Retirement Fund": { p: 50000000, y: 25, i: 6, r: 12, m: "Future you will thank current you! 🏝️" },
+            "Custom": { p: 500000, y: 5, i: 6, r: 12, m: "Your goal won't start itself. Start BOSS! 🚀" }
         };
 
         function calculate() {
@@ -32,13 +32,11 @@
             const r = (parseFloat(els.ret.value) || 0) / 100;
 
             const futureCost = p * Math.pow(1 + i, y);
-            
-            let sip = 0;
             const months = y * 12;
             const monthlyRate = r / 12;
+            let sip = 0;
 
             if (futureCost > 0 && months > 0) {
-                // Sinking Fund Formula
                 sip = (futureCost * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
             }
 
@@ -46,33 +44,26 @@
             els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
         }
 
-        const setupSync = (val, slide) => {
-            val.addEventListener('input', () => { slide.value = val.value; calculate(); });
-            slide.addEventListener('input', () => { val.value = slide.value; calculate(); });
+        const sync = (v, s) => {
+            v.addEventListener('input', () => { s.value = v.value; calculate(); });
+            s.addEventListener('input', () => { v.value = s.value; calculate(); });
         };
 
-        setupSync(els.price, els.priceSlider);
-        setupSync(els.years, els.yearsSlider);
-        setupSync(els.infl, els.inflSlider);
-        setupSync(els.ret, els.retSlider);
+        sync(els.price, els.priceSlider);
+        sync(els.years, els.yearsSlider);
+        sync(els.infl, els.inflSlider);
+        sync(els.ret, els.retSlider);
 
-        // HYBRID LOGIC: Detects selection or typing
-        els.goal.addEventListener('input', function() {
-            const val = this.value;
-            const target = config[val];
-            
+        els.goal.addEventListener('change', function() {
+            const target = config[this.value];
             if (target) {
-                // If it matches a list item, update everything
                 els.price.value = els.priceSlider.value = target.p;
                 els.years.value = els.yearsSlider.value = target.y;
                 els.infl.value = els.inflSlider.value = target.i;
                 els.ret.value = els.retSlider.value = target.r;
                 els.nudge.innerText = target.m;
-            } else {
-                // If user is typing a custom goal
-                els.nudge.innerText = "Your goal won't start itself. Start BOSS! 🚀";
+                calculate();
             }
-            calculate();
         });
 
         calculate();
