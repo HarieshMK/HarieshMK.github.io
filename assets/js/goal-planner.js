@@ -44,7 +44,7 @@
             "New Car": { p: 1200000, y: 5, i: 5, r: 10, m: "Drive home your dream ride. 🚗" },
             "Car Downpayment": { p: 400000, y: 3, i: 5, r: 9, m: "Save the downpayment, BOSS style. 🏎️" },
             "Business Start": { p: 2000000, y: 5, i: 8, r: 12, m: "Be your own BOSS. Build your capital. 💼" },
-            "Retirement Fund": { p: 50000000, y: 25, i: 6, r: 12, m: "Retire like a King/Queen. 🏝️" },
+           "Retirement Fund": { p: 10000000, y: 25, i: 6, r: 12, m: "Retire like a King/Queen. 🏝️" },
             "Health Insurance": { p: 30000, y: 1, i: 15, r: 6, m: "Health is wealth. Stay protected. 🏥" },
             "Car Insurance": { p: 20000, y: 1, i: 5, r: 6, m: "Drive protected. 🚗" },
             "Local Vacation": { p: 100000, y: 1, i: 8, r: 7, m: "Refresh and recharge. 🏔️" },
