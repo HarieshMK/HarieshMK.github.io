@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: null
 title: Smart Goal Planner
 permalink: /calculators/goal-planner/
 ---
