@@ -24,7 +24,7 @@ permalink: /calculators/goal-planner/
           <option value="Own Wedding">
           <option value="Sibling's Wedding">
           <option value="Starting a Business">
-          <option value="School Admission">
+          <option value="Child's School Admission">
           <option value="Child's Yearly School Fees">
           <option value="Child's UG (India)">
           <option value="Child's UG (Foreign)">
