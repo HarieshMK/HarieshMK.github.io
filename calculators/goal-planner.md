@@ -8,17 +8,37 @@ permalink: /calculators/goal-planner/
 <div class="calculator-container">
     <div class="calc-inputs">
         <div class="input-group">
-            <label>What are we planning for?</label>
-            <select id="goal-name" class="full-width-input">
-                <option value="" disabled selected>Select a goal...</option>
-                <option value="Dream House">Dream House 🏠</option>
-                <option value="New Car">New Car 🚗</option>
-                <option value="Child Education">Child Education 🎓</option>
-                <option value="Foreign Vacation">Foreign Vacation ✈️</option>
-                <option value="Retirement Fund">Retirement Fund 🏝️</option>
-                <option value="Custom">Other / Custom Goal 🚀</option>
-            </select>
-        </div>
+    <label>What are we planning for?</label>
+    <select id="goal-name" class="full-width-input">
+        <option value="" disabled selected>Select a goal...</option>
+        <optgroup label="Family & Life Events">
+            <option value="Own Wedding">Own Wedding 💍</option>
+            <option value="Siblings Wedding">Sibling's Wedding 🥂</option>
+            <option value="Jewelry Purchase">Jewelry Purchase ✨</option>
+            <option value="Home Renovation">Home Renovation 🔨</option>
+        </optgroup>
+        <optgroup label="Education">
+            <option value="School Admission">School Admission (One-time) 🏫</option>
+            <option value="Yearly School Fees">Yearly School Fees 📚</option>
+            <option value="Child UG India">Child's UG (India) 🎓</option>
+            <option value="Child UG Foreign">Child's UG (Foreign) 🌍</option>
+            <option value="Child PG Foreign">Child's PG (Foreign) 🏛️</option>
+            <option value="My Own PG">My Own PG/MBA 📖</option>
+        </optgroup>
+        <optgroup label="Assets & Business">
+            <option value="Dream House">Dream House 🏠</option>
+            <option value="Car Downpayment">Car Downpayment 🏎️</option>
+            <option value="Business Start">Starting a Business 💼</option>
+            <option value="Retirement Fund">Retirement Fund 🏝️</option>
+        </optgroup>
+        <optgroup label="Recurring & Travel">
+            <option value="Health Insurance">Health Insurance (Yearly) 🏥</option>
+            <option value="Car Insurance">Car Insurance (Yearly) 🛡️</option>
+            <option value="Local Vacation">Local Vacation 🚗</option>
+            <option value="Foreign Vacation">Foreign Vacation ✈️</option>
+        </optgroup>
+    </select>
+</div>
 
         <div class="input-group">
             <label>Current Cost Today (₹)</label>
