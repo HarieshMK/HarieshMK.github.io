@@ -825,3 +825,44 @@ color: #ffffff !important;
 .dark-theme .result-item span { color: #94a3b8; }
 .dark-theme .result-item strong { color: #f8fafc !important; }
 .dark-theme .label-row input[type="number"] { background: #020617; border-color: #334155; color: #38bdf8; }
+
+/* ===== 16. GOAL PLANNER SPECIFIC POLISH ===== */
+
+/* Word Preview Badge (Lakh/Crore) */
+.word-preview {
+  font-size: 0.75rem;
+  color: #0ea5e9;           /* Sky blue to match your sliders */
+  font-weight: 700;
+  background: rgba(14, 165, 233, 0.1); /* Soft blue glow */
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-left: auto;        /* Pushes it to the right, next to the input box */
+  margin-right: 12px;       /* Gap between word and number box */
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+/* Ensure the label row handles three items (Label, Word, Input) cleanly */
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Dark Mode adjustment for the word badge */
+.dark-theme .word-preview {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+/* Mobile Fix for Word Previews */
+@media (max-width: 480px) {
+  .label-row {
+    flex-wrap: wrap; /* Allows the badge to drop to a new line if needed */
+  }
+  .word-preview {
+    margin: 5px 0;
+    order: 3; /* Places it below the label and input on very small screens */
+  }
+}
