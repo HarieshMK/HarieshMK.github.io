@@ -120,4 +120,4 @@ permalink: /calculators/goal-planner/
   <a href="/calculators/" class="back-link">← Back to All Calculators</a>
 </div>
 
-<script src="/assets/js/goal-planner.js?v=1.1"></script>
+<script src="/assets/js/goal-planner.js?v=999"></script>
