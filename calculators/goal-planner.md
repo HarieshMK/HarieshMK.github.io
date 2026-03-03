@@ -5,12 +5,14 @@ permalink: /calculators/goal-planner/
 ---
 
 # 🎯 Smart Goal Planner
+
 *Tell us what your dream costs today. We’ll calculate exactly what you need to save from today to own it tomorrow.*
+
 
 <div class="calculator-container">
   <div class="calc-inputs">
     
-<div class="input-group preset-group"> 
+    <div class="input-group preset-group"> 
       <div class="label-row">
         <label>What are we planning for?</label>
       </div>
@@ -103,8 +105,7 @@ permalink: /calculators/goal-planner/
     </div>
 
     <div class="calc-disclaimer">
-      <p><strong>The Bottom Line:</strong> This is the monthly amount you need to invest starting <em>right now</em> to reach your goal on time.</p>
-      <p style="margin-top: 10px; font-weight: 800; color: #b45309;">
+      <p id="goal-nudge" style="margin-top: 10px; font-weight: 800; color: #b45309;">
         Don’t just look at the numbers, start BOSS! The longer you wait, the bigger this number gets. :P
       </p>
       <hr style="margin: 15px 0; border: 0; border-top: 1px dashed rgba(146, 64, 14, 0.3);">
