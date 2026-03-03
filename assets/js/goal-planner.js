@@ -98,17 +98,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CORE MATH ---
     function calculateGoal() {
+        // 1. Update Word Labels (Lakh/Crore)
         updateWordLabel(currentPriceInput.value, 'current-price-words');
         updateWordLabel(existingCorpusInput.value, 'existing-corpus-words');
 
+        // 2. Robust Nudge Logic
         const goalName = goalNameInput.value || "this dream";
-        
-        // Updated Nudge Logic (Variable shadowing fixed)
-        const nudgeElement = document.querySelector('.calc-disclaimer p[style*="color: #b45309"]'); 
+        const nudgeElement = document.getElementById('goal-nudge'); // Better to use an ID
         if (nudgeElement) {
             nudgeElement.innerHTML = `Don’t just look at the numbers, start BOSS! Your <strong>${goalName}</strong> isn't getting any cheaper. :P`;
         }
 
+        // 3. Calculation Constants
         const currentPrice = parseFloat(currentPriceInput.value) || 0;
         const years = parseFloat(yearsInput.value) || 0;
         const inflation = (parseFloat(inflationInput.value) || 0) / 100;
@@ -116,21 +117,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const annualReturn = (parseFloat(returnRateInput.value) || 0) / 100;
         
         const monthlyReturn = annualReturn / 12;
-        const totalMonths = years * 12;
+        const totalMonths = Math.max(0, years * 12);
 
+        // 4. Future Cost & Gap Math
         const futureCost = currentPrice * Math.pow(1 + inflation, years);
         const fvExisting = existingCorpus * Math.pow(1 + annualReturn, years);
         const gap = Math.max(0, futureCost - fvExisting);
 
+        // 5. SIP Calculation (Handling 0 months or 0 gap)
         let requiredSIP = 0;
-        if (gap > 0 && totalMonths > 0) {
-            if (monthlyReturn > 0) {
-                requiredSIP = (gap * monthlyReturn) / ((Math.pow(1 + monthlyReturn, totalMonths) - 1) * (1 + monthlyReturn));
+        if (gap > 0) {
+            if (totalMonths > 0) {
+                if (monthlyReturn > 0) {
+                    // Standard SIP formula
+                    requiredSIP = (gap * monthlyReturn) / ((Math.pow(1 + monthlyReturn, totalMonths) - 1) * (1 + monthlyReturn));
+                } else {
+                    requiredSIP = gap / totalMonths;
+                }
             } else {
-                requiredSIP = gap / totalMonths;
+                // If years is 0, you need the full gap amount immediately (not really a monthly SIP)
+                requiredSIP = gap; 
             }
         }
 
+        // 6. Final Display Formatting
         futureCostDisplay.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
         corpusGapDisplay.innerText = "₹" + Math.round(gap).toLocaleString('en-IN');
         requiredSIPDisplay.innerText = "₹" + Math.round(requiredSIP).toLocaleString('en-IN');
