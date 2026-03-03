@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const existingCorpusInput = document.getElementById('existing-corpus');
     const existingCorpusSlider = document.getElementById('existing-corpus-slider');
     const returnRateInput = document.getElementById('goal-returns');
-    const returnRateSlider = document.getElementById('return-rate-slider'); // Note: ensure ID match in HTML
+    const returnRateSlider = document.getElementById('goal-returns-slider');
 
     // Outputs
     const futureCostDisplay = document.getElementById('future-cost');
@@ -29,12 +29,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- NEW UTILITY: WORD LABEL (Moved outside of syncInputs) ---
+    function updateWordLabel(value, elementId) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        let num = parseFloat(value) || 0;
+        if (num >= 10000000) {
+            el.innerText = "₹" + (num / 10000000).toFixed(2) + " Cr";
+        } else if (num >= 100000) {
+            el.innerText = "₹" + (num / 100000).toFixed(2) + " L";
+        } else {
+            el.innerText = "₹" + num.toLocaleString('en-IN');
+        }
+    }
+
     // Initialize Sync for all pairs
     syncInputs(currentPriceInput, currentPriceSlider);
     syncInputs(yearsInput, yearsSlider);
     syncInputs(inflationInput, inflationSlider);
     syncInputs(existingCorpusInput, existingCorpusSlider);
-    syncInputs(document.getElementById('goal-returns'), document.getElementById('goal-returns-slider'));
+    syncInputs(returnRateInput, returnRateSlider);
 
     // --- SHARED UTILITY: FONT SCALING ---
     function autoScaleNumbers() {
@@ -60,28 +74,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- THE CORE MATH ---
     function calculateGoal() {
-        // 1. Get Values
+        // 1. Update Word Labels
+        updateWordLabel(currentPriceInput.value, 'current-price-words');
+        updateWordLabel(existingCorpusInput.value, 'existing-corpus-words');
+
+        // 2. Get Values
         const currentPrice = parseFloat(currentPriceInput.value) || 0;
         const years = parseFloat(yearsInput.value) || 0;
         const inflation = (parseFloat(inflationInput.value) || 0) / 100;
         const existingCorpus = parseFloat(existingCorpusInput.value) || 0;
-        const annualReturn = (parseFloat(document.getElementById('goal-returns').value) || 0) / 100;
+        const annualReturn = (parseFloat(returnRateInput.value) || 0) / 100;
         
         const monthlyReturn = annualReturn / 12;
         const totalMonths = years * 12;
 
-        // 2. Calculate Future Cost (Adjusted for Inflation)
-        // Formula: FV = PV * (1 + r)^n
+        // 3. Calculate Future Cost (Adjusted for Inflation)
         const futureCost = currentPrice * Math.pow(1 + inflation, years);
 
-        // 3. Calculate Future Value of Existing Corpus
+        // 4. Calculate Future Value of Existing Corpus
         const fvExisting = existingCorpus * Math.pow(1 + annualReturn, years);
 
-        // 4. Calculate the Gap
+        // 5. Calculate the Gap
         const gap = Math.max(0, futureCost - fvExisting);
 
-        // 5. Calculate Required Monthly SIP
-        // Formula: P = (Gap * r) / [((1 + r)^n - 1) * (1 + r)]
+        // 6. Calculate Required Monthly SIP
         let requiredSIP = 0;
         if (gap > 0 && totalMonths > 0) {
             if (monthlyReturn > 0) {
@@ -91,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 6. Display Results
+        // 7. Display Results
         futureCostDisplay.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
         corpusGapDisplay.innerText = "₹" + Math.round(gap).toLocaleString('en-IN');
         requiredSIPDisplay.innerText = "₹" + Math.round(requiredSIP).toLocaleString('en-IN');
