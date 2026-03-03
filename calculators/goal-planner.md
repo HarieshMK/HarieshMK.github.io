@@ -66,6 +66,16 @@ permalink: /calculators/goal-planner/
             <input type="range" id="goal-returns-slider" class="slider" min="1" max="25" step="0.5" value="12">
         </div>
     </div>
+    <div class="input-group">
+    <label>Current Savings for this Goal (₹) <span id="existing-corpus-text" class="human-readable"></span></label>
+    <input type="number" id="existing-corpus" value="0">
+    <input type="range" id="existing-corpus-slider" class="slider" min="0" max="5000000" step="5000" value="0">
+    
+    </div>
+    <div class="input-group">
+    <label>Return on Existing Savings: <span id="corpus-ret-val">7</span>% p.a.</label>
+    <input type="range" id="corpus-returns-slider" class="slider" min="1" max="20" step="0.5" value="7">
+    </div>
 
     <div class="calc-results">
         <div class="result-box">
