@@ -1,60 +1,80 @@
----
-layout: default
-title: Smart Goal Planner
-permalink: /calculators/goal-planner/
----
+(function() {
+    const init = function() {
+        const getEl = (id) => document.getElementById(id);
+        
+        const els = {
+            goal: getEl('goal-name'),
+            price: getEl('current-price'),
+            priceSlider: getEl('current-price-slider'),
+            years: getEl('goal-years'),
+            yearsSlider: getEl('goal-years-slider'),
+            infl: getEl('goal-inflation'),
+            inflSlider: getEl('goal-inflation-slider'),
+            ret: getEl('goal-returns'),
+            retSlider: getEl('goal-returns-slider'),
+            outCost: getEl('future-cost'),
+            outSIP: getEl('required-sip'),
+            nudge: getEl('goal-nudge')
+        };
 
-<div markdown="0">
-  <div class="calculator-container">
-    <div class="calc-inputs">
-      
-      <div class="input-group">
-        <label>What are we planning for?</label>
-        <input type="text" id="goal-name" list="goal-presets" placeholder="Select a goal...">
-        <datalist id="goal-presets">
-          <option value="Dream House">
-          <option value="New Car">
-          <option value="Retirement Fund">
-        </datalist>
-      </div>
+        const config = {
+            "Dream House": { p: 8000000, y: 15, i: 7, r: 12, m: "A big house needs a big heart and a solid plan! 🏠" },
+            "New Car": { p: 1200000, y: 5, i: 5, r: 10, m: "Time to get those wheels rolling! 🚗" },
+            "Child Education": { p: 2500000, y: 12, i: 10, r: 12, m: "Investing in their future is the best ROI. 🎓" },
+            "Foreign Vacation": { p: 600000, y: 3, i: 8, r: 8, m: "Pack your bags, the world is waiting! ✈️" },
+            "Retirement": { p: 50000000, y: 25, i: 6, r: 12, m: "Future you will thank current you for this! 🏝️" }
+        };
 
-      <div class="input-group">
-        <label>Current Price (Today)</label>
-        <input type="number" id="current-price" value="500000">
-        <input type="range" id="current-price-slider" min="10000" max="10000000" step="10000" value="500000">
-      </div>
+        function calculate() {
+            const p = parseFloat(els.price.value) || 0;
+            const y = parseFloat(els.years.value) || 0;
+            const i = (parseFloat(els.infl.value) || 0) / 100;
+            const r = (parseFloat(els.ret.value) || 0) / 100;
 
-      <div class="input-group">
-        <label>Years to Goal</label>
-        <input type="number" id="goal-years" value="5">
-        <input type="range" id="goal-years-slider" min="1" max="40" value="5">
-      </div>
+            // Future Cost = Current Price * (1 + inflation)^years
+            const futureCost = p * Math.pow(1 + i, y);
+            
+            // SIP = (FV * monthlyRate) / ((1 + monthlyRate)^months - 1)
+            let sip = 0;
+            const months = y * 12;
+            const monthlyRate = r / 12;
 
-      <div class="input-group">
-        <label>Expected Inflation (%)</label>
-        <input type="number" id="goal-inflation" value="6">
-        <input type="range" id="goal-inflation-slider" min="1" max="15" step="0.5" value="6">
-      </div>
+            if (futureCost > 0 && months > 0) {
+                sip = (futureCost * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+            }
 
-      <div class="input-group">
-        <label>Existing Savings</label>
-        <input type="number" id="existing-corpus" value="0">
-        <input type="range" id="existing-corpus-slider" min="0" max="5000000" step="5000" value="0">
-      </div>
+            els.outCost.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
+            els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
+        }
 
-      <div class="input-group">
-        <label>Expected Returns (%)</label>
-        <input type="number" id="goal-returns" value="12">
-        <input type="range" id="goal-returns-slider" min="1" max="25" step="0.5" value="12">
-      </div>
-    </div>
+        // Sync inputs and sliders
+        const setupSync = (val, slide) => {
+            val.addEventListener('input', () => { slide.value = val.value; calculate(); });
+            slide.addEventListener('input', () => { val.value = slide.value; calculate(); });
+        };
 
-    <div class="calc-results">
-      <div class="result-item">Future Cost: <strong id="future-cost">₹0</strong></div>
-      <div class="result-item">Corpus Gap: <strong id="corpus-gap">₹0</strong></div>
-      <div class="result-item highlight">Monthly SIP: <strong id="required-sip">₹0</strong></div>
-    </div>
-  </div>
-</div>
+        setupSync(els.price, els.priceSlider);
+        setupSync(els.years, els.yearsSlider);
+        setupSync(els.infl, els.inflSlider);
+        setupSync(els.ret, els.retSlider);
 
-<script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+        // Goal Selection Logic
+        els.goal.addEventListener('change', function() {
+            const target = config[this.value];
+            if (target) {
+                els.price.value = els.priceSlider.value = target.p;
+                els.years.value = els.yearsSlider.value = target.y;
+                els.infl.value = els.inflSlider.value = target.i;
+                els.ret.value = els.retSlider.value = target.r;
+                els.nudge.innerText = target.m;
+                calculate();
+            }
+        });
+
+        calculate();
+    };
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+    document.addEventListener("turbo:load", init);
+})();
