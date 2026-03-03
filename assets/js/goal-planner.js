@@ -1,160 +1,127 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. SELECT ALL ELEMENTS
-    const goalNameInput = document.getElementById('goal-name');
-    const currentPriceInput = document.getElementById('current-price');
-    const currentPriceSlider = document.getElementById('current-price-slider');
-    const yearsInput = document.getElementById('goal-years');
-    const yearsSlider = document.getElementById('goal-years-slider');
-    const inflationInput = document.getElementById('goal-inflation');
-    const inflationSlider = document.getElementById('goal-inflation-slider');
-    const existingCorpusInput = document.getElementById('existing-corpus');
-    const existingCorpusSlider = document.getElementById('existing-corpus-slider');
-    const returnRateInput = document.getElementById('goal-returns');
-    const returnRateSlider = document.getElementById('goal-returns-slider');
+// goal-planner.js
+(function() {
+    const init = function() {
+        const getEl = (id) => document.getElementById(id);
+        
+        // 1. Element Mapping
+        const els = {
+            name: getEl('goal-name'),
+            price: getEl('current-price'),
+            priceSlider: getEl('current-price-slider'),
+            years: getEl('goal-years'),
+            yearsSlider: getEl('goal-years-slider'),
+            inflation: getEl('goal-inflation'),
+            inflationSlider: getEl('goal-inflation-slider'),
+            corpus: getEl('existing-corpus'),
+            corpusSlider: getEl('existing-corpus-slider'),
+            returns: getEl('goal-returns'),
+            returnsSlider: getEl('goal-returns-slider'),
+            outCost: getEl('future-cost'),
+            outGap: getEl('corpus-gap'),
+            outSIP: getEl('required-sip'),
+            nudge: getEl('goal-nudge')
+        };
 
-    const futureCostDisplay = document.getElementById('future-cost');
-    const corpusGapDisplay = document.getElementById('corpus-gap');
-    const requiredSIPDisplay = document.getElementById('required-sip');
+        // Check if essential elements are missing
+        if (!els.price || !els.outSIP) return;
 
-    // 2. PRESETS DATA
-    const presets = {
-        "Dream House": { price: 10000000, years: 15, returns: 12, inflation: 7 },
-        "House Downpayment": { price: 2000000, years: 5, returns: 12, inflation: 6 },
-        "Home Renovation": { price: 800000, years: 3, returns: 10, inflation: 8 },
-        "New Car": { price: 1500000, years: 5, returns: 10, inflation: 5 },
-        "Car Downpayment": { price: 300000, years: 2, returns: 8, inflation: 5 },
-        "Jewelry Purchase": { price: 500000, years: 4, returns: 12, inflation: 8 },
-        "Own Wedding": { price: 2500000, years: 5, returns: 12, inflation: 8 },
-        "Sibling's Wedding": { price: 1000000, years: 4, returns: 10, inflation: 8 },
-        "Starting a Business": { price: 2000000, years: 5, returns: 12, inflation: 6 },
-        "Child's School Admission": { price: 300000, years: 3, returns: 10, inflation: 12 },
-        "Child's Yearly School Fees": { price: 200000, years: 1, returns: 7, inflation: 10 },
-        "Child's UG (India)": { price: 2500000, years: 12, returns: 12, inflation: 10 },
-        "Child's UG (Foreign)": { price: 8000000, years: 12, returns: 12, inflation: 12 },
-        "Child's PG (India)": { price: 1500000, years: 15, returns: 12, inflation: 10 },
-        "Child's PG (Foreign)": { price: 6000000, years: 15, returns: 12, inflation: 12 },
-        "My Own PG/MBA (India)": { price: 2000000, years: 4, returns: 10, inflation: 10 },
-        "My Own PG/MBA (Foreign)": { price: 5000000, years: 4, returns: 10, inflation: 12 },
-        "Local Vacation": { price: 100000, years: 1, returns: 7, inflation: 8 },
-        "Foreign Vacation": { price: 700000, years: 3, returns: 10, inflation: 10 },
-        "Health Insurance (Yearly)": { price: 25000, years: 1, returns: 7, inflation: 15 },
-        "Car Insurance (Yearly)": { price: 30000, years: 1, returns: 7, inflation: 5 },
-        "Retirement Fund": { price: 50000000, years: 25, returns: 12, inflation: 6 }
-    };
+        const presets = {
+            "Dream House": { price: 10000000, years: 15, returns: 12, inflation: 7 },
+            "House Downpayment": { price: 2000000, years: 5, returns: 12, inflation: 6 },
+            "Home Renovation": { price: 800000, years: 3, returns: 10, inflation: 8 },
+            "New Car": { price: 1500000, years: 5, returns: 10, inflation: 5 },
+            "Car Downpayment": { price: 300000, years: 2, returns: 8, inflation: 5 },
+            "Jewelry Purchase": { price: 500000, years: 4, returns: 12, inflation: 8 },
+            "Own Wedding": { price: 2500000, years: 5, returns: 12, inflation: 8 },
+            "Sibling's Wedding": { price: 1000000, years: 4, returns: 10, inflation: 8 },
+            "Starting a Business": { price: 2000000, years: 5, returns: 12, inflation: 6 },
+            "Child's School Admission": { price: 300000, years: 3, returns: 10, inflation: 12 },
+            "Child's Yearly School Fees": { price: 200000, years: 1, returns: 7, inflation: 10 },
+            "Child's UG (India)": { price: 2500000, years: 12, returns: 12, inflation: 10 },
+            "Child's UG (Foreign)": { price: 8000000, years: 12, returns: 12, inflation: 12 },
+            "Child's PG (India)": { price: 1500000, years: 15, returns: 12, inflation: 10 },
+            "Child's PG (Foreign)": { price: 6000000, years: 15, returns: 12, inflation: 12 },
+            "My Own PG/MBA (India)": { price: 2000000, years: 4, returns: 10, inflation: 10 },
+            "My Own PG/MBA (Foreign)": { price: 5000000, years: 4, returns: 10, inflation: 12 },
+            "Local Vacation": { price: 100000, years: 1, returns: 7, inflation: 8 },
+            "Foreign Vacation": { price: 700000, years: 3, returns: 10, inflation: 10 },
+            "Health Insurance (Yearly)": { price: 25000, years: 1, returns: 7, inflation: 15 },
+            "Car Insurance (Yearly)": { price: 30000, years: 1, returns: 7, inflation: 5 },
+            "Retirement Fund": { price: 50000000, years: 25, returns: 12, inflation: 6 }
+        };
 
-    // --- PRESET LISTENER ---
-    goalNameInput.addEventListener('input', function() {
-        const selected = presets[this.value];
-        if (selected) {
-            currentPriceInput.value = selected.price;
-            currentPriceSlider.value = selected.price;
-            yearsInput.value = selected.years;
-            yearsSlider.value = selected.years;
-            returnRateInput.value = selected.returns;
-            returnRateSlider.value = selected.returns;
-            inflationInput.value = selected.inflation;
-            inflationSlider.value = selected.inflation;
-            calculateGoal(); 
+        function updateWordLabel(value, elementId) {
+            const el = getEl(elementId);
+            if (!el) return;
+            let num = parseFloat(value) || 0;
+            if (num >= 10000000) el.innerText = "₹" + (num / 10000000).toFixed(2) + " Cr";
+            else if (num >= 100000) el.innerText = "₹" + (num / 100000).toFixed(2) + " L";
+            else el.innerText = "₹" + num.toLocaleString('en-IN');
         }
-    });
 
-    // --- UTILITIES ---
-    function syncInputs(input, slider) {
-        if(!input || !slider) return;
-        input.addEventListener('input', () => { slider.value = input.value; calculateGoal(); });
-        slider.addEventListener('input', () => { input.value = slider.value; calculateGoal(); });
-    }
+        function calculate() {
+            updateWordLabel(els.price.value, 'current-price-words');
+            updateWordLabel(els.corpus.value, 'existing-corpus-words');
 
-    function updateWordLabel(value, elementId) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        let num = parseFloat(value) || 0;
-        if (num >= 10000000) {
-            el.innerText = "₹" + (num / 10000000).toFixed(2) + " Cr";
-        } else if (num >= 100000) {
-            el.innerText = "₹" + (num / 100000).toFixed(2) + " L";
-        } else {
-            el.innerText = "₹" + num.toLocaleString('en-IN');
+            const goalName = els.name.value || "this dream";
+            if (els.nudge) els.nudge.innerHTML = `Don’t just look at the numbers, start BOSS! Your <strong>${goalName}</strong> isn't getting any cheaper. :P`;
+
+            const price = parseFloat(els.price.value) || 0;
+            const years = parseFloat(els.years.value) || 0;
+            const infl = (parseFloat(els.inflation.value) || 0) / 100;
+            const corp = parseFloat(els.corpus.value) || 0;
+            const ret = (parseFloat(els.returns.value) || 0) / 100;
+            
+            const totalMonths = years * 12;
+            const futureCost = price * Math.pow(1 + infl, years);
+            const fvExisting = corp * Math.pow(1 + ret, years);
+            const gap = Math.max(0, futureCost - fvExisting);
+
+            let sip = 0;
+            if (gap > 0 && totalMonths > 0) {
+                const mRet = ret / 12;
+                if (mRet > 0) sip = (gap * mRet) / ((Math.pow(1 + mRet, totalMonths) - 1) * (1 + mRet));
+                else sip = gap / totalMonths;
+            } else if (gap > 0 && totalMonths === 0) {
+                sip = gap;
+            }
+
+            els.outCost.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
+            els.outGap.innerText = "₹" + Math.round(gap).toLocaleString('en-IN');
+            els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
         }
-    }
 
-    function autoScaleNumbers() {
-        const numbersToScale = document.querySelectorAll('.result-item strong');
-        const resultsContainer = document.querySelector('.calc-results');
-        if (!resultsContainer) return;
-        const maxAllowedWidth = resultsContainer.getBoundingClientRect().width - 40; 
-        numbersToScale.forEach(num => {
-            let maxFontSize = num.closest('.highlight') ? 32 : 24; 
-            let fontSize = maxFontSize;
-            num.style.fontSize = fontSize + 'px';
-            if (num.scrollWidth > maxAllowedWidth) {
-                while (num.scrollWidth > maxAllowedWidth && fontSize > 8) {
-                    fontSize -= 0.5;
-                    num.style.fontSize = fontSize + 'px';
-                }
+        // Event Listeners
+        const sync = (input, slider) => {
+            input.addEventListener('input', () => { slider.value = input.value; calculate(); });
+            slider.addEventListener('input', () => { input.value = slider.value; calculate(); });
+        };
+
+        sync(els.price, els.priceSlider);
+        sync(els.years, els.yearsSlider);
+        sync(els.inflation, els.inflationSlider);
+        sync(els.corpus, els.corpusSlider);
+        sync(els.returns, els.returnsSlider);
+
+        els.name.addEventListener('input', function() {
+            const s = presets[this.value];
+            if (s) {
+                els.price.value = els.priceSlider.value = s.price;
+                els.years.value = els.yearsSlider.value = s.years;
+                els.returns.value = els.returnsSlider.value = s.returns;
+                els.inflation.value = els.inflationSlider.value = s.inflation;
+                calculate();
             }
         });
+
+        calculate();
+    };
+
+    // Run on load and on Turbo-load (for Jekyll themes)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
-
-    // --- CORE MATH ---
-    function calculateGoal() {
-        // 1. Update Word Labels (Lakh/Crore)
-        updateWordLabel(currentPriceInput.value, 'current-price-words');
-        updateWordLabel(existingCorpusInput.value, 'existing-corpus-words');
-
-        // 2. Robust Nudge Logic
-        const goalName = goalNameInput.value || "this dream";
-        const nudgeElement = document.getElementById('goal-nudge'); // Better to use an ID
-        if (nudgeElement) {
-            nudgeElement.innerHTML = `Don’t just look at the numbers, start BOSS! Your <strong>${goalName}</strong> isn't getting any cheaper. :P`;
-        }
-
-        // 3. Calculation Constants
-        const currentPrice = parseFloat(currentPriceInput.value) || 0;
-        const years = parseFloat(yearsInput.value) || 0;
-        const inflation = (parseFloat(inflationInput.value) || 0) / 100;
-        const existingCorpus = parseFloat(existingCorpusInput.value) || 0;
-        const annualReturn = (parseFloat(returnRateInput.value) || 0) / 100;
-        
-        const monthlyReturn = annualReturn / 12;
-        const totalMonths = Math.max(0, years * 12);
-
-        // 4. Future Cost & Gap Math
-        const futureCost = currentPrice * Math.pow(1 + inflation, years);
-        const fvExisting = existingCorpus * Math.pow(1 + annualReturn, years);
-        const gap = Math.max(0, futureCost - fvExisting);
-
-        // 5. SIP Calculation (Handling 0 months or 0 gap)
-        let requiredSIP = 0;
-        if (gap > 0) {
-            if (totalMonths > 0) {
-                if (monthlyReturn > 0) {
-                    // Standard SIP formula
-                    requiredSIP = (gap * monthlyReturn) / ((Math.pow(1 + monthlyReturn, totalMonths) - 1) * (1 + monthlyReturn));
-                } else {
-                    requiredSIP = gap / totalMonths;
-                }
-            } else {
-                // If years is 0, you need the full gap amount immediately (not really a monthly SIP)
-                requiredSIP = gap; 
-            }
-        }
-
-        // 6. Final Display Formatting
-        futureCostDisplay.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
-        corpusGapDisplay.innerText = "₹" + Math.round(gap).toLocaleString('en-IN');
-        requiredSIPDisplay.innerText = "₹" + Math.round(requiredSIP).toLocaleString('en-IN');
-
-        autoScaleNumbers();
-    }
-
-    // Initialize Sync
-    syncInputs(currentPriceInput, currentPriceSlider);
-    syncInputs(yearsInput, yearsSlider);
-    syncInputs(inflationInput, inflationSlider);
-    syncInputs(existingCorpusInput, existingCorpusSlider);
-    syncInputs(returnRateInput, returnRateSlider);
-
-    calculateGoal();
-    window.addEventListener('resize', autoScaleNumbers);
-});
+    document.addEventListener("turbo:load", init);
+})();
