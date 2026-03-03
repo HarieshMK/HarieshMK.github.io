@@ -17,13 +17,14 @@ permalink: /calculators/goal-planner/
       </div>
     </div>
 
-    <div class="input-group">
-      <div class="label-row">
-        <label>Current Price (Today)</label>
-        <input type="number" id="current-price" value="5000000">
-      </div>
-      <input type="range" id="current-price-slider" class="slider" min="100000" max="100000000" step="100000" value="5000000">
-    </div>
+<div class="input-group">
+  <div class="label-row">
+    <label>Current Price (Today)</label>
+    <span id="current-price-words" class="word-preview">₹0</span>
+    <input type="number" id="current-price" value="5000000">
+  </div>
+  <input type="range" id="current-price-slider" class="slider" min="100000" max="100000000" step="100000" value="5000000">
+</div>
 
     <div class="input-group">
       <div class="label-row">
@@ -41,13 +42,14 @@ permalink: /calculators/goal-planner/
       <input type="range" id="goal-inflation-slider" class="slider" min="0" max="15" step="0.5" value="6">
     </div>
 
-    <div class="input-group">
-      <div class="label-row">
-        <label>Existing Corpus (Savings)</label>
-        <input type="number" id="existing-corpus" value="500000">
-      </div>
-      <input type="range" id="existing-corpus-slider" class="slider" min="0" max="10000000" step="50000" value="500000">
-    </div>
+<div class="input-group">
+  <div class="label-row">
+    <label>Existing Corpus (Savings)</label>
+    <span id="existing-corpus-words" class="word-preview">₹0</span>
+    <input type="number" id="existing-corpus" value="500000">
+  </div>
+  <input type="range" id="existing-corpus-slider" class="slider" min="0" max="10000000" step="50000" value="500000">
+</div>
 
     <div class="input-group">
       <div class="label-row">
