@@ -10,36 +10,36 @@ permalink: /calculators/goal-planner/
 <div class="calculator-container">
   <div class="calc-inputs">
     
-    <div class="input-group">
-      <div class="label-row">
-        <label>What are we planning for?</label>
-        <input type="text" id="goal-name" list="goal-presets" placeholder="Select or type your dream..." style="width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; font-weight: 600; background: #fff;">
-        <datalist id="goal-presets">
-          <option value="Dream House">
-          <option value="House Downpayment">
-          <option value="Home Renovation">
-          <option value="New Car">
-          <option value="Car Downpayment">
-          <option value="Jewelry Purchase">
-          <option value="Own Wedding">
-          <option value="Sibling's Wedding">
-          <option value="Starting a Business">
-          <option value="Child's School Admission">
-          <option value="Child's Yearly School Fees">
-          <option value="Child's UG (India)">
-          <option value="Child's UG (Foreign)">
-          <option value="Child's PG (India)">
-          <option value="Child's PG (Foreign)">
-          <option value="My Own PG/MBA (India)">
-          <option value="My Own PG/MBA (Foreign)">
-          <option value="Local Vacation">
-          <option value="Foreign Vacation">
-          <option value="Health Insurance (Yearly)">
-          <option value="Car Insurance (Yearly)">
-          <option value="Retirement Fund">
-        </datalist>
-      </div>
-    </div>
+    <div class="input-group preset-group"> 
+  <div class="label-row">
+    <label>What are we planning for?</label>
+    <input type="text" id="goal-name" list="goal-presets" placeholder="Select or type your dream..." style="width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; font-weight: 600; background: #fff;">
+    <datalist id="goal-presets">
+      <option value="Dream House">
+      <option value="House Downpayment">
+      <option value="Home Renovation">
+      <option value="New Car">
+      <option value="Car Downpayment">
+      <option value="Jewelry Purchase">
+      <option value="Own Wedding">
+      <option value="Sibling's Wedding">
+      <option value="Starting a Business">
+      <option value="Child's School Admission">
+      <option value="Child's Yearly School Fees">
+      <option value="Child's UG (India)">
+      <option value="Child's UG (Foreign)">
+      <option value="Child's PG (India)">
+      <option value="Child's PG (Foreign)">
+      <option value="My Own PG/MBA (India)">
+      <option value="My Own PG/MBA (Foreign)">
+      <option value="Local Vacation">
+      <option value="Foreign Vacation">
+      <option value="Health Insurance (Yearly)">
+      <option value="Car Insurance (Yearly)">
+      <option value="Retirement Fund">
+    </datalist>
+  </div>
+</div>
 
     <div class="input-group">
       <div class="label-row">
