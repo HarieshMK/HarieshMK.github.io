@@ -8,7 +8,7 @@ permalink: /calculators/goal-planner/
 
 *Tell us what your dream costs today. We’ll calculate exactly what you need to save from today to own it tomorrow.*
 
-
+<div markdown="0">
 <div class="calculator-container">
   <div class="calc-inputs">
     
@@ -110,14 +110,15 @@ permalink: /calculators/goal-planner/
       </p>
       <hr style="margin: 15px 0; border: 0; border-top: 1px dashed rgba(146, 64, 14, 0.3);">
       <p style="font-size: 0.7rem; opacity: 0.8; font-style: italic;">
-        <strong>Disclaimer:</strong> Markets are moody and inflation is a thief. These numbers are projections, so consider this as a guide not a GOD.
+        <strong>Disclaimer:</strong> Markets are moody and inflation is a thief. These numbers are projections.
       </p>
     </div>
   </div>
+</div>
 </div>
 
 <div class="back-to-blogs-container">
   <a href="/calculators/" class="back-link">← Back to All Calculators</a>
 </div>
 
-<script src="/assets/js/goal-planner.js?v=999"></script>
+<script src="/assets/js/goal-planner.js?v={{ site.time | date: '%s' }}"></script>
