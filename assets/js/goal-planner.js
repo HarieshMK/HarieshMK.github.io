@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "Own Wedding": { price: 2500000, years: 5, returns: 12, inflation: 8 },
         "Sibling's Wedding": { price: 1000000, years: 4, returns: 10, inflation: 8 },
         "Starting a Business": { price: 2000000, years: 5, returns: 12, inflation: 6 },
-        "School Admission": { price: 300000, years: 3, returns: 10, inflation: 12 },
+        "Child's School Admission": { price: 300000, years: 3, returns: 10, inflation: 12 },
         "Child's Yearly School Fees": { price: 200000, years: 1, returns: 7, inflation: 10 },
         "Child's UG (India)": { price: 2500000, years: 12, returns: 12, inflation: 10 },
         "Child's UG (Foreign)": { price: 8000000, years: 12, returns: 12, inflation: 12 },
