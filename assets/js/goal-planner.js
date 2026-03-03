@@ -1,3 +1,4 @@
+console.log("PLANNER LOADED");
 // goal-planner.js
 (function() {
     const init = function() {
