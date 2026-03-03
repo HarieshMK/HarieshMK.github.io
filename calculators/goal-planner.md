@@ -8,16 +8,16 @@ permalink: /calculators/goal-planner/
 <div class="calculator-container">
     <div class="calc-inputs">
         <div class="input-group">
-            <label>Choose your Goal</label>
-            <select id="goal-name" class="full-width">
-                <option value="" disabled selected>Select a goal...</option>
-                <option value="Dream House">Dream House 🏠</option>
-                <option value="New Car">New Car 🚗</option>
-                <option value="Child Education">Child Education 🎓</option>
-                <option value="Foreign Vacation">Foreign Vacation ✈️</option>
-                <option value="Retirement">Retirement Fund 🏝️</option>
-            </select>
-        </div>
+            <label>What are you planning for?</label>
+            <input type="text" id="goal-name" list="goal-presets" placeholder="Select or type a goal...">
+                <datalist id="goal-presets">
+                <option value="Dream House">
+                <option value="New Car">
+                <option value="Child Education">
+                <option value="Foreign Vacation">
+                <option value="Retirement Fund">
+                </datalist>
+</div>
 
         <div class="input-group">
             <label>Current Cost Today (₹)</label>
