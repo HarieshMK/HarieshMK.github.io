@@ -646,11 +646,11 @@ img {
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
 
-/* ===== 15. CALCULATOR INTERFACE (ADJUSTABLE PRESET) ===== */
+/* ===== 15. CALCULATOR INTERFACE (UNIFIED) ===== */
 .calculator-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
   background: #ffffff;
   padding: 40px;
   border-radius: 24px;
@@ -658,250 +658,141 @@ img {
   margin-top: 20px;
   align-items: start;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
-/* --- Input Section --- */
-.calc-inputs { width: 100%;                   /* Ensures inputs fill the left column */
+/* Ensure Left & Right sides take proper space */
+.calc-inputs { 
+  flex: 1.2; 
+  min-width: 300px; 
 }
 
-.input-group {  margin-bottom: 28px;           /* Vertical space between each slider/input set */
+.calc-results {
+  flex: 1;
+  min-width: 300px;
+  background: #f8fafc;
+  padding: 25px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
-.label-row { 
-  display: flex; 
-  justify-content: space-between; /* Pushes text to left and number-box to right */
-  align-items: center; 
-  margin-bottom: 15px;           /* Vertical space between the label text and the slider bar */
+/* --- Input Group Styling --- */
+.input-group { margin-bottom: 25px; }
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  width: 100%;
 }
 
 .label-row label {
-  font-weight: 700;              /* Thickness of the label font */
-  color: #1e293b;                /* Text color */
-  font-size: 0.95rem;            /* Text size */
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.95rem;
 }
 
 .label-row input[type="number"] {
-  width: 140px;                  /* Horizontal width of the number box */
-  padding: 10px 14px;            /* Internal padding inside the number box (Top/Bottom Left/Right) */
-  border: 2px solid #f1f5f9;     /* Border around the number box */
-  border-radius: 10px;           /* Roundness of the number box */
-  font-weight: 700; 
-  color: #0369a1; 
-  font-size: 1.1rem; 
-  font-family: 'JetBrains Mono', monospace; 
-  background: #f8fafc;
+  width: 120px;
+  padding: 8px 12px;
+  border: 2px solid #f1f5f9;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #0369a1;
+  font-family: 'JetBrains Mono', monospace;
+  background: #fff;
 }
 
-/* Slider Bar Styling */
+/* --- Word Preview Badge --- */
+.word-preview {
+  font-size: 0.75rem;
+  color: #0ea5e9;
+  font-weight: 700;
+  background: rgba(14, 165, 233, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+/* --- Sliders --- */
 .slider {
   -webkit-appearance: none;
-  width: 100%; 
-  height: 6px;                   /* Thickness of the slider track line */
-  background: #e2e8f0; 
-  border-radius: 10px; 
-  margin: 10px 0;                /* Vertical margin around the slider bar */
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  outline: none;
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 20px;                   /* Diameter of the slider handle circle */
-  height: 20px;                  /* Diameter of the slider handle circle */
-  background: #0ea5e9; 
-  border-radius: 50%;            /* Makes the handle a perfect circle */
-  border: 3px solid #fff;        /* White ring around the handle */
+  width: 22px;
+  height: 22px;
+  background: #0ea5e9;
+  border-radius: 50%;
+  border: 3px solid #fff;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* --- Results Column --- */
-.calc-results {
-  background: #f8fafc;
-  padding: 20px 15px;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden; /* Clips any overflow that the JS missed */
-}
-
+/* --- Results Styling --- */
 .input-header {
-  font-size: 1rem;             /* Header text size (e.g., FUTURE PROJECTION) */
-  font-weight: 800; 
-  text-transform: uppercase; 
-  letter-spacing: 0.12em;        /* Space between letters in header */
-  color: #94a3b8; 
-  margin-bottom: 10px;           /* Vertical space after the header */
-  border-bottom: 1px solid #e2e8f0; /* Underline below the header */
-  padding-bottom: 2px;           /* Gap between header text and its underline */
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 5px;
 }
 
 .result-item {
   display: flex;
   flex-direction: column;
-  align-items: center;    /* Center the number horizontally */
-  padding: 12px 0;        /* Consistent vertical spacing */
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  width: 100%;            /* Ensure it takes full width of calc-results */
-  box-sizing: border-box;
-  overflow: visible;      /* Changed to visible so digits aren't clipped during scaling */
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
 }
 
-.result-item span { 
-  color: #64748b; 
-  font-size: 0.8rem;             /* Result label size (e.g., "Total Invested") */
-  font-weight: 600; 
-  margin-bottom: 6px;            /* Vertical gap between label and the actual amount */
-}
+.result-item span { color: #64748b; font-size: 0.85rem; margin-bottom: 5px; }
 
 .result-item strong {
-  display: inline-block;  /* Essential for JS to measure pixel width */
-  width: auto;            /* Allow it to be its true size for measurement */
-  max-width: 100%;        /* Constrain to parent width */
+  font-size: 1.5rem;
   color: #0f172a;
   font-family: 'JetBrains Mono', monospace;
-  white-space: nowrap;    /* Keep on one line */
-  overflow: visible;      /* Prevent the browser from clipping the last digit */
-  line-height: 1.1;       /* Tighter line height for better vertical centering */
-  text-align: center;
-  /* Remove fixed font-size here so JS takes full control */
 }
-
-/* --- Target Portfolio Card (The Blue Box) Fixes --- */
 
 .result-item.highlight {
-  margin: 15px 0;
-  padding: 15px 4px !important;     /* Reduced side padding to 10px for more number room */
   background: #0c4a6e;
-  border-radius: 10px;
+  padding: 20px;
+  border-radius: 15px;
+  margin: 15px 0;
   border: none;
-  width: 100%;            /* Force it to fill the column */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: visible !important;
 }
 
-.result-item.highlight span { 
-  color: #bae6fd; 
-  font-weight: 700;
-  margin-bottom: 8px;
-}
+.result-item.highlight span { color: #bae6fd; }
+.result-item.highlight strong { color: #ffffff !important; font-size: 2rem; }
 
-.result-item.highlight strong { 
-color: #ffffff !important;
-    display: inline-block !important;
-    max-width: 100% !important;
-    /* Ensure the browser doesn't clip the right edge of the font */
-    overflow: visible !important; 
-    white-space: nowrap !important;
-}
-/* Remove border from the last item to keep it clean */
-.calc-results .result-item:last-child {
-  border-bottom: none;
-}
-
-/* Disclaimer Box */
+/* --- Disclaimer & Nudge --- */
 .calc-disclaimer {
-  margin-top: 35px;              /* Space between the last input and the disclaimer box */
-  padding: 18px;                 /* Internal padding inside the yellow box */
-  background: #fffbeb; 
-  border-radius: 14px; 
-  border-left: 5px solid #f59e0b; /* Thick accent bar on the left */
+  margin-top: 20px;
+  padding: 20px;
+  background: #fffbeb;
+  border-radius: 14px;
+  border-left: 5px solid #f59e0b;
 }
 
-.calc-disclaimer p {
-  font-size: 0.75rem; 
-  color: #92400e; 
-  line-height: 1.6;              /* Space between lines of text */
-  margin: 0;
-}
+.calc-disclaimer p { font-size: 0.8rem; color: #92400e; margin-bottom: 10px; line-height: 1.5; }
 
-/* --- Dark Mode Optimizations --- */
+/* --- Dark Mode --- */
 .dark-theme .calculator-container { background: #0f172a; border-color: #1e293b; }
-.dark-theme .calc-results { background: #1e293b; } /* Results background in dark mode */
+.dark-theme .calc-results { background: #1e293b; }
 .dark-theme .label-row label { color: #f1f5f9; }
-.dark-theme .result-item span { color: #94a3b8; }
-.dark-theme .result-item strong { color: #f8fafc !important; }
 .dark-theme .label-row input[type="number"] { background: #020617; border-color: #334155; color: #38bdf8; }
-
-/* ===== 16. GOAL PLANNER SPECIFIC POLISH ===== */
-
-/* Word Preview Badge (Lakh/Crore) */
-.word-preview {
-  font-size: 0.75rem;
-  color: #0ea5e9;           /* Sky blue to match your sliders */
-  font-weight: 700;
-  background: rgba(14, 165, 233, 0.1); /* Soft blue glow */
-  padding: 4px 10px;
-  border-radius: 8px;
-  margin-left: auto;        /* Pushes it to the right, next to the input box */
-  margin-right: 12px;       /* Gap between word and number box */
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-/* Ensure the label row handles three items (Label, Word, Input) cleanly */
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-/* Dark Mode adjustment for the word badge */
-.dark-theme .word-preview {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-}
-
-/* Mobile Fix for Word Previews */
-@media (max-width: 480px) {
-  .label-row {
-    flex-wrap: wrap; /* Allows the badge to drop to a new line if needed */
-  }
-  .word-preview {
-    margin: 5px 0;
-    order: 3; /* Places it below the label and input on very small screens */
-  }
-}
-/* Specific layout fix ONLY for Goal Planner */
-.calculator-container:has(.preset-group) {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 30px !important;
-    align-items: flex-start !important;
-}
-
-/* Ensure the input side doesn't squash the results on Goal Planner */
-.calculator-container:has(.preset-group) .calc-inputs {
-    flex: 1.2 !important;
-    min-width: 320px !important;
-}
-
-.calculator-container:has(.preset-group) .calc-results {
-    flex: 1 !important;
-    min-width: 320px !important;
-    height: auto !important;
-}
-
-/* Fix for the Goal Name box spacing */
-.preset-group {
-    margin-bottom: 35px !important;
-}
-
-.preset-group .label-row {
-    margin-bottom: 0 !important;
-}
-
-/* Ensure the datalist input looks premium */
-#goal-name {
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-    transition: border-color 0.2s ease;
-}
-
-#goal-name:focus {
-    border-color: #38bdf8 !important;
-    outline: none;
-}
+.dark-theme .result-item strong { color: #ffffff !important; }
+.dark-theme .word-preview { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
