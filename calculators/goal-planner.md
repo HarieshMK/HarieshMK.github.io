@@ -8,21 +8,22 @@ permalink: /calculators/goal-planner/
 <div class="calculator-container">
     <div class="calc-inputs">
         <div class="input-group">
-            <label>What are you planning for?</label>
-            <input type="text" id="goal-name" list="goal-presets" placeholder="Select or type a goal...">
-                <datalist id="goal-presets">
-                <option value="Dream House">
-                <option value="New Car">
-                <option value="Child Education">
-                <option value="Foreign Vacation">
-                <option value="Retirement Fund">
-                </datalist>
-</div>
+            <label>What are we planning for?</label>
+            <select id="goal-name" class="full-width-input">
+                <option value="" disabled selected>Select a goal...</option>
+                <option value="Dream House">Dream House 🏠</option>
+                <option value="New Car">New Car 🚗</option>
+                <option value="Child Education">Child Education 🎓</option>
+                <option value="Foreign Vacation">Foreign Vacation ✈️</option>
+                <option value="Retirement Fund">Retirement Fund 🏝️</option>
+                <option value="Custom">Other / Custom Goal 🚀</option>
+            </select>
+        </div>
 
         <div class="input-group">
             <label>Current Cost Today (₹)</label>
             <input type="number" id="current-price" value="500000">
-            <input type="range" id="current-price-slider" class="slider" min="100000" max="10000000" step="50000" value="500000">
+            <input type="range" id="current-price-slider" class="slider" min="100000" max="100000000" step="50000" value="500000">
         </div>
 
         <div class="input-group">
@@ -54,24 +55,23 @@ permalink: /calculators/goal-planner/
             <h2 id="required-sip">₹0</h2>
         </div>
         <div class="nudge-container">
-            <p id="goal-nudge">Select a goal to see your personalized plan!</p>
+            <p id="goal-nudge">Select a goal to see your plan!</p>
         </div>
     </div>
 </div>
 </div>
 
 <style>
-    .calculator-container { display: flex; flex-wrap: wrap; gap: 40px; margin: 20px 0; font-family: sans-serif; }
+    .calculator-container { display: flex; flex-wrap: wrap; gap: 40px; margin: 20px 0; }
     .calc-inputs { flex: 1.5; min-width: 300px; }
-    .calc-results { flex: 1; min-width: 300px; background: #f0f7ff; padding: 25px; border-radius: 15px; height: fit-content; }
+    .calc-results { flex: 1; min-width: 300px; background: #f0f7ff; padding: 25px; border-radius: 15px; }
     .input-group { margin-bottom: 22px; }
-    .input-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #334155; }
-    .full-width, input[type="number"] { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
-    .slider { width: 100%; margin-top: 12px; cursor: pointer; }
-    .result-box { margin-bottom: 20px; border-bottom: 1px solid #d1d5db; padding-bottom: 10px; }
+    .input-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+    .full-width-input, input[type="number"] { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
+    .slider { width: 100%; margin-top: 12px; }
+    .result-box { margin-bottom: 20px; }
     .result-box.highlight { background: #fff; padding: 15px; border-radius: 10px; border: 2px solid #3b82f6; }
-    .result-box h2 { margin: 5px 0; color: #1e293b; }
-    .nudge-container { margin-top: 20px; font-weight: 700; color: #1d4ed8; font-style: italic; }
+    .nudge-container { margin-top: 20px; font-weight: 700; color: #1d4ed8; }
 </style>
 
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
