@@ -51,7 +51,7 @@ permalink: /calculators/goal-planner/
         <div class="input-group">
             <label>Current Cost Today (₹)</label>
             <input type="number" id="current-price" value="500000">
-            <input type="range" id="current-price-slider" class="slider" min="100000" max="100000000" step="50000" value="500000">
+            <input type="range" id="current-price-slider" class="slider" min="100000" max="10000000" step="50000" value="500000">
         </div>
 
         <div class="input-group">
