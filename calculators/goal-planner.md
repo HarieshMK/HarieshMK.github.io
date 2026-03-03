@@ -121,4 +121,4 @@ permalink: /calculators/goal-planner/
   <a href="/calculators/" class="back-link">← Back to All Calculators</a>
 </div>
 
-<script src="/assets/js/goal-planner.js?v={{ site.time | date: '%s' }}"></script>
+<script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
