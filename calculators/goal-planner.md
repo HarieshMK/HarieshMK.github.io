@@ -48,11 +48,14 @@ permalink: /calculators/goal-planner/
         </optgroup>
     </select>
 </div>
-        <div class="input-group">
-            <label>Current Cost Today (₹)</label>
-            <input type="number" id="current-price" value="500000">
-            <input type="range" id="current-price-slider" class="slider" min="10000" max="10000000" step="5000" value="500000">
-        </div>
+<div class="input-group">
+    <label>
+        Current Cost Today (₹) 
+        <span id="current-price-text" style="color: #3b82f6; font-weight: bold; margin-left: 10px;"></span>
+    </label>
+    <input type="number" id="current-price" value="500000">
+    <input type="range" id="current-price-slider" class="slider" min="10000" max="100000000" step="5000" value="500000">
+</div>
 
         <div class="input-group">
             <label>Years to Goal</label>
