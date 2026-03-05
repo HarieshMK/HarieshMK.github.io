@@ -63,17 +63,17 @@ permalink: /calculators/goal-planner/
         </div>
 
         <div class="input-group">
-            <label>Years to Goal: <span id="years-val">5</span></label>
+            <label>Years to Goal: <span id="years-val">5</span> Years</label>
             <input type="range" id="goal-years-slider" class="slider" min="1" max="40" value="5">
         </div>
 
         <div class="input-group">
-            <label>Inflation (% p.a.): <span id="infl-val">6</span>%</label>
+            <label>Inflation: <span id="infl-val">6</span>% p.a.</label>
             <input type="range" id="goal-inflation-slider" class="slider" min="1" max="15" step="0.5" value="6">
         </div>
 
         <div class="input-group">
-            <label>Expected SIP Returns (% p.a.): <span id="ret-val">12</span>%</label>
+            <label>Expected SIP Returns: <span id="ret-val">12</span>% p.a.</label>
             <input type="range" id="goal-returns-slider" class="slider" min="1" max="25" step="0.5" value="12">
         </div>
     </div>
@@ -95,18 +95,19 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    .calculator-container { display: flex; flex-wrap: wrap; gap: 30px; margin: 20px 0; font-family: sans-serif; }
+    .calculator-container { display: flex; flex-wrap: wrap; gap: 30px; margin: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .calc-inputs { flex: 1.2; min-width: 300px; }
-    .calc-results { flex: 1; min-width: 300px; background: #f1f5f9; padding: 25px; border-radius: 15px; height: fit-content; position: sticky; top: 20px;}
-    .input-group { margin-bottom: 20px; }
-    .input-group label { display: block; font-weight: bold; margin-bottom: 8px; }
-    .human-readable { color: #2563eb; margin-left: 5px; font-weight: normal; font-size: 0.9em; }
-    .full-width-input, input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-    .slider { width: 100%; margin-top: 10px; cursor: pointer; }
-    .result-box { margin-bottom: 20px; }
-    .result-box .label { font-size: 0.9rem; color: #64748b; }
-    .result-box h2 { margin: 5px 0; color: #1e293b; }
-    .highlight { border: 2px solid #2563eb; background: #fff; padding: 15px; border-radius: 10px; }
+    .calc-results { flex: 1; min-width: 300px; background: #f1f5f9; padding: 25px; border-radius: 15px; height: fit-content; position: sticky; top: 20px; border: 1px solid #e2e8f0; }
+    .input-group { margin-bottom: 22px; }
+    .input-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #334155; }
+    .human-readable { color: #2563eb; margin-left: 5px; font-weight: bold; }
+    .full-width-input, input[type="number"] { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
+    .slider { width: 100%; margin-top: 10px; cursor: pointer; accent-color: #2563eb; }
+    .result-box .label { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .result-box h2 { margin: 8px 0; color: #0f172a; font-size: 2rem; }
+    .highlight { background: #fff; border: 2px solid #2563eb; padding: 20px; border-radius: 12px; }
     .highlight h2 { color: #2563eb; }
-    .nudge-container { margin-top: 15px; font-weight: bold; color: #1e40af; }
+    .nudge-container { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; font-weight: 500; color: #1e40af; font-style: italic; }
 </style>
+
+<script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
