@@ -2,138 +2,140 @@
     const init = function() {
         const getEl = (id) => document.getElementById(id);
         
+        // 1. Mapped all elements (Dates, Numbers, Sliders)
         const els = {
             goal: getEl('goal-name'),
+            startD: getEl('start-date'),
+            targetD: getEl('target-date'),
             price: getEl('current-price'),
-            priceSlider: getEl('current-price-slider'),
+            priceS: getEl('current-price-slider'),
             corpus: getEl('existing-corpus'),
-            corpusSlider: getEl('existing-corpus-slider'),
-            corpusRetSlider: getEl('corpus-returns-slider'),
-            yearsSlider: getEl('goal-years-slider'),
-            inflSlider: getEl('goal-inflation-slider'),
-            retSlider: getEl('goal-returns-slider'),
+            corpusS: getEl('existing-corpus-slider'),
+            corpRet: getEl('corpus-returns'),
+            corpRetS: getEl('corpus-returns-slider'),
+            sipRet: getEl('goal-returns'),
+            sipRetS: getEl('goal-returns-slider'),
+            infl: getEl('goal-inflation'),
+            inflS: getEl('goal-inflation-slider'),
+            // Outputs
             outCost: getEl('future-cost'),
             outSIP: getEl('required-sip'),
             nudge: getEl('goal-nudge'),
-            priceText: getEl('current-price-text'),
-            corpusText: getEl('existing-corpus-text'),
-            yVal: getEl('years-val'),
-            iVal: getEl('infl-val'),
-            rVal: getEl('ret-val'),
-            crVal: getEl('corpus-ret-val'),
-            riskLabel: getEl('risk-label')
+            deadlineD: getEl('deadline-date'),
+            timeLeft: getEl('time-left'),
+            totalDur: getEl('total-duration'),
+            riskL: getEl('risk-label')
         };
 
-        const formatIndianWords = (num) => {
+        // Initialize Dates (Start: Today, Target: Today + 5 years)
+        const today = new Date();
+        const defaultFuture = new Date();
+        defaultFuture.setFullYear(today.getFullYear() + 5);
+        if(els.startD) els.startD.value = today.toISOString().split('T')[0];
+        if(els.targetD) els.targetD.value = defaultFuture.toISOString().split('T')[0];
+
+        const formatIndian = (num) => {
             if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
             if (num >= 100000) return (num / 100000).toFixed(2) + " L";
-            // Indian Comma system for everything else
             return Math.round(num).toLocaleString('en-IN');
         };
 
-        const getAutoReturn = (years) => {
-            if (years < 4) return { rate: 6, label: "(Low Risk)" };
-            if (years <= 7) return { rate: 8, label: "(Moderate)" };
-            return { rate: 10, label: "(Aggressive)" };
-        };
-
         const config = {
-            "Own Wedding": { p: 1500000, y: 5, i: 8, r: 10, m: "Your big day, funded by smart decisions. 💍" },
-            "Siblings Wedding": { p: 500000, y: 3, i: 8, r: 9, m: "Celebrate their happiness stress-free. 🥂" },
-            "Emergency Fund": { p: 600000, y: 2, i: 6, r: 7, m: "Your financial shock-absorber. 🛡️" },
-            "Jewelry Purchase": { p: 300000, y: 2, i: 10, r: 7, m: "Beat the gold price hike! ✨" },
-            "Home Renovation": { p: 1000000, y: 4, i: 7, r: 10, m: "Modernize your sanctuary. 🔨" },
-            "Home Appliances": { p: 200000, y: 2, i: 5, r: 8, m: "Smart gadgets for a smart home. 📺" },
-            "School Admission": { p: 300000, y: 3, i: 12, r: 8, m: "Education inflation is high! 🏫" },
-            "Yearly School Fees": { p: 150000, y: 1, i: 10, r: 6, m: "Peace of mind for the year. 📚" },
-            "Child UG India": { p: 2500000, y: 15, i: 10, r: 12, m: "Quality education foundation. 🎓" },
-            "Child UG Foreign": { p: 8000000, y: 15, i: 12, r: 12, m: "Global dreams need capital. 🌍" },
-            "Child PG India": { p: 2000000, y: 18, i: 10, r: 12, m: "Specialization funded today. 🏛️" },
-            "Child PG Foreign": { p: 6000000, y: 18, i: 12, r: 12, m: "Fly high with a global degree. ✈️" },
-            "My Own PG": { p: 2500000, y: 3, i: 10, r: 11, m: "Invest in yourself. 📖" },
-            "Dream House": { p: 10000000, y: 15, i: 7, r: 12, m: "Your dream home is calling. 🏰" },
-            "House Downpayment": { p: 2000000, y: 5, i: 7, r: 12, m: "Skip the heavy interest. 💰" },
-            "New Car": { p: 1200000, y: 5, i: 5, r: 10, m: "Drive home your dream ride. 🚗" },
-            "Car Downpayment": { p: 400000, y: 3, i: 5, r: 9, m: "Save the downpayment, BOSS style. 🏎️" },
-            "Business Start": { p: 2000000, y: 5, i: 8, r: 12, m: "Be your own BOSS. 💼" },
-            "Retirement Fund": { p: 10000000, y: 25, i: 6, r: 12, m: "Retire like a King/Queen. 🏝️" },
-            "Health Insurance": { p: 30000, y: 1, i: 15, r: 6, m: "Health is wealth. 🏥" },
-            "Car Insurance": { p: 20000, y: 1, i: 5, r: 6, m: "Stay covered. 🚗" },
-            "Local Vacation": { p: 100000, y: 1, i: 8, r: 7, m: "Refresh and recharge. 🏔️" },
-            "Foreign Vacation": { p: 700000, y: 2, i: 10, r: 8, m: "Stamp that passport! 🗽" }
+            "Own Wedding": { p: 1500000, r: 10, i: 8, m: "Your big day, funded by smart decisions. 💍" },
+            "Retirement Fund": { p: 10000000, r: 12, i: 6, m: "Retire like a King/Queen. 🏝️" },
+            "Child UG India": { p: 2500000, r: 12, i: 10, m: "Quality education foundation. 🎓" }
+            // ... add others as needed
         };
 
-        function calculate(isManualCorpusReturn = false) {
-            // Safety Check: if elements are missing, don't crash the script
-            if (!els.price || !els.yearsSlider || !els.inflSlider || !els.retSlider) return;
+        function calculate(isManualCorpRet = false) {
+            if (!els.startD || !els.targetD || !els.price) return;
 
+            const d1 = new Date(els.startD.value);
+            const d2 = new Date(els.targetD.value);
+            const now = new Date();
+
+            // 1. Time Calculations
+            let totalYears = (d2 - d1) / (1000 * 60 * 60 * 24 * 365.25);
+            totalYears = Math.max(0.1, totalYears);
+
+            let remainingMs = d2 - now;
+            let daysLeft = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+            let yearsRemaining = Math.max(0.08, daysLeft / 365.25); // Min 1 month
+
+            // 2. Countdown UI
+            if (els.deadlineD) {
+                els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { month: 'short', year: 'numeric', day: 'numeric' });
+                if (daysLeft > 0) {
+                    const monthsLeft = Math.floor(daysLeft / 30.44);
+                    const remDays = daysLeft % 30;
+                    els.timeLeft.innerText = `${monthsLeft} Months, ${remDays} Days left`;
+                    els.totalDur.innerText = `Total Journey: ${totalYears.toFixed(1)} Years`;
+                } else {
+                    els.timeLeft.innerText = "Goal Date Reached! 🏁";
+                }
+            }
+
+            // 3. Financial Inputs
             const p = parseFloat(els.price.value) || 0;
             const existing = parseFloat(els.corpus.value) || 0;
-            const y = parseFloat(els.yearsSlider.value) || 0;
-            const i = (parseFloat(els.inflSlider.value) || 0) / 100;
-            const r = (parseFloat(els.retSlider.value) || 0) / 100;
+            const inflation = (parseFloat(els.infl.value) || 0) / 100;
+            const rSIP = (parseFloat(els.sipRet.value) || 0) / 100;
 
-            // Handle Dynamic Corpus Returns
-            if (!isManualCorpusReturn) {
-                const suggested = getAutoReturn(y);
-                if (els.corpusRetSlider) els.corpusRetSlider.value = suggested.rate;
-                if (els.riskLabel) els.riskLabel.innerText = suggested.label;
+            // Auto-adjust Corpus Return based on time remaining
+            if (!isManualCorpRet) {
+                let rate = 10; let label = "(Aggressive)";
+                if (yearsRemaining < 4) { rate = 6; label = "(Safe)"; }
+                else if (yearsRemaining <= 7) { rate = 8; label = "(Moderate)"; }
+                els.corpRet.value = els.corpRetS.value = rate;
+                if(els.riskL) els.riskL.innerText = label;
             }
-            const cr = (parseFloat(els.corpusRetSlider.value) || 0) / 100;
+            const rCorp = (parseFloat(els.corpRet.value) || 0) / 100;
 
-            // Update Labels
-            if(els.priceText) els.priceText.innerText = "(" + formatIndianWords(p) + ")";
-            if(els.corpusText) els.corpusText.innerText = "(" + formatIndianWords(existing) + ")";
-            if(els.yVal) els.yVal.innerText = y;
-            if(els.iVal) els.iVal.innerText = (i * 100).toFixed(1);
-            if(els.rVal) els.rVal.innerText = (r * 100).toFixed(1);
-            if(els.crVal) els.crVal.innerText = (cr * 100).toFixed(1);
+            // 4. THE MATH
+            const futureCost = p * Math.pow(1 + inflation, totalYears);
+            const grownSavings = existing * Math.pow(1 + rCorp, totalYears);
+            const gap = Math.max(0, futureCost - grownSavings);
 
-            // Math
-            const futureCost = p * Math.pow(1 + i, y);
-            const futureCorpusValue = existing * Math.pow(1 + cr, y);
-            const netGap = Math.max(0, futureCost - futureCorpusValue);
-
-            const months = y * 12;
-            const monthlyRate = r / 12;
+            const mRate = rSIP / 12;
+            const monthsRemaining = yearsRemaining * 12;
             let sip = 0;
 
-            if (netGap > 0 && months > 0 && monthlyRate > 0) {
-                sip = (netGap * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+            if (gap > 0 && mRate > 0) {
+                sip = (gap * mRate) / (Math.pow(1 + mRate, monthsRemaining) - 1);
             }
 
-            // UI Update
-            if(els.outCost) els.outCost.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
-            if(els.outSIP) els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
+            // 5. Results UI
+            els.outCost.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
+            els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
+            
+            getEl('current-price-text').innerText = "(" + formatIndian(p) + ")";
+            getEl('existing-corpus-text').innerText = "(" + formatIndian(existing) + ")";
         }
 
         // Sync Helper
-        const setupSync = (num, slider) => {
-            if(!num || !slider) return;
-            num.addEventListener('input', () => { slider.value = num.value; calculate(); });
-            slider.addEventListener('input', () => { num.value = slider.value; calculate(); });
+        const setupSync = (input, slider, isCorp = false) => {
+            if(!input || !slider) return;
+            input.addEventListener('input', () => { slider.value = input.value; calculate(isCorp); });
+            slider.addEventListener('input', () => { input.value = slider.value; calculate(isCorp); });
         };
 
-        setupSync(els.price, els.priceSlider);
-        setupSync(els.corpus, els.corpusSlider);
+        // Link everything
+        setupSync(els.price, els.priceS);
+        setupSync(els.corpus, els.corpusS);
+        setupSync(els.corpRet, els.corpRetS, true);
+        setupSync(els.sipRet, els.sipRetS);
+        setupSync(els.infl, els.inflS);
 
-        // Add Listeners
-        [els.yearsSlider, els.inflSlider, els.retSlider].forEach(s => {
-            if(s) s.addEventListener('input', () => calculate(false));
-        });
-        
-        if(els.corpusRetSlider) {
-            els.corpusRetSlider.addEventListener('input', () => calculate(true));
-        }
+        els.startD.addEventListener('change', () => calculate(false));
+        els.targetD.addEventListener('change', () => calculate(false));
 
         if(els.goal) {
             els.goal.addEventListener('change', function() {
                 const target = config[this.value];
                 if (target) {
-                    els.price.value = els.priceSlider.value = target.p;
-                    els.yearsSlider.value = target.y;
-                    els.inflSlider.value = target.i;
-                    els.retSlider.value = target.r;
+                    els.price.value = els.priceS.value = target.p;
+                    els.sipRet.value = els.sipRetS.value = target.r;
+                    els.infl.value = els.inflS.value = target.i;
                     if(els.nudge) els.nudge.innerText = target.m;
                     calculate(false);
                 }
@@ -143,6 +145,5 @@
         calculate();
     };
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
+    init();
 })();
