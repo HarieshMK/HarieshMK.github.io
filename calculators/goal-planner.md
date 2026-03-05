@@ -3,7 +3,7 @@ layout: default
 title: Smart Goal Planner
 permalink: /calculators/goal-planner/
 ---
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <div markdown="0">
 <div class="calculator-container" id="printable-area">
     <div class="print-only">
@@ -133,42 +133,153 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
+    /* 1. CORE LAYOUT & TYPOGRAPHY */
     .calculator-container { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 30px; 
-    margin: 20px 0; 
-    font-family: 'Plus Jakarta Sans', sans-serif; /* Updated to premium font */
-    color: #1e293b;
-}
-    .calc-inputs { flex: 1.3; min-width: 300px; }
-    .calc-results { flex: 1; min-width: 300px; background: #f8fafc; padding: 25px; border-radius: 15px; height: fit-content; position: sticky; top: 20px; border: 1px solid #e2e8f0; }
-    .input-row { display: flex; gap: 20px; margin-bottom: 10px; flex-wrap: wrap; }
-    .flex-1 { flex: 1; min-width: 140px; }
-    .input-group { margin-bottom: 20px; }
-    .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; color: #334155; }
-    .input-with-box { display: flex; flex-direction: column; gap: 8px; }
-    .timeline-hint { font-size: 0.85rem; color: #64748b; margin-top: -10px; margin-bottom: 20px; font-weight: 600; }
-    .human-readable { color: #2563eb; font-size: 0.85rem; margin-left: 5px; }
-input[type="date"], input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: white; box-sizing: order-box; font-family: inherit;}
-    input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: white; }
-    .slider { width: 100%; cursor: pointer; accent-color: #2563eb; }
-    
-    .result-box { margin-bottom: 20px; }
-    .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-    .result-box h2 { font-size: 2.2rem; margin: 5px 0; color: #0f172a; }
-    .highlight { border: 2px solid #2563eb; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-    .highlight h2 { color: #2563eb; }
-    
-    .countdown-box { background: #eff6ff; padding: 15px; border-radius: 10px; border-left: 4px solid #2563eb; }
-    .countdown-box h3 { margin: 5px 0; font-size: 1.1rem; color: #1e293b; }
-    .remaining-text { margin: 0; font-size: 0.95rem; color: #2563eb; font-weight: bold; }
-    .journey-text { margin: 5px 0 0 0; font-size: 0.75rem; color: #64748b; }
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 30px; 
+        margin: 20px 0; 
+        font-family: 'Inter', -apple-system, sans-serif; 
+        color: #1e293b;
+        -webkit-font-smoothing: antialiased;
+    }
 
-    .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
-    .download-button:hover { background: #1e293b; }
+    .calc-inputs { flex: 1.2; min-width: 300px; }
+    
+    .calc-results { 
+        flex: 1; 
+        min-width: 300px; 
+        background: #f8fafc; /* Matches .calc-results in your CSS */
+        padding: 30px; 
+        border-radius: 20px; 
+        height: fit-content; 
+        position: sticky; 
+        top: 20px; 
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
 
-    .print-only { display: none; }
+    /* 2. PREMIUM LABELS (Matching Section 15 of your style.css) */
+    .input-group label { 
+        display: block; 
+        font-weight: 700; 
+        margin-bottom: 10px; 
+        font-size: 0.95rem; /* Matched to .label-row label */
+        color: #1e293b; 
+    }
+
+    /* 3. INPUTS & JETBRAINS MONO FOR NUMBERS */
+    input[type="date"], 
+    .full-width-input { 
+        width: 100%; 
+        padding: 14px; 
+        border: 2px solid #f1f5f9; 
+        border-radius: 10px; 
+        font-size: 1rem; 
+        background: white; 
+        box-sizing: border-box; 
+        font-family: 'Inter', sans-serif;
+    }
+
+    input[type="number"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #f1f5f9;
+        border-radius: 10px;
+        font-weight: 700;
+        color: #0369a1; /* Blue color for numbers from your CSS */
+        font-family: 'JetBrains Mono', monospace; /* The "Premium" Secret */
+        background: #fff;
+    }
+
+    /* 4. RESULTS SECTION (Matching your .result-item.highlight) */
+    .result-box .label { 
+        font-size: 0.85rem; 
+        color: #64748b; 
+        text-transform: uppercase; 
+        letter-spacing: 0.1em; 
+        font-weight: 800; 
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .result-box h2 { 
+        font-size: 2.2rem; 
+        font-weight: 700; 
+        margin: 5px 0; 
+        color: #0f172a; 
+        font-family: 'JetBrains Mono', monospace; /* Professional Number Look */
+    }
+
+    .highlight { 
+        background: #0c4a6e !important; /* Matches .result-item.highlight in your CSS */
+        padding: 25px; 
+        border-radius: 15px; 
+        color: white;
+        text-align: center;
+        margin: 20px 0;
+    }
+    .highlight h2 { color: #ffffff !important; font-size: 2.5rem; }
+    .highlight .label { color: #bae6fd !important; }
+
+    /* 5. SLIDERS (Matching Section 15 .slider) */
+    .slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        outline: none;
+        margin: 15px 0;
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        background: #0ea5e9;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 6. COUNTDOWN & NUDGE */
+    .countdown-box {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 5px solid #0ea5e9;
+        margin-top: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    
+    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 5px 0; color: #0f172a; font-size: 1.2rem; }
+
+    .download-button { 
+        width: 100%; 
+        background: #0f172a; 
+        color: white; 
+        border: none; 
+        padding: 16px; 
+        border-radius: 12px; 
+        font-weight: 700; 
+        font-family: 'Inter', sans-serif;
+        cursor: pointer; 
+        margin-top: 15px; 
+    }
+
+    /* 7. DARK MODE (Integrated from your Section 7 & 15) */
+    .dark-theme .calculator-container { background: #0f172a; border-color: #1e293b; }
+    .dark-theme .calc-results { background: #1e293b; }
+    .dark-theme .label-row label, .dark-theme .input-group label { color: #f1f5f9; }
+    .dark-theme input[type="number"], .dark-theme input[type="date"], .dark-theme .full-width-input { 
+        background: #020617; 
+        border-color: #334155; 
+        color: #38bdf8; 
+    }
+    .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff !important; }
+    .dark-theme .countdown-box { background: #0f172a; border-color: #38bdf8; }
 
     /* Print Logic */
     @media print {
@@ -176,12 +287,9 @@ input[type="date"], input[type="number"], .full-width-input { width: 100%; paddi
         body * { visibility: hidden; }
         #printable-area, #printable-area * { visibility: visible; }
         #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
-        .download-button, .slider, input[type="range"] { display: none !important; }
-        input, select { border: none !important; appearance: none; font-weight: bold; background: transparent !important; }
-        .calc-results { position: static; background: white; padding: 0; border: none; }
-        .highlight { border: 2px solid #2563eb !important; background: #f0f7ff !important; -webkit-print-color-adjust: exact; }
-        .print-only { display: block; border-bottom: 2px solid #0f172a; margin-bottom: 20px; }
+        .download-button, .slider { display: none !important; }
+        .highlight { background: #f0f9ff !important; border: 2px solid #0c4a6e !important; color: #0c4a6e !important; }
+        .highlight h2, .highlight .label { color: #0c4a6e !important; }
     }
 </style>
-
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
