@@ -41,11 +41,37 @@
         };
 
         const config = {
-            "Own Wedding": { p: 1500000, r: 10, i: 8, m: "Your big day, funded by smart decisions. 💍" },
-            "Retirement Fund": { p: 10000000, r: 12, i: 6, m: "Retire like a King/Queen. 🏝️" },
-            "Child UG India": { p: 2500000, r: 12, i: 10, m: "Quality education foundation. 🎓" }
-            // ... add others as needed
-        };
+    // Family & Life
+    "Own Wedding": { p: 1500000, r: 12, i: 8, m: "Your big day, funded by smart decisions. 💍" },
+    "Siblings Wedding": { p: 500000, r: 10, i: 8, m: "Celebrate their happiness stress-free. 🥂" },
+    "Emergency Fund": { p: 600000, r: 8, i: 6, m: "Your financial shock-absorber. 🛡️" },
+    "Jewelry Purchase": { p: 300000, r: 8, i: 10, m: "Beat the gold price hike! ✨" },
+    "Home Renovation": { p: 1000000, r: 12, i: 7, m: "Modernize your sanctuary. 🔨" },
+    "Home Appliances": { p: 200000, r: 9, i: 5, m: "Smart gadgets for a smart home. 📺" },
+
+    // Education
+    "School Admission": { p: 300000, r: 10, i: 12, m: "Education inflation is high—start early! 🏫" },
+    "Yearly School Fees": { p: 150000, r: 8, i: 10, m: "Peace of mind for the whole year. 📚" },
+    "Child UG India": { p: 2500000, r: 12, i: 10, m: "Quality education is the best legacy. 🎓" },
+    "Child UG Foreign": { p: 8000000, r: 13, i: 12, m: "Global dreams need global capital. 🌍" },
+    "Child PG India": { p: 2000000, r: 12, i: 10, m: "Specialization funded today. 🏛️" },
+    "Child PG Foreign": { p: 6000000, r: 13, i: 12, m: "Fly high with a global degree. ✈️" },
+    "My Own PG": { p: 2500000, r: 11, i: 10, m: "Invest in yourself. You're the best asset. 📖" },
+
+    // Assets & Business
+    "Dream House": { p: 10000000, r: 12, i: 7, m: "The address of your dreams is calling. 🏰" },
+    "House Downpayment": { p: 2000000, r: 12, i: 7, m: "Skip the heavy interest. 💰" },
+    "New Car": { p: 1200000, r: 10, i: 5, m: "Drive home your dream ride. 🚗" },
+    "Car Downpayment": { p: 400000, r: 9, i: 5, m: "Save the downpayment, BOSS style. 🏎️" },
+    "Business Start": { p: 2000000, r: 13, i: 8, m: "Be your own BOSS. Build your capital. 💼" },
+    "Retirement Fund": { p: 10000000, r: 12, i: 6, m: "Retire like a King/Queen. 🏝️" },
+
+    // Travel & Recurring
+    "Health Insurance": { p: 30000, r: 7, i: 15, m: "Health is wealth. Stay protected. 🏥" },
+    "Car Insurance": { p: 20000, r: 7, i: 5, m: "Drive protected. 🚗" },
+    "Local Vacation": { p: 100000, r: 8, i: 8, m: "Refresh and recharge. 🏔️" },
+    "Foreign Vacation": { p: 700000, r: 9, i: 10, m: "Stamp that passport! 🗽" }
+};
 
         function calculate(isManualCorpRet = false) {
             if (!els.startD || !els.targetD || !els.price) return;
