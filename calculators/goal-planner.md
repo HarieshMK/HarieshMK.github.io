@@ -52,6 +52,17 @@ permalink: /calculators/goal-planner/
         </div>
 
         <div class="input-group">
+            <label>Current Savings for this Goal (₹) <span id="existing-corpus-text" class="human-readable"></span></label>
+            <input type="number" id="existing-corpus" value="0">
+            <input type="range" id="existing-corpus-slider" class="slider" min="0" max="5000000" step="5000" value="0">
+        </div>
+
+        <div class="input-group">
+            <label>Return on Existing Savings: <span id="corpus-ret-val">7</span>% p.a. <small id="risk-label" style="color: #64748b; font-weight: normal;"></small></label>
+            <input type="range" id="corpus-returns-slider" class="slider" min="1" max="20" step="0.5" value="7">
+        </div>
+
+        <div class="input-group">
             <label>Years to Goal: <span id="years-val">5</span></label>
             <input type="range" id="goal-years-slider" class="slider" min="1" max="40" value="5">
         </div>
@@ -62,19 +73,9 @@ permalink: /calculators/goal-planner/
         </div>
 
         <div class="input-group">
-            <label>Expected Returns (% p.a.): <span id="ret-val">12</span>%</label>
+            <label>Expected SIP Returns (% p.a.): <span id="ret-val">12</span>%</label>
             <input type="range" id="goal-returns-slider" class="slider" min="1" max="25" step="0.5" value="12">
         </div>
-    </div>
-    <div class="input-group">
-    <label>Current Savings for this Goal (₹) <span id="existing-corpus-text" class="human-readable"></span></label>
-    <input type="number" id="existing-corpus" value="0">
-    <input type="range" id="existing-corpus-slider" class="slider" min="0" max="5000000" step="5000" value="0">
-    
-    </div>
-    <div class="input-group">
-    <label>Return on Existing Savings: <span id="corpus-ret-val">7</span>% p.a.</label>
-    <input type="range" id="corpus-returns-slider" class="slider" min="1" max="20" step="0.5" value="7">
     </div>
 
     <div class="calc-results">
@@ -96,10 +97,10 @@ permalink: /calculators/goal-planner/
 <style>
     .calculator-container { display: flex; flex-wrap: wrap; gap: 30px; margin: 20px 0; font-family: sans-serif; }
     .calc-inputs { flex: 1.2; min-width: 300px; }
-    .calc-results { flex: 1; min-width: 300px; background: #f1f5f9; padding: 25px; border-radius: 15px; height: fit-content; }
+    .calc-results { flex: 1; min-width: 300px; background: #f1f5f9; padding: 25px; border-radius: 15px; height: fit-content; position: sticky; top: 20px;}
     .input-group { margin-bottom: 20px; }
     .input-group label { display: block; font-weight: bold; margin-bottom: 8px; }
-    .human-readable { color: #2563eb; margin-left: 5px; }
+    .human-readable { color: #2563eb; margin-left: 5px; font-weight: normal; font-size: 0.9em; }
     .full-width-input, input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
     .slider { width: 100%; margin-top: 10px; cursor: pointer; }
     .result-box { margin-bottom: 20px; }
@@ -109,5 +110,3 @@ permalink: /calculators/goal-planner/
     .highlight h2 { color: #2563eb; }
     .nudge-container { margin-top: 15px; font-weight: bold; color: #1e40af; }
 </style>
-
-<script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
