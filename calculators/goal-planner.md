@@ -3,7 +3,7 @@ layout: default
 title: Smart Goal Planner
 permalink: /calculators/goal-planner/
 ---
-
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <div markdown="0">
 <div class="calculator-container" id="printable-area">
     <div class="print-only">
@@ -133,17 +133,25 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    .calculator-container { display: flex; flex-wrap: wrap; gap: 30px; margin: 20px 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .calculator-container { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 30px; 
+    margin: 20px 0; 
+    font-family: 'Plus Jakarta Sans', sans-serif; /* Updated to premium font */
+    color: #1e293b;
+}
     .calc-inputs { flex: 1.3; min-width: 300px; }
     .calc-results { flex: 1; min-width: 300px; background: #f8fafc; padding: 25px; border-radius: 15px; height: fit-content; position: sticky; top: 20px; border: 1px solid #e2e8f0; }
-    .input-row { display: flex; gap: 15px; margin-bottom: 10px; }
-    .flex-1 { flex: 1; }
+    .input-row { display: flex; gap: 20px; margin-bottom: 10px; flex-wrap: wrap; }
+    .flex-1 { flex: 1; min-width: 140px; }
     .input-group { margin-bottom: 20px; }
     .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; color: #334155; }
     .input-with-box { display: flex; flex-direction: column; gap: 8px; }
     .timeline-hint { font-size: 0.85rem; color: #64748b; margin-top: -10px; margin-bottom: 20px; font-weight: 600; }
     .human-readable { color: #2563eb; font-size: 0.85rem; margin-left: 5px; }
-    input[type="date"], input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: white; }
+input[type="date"], input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: white; box-sizing: order-box; font-family: inherit;}
+    input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: white; }
     .slider { width: 100%; cursor: pointer; accent-color: #2563eb; }
     
     .result-box { margin-bottom: 20px; }
