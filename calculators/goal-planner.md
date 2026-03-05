@@ -89,6 +89,12 @@ permalink: /calculators/goal-planner/
         <div class="nudge-container">
             <p id="goal-nudge">Ready to be a BOSS? 🚀</p>
         </div>
+        <div class="result-box countdown-box">
+    <span class="label">Goal Countdown</span>
+    <h3 id="deadline-date" style="margin: 5px 0; color: #1e293b;">--</h3>
+    <p id="time-left" style="margin: 0; font-size: 0.9rem; color: #2563eb; font-weight: bold;"></p>
+    <p id="total-duration" style="margin: 5px 0 0 0; font-size: 0.75rem; color: #64748b;"></p>
+</div>
     </div>
 </div>
 </div>
