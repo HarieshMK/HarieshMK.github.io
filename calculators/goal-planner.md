@@ -6,6 +6,11 @@ permalink: /calculators/goal-planner/
 
 <div markdown="0">
 <div class="calculator-container" id="printable-area">
+    <div class="print-only">
+        <h1>Personal Goal Strategy Report</h1>
+        <p>Generated on: <span id="print-date"></span></p>
+    </div>
+
     <div class="calc-inputs">
         <div class="input-group">
             <label>What are we planning for?</label>
@@ -138,7 +143,7 @@ permalink: /calculators/goal-planner/
     .input-with-box { display: flex; flex-direction: column; gap: 8px; }
     .timeline-hint { font-size: 0.85rem; color: #64748b; margin-top: -10px; margin-bottom: 20px; font-weight: 600; }
     .human-readable { color: #2563eb; font-size: 0.85rem; margin-left: 5px; }
-    input[type="date"], input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
+    input[type="date"], input[type="number"], .full-width-input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: white; }
     .slider { width: 100%; cursor: pointer; accent-color: #2563eb; }
     
     .result-box { margin-bottom: 20px; }
@@ -155,13 +160,19 @@ permalink: /calculators/goal-planner/
     .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
     .download-button:hover { background: #1e293b; }
 
-    /* Print Specific Styles */
+    .print-only { display: none; }
+
+    /* Print Logic */
     @media print {
+        @page { size: A4; margin: 1cm; }
+        body * { visibility: hidden; }
+        #printable-area, #printable-area * { visibility: visible; }
+        #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
         .download-button, .slider, input[type="range"] { display: none !important; }
-        .calc-inputs { flex: 1; }
-        .calculator-container { display: block; }
-        .calc-results { position: static; border: none; background: white; padding: 0; }
-        .highlight { border: 1px solid #ccc; }
+        input, select { border: none !important; appearance: none; font-weight: bold; background: transparent !important; }
+        .calc-results { position: static; background: white; padding: 0; border: none; }
+        .highlight { border: 2px solid #2563eb !important; background: #f0f7ff !important; -webkit-print-color-adjust: exact; }
+        .print-only { display: block; border-bottom: 2px solid #0f172a; margin-bottom: 20px; }
     }
 </style>
 
