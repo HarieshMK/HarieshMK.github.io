@@ -25,13 +25,11 @@
         };
 
         const formatIndianWords = (num) => {
-            // For 1 Crore and above
             if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
-            // For 1 Lakh and above
             if (num >= 100000) return (num / 100000).toFixed(2) + " L";
-            // For everything else, use Indian comma system (e.g., 50,000)
+            // Indian Comma system for everything else
             return Math.round(num).toLocaleString('en-IN');
-        };    
+        };
 
         const getAutoReturn = (years) => {
             if (years < 4) return { rate: 6, label: "(Low Risk)" };
@@ -46,27 +44,28 @@
             "Jewelry Purchase": { p: 300000, y: 2, i: 10, r: 7, m: "Beat the gold price hike! ✨" },
             "Home Renovation": { p: 1000000, y: 4, i: 7, r: 10, m: "Modernize your sanctuary. 🔨" },
             "Home Appliances": { p: 200000, y: 2, i: 5, r: 8, m: "Smart gadgets for a smart home. 📺" },
-            "School Admission": { p: 300000, y: 3, i: 12, r: 8, m: "Education inflation is high—start early! 🏫" },
-            "Yearly School Fees": { p: 150000, y: 1, i: 10, r: 6, m: "Peace of mind for the whole year. 📚" },
-            "Child UG India": { p: 2500000, y: 15, i: 10, r: 12, m: "Quality education is the best legacy. 🎓" },
-            "Child UG Foreign": { p: 8000000, y: 15, i: 12, r: 12, m: "Global dreams need global capital. 🌍" },
+            "School Admission": { p: 300000, y: 3, i: 12, r: 8, m: "Education inflation is high! 🏫" },
+            "Yearly School Fees": { p: 150000, y: 1, i: 10, r: 6, m: "Peace of mind for the year. 📚" },
+            "Child UG India": { p: 2500000, y: 15, i: 10, r: 12, m: "Quality education foundation. 🎓" },
+            "Child UG Foreign": { p: 8000000, y: 15, i: 12, r: 12, m: "Global dreams need capital. 🌍" },
             "Child PG India": { p: 2000000, y: 18, i: 10, r: 12, m: "Specialization funded today. 🏛️" },
             "Child PG Foreign": { p: 6000000, y: 18, i: 12, r: 12, m: "Fly high with a global degree. ✈️" },
             "My Own PG": { p: 2500000, y: 3, i: 10, r: 11, m: "Invest in yourself. 📖" },
-            "Dream House": { p: 10000000, y: 15, i: 7, r: 12, m: "The address of your dreams is calling. 🏰" },
+            "Dream House": { p: 10000000, y: 15, i: 7, r: 12, m: "Your dream home is calling. 🏰" },
             "House Downpayment": { p: 2000000, y: 5, i: 7, r: 12, m: "Skip the heavy interest. 💰" },
             "New Car": { p: 1200000, y: 5, i: 5, r: 10, m: "Drive home your dream ride. 🚗" },
             "Car Downpayment": { p: 400000, y: 3, i: 5, r: 9, m: "Save the downpayment, BOSS style. 🏎️" },
             "Business Start": { p: 2000000, y: 5, i: 8, r: 12, m: "Be your own BOSS. 💼" },
             "Retirement Fund": { p: 10000000, y: 25, i: 6, r: 12, m: "Retire like a King/Queen. 🏝️" },
             "Health Insurance": { p: 30000, y: 1, i: 15, r: 6, m: "Health is wealth. 🏥" },
-            "Car Insurance": { p: 20000, y: 1, i: 5, r: 6, m: "Drive protected. 🚗" },
+            "Car Insurance": { p: 20000, y: 1, i: 5, r: 6, m: "Stay covered. 🚗" },
             "Local Vacation": { p: 100000, y: 1, i: 8, r: 7, m: "Refresh and recharge. 🏔️" },
             "Foreign Vacation": { p: 700000, y: 2, i: 10, r: 8, m: "Stamp that passport! 🗽" }
         };
 
         function calculate(isManualCorpusReturn = false) {
-            if (!els.price || !els.yearsSlider) return;
+            // Safety Check: if elements are missing, don't crash the script
+            if (!els.price || !els.yearsSlider || !els.inflSlider || !els.retSlider) return;
 
             const p = parseFloat(els.price.value) || 0;
             const existing = parseFloat(els.corpus.value) || 0;
@@ -77,12 +76,12 @@
             // Handle Dynamic Corpus Returns
             if (!isManualCorpusReturn) {
                 const suggested = getAutoReturn(y);
-                els.corpusRetSlider.value = suggested.rate;
-                if(els.riskLabel) els.riskLabel.innerText = suggested.label;
+                if (els.corpusRetSlider) els.corpusRetSlider.value = suggested.rate;
+                if (els.riskLabel) els.riskLabel.innerText = suggested.label;
             }
             const cr = (parseFloat(els.corpusRetSlider.value) || 0) / 100;
 
-            // Update UI Labels
+            // Update Labels
             if(els.priceText) els.priceText.innerText = "(" + formatIndianWords(p) + ")";
             if(els.corpusText) els.corpusText.innerText = "(" + formatIndianWords(existing) + ")";
             if(els.yVal) els.yVal.innerText = y;
@@ -90,7 +89,7 @@
             if(els.rVal) els.rVal.innerText = (r * 100).toFixed(1);
             if(els.crVal) els.crVal.innerText = (cr * 100).toFixed(1);
 
-            // Math Logic
+            // Math
             const futureCost = p * Math.pow(1 + i, y);
             const futureCorpusValue = existing * Math.pow(1 + cr, y);
             const netGap = Math.max(0, futureCost - futureCorpusValue);
@@ -103,12 +102,14 @@
                 sip = (netGap * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
             }
 
+            // UI Update
             if(els.outCost) els.outCost.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
             if(els.outSIP) els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
         }
 
-        // Setup Event Listeners
+        // Sync Helper
         const setupSync = (num, slider) => {
+            if(!num || !slider) return;
             num.addEventListener('input', () => { slider.value = num.value; calculate(); });
             slider.addEventListener('input', () => { num.value = slider.value; calculate(); });
         };
@@ -116,27 +117,32 @@
         setupSync(els.price, els.priceSlider);
         setupSync(els.corpus, els.corpusSlider);
 
-        els.yearsSlider.addEventListener('input', () => calculate(false));
-        els.corpusRetSlider.addEventListener('input', () => calculate(true));
-        els.inflSlider.addEventListener('input', () => calculate(true));
-        els.retSlider.addEventListener('input', () => calculate(true));
-
-        els.goal.addEventListener('change', function() {
-            const target = config[this.value];
-            if (target) {
-                els.price.value = els.priceSlider.value = target.p;
-                els.yearsSlider.value = target.y;
-                els.inflSlider.value = target.i;
-                els.retSlider.value = target.r;
-                els.nudge.innerText = target.m;
-                calculate(false);
-            }
+        // Add Listeners
+        [els.yearsSlider, els.inflSlider, els.retSlider].forEach(s => {
+            if(s) s.addEventListener('input', () => calculate(false));
         });
+        
+        if(els.corpusRetSlider) {
+            els.corpusRetSlider.addEventListener('input', () => calculate(true));
+        }
+
+        if(els.goal) {
+            els.goal.addEventListener('change', function() {
+                const target = config[this.value];
+                if (target) {
+                    els.price.value = els.priceSlider.value = target.p;
+                    els.yearsSlider.value = target.y;
+                    els.inflSlider.value = target.i;
+                    els.retSlider.value = target.r;
+                    if(els.nudge) els.nudge.innerText = target.m;
+                    calculate(false);
+                }
+            });
+        }
 
         calculate();
     };
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
-    document.addEventListener("turbo:load", init);
 })();
