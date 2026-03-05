@@ -7,7 +7,7 @@ permalink: /calculators/goal-planner/
 <div markdown="0">
 <div class="calculator-container" id="printable-area">
     <div class="print-only">
-        <h1>Personal Goal Strategy Report</h1>
+        <h1>Smart Goal Planner</h1>
         <p>Generated on: <span id="print-date"></span></p>
     </div>
 
@@ -133,11 +133,11 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. CORE LAYOUT & TYPOGRAPHY */
+    /* 1. CORE LAYOUT */
     .calculator-container { 
         display: flex; 
         flex-wrap: wrap; 
-        gap: 30px; 
+        gap: 25px; 
         margin: 20px 0; 
         font-family: 'Inter', -apple-system, sans-serif; 
         color: #1e293b;
@@ -149,147 +149,130 @@ permalink: /calculators/goal-planner/
     .calc-results { 
         flex: 1; 
         min-width: 300px; 
-        background: #f8fafc; /* Matches .calc-results in your CSS */
-        padding: 30px; 
+        background: #f8fafc; 
+        padding: 25px; 
         border-radius: 20px; 
         height: fit-content; 
         position: sticky; 
         top: 20px; 
         border: 1px solid #e2e8f0;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
 
-    /* 2. PREMIUM LABELS (Matching Section 15 of your style.css) */
+    /* 2. SIDE-BY-SIDE DATES (FIXED) */
+    .input-row { 
+        display: flex; 
+        gap: 15px; 
+        margin-bottom: 15px; 
+    }
+    
+    .flex-1 { flex: 1; }
+
     .input-group label { 
         display: block; 
         font-weight: 700; 
-        margin-bottom: 10px; 
-        font-size: 0.95rem; /* Matched to .label-row label */
+        margin-bottom: 8px; 
+        font-size: 0.85rem; /* Slightly smaller for better fit */
         color: #1e293b; 
     }
 
-    /* 3. INPUTS & JETBRAINS MONO FOR NUMBERS */
-    input[type="date"], 
-    .full-width-input { 
+    input[type="date"], .full-width-input { 
         width: 100%; 
-        padding: 14px; 
+        padding: 10px; /* Thinner padding to save space */
         border: 2px solid #f1f5f9; 
         border-radius: 10px; 
-        font-size: 1rem; 
-        background: white; 
-        box-sizing: border-box; 
+        font-size: 0.9rem; 
         font-family: 'Inter', sans-serif;
     }
 
     input[type="number"] {
         width: 100%;
-        padding: 12px;
+        padding: 10px;
         border: 2px solid #f1f5f9;
         border-radius: 10px;
         font-weight: 700;
-        color: #0369a1; /* Blue color for numbers from your CSS */
-        font-family: 'JetBrains Mono', monospace; /* The "Premium" Secret */
-        background: #fff;
+        color: #0369a1; 
+        font-family: 'JetBrains Mono', monospace;
     }
 
-    /* 4. RESULTS SECTION (Matching your .result-item.highlight) */
+    /* 3. TIGHTENED RESULT SPACING */
+    .result-box { margin-bottom: 15px; }
     .result-box .label { 
-        font-size: 0.85rem; 
+        font-size: 0.75rem; 
         color: #64748b; 
         text-transform: uppercase; 
-        letter-spacing: 0.1em; 
+        letter-spacing: 0.05em; 
         font-weight: 800; 
-        display: block;
-        margin-bottom: 8px;
+        margin-bottom: 2px;
     }
 
     .result-box h2 { 
-        font-size: 2.2rem; 
-        font-weight: 700; 
-        margin: 5px 0; 
-        color: #0f172a; 
-        font-family: 'JetBrains Mono', monospace; /* Professional Number Look */
+        font-size: 1.8rem; 
+        margin: 0; 
+        font-family: 'JetBrains Mono', monospace; 
     }
 
     .highlight { 
-        background: #0c4a6e !important; /* Matches .result-item.highlight in your CSS */
-        padding: 25px; 
+        background: #0c4a6e !important; 
+        padding: 18px; 
         border-radius: 15px; 
         color: white;
         text-align: center;
-        margin: 20px 0;
-    }
-    .highlight h2 { color: #ffffff !important; font-size: 2.5rem; }
-    .highlight .label { color: #bae6fd !important; }
-
-    /* 5. SLIDERS (Matching Section 15 .slider) */
-    .slider {
-        -webkit-appearance: none;
-        width: 100%;
-        height: 6px;
-        background: #e2e8f0;
-        border-radius: 10px;
-        outline: none;
-        margin: 15px 0;
     }
 
-    .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 22px;
-        height: 22px;
-        background: #0ea5e9;
-        border-radius: 50%;
-        border: 3px solid #fff;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    /* 6. COUNTDOWN & NUDGE */
+    /* 4. TIGHTENED COUNTDOWN (FIXED GAP) */
     .countdown-box {
         background: #ffffff;
-        padding: 20px;
+        padding: 15px;
         border-radius: 12px;
         border-left: 5px solid #0ea5e9;
-        margin-top: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        line-height: 1.2; /* Tightens text spacing */
     }
     
-    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 5px 0; color: #0f172a; font-size: 1.2rem; }
-
-    .download-button { 
-        width: 100%; 
-        background: #0f172a; 
-        color: white; 
-        border: none; 
-        padding: 16px; 
-        border-radius: 12px; 
-        font-weight: 700; 
-        font-family: 'Inter', sans-serif;
-        cursor: pointer; 
-        margin-top: 15px; 
+    .countdown-box h3 { 
+        font-family: 'JetBrains Mono', monospace; 
+        margin: 4px 0; 
+        font-size: 1.1rem; 
     }
 
-    /* 7. DARK MODE (Integrated from your Section 7 & 15) */
-    .dark-theme .calculator-container { background: #0f172a; border-color: #1e293b; }
-    .dark-theme .calc-results { background: #1e293b; }
+    .remaining-text, .journey-text { 
+        font-size: 0.8rem; 
+        margin: 2px 0 !important; /* Forces small gap */
+        color: #64748b;
+    }
+
+    .timeline-hint { 
+        font-size: 0.8rem; 
+        color: #64748b; 
+        margin-top: -10px; 
+        margin-bottom: 20px; 
+    }
+
+    /* 5. DARK MODE FIXES (VISIBILITY) */
+    .dark-theme .calculator-container { background: #0f172a; }
+    .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
     .dark-theme .label-row label, .dark-theme .input-group label { color: #f1f5f9; }
-    .dark-theme input[type="number"], .dark-theme input[type="date"], .dark-theme .full-width-input { 
-        background: #020617; 
-        border-color: #334155; 
-        color: #38bdf8; 
+    
+    /* Small text visibility in Dark Mode */
+    .dark-theme .timeline-hint, 
+    .dark-theme .remaining-text, 
+    .dark-theme .journey-text,
+    .dark-theme .result-box .label { 
+        color: #94a3b8 !important; 
     }
-    .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff !important; }
-    .dark-theme .countdown-box { background: #0f172a; border-color: #38bdf8; }
 
-    /* Print Logic */
-    @media print {
-        @page { size: A4; margin: 1cm; }
-        body * { visibility: hidden; }
-        #printable-area, #printable-area * { visibility: visible; }
-        #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
-        .download-button, .slider { display: none !important; }
-        .highlight { background: #f0f9ff !important; border: 2px solid #0c4a6e !important; color: #0c4a6e !important; }
-        .highlight h2, .highlight .label { color: #0c4a6e !important; }
+    .dark-theme .countdown-box { background: #0f172a; border-color: #38bdf8; }
+    .dark-theme .countdown-box h3 { color: #ffffff !important; }
+
+    .slider {
+        -webkit-appearance: none;
+        width: 100%; height: 6px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        margin: 12px 0;
+    }
+
+    @media (max-width: 600px) {
+        .input-row { flex-direction: column; } /* Stacks only on very small screens */
     }
 </style>
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
