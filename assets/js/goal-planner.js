@@ -25,7 +25,8 @@
             timeLeft: getEl('time-left'),
             totalDur: getEl('total-duration'),
             nudge: getEl('goal-nudge'),
-            downloadBtn: getEl('download-btn')
+            downloadBtn: getEl('download-btn'),
+            printDate: getEl('print-date') // Added to mapping
         };
 
         // Date Defaults
@@ -34,6 +35,13 @@
         future.setFullYear(today.getFullYear() + 5);
         if(els.startD) els.startD.value = today.toISOString().split('T')[0];
         if(els.targetD) els.targetD.value = future.toISOString().split('T')[0];
+
+        // Populate the Print Date safely
+        if(els.printDate) {
+            els.printDate.innerText = new Date().toLocaleDateString('en-IN', { 
+                day: 'numeric', month: 'long', year: 'numeric' 
+            });
+        }
 
         const formatIndian = (num) => {
             if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
