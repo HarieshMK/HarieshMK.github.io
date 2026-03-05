@@ -133,71 +133,60 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. CORE LAYOUT */
+    /* 1. LAYOUT ENGINE - FORCES SIDE-BY-SIDE */
     .calculator-container { 
-        display: flex; 
-        flex-wrap: wrap; 
-        gap: 25px; 
+        display: grid;
+        grid-template-columns: 1.2fr 1fr; /* Forces two columns */
+        gap: 30px; 
         margin: 20px 0; 
         font-family: 'Inter', -apple-system, sans-serif; 
         color: #1e293b;
         -webkit-font-smoothing: antialiased;
+        align-items: start;
     }
 
-    .calc-inputs { flex: 1.2; min-width: 300px; }
+    .calc-inputs { width: 100%; }
     
     .calc-results { 
-        flex: 1; 
-        min-width: 300px; 
         background: #f8fafc; 
         padding: 25px; 
         border-radius: 20px; 
-        height: fit-content; 
-        position: sticky; 
-        top: 20px; 
         border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 20px;
     }
 
-    /* 2. SIDE-BY-SIDE DATES (FIXED) */
+    /* 2. SIDE-BY-SIDE DATES (TIGHT) */
     .input-row { 
         display: flex; 
-        gap: 15px; 
-        margin-bottom: 15px; 
+        gap: 12px; 
+        margin-bottom: 10px; 
     }
-    
     .flex-1 { flex: 1; }
 
     .input-group label { 
         display: block; 
         font-weight: 700; 
-        margin-bottom: 8px; 
-        font-size: 0.85rem; /* Slightly smaller for better fit */
+        margin-bottom: 6px; 
+        font-size: 0.85rem; 
         color: #1e293b; 
     }
 
-    input[type="date"], .full-width-input { 
+    input[type="date"], .full-width-input, input[type="number"] { 
         width: 100%; 
-        padding: 10px; /* Thinner padding to save space */
+        padding: 10px;
         border: 2px solid #f1f5f9; 
         border-radius: 10px; 
-        font-size: 0.9rem; 
-        font-family: 'Inter', sans-serif;
-    }
-
-    input[type="number"] {
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #f1f5f9;
-        border-radius: 10px;
-        font-weight: 700;
-        color: #0369a1; 
+        font-size: 0.95rem; 
         font-family: 'JetBrains Mono', monospace;
+        box-sizing: border-box;
     }
 
-    /* 3. TIGHTENED RESULT SPACING */
+    /* 3. PREMIUM RESULTS STYLING */
     .result-box { margin-bottom: 15px; }
     .result-box .label { 
-        font-size: 0.75rem; 
+        font-size: 0.7rem; 
         color: #64748b; 
         text-transform: uppercase; 
         letter-spacing: 0.05em; 
@@ -209,50 +198,46 @@ permalink: /calculators/goal-planner/
         font-size: 1.8rem; 
         margin: 0; 
         font-family: 'JetBrains Mono', monospace; 
+        color: #0f172a;
     }
 
+    /* Vibrant Blue Highlight with White Text */
     .highlight { 
-        background: #0c4a6e !important; 
-        padding: 18px; 
+        background: #0284c7 !important; 
+        padding: 20px; 
         border-radius: 15px; 
-        color: white;
+        color: #ffffff !important;
         text-align: center;
     }
+    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; }
+    .highlight .label { color: rgba(255,255,255,0.8) !important; }
 
-    /* 4. TIGHTENED COUNTDOWN (FIXED GAP) */
+    /* 4. COMPACT COUNTDOWN */
     .countdown-box {
         background: #ffffff;
         padding: 15px;
         border-radius: 12px;
-        border-left: 5px solid #0ea5e9;
-        line-height: 1.2; /* Tightens text spacing */
+        border-left: 4px solid #0284c7;
+        margin-top: 10px;
     }
-    
     .countdown-box h3 { 
         font-family: 'JetBrains Mono', monospace; 
-        margin: 4px 0; 
+        margin: 2px 0; 
         font-size: 1.1rem; 
+        color: #0f172a;
     }
-
-    .remaining-text, .journey-text { 
-        font-size: 0.8rem; 
-        margin: 2px 0 !important; /* Forces small gap */
+    .remaining-text, .journey-text, .timeline-hint { 
+        font-size: 0.75rem; 
+        margin: 1px 0 !important; 
         color: #64748b;
+        line-height: 1.3;
     }
 
-    .timeline-hint { 
-        font-size: 0.8rem; 
-        color: #64748b; 
-        margin-top: -10px; 
-        margin-bottom: 20px; 
-    }
-
-    /* 5. DARK MODE FIXES (VISIBILITY) */
-    .dark-theme .calculator-container { background: #0f172a; }
+    /* 5. DARK MODE VISIBILITY FIXES */
+    .dark-theme .calculator-container { color: #f1f5f9; }
     .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
     .dark-theme .label-row label, .dark-theme .input-group label { color: #f1f5f9; }
     
-    /* Small text visibility in Dark Mode */
     .dark-theme .timeline-hint, 
     .dark-theme .remaining-text, 
     .dark-theme .journey-text,
@@ -260,19 +245,19 @@ permalink: /calculators/goal-planner/
         color: #94a3b8 !important; 
     }
 
+    .dark-theme .result-box h2 { color: #ffffff !important; }
     .dark-theme .countdown-box { background: #0f172a; border-color: #38bdf8; }
     .dark-theme .countdown-box h3 { color: #ffffff !important; }
 
-    .slider {
-        -webkit-appearance: none;
-        width: 100%; height: 6px;
-        background: #e2e8f0;
-        border-radius: 10px;
-        margin: 12px 0;
-    }
+    .dark-theme input { background: #020617; border-color: #334155; color: #38bdf8 !important; }
 
-    @media (max-width: 600px) {
-        .input-row { flex-direction: column; } /* Stacks only on very small screens */
+    /* Slider styling */
+    .slider { width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 10px 0; }
+
+    /* Mobile Responsive Toggle */
+    @media (max-width: 850px) {
+        .calculator-container { grid-template-columns: 1fr; }
+        .calc-results { position: static; }
     }
 </style>
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
