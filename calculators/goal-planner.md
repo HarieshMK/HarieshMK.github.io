@@ -153,9 +153,10 @@ permalink: /calculators/goal-planner/
     .highlight h2 { color: #ffffff !important; font-size: 2.2rem; }
     .highlight .label { color: rgba(255,255,255,0.9); }
 
+    /* COUNTDOWN BOX (LIGHT MODE) */
     .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; margin: 20px 0; }
     .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
-    .remaining-text, .journey-text { font-size: 0.85rem; color: #64748b; margin: 4px 0; }
+    .remaining-text, .journey-text { font-size: 0.85rem; color: #475569; margin: 4px 0; font-weight: 500; }
     
     .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
@@ -164,14 +165,17 @@ permalink: /calculators/goal-planner/
     .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
     .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
 
-    /* 4. DARK MODE OVERRIDES (Preserving Premium Structure) */
+    /* 4. DARK MODE OVERRIDES */
     .dark-mode { background-color: #0b1120; color: #f1f5f9; }
     .dark-mode .calc-header h1 { color: #ffffff; }
     .dark-mode .calc-results { background: #111827; border-color: #1f2937; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); }
     .dark-mode .result-box h2 { color: #ffffff; }
-    .dark-mode .countdown-box { background: #1f2937; }
-    .dark-mode .countdown-box h3 { color: #ffffff; }
-    .dark-mode .remaining-text, .dark-mode .journey-text { color: #cbd5e1; }
+    
+    /* COUNTDOWN BOX (DARK MODE) */
+    .dark-mode .countdown-box { background: #1f2937; border-color: #0ea5e9; }
+    .dark-mode .countdown-box h3 { color: #000000; background: #ffffff; padding: 2px 5px; border-radius: 4px; display: inline-block; }
+    .dark-mode .remaining-text, .dark-mode .journey-text { color: #e2e8f0; font-weight: 500; }
+    
     .dark-mode input[type="date"], .dark-mode .full-width-input, .dark-mode input[type="number"] { background: #0b1120; border-color: #374151; color: white; }
 
     /* 5. RESPONSIVE */
@@ -181,4 +185,5 @@ permalink: /calculators/goal-planner/
         .calc-results { position: static; }
     }
 </style>
+
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
