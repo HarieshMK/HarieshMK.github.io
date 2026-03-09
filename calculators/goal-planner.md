@@ -133,7 +133,7 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. CONTAINER - Safe for both modes */
+    /* 1. CONTAINER */
     .calculator-wrapper { max-width: 1050px; margin: 20px auto; padding: 20px; font-family: 'Inter', sans-serif; }
     .calc-header { margin-bottom: 30px; }
     
@@ -141,18 +141,25 @@ permalink: /calculators/goal-planner/
     .calc-main-body { display: flex; flex-direction: row; gap: 40px; align-items: flex-start; }
     .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 20px; }
     
-    /* 3. LIGHT MODE STYLES (Default) */
+    /* 3. DEFAULT (LIGHT MODE) STYLES */
     .calc-results { 
         flex: 1; background: #f8fafc; padding: 30px; border-radius: 20px; 
         border: 1px solid #e2e8f0; position: sticky; top: 20px; 
     }
-    input[type="date"], .full-width-input, input[type="number"] { 
-        width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 10px; 
-    }
-
-    /* 4. DARK MODE OVERRIDES (Apply this class to your wrapper when dark mode is ON) */
+    .countdown-box { background: #ffffff; color: #0f172a; } /* Light mode colors */
+    .remaining-text, .journey-text { color: #64748b; }
+    
+    /* 4. DARK MODE OVERRIDES */
     .dark-mode { background-color: #0b1120; color: #f1f5f9; }
     .dark-mode .calc-results { background: #111827; border-color: #1f2937; }
+    
+    /* FIX: Countdown box text in Dark Mode */
+    .dark-mode .countdown-box { background: #1f2937; color: #f1f5f9; } 
+    .dark-mode .remaining-text, 
+    .dark-mode .journey-text { color: #cbd5e1; } /* Lighter gray for readability */
+    .dark-mode #deadline-date { color: #ffffff; }
+
+    /* Inputs in Dark Mode */
     .dark-mode input[type="date"], 
     .dark-mode .full-width-input, 
     .dark-mode input[type="number"] { background: #0b1120; border-color: #374151; color: white; }
@@ -168,4 +175,5 @@ permalink: /calculators/goal-planner/
         .calc-results { position: static; }
     }
 </style>
+
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
