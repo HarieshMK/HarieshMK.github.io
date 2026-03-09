@@ -1,4 +1,3 @@
----
 layout: default
 title: Smart Goal Planner
 permalink: /calculators/goal-planner/
@@ -133,39 +132,54 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. LAYOUT & SPACING */
-    .calculator-wrapper { max-width: 1050px; margin: 20px auto; padding: 20px; font-family: 'Inter', sans-serif; }
-    .calc-header { margin-bottom: 30px; }
-    .calc-main-body { display: flex; flex-direction: row; gap: 40px; align-items: flex-start; }
-    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 20px; }
-    
-    /* 2. PREMIUM CARD STYLING (Default/Light Mode) */
-    .calc-results { 
-        flex: 1; background: #f8fafc; padding: 30px; border-radius: 20px; 
-        border: 1px solid #e2e8f0; position: sticky; top: 20px; 
-    }
-    .countdown-box { 
-        background: #ffffff; padding: 15px; border-radius: 14px; 
-        border-left: 5px solid #0ea5e9; margin: 20px 0; 
-    }
-    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
-    .remaining-text, .journey-text { font-size: 0.85rem; color: #64748b; margin: 4px 0; }
-    .download-button { width: 100%; background: #0f172a; color: white; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-    
-    /* 3. DARK MODE OVERRIDES */
-    .dark-mode { background-color: #0b1120; color: #f1f5f9; }
-    .dark-mode .calc-results { background: #111827; border-color: #1f2937; }
-    .dark-mode .countdown-box { background: #1f2937; color: #f1f5f9; }
-    .dark-mode .countdown-box h3 { color: #ffffff; }
-    .dark-mode .remaining-text, .dark-mode .journey-text { color: #cbd5e1; }
-    .dark-mode input[type="date"], .dark-mode .full-width-input, .dark-mode input[type="number"] { 
-        background: #0b1120; border-color: #374151; color: white; 
+    /* Wrapper ensures the header and body align perfectly */
+    .calculator-wrapper { max-width: 1050px; margin: 20px auto; font-family: 'Inter', sans-serif; padding: 20px; }
+
+    /* Heading styling */
+    .calc-header h1 { margin-bottom: 25px; color: #0f172a; }
+
+    /* Main Flex body: Inputs and Results side by side */
+    .calc-main-body { 
+        display: flex; 
+        flex-direction: row; 
+        gap: 40px; 
+        align-items: flex-start;
     }
 
-    /* 4. RESPONSIVE */
+    /* Column Sizing */
+    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 15px; }
+    .calc-results { flex: 1; background: #f8fafc; padding: 30px; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); position: sticky; top: 20px; }
+
+    /* Inner styling remains identical to your previous working version */
+    .input-row { display: flex; gap: 15px; width: 100%; }
+    .flex-1 { flex: 1; }
+    .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.85rem; color: #1e293b; }
+    input[type="date"], .full-width-input, input[type="number"] { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 10px; font-family: 'JetBrains Mono', monospace; box-sizing: border-box; }
+    .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
+    .result-box h2 { font-size: 1.8rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
+    .highlight { background: #0ea5e9; padding: 25px; border-radius: 18px; color: white; text-align: center; }
+    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; }
+    .highlight .label { color: rgba(255,255,255,0.9); }
+    .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; margin: 20px 0; }
+    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
+    .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
+
     @media (max-width: 850px) {
         .calc-main-body { flex-direction: column; }
         .calc-inputs, .calc-results { width: 100%; }
+        .calc-results { position: static; }
+    }
+</style>
+<script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+    .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
+
+    /* RESPONSIVE: Stack them on Mobile only */
+    @media (max-width: 850px) {
+        .calculator-container { flex-direction: column; }
+        .calc-inputs, .calc-results { width: 100%; flex: none; }
         .calc-results { position: static; }
     }
 </style>
