@@ -134,10 +134,10 @@ permalink: /calculators/goal-planner/
 
 <style>
     /* 1. CONTAINER & LAYOUT */
-    .calculator-wrapper { max-width: 1050px; margin: 20px auto; padding: 20px; font-family: 'Inter', sans-serif; }
-    .calc-header h1 { margin-bottom: 25px; color: #0f172a; }
-    .calc-main-body { display: flex; flex-direction: row; gap: 40px; align-items: flex-start; }
-    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 20px; }
+    .calculator-wrapper { max-width: 1050px; margin: 0px auto; padding: 5px; font-family: 'Inter', sans-serif; }
+    .calc-header h1 { margin-bottom: 15px; color: #0f172a; }
+    .calc-main-body { display: flex; flex-direction: row; gap: 20px; align-items: flex-start; }
+    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 10px; }
     
     /* 2. PREMIUM RESULTS CARD (LIGHT MODE) */
     .calc-results { 
