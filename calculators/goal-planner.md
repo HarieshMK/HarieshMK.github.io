@@ -165,16 +165,15 @@ permalink: /calculators/goal-planner/
     .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
     .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
 
-    /* 4. DARK MODE OVERRIDES (Forced with !important to prevent conflicts) */
-    .dark-mode { background-color: #0b1120 !important; color: #f1f5f9 !important; }
-    .dark-mode .calc-header h1 { color: #ffffff !important; }
-    .dark-mode .calc-results { background: #111827 !important; border-color: #1f2937 !important; }
+   /* 4. DARK MODE OVERRIDES - UPDATED SELECTOR */
+    .dark-theme { background-color: #0b1120 !important; color: #f1f5f9 !important; }
+    .dark-theme .calc-header h1 { color: #ffffff !important; }
+    .dark-theme .calc-results { background: #111827 !important; border-color: #1f2937 !important; }
     
-    /* TARGETING THE COUNTDOWN BOX IN DARK MODE */
-    .dark-mode .countdown-box { background: #1f2937 !important; border-color: #0ea5e9 !important; }
+    /* Targeting the countdown box */
+    .dark-theme .countdown-box { background: #1f2937 !important; border-color: #0ea5e9 !important; }
     
-    /* Forcing the date to Black in Dark Mode */
-    .dark-mode .countdown-box h3 { 
+    .dark-theme .countdown-box h3 { 
         color: #000000 !important; 
         background: #ffffff !important; 
         padding: 4px 8px !important; 
@@ -182,16 +181,15 @@ permalink: /calculators/goal-planner/
         display: inline-block !important; 
     }
     
-    /* Forcing the remaining text to light/pop-out grey */
-    .dark-mode .remaining-text, 
-    .dark-mode .journey-text { 
+    .dark-theme .remaining-text, 
+    .dark-theme .journey-text { 
         color: #e2e8f0 !important; 
         font-weight: 600 !important; 
     }
     
-    .dark-mode input[type="date"], 
-    .dark-mode .full-width-input, 
-    .dark-mode input[type="number"] { background: #0b1120 !important; border-color: #374151 !important; color: white !important; }
+    .dark-theme input[type="date"], 
+    .dark-theme .full-width-input, 
+    .dark-theme input[type="number"] { background: #0b1120 !important; border-color: #374151 !important; color: white !important; }
 
     /* 5. RESPONSIVE */
     @media (max-width: 850px) {
