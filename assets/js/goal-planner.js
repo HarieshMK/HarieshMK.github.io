@@ -183,26 +183,22 @@
 
 
             // Update Countdown UI
-
-            if (els.deadlineD) {
-
-                els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { month: 'short', year: 'numeric', day: 'numeric' });
-
-                if (daysLeft > 0) {
-
-                    const moLeft = Math.floor(daysLeft / 30.44);
-
-                    els.timeLeft.innerText = `${moLeft} Months, ${daysLeft % 30} Days left`;
-
-                    els.totalDur.innerText = `Total Journey: ${totalYears.toFixed(1)} Years`;
-
-                } else {
-
-                    els.timeLeft.innerText = "Goal Date Reached! 🏁";
-
-                }
-
-            }
+if (els.deadlineD) {
+    els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { month: 'short', year: 'numeric', day: 'numeric' });
+    
+    if (remainingMs > 0) {
+        // Calculate total days left
+        const totalDaysLeft = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+        // Simple conversion for display
+        const months = Math.floor(totalDaysLeft / 30);
+        const days = totalDaysLeft % 30;
+        
+        els.timeLeft.innerText = `${months} Months, ${days} Days left`;
+        els.totalDur.innerText = `Total Journey: ${totalYears.toFixed(1)} Years`;
+    } else {
+        els.timeLeft.innerText = "Goal Date Reached! 🏁";
+    }
+}
 
 
 
