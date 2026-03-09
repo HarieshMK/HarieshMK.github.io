@@ -133,31 +133,29 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. MASTER CONTAINER */
     .calculator-container { 
         display: flex;
         flex-wrap: wrap; 
-        gap: 30px; 
+        gap: 20px; 
         margin: 20px 0; 
         font-family: 'Inter', sans-serif; 
         width: 100%;
         max-width: 1100px;
-        align-items: flex-start; /* Keeps results box at top */
+        align-items: flex-start;
+        justify-content: center; /* Fixes the "hanging" alignment */
     }
 
-    /* 2. INPUTS (LEFT) */
     .calc-inputs { 
-        flex: 1.2; 
-        min-width: 320px; 
+        flex: 1 1 450px; /* Allows inputs to shrink/grow but stay sensible */
+        max-width: 100%;
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
-    /* 3. RESULTS (RIGHT) */
     .calc-results { 
-        flex: 1; 
-        min-width: 320px;
+        flex: 1 1 350px; /* Keeps results at a minimum width */
+        max-width: 100%;
         background: #f8fafc; 
         padding: 25px; 
         border-radius: 24px; 
@@ -166,15 +164,11 @@ permalink: /calculators/goal-planner/
         display: flex;
         flex-direction: column;
         gap: 20px;
-        height: auto;
     }
 
-    /* Row Fixes */
     .input-row { display: flex; gap: 15px; width: 100%; }
     .flex-1 { flex: 1; }
 
-    /* Group Styling */
-    .input-group { margin-bottom: 5px; }
     .input-group label { 
         display: block; 
         font-weight: 700; 
@@ -183,7 +177,6 @@ permalink: /calculators/goal-planner/
         color: #1e293b; 
     }
 
-    /* Form Elements */
     input[type="date"], .full-width-input, input[type="number"] { 
         width: 100%; 
         padding: 12px;
@@ -193,7 +186,6 @@ permalink: /calculators/goal-planner/
         box-sizing: border-box;
     }
 
-    /* Results UI Styling */
     .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
     .result-box h2 { font-size: 1.8rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
 
@@ -216,17 +208,12 @@ permalink: /calculators/goal-planner/
         padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; 
     }
 
-    /* Theme Overrides */
-    .dark-theme .input-group label { color: #f1f5f9; }
-    .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
-    .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff; }
-
     .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
     .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
 
     @media (max-width: 850px) {
         .calculator-container { flex-direction: column; }
-        .calc-inputs, .calc-results { width: 100%; }
+        .calc-inputs, .calc-results { width: 100%; flex: none; }
     }
 </style>
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
