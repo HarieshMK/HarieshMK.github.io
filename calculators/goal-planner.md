@@ -133,40 +133,48 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* Wrapper ensures the header and body align perfectly */
+    /* 1. MASTER LAYOUT */
+    body { background-color: #0b1120; color: #f1f5f9; }
     .calculator-wrapper { max-width: 1050px; margin: 20px auto; font-family: 'Inter', sans-serif; padding: 20px; }
+    .calc-header { margin-bottom: 30px; border-bottom: 1px solid #1e293b; padding-bottom: 20px; }
+    .calc-header h1 { color: #ffffff; margin: 0; }
 
-    /* Heading styling */
-    .calc-header h1 { margin-bottom: 25px; color: #0f172a; }
+    /* 2. FLEX CONTAINER */
+    .calc-main-body { display: flex; flex-direction: row; gap: 40px; align-items: flex-start; }
 
-    /* Main Flex body: Inputs and Results side by side */
-    .calc-main-body { 
-        display: flex; 
-        flex-direction: row; 
-        gap: 40px; 
-        align-items: flex-start;
+    /* 3. COLUMNS - Refined for Dark Mode */
+    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 20px; }
+    .calc-results { 
+        flex: 1; 
+        background: #111827; /* Darker card background */
+        padding: 30px; 
+        border-radius: 20px; 
+        border: 1px solid #1f2937; 
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        position: sticky; 
+        top: 20px; 
     }
 
-    /* Column Sizing */
-    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 15px; }
-    .calc-results { flex: 1; background: #f8fafc; padding: 30px; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); position: sticky; top: 20px; }
+    /* 4. FORM ELEMENTS - High readability */
+    .input-group label { color: #94a3b8; font-weight: 500; margin-bottom: 8px; font-size: 0.85rem; display: block; }
+    input[type="date"], .full-width-input, input[type="number"] { 
+        width: 100%; padding: 12px; background: #0b1120; 
+        border: 1px solid #374151; border-radius: 10px; 
+        color: #ffffff; font-family: 'JetBrains Mono', monospace; 
+    }
 
-    /* Inner styling remains identical to your previous working version */
-    .input-row { display: flex; gap: 15px; width: 100%; }
-    .flex-1 { flex: 1; }
-    .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.85rem; color: #1e293b; }
-    input[type="date"], .full-width-input, input[type="number"] { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 10px; font-family: 'JetBrains Mono', monospace; box-sizing: border-box; }
-    .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
-    .result-box h2 { font-size: 1.8rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
-    .highlight { background: #0ea5e9; padding: 25px; border-radius: 18px; color: white; text-align: center; }
-    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; }
-    .highlight .label { color: rgba(255,255,255,0.9); }
-    .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; margin: 20px 0; }
-    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
-    .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-    .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
+    /* 5. RESULTS UI - Matching your reference */
+    .result-box .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; }
+    .result-box h2 { font-size: 1.8rem; margin: 5px 0 20px 0; font-family: 'JetBrains Mono', monospace; color: #ffffff; }
+    .highlight { background: #0ea5e9; padding: 25px; border-radius: 14px; text-align: center; }
+    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; margin: 0; }
+    .countdown-box { background: #1f2937; padding: 15px; border-radius: 14px; margin-top: 20px; }
+    .download-button { width: 100%; background: #ffffff; color: #0f172a; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; }
 
+    /* 6. SLIDER & RESPONSIVE */
+    .slider { -webkit-appearance: none; width: 100%; height: 4px; background: #374151; border-radius: 2px; margin: 15px 0; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #0ea5e9; border-radius: 50%; cursor: pointer; }
+    
     @media (max-width: 850px) {
         .calc-main-body { flex-direction: column; }
         .calc-inputs, .calc-results { width: 100%; }
