@@ -126,7 +126,7 @@ permalink: /calculators/goal-planner/
         <p id="goal-nudge">Ready to be a BOSS? 🚀</p>
     </div>
 
-    <div class="result-box disclaimer-box">
+    <div class="result-box calc-disclaimer">
         <span class="label">Disclaimer</span>
         <p><strong>The Unexciting Reality:</strong> Markets move, inflation is a thief. This isn't professional advice—it's just math. Treat this guide like a map, but remember: you’re the one who has to do the driving.</p>
     </div>
