@@ -229,27 +229,23 @@ permalink: /calculators/goal-planner/
         .calc-results { position: static; }
     }
    /* 6. Prevent wrapping and force dynamic scaling */
+/* Add this to your style block */
 .result-box h2 {
-    font-family: 'JetBrains Mono', monospace;
-    color: #0f172a;
-    margin: 0;
-    
-    /* Forces single line */
+    font-size: 1.8rem; /* Default size */
+    /* This makes the font shrink dynamically as the screen narrows */
+    font-size: clamp(0.8rem, 4vw, 1.8rem); 
+    /* Force single line, no wrapping */
     white-space: nowrap; 
-    
-    /* Shrinks font size: min 0.8rem, ideal 1.8rem, max 1.8rem */
-    font-size: clamp(0.8rem, 3.5vw, 1.8rem); 
-    
-    /* Keeps it contained */
+    /* If still too long, show ellipsis instead of breaking layout */
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Ensure it doesn't push the container width */
     max-width: 100%;
 }
 
-/* 2. Specific override for the blue Highlight box */
+/* Specific fix for the blue highlight box */
 .highlight h2 {
-    color: #ffffff !important;
-    font-size: clamp(1rem, 4vw, 2.2rem); 
+    font-size: clamp(1rem, 5vw, 2.2rem) !important;
 }
 
 /* 3. Ensure Dark Mode text remains visible */
