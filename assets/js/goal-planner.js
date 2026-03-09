@@ -91,16 +91,31 @@
             let yearsRemaining = Math.max(0.08, daysLeft / 365.25);
 
             // Update Countdown UI
-            if (els.deadlineD) {
-                els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { month: 'short', year: 'numeric', day: 'numeric' });
-                if (daysLeft > 0) {
-                    const moLeft = Math.floor(daysLeft / 30.44);
-                    els.timeLeft.innerText = `${moLeft} Months, ${daysLeft % 30} Days left`;
-                    els.totalDur.innerText = `Total Journey: ${totalYears.toFixed(1)} Years`;
-                } else {
-                    els.timeLeft.innerText = "Goal Date Reached! 🏁";
-                }
-            }
+if (els.deadlineD) {
+    els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { month: 'short', year: 'numeric', day: 'numeric' });
+    
+    if (daysLeft > 0) {
+        // Calculate difference in months and remaining days
+        let diffMonths = (d2.getFullYear() - now.getFullYear()) * 12 + (d2.getMonth() - now.getMonth());
+        let remainingDays = d2.getDate() - now.getDate();
+        
+        // Adjust if days are negative
+        if (remainingDays < 0) {
+            diffMonths--;
+            // Get total days in the previous month to calculate remainder correctly
+            const prevMonth = new Date(d2.getFullYear(), d2.getMonth(), 0);
+            remainingDays += prevMonth.getDate();
+        }
+        
+        // Ensure we don't show negative months
+        diffMonths = Math.max(0, diffMonths);
+
+        els.timeLeft.innerText = `${diffMonths} Months, ${remainingDays} Days left`;
+        els.totalDur.innerText = `Total Journey: ${totalYears.toFixed(1)} Years`;
+    } else {
+        els.timeLeft.innerText = "Goal Date Reached! 🏁";
+    }
+}
 
             const p = parseFloat(els.price.value) || 0;
             const existing = parseFloat(els.corpus.value) || 0;
