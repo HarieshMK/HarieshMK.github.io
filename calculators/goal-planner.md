@@ -133,47 +133,40 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. CONTAINER */
+    /* 1. LAYOUT & SPACING */
     .calculator-wrapper { max-width: 1050px; margin: 20px auto; padding: 20px; font-family: 'Inter', sans-serif; }
     .calc-header { margin-bottom: 30px; }
-    
-    /* 2. FLEX LAYOUT */
     .calc-main-body { display: flex; flex-direction: row; gap: 40px; align-items: flex-start; }
     .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 20px; }
     
-    /* 3. DEFAULT (LIGHT MODE) STYLES */
+    /* 2. PREMIUM CARD STYLING (Default/Light Mode) */
     .calc-results { 
         flex: 1; background: #f8fafc; padding: 30px; border-radius: 20px; 
         border: 1px solid #e2e8f0; position: sticky; top: 20px; 
     }
-    .countdown-box { background: #ffffff; color: #0f172a; } /* Light mode colors */
-    .remaining-text, .journey-text { color: #64748b; }
-    
-    /* 4. DARK MODE OVERRIDES */
-    .dark-mode { background-color: #0b1120; color: #f1f5f9; }
-    .dark-mode .calc-results { background: #111827; border-color: #1f2937; }
-    
-    /* FIX: Countdown box text in Dark Mode */
-    .dark-mode .countdown-box { background: #1f2937; color: #f1f5f9; } 
-    .dark-mode .remaining-text, 
-    .dark-mode .journey-text { color: #cbd5e1; } /* Lighter gray for readability */
-    .dark-mode #deadline-date { color: #ffffff; }
-
-    /* Inputs in Dark Mode */
-    .dark-mode input[type="date"], 
-    .dark-mode .full-width-input, 
-    .dark-mode input[type="number"] { background: #0b1120; border-color: #374151; color: white; }
-
-    /* 5. SHARED UI ELEMENTS */
-    .result-box .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; }
-    .result-box h2 { font-size: 1.8rem; margin: 5px 0 20px 0; font-family: 'JetBrains Mono', monospace; }
+    .countdown-box { 
+        background: #ffffff; padding: 15px; border-radius: 14px; 
+        border-left: 5px solid #0ea5e9; margin: 20px 0; 
+    }
+    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
+    .remaining-text, .journey-text { font-size: 0.85rem; color: #64748b; margin: 4px 0; }
     .download-button { width: 100%; background: #0f172a; color: white; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     
+    /* 3. DARK MODE OVERRIDES */
+    .dark-mode { background-color: #0b1120; color: #f1f5f9; }
+    .dark-mode .calc-results { background: #111827; border-color: #1f2937; }
+    .dark-mode .countdown-box { background: #1f2937; color: #f1f5f9; }
+    .dark-mode .countdown-box h3 { color: #ffffff; }
+    .dark-mode .remaining-text, .dark-mode .journey-text { color: #cbd5e1; }
+    .dark-mode input[type="date"], .dark-mode .full-width-input, .dark-mode input[type="number"] { 
+        background: #0b1120; border-color: #374151; color: white; 
+    }
+
+    /* 4. RESPONSIVE */
     @media (max-width: 850px) {
         .calc-main-body { flex-direction: column; }
         .calc-inputs, .calc-results { width: 100%; }
         .calc-results { position: static; }
     }
 </style>
-
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
