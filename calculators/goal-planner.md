@@ -197,30 +197,30 @@ permalink: /calculators/goal-planner/
     .dark-theme .full-width-input, 
     .dark-theme input[type="number"] { background: #0b1120 !important; border-color: #374151 !important; color: white !important; }
 
-/* Styling for the new disclaimer box */
-.disclaimer-box {
-    background: #ffffff; 
-    border: 1px solid #e2e8f0;
-    padding: 15px;
-    border-radius: 12px;
-    margin-top: 10px;
+/* --- Disclaimer Box --- */
+.calc-disclaimer {
+  margin-top: 20px;
+  padding: 20px;
+  background: #fffbeb;
+  border-radius: 14px;
+  border-left: 5px solid #f59e0b;
 }
 
-.disclaimer-box p {
-    font-size: 0.8rem;
-    color: #64748b;
-    line-height: 1.4;
-    margin: 5px 0 0 0;
+.calc-disclaimer p { 
+  font-size: 0.8rem; 
+  color: #92400e; 
+  margin: 0; /* Updated to 0 to match your snippet */
+  line-height: 1.5; 
 }
 
-/* Dark Mode adjustment */
-.dark-theme .disclaimer-box {
-    background: #111827 !important;
-    border-color: #374151 !important;
+/* Dark Mode adjustment for the Amber style */
+.dark-theme .calc-disclaimer {
+  background: #453411 !important; /* Darker amber background */
+  border-left-color: #f59e0b !important;
 }
 
-.dark-theme .disclaimer-box p {
-    color: #94a3b8 !important;
+.dark-theme .calc-disclaimer p {
+  color: #fcd34d !important; /* Lighter text for readability */
 }
     /* 5. RESPONSIVE */
     @media (max-width: 850px) {
