@@ -131,30 +131,43 @@ permalink: /calculators/goal-planner/
     </div>
 </div>
 </div>
+
 <style>
-    /* 1. MASTER LAYOUT - STRICT SIDE-BY-SIDE */
+    /* 1. MASTER LAYOUT - FORCED DIRECTION */
     .calculator-container { 
         display: grid;
-        grid-template-columns: 1.2fr 1fr; /* Strict 2-column split */
+        grid-template-columns: 1.2fr 1fr; 
         gap: 35px; 
         margin: 20px 0; 
         font-family: 'Inter', -apple-system, sans-serif; 
         align-items: start;
+        /* Forced left-to-right flow */
+        direction: ltr !important; 
     }
 
-    /* 2. INPUTS COLUMN (LEFT) */
+    /* 2. INPUTS COLUMN (LEFT) - FORCED ORDER 1 */
     .calc-inputs { 
         display: flex;
         flex-direction: column;
         gap: 15px;
+        order: 1 !important; 
     }
 
-    .input-row { 
-        display: flex; 
-        gap: 15px; 
-        width: 100%;
+    /* 3. RESULTS COLUMN (RIGHT) - FORCED ORDER 2 */
+    .calc-results { 
+        background: #f8fafc; 
+        padding: 25px; 
+        border-radius: 24px; 
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        order: 2 !important; 
     }
-    
+
+    /* Keep your existing input-row and date styling */
+    .input-row { display: flex; gap: 15px; width: 100%; }
     .flex-1 { flex: 1; }
 
     .input-group label { 
@@ -175,42 +188,10 @@ permalink: /calculators/goal-planner/
         font-size: 0.95rem;
     }
 
-    .timeline-hint { 
-        font-size: 0.8rem; 
-        color: #64748b; 
-        margin: -5px 0 10px 0;
-    }
+    /* PREMIUM RESULTS STYLING */
+    .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
+    .result-box h2 { font-size: 2rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
 
-    /* 3. RESULTS COLUMN (RIGHT) */
-    .calc-results { 
-        background: #f8fafc; 
-        padding: 25px; 
-        border-radius: 24px; 
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .result-box .label { 
-        font-size: 0.75rem; 
-        color: #64748b; 
-        text-transform: uppercase; 
-        letter-spacing: 0.08em; 
-        font-weight: 800; 
-        margin-bottom: 4px;
-        display: block;
-    }
-
-    .result-box h2 { 
-        font-size: 2rem; 
-        margin: 0; 
-        font-family: 'JetBrains Mono', monospace; 
-        color: #0f172a;
-    }
-
-    /* VIBRANT SKY BLUE HIGHLIGHT */
     .highlight { 
         background: #0ea5e9 !important; 
         padding: 22px; 
@@ -221,67 +202,27 @@ permalink: /calculators/goal-planner/
     .highlight h2 { color: #ffffff !important; font-size: 2.4rem; }
     .highlight .label { color: rgba(255,255,255,0.9) !important; }
 
-    /* COMPACT GOAL COUNTDOWN */
-    .countdown-box {
-        background: #ffffff;
-        padding: 15px;
-        border-radius: 14px;
-        border-left: 5px solid #0ea5e9;
-    }
-    
-    .countdown-box h3 { 
-        font-family: 'JetBrains Mono', monospace; 
-        margin: 2px 0; 
-        font-size: 1.15rem; 
-    }
+    .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; }
+    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; font-size: 1.15rem; }
+    .remaining-text, .journey-text { font-size: 0.8rem; margin: 2px 0 !important; color: #64748b; }
 
-    .remaining-text, .journey-text { 
-        font-size: 0.8rem; 
-        margin: 2px 0 !important; 
-        color: #64748b;
-    }
+    #goal-nudge { font-size: 0.9rem; text-align: center; font-weight: 600; margin: 10px 0 0 0; }
+    .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-    /* BUTTONS & NUDGE INSIDE BOX */
-    #goal-nudge { 
-        font-size: 0.9rem; 
-        text-align: center; 
-        font-weight: 600; 
-        margin: 10px 0 0 0;
-    }
-
-    .download-button { 
-        width: 100%; 
-        background: #0f172a; 
-        color: white; 
-        border: none; 
-        padding: 14px; 
-        border-radius: 12px; 
-        font-weight: 700; 
-        cursor: pointer; 
-        transition: transform 0.2s ease;
-    }
-    
-    .download-button:hover { transform: translateY(-2px); background: #1e293b; }
-
-    /* 4. DARK MODE FIXES */
+    /* DARK MODE VISIBILITY */
     .dark-theme .calculator-container { color: #f1f5f9; }
     .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
-    .dark-theme .label-row label, .dark-theme .input-group label { color: #f1f5f9; }
+    .dark-theme .input-group label { color: #f1f5f9; }
     .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff !important; }
-    
     .dark-theme .countdown-box { background: #0f172a; }
     .dark-theme .remaining-text, .dark-theme .journey-text, .dark-theme .timeline-hint { color: #94a3b8 !important; }
-    .dark-theme input { background: #020617; border-color: #334155; color: #38bdf8 !important; }
-
-    /* 5. SLIDER STYLING */
-    .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .dark-theme input, .dark-theme select { background: #020617; border-color: #334155; color: #38bdf8 !important; }
 
     /* Mobile Responsive Toggle */
     @media (max-width: 850px) {
         .calculator-container { grid-template-columns: 1fr; }
-        .calc-results { position: static; order: 2; } /* Forces results below on mobile */
-        .calc-inputs { order: 1; }
+        .calc-results { order: 2 !important; } 
+        .calc-inputs { order: 1 !important; }
     }
 </style>
 
