@@ -215,12 +215,12 @@ permalink: /calculators/goal-planner/
 
 /* Dark Mode adjustment for the Amber style */
 .dark-theme .calc-disclaimer {
-  background: #453411 !important; /* Darker amber background */
+  background: #fffbeb !important; /* Darker amber background */
   border-left-color: #f59e0b !important;
 }
 
 .dark-theme .calc-disclaimer p {
-  color: #fcd34d !important; /* Lighter text for readability */
+  color: #92400e !important; /* Lighter text for readability */
 }
     /* 5. RESPONSIVE */
     @media (max-width: 850px) {
