@@ -133,47 +133,34 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. MASTER LAYOUT */
-    body { background-color: #0b1120; color: #f1f5f9; }
-    .calculator-wrapper { max-width: 1050px; margin: 20px auto; font-family: 'Inter', sans-serif; padding: 20px; }
-    .calc-header { margin-bottom: 30px; border-bottom: 1px solid #1e293b; padding-bottom: 20px; }
-    .calc-header h1 { color: #ffffff; margin: 0; }
-
-    /* 2. FLEX CONTAINER */
+    /* 1. CONTAINER - Safe for both modes */
+    .calculator-wrapper { max-width: 1050px; margin: 20px auto; padding: 20px; font-family: 'Inter', sans-serif; }
+    .calc-header { margin-bottom: 30px; }
+    
+    /* 2. FLEX LAYOUT */
     .calc-main-body { display: flex; flex-direction: row; gap: 40px; align-items: flex-start; }
-
-    /* 3. COLUMNS - Refined for Dark Mode */
     .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 20px; }
+    
+    /* 3. LIGHT MODE STYLES (Default) */
     .calc-results { 
-        flex: 1; 
-        background: #111827; /* Darker card background */
-        padding: 30px; 
-        border-radius: 20px; 
-        border: 1px solid #1f2937; 
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        position: sticky; 
-        top: 20px; 
+        flex: 1; background: #f8fafc; padding: 30px; border-radius: 20px; 
+        border: 1px solid #e2e8f0; position: sticky; top: 20px; 
     }
-
-    /* 4. FORM ELEMENTS - High readability */
-    .input-group label { color: #94a3b8; font-weight: 500; margin-bottom: 8px; font-size: 0.85rem; display: block; }
     input[type="date"], .full-width-input, input[type="number"] { 
-        width: 100%; padding: 12px; background: #0b1120; 
-        border: 1px solid #374151; border-radius: 10px; 
-        color: #ffffff; font-family: 'JetBrains Mono', monospace; 
+        width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 10px; 
     }
 
-    /* 5. RESULTS UI - Matching your reference */
-    .result-box .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; }
-    .result-box h2 { font-size: 1.8rem; margin: 5px 0 20px 0; font-family: 'JetBrains Mono', monospace; color: #ffffff; }
-    .highlight { background: #0ea5e9; padding: 25px; border-radius: 14px; text-align: center; }
-    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; margin: 0; }
-    .countdown-box { background: #1f2937; padding: 15px; border-radius: 14px; margin-top: 20px; }
-    .download-button { width: 100%; background: #ffffff; color: #0f172a; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+    /* 4. DARK MODE OVERRIDES (Apply this class to your wrapper when dark mode is ON) */
+    .dark-mode { background-color: #0b1120; color: #f1f5f9; }
+    .dark-mode .calc-results { background: #111827; border-color: #1f2937; }
+    .dark-mode input[type="date"], 
+    .dark-mode .full-width-input, 
+    .dark-mode input[type="number"] { background: #0b1120; border-color: #374151; color: white; }
 
-    /* 6. SLIDER & RESPONSIVE */
-    .slider { -webkit-appearance: none; width: 100%; height: 4px; background: #374151; border-radius: 2px; margin: 15px 0; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #0ea5e9; border-radius: 50%; cursor: pointer; }
+    /* 5. SHARED UI ELEMENTS */
+    .result-box .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; }
+    .result-box h2 { font-size: 1.8rem; margin: 5px 0 20px 0; font-family: 'JetBrains Mono', monospace; }
+    .download-button { width: 100%; background: #0f172a; color: white; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
     
     @media (max-width: 850px) {
         .calc-main-body { flex-direction: column; }
