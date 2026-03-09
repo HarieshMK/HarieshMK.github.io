@@ -103,36 +103,39 @@ permalink: /calculators/goal-planner/
             </div>
         </div>
 
-        <div class="calc-results">
-            <div class="result-box">
-                <span class="label">Future Cost</span>
-                <h2 id="future-cost">₹0</h2>
-            </div>
-            
-            <div class="result-box highlight">
-                <span class="label">Required Monthly SIP</span>
-                <h2 id="required-sip">₹0</h2>
-            </div>
-
-            <div class="result-box countdown-box">
-                <span class="label">Goal Countdown</span>
-                <h3 id="deadline-date">--</h3>
-                <p id="time-left" class="remaining-text"></p>
-                <p id="total-duration" class="journey-text"></p>
-            </div>
-
-            <div class="nudge-container">
-                <p id="goal-nudge">Ready to be a BOSS? 🚀</p>
-            </div>
-            <div id="disclaimer-box" style="background-color: #fffdf0; border: 1px solid #ffe58f; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.9em; color: #555;">
-    <p><strong>The Unexciting Reality:</strong> Markets move, inflation is a thief. This isn't professional advice—it's just math. Treat this guide like a map, but remember: you’re the one who has to do the driving.</p>
-</div>
-
-            <button id="download-btn" class="download-button">
-                Download Goal Plan 📥
-            </button>
-        </div>
+       <div class="calc-results">
+    <div class="result-box">
+        <span class="label">Future Cost</span>
+        <h2 id="future-cost">₹0</h2>
     </div>
+    
+    <div class="result-box highlight">
+        <span class="label">Required Monthly SIP</span>
+        <h2 id="required-sip">₹0</h2>
+    </div>
+
+    <div class="result-box countdown-box">
+        <span class="label">Goal Countdown</span>
+        <h3 id="deadline-date">--</h3>
+        <p id="time-left" class="remaining-text"></p>
+        <p id="total-duration" class="journey-text"></p>
+    </div>
+
+    <div class="result-box nudge-container">
+        <span class="label">The Boss Nudge</span>
+        <p id="goal-nudge">Ready to be a BOSS? 🚀</p>
+    </div>
+
+    <div class="result-box disclaimer-box">
+        <span class="label">Disclaimer</span>
+        <p><strong>The Unexciting Reality:</strong> Markets move, inflation is a thief. This isn't professional advice—it's just math. Treat this guide like a map, but remember: you’re the one who has to do the driving.</p>
+    </div>
+
+    <button id="download-btn" class="download-button">
+        Download Goal Plan 📥
+    </button>
+</div>
+</div>
 </div>
 
 <style>
@@ -193,13 +196,32 @@ permalink: /calculators/goal-planner/
     .dark-theme input[type="date"], 
     .dark-theme .full-width-input, 
     .dark-theme input[type="number"] { background: #0b1120 !important; border-color: #374151 !important; color: white !important; }
-    /* Update this in your Dark Mode section */
-.dark-theme #disclaimer-box { 
-    background-color: #262626 !important; 
-    border-color: #525252 !important; 
-    color: #a3a3a3 !important; 
+
+/* Styling for the new disclaimer box */
+.disclaimer-box {
+    background: #ffffff; 
+    border: 1px solid #e2e8f0;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 10px;
 }
 
+.disclaimer-box p {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.4;
+    margin: 5px 0 0 0;
+}
+
+/* Dark Mode adjustment */
+.dark-theme .disclaimer-box {
+    background: #111827 !important;
+    border-color: #374151 !important;
+}
+
+.dark-theme .disclaimer-box p {
+    color: #94a3b8 !important;
+}
     /* 5. RESPONSIVE */
     @media (max-width: 850px) {
         .calc-main-body { flex-direction: column; }
