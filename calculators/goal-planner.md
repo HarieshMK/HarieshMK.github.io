@@ -133,42 +133,49 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
+    /* 1. MASTER CONTAINER - Side by Side Logic */
     .calculator-container { 
         display: flex;
-        flex-wrap: wrap; 
-        gap: 20px; 
-        margin: 20px 0; 
+        flex-direction: row; /* Force horizontal alignment */
+        flex-wrap: nowrap;   /* Prevent wrapping on desktop */
+        gap: 40px; 
+        margin: 20px auto; 
         font-family: 'Inter', sans-serif; 
         width: 100%;
-        max-width: 1100px;
+        max-width: 1050px; /* Aligned with your SIP calculator style */
         align-items: flex-start;
-        justify-content: center; /* Fixes the "hanging" alignment */
+        padding: 20px;
+        box-sizing: border-box;
     }
 
+    /* 2. INPUTS (LEFT) */
     .calc-inputs { 
-        flex: 1 1 450px; /* Allows inputs to shrink/grow but stay sensible */
-        max-width: 100%;
+        flex: 1.4; /* Takes up more space on the left */
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
+    /* 3. RESULTS (RIGHT) */
     .calc-results { 
-        flex: 1 1 350px; /* Keeps results at a minimum width */
-        max-width: 100%;
+        flex: 1; /* Slighly narrower than inputs */
         background: #f8fafc; 
-        padding: 25px; 
+        padding: 30px; 
         border-radius: 24px; 
         border: 1px solid #e2e8f0;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         display: flex;
         flex-direction: column;
         gap: 20px;
+        position: sticky; /* Keeps results visible while scrolling inputs */
+        top: 20px;
     }
 
+    /* Row Fixes */
     .input-row { display: flex; gap: 15px; width: 100%; }
     .flex-1 { flex: 1; }
 
+    /* Group Styling */
     .input-group label { 
         display: block; 
         font-weight: 700; 
@@ -177,6 +184,7 @@ permalink: /calculators/goal-planner/
         color: #1e293b; 
     }
 
+    /* Form Elements */
     input[type="date"], .full-width-input, input[type="number"] { 
         width: 100%; 
         padding: 12px;
@@ -186,12 +194,13 @@ permalink: /calculators/goal-planner/
         box-sizing: border-box;
     }
 
+    /* Results UI Styling */
     .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
     .result-box h2 { font-size: 1.8rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
 
     .highlight { 
         background: #0ea5e9; 
-        padding: 20px; 
+        padding: 25px; 
         border-radius: 18px; 
         color: white;
         text-align: center;
@@ -211,9 +220,11 @@ permalink: /calculators/goal-planner/
     .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
     .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
 
+    /* RESPONSIVE: Stack them on Mobile only */
     @media (max-width: 850px) {
         .calculator-container { flex-direction: column; }
         .calc-inputs, .calc-results { width: 100%; flex: none; }
+        .calc-results { position: static; }
     }
 </style>
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
