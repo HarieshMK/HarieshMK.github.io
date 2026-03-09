@@ -1,3 +1,4 @@
+---
 layout: default
 title: Smart Goal Planner
 permalink: /calculators/goal-planner/
