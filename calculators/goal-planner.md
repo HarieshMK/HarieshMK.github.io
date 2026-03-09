@@ -193,6 +193,12 @@ permalink: /calculators/goal-planner/
     .dark-theme input[type="date"], 
     .dark-theme .full-width-input, 
     .dark-theme input[type="number"] { background: #0b1120 !important; border-color: #374151 !important; color: white !important; }
+    /* Update this in your Dark Mode section */
+.dark-theme #disclaimer-box { 
+    background-color: #262626 !important; 
+    border-color: #525252 !important; 
+    color: #a3a3a3 !important; 
+}
 
     /* 5. RESPONSIVE */
     @media (max-width: 850px) {
