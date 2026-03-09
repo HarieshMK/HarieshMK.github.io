@@ -131,7 +131,6 @@ permalink: /calculators/goal-planner/
     </div>
 </div>
 </div>
-
 <style>
     /* 1. MASTER LAYOUT - STRICT SIDE-BY-SIDE */
     .calculator-container { 
@@ -285,4 +284,5 @@ permalink: /calculators/goal-planner/
         .calc-inputs { order: 1; }
     }
 </style>
+
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
