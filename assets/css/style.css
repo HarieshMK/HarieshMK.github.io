@@ -796,11 +796,3 @@ img {
 .dark-theme .label-row input[type="number"] { background: #020617; border-color: #334155; color: #38bdf8; }
 .dark-theme .result-item strong { color: #ffffff !important; }
 .dark-theme .word-preview { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-
-.countdown-box {
-    background: #ffffff;
-    padding: 15px;
-    border-radius: 10px;
-    border-left: 4px solid #2563eb;
-    margin-top: 15px;
-}
