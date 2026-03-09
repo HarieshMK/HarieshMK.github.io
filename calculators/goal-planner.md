@@ -124,6 +124,9 @@ permalink: /calculators/goal-planner/
             <div class="nudge-container">
                 <p id="goal-nudge">Ready to be a BOSS? 🚀</p>
             </div>
+            <div id="disclaimer-box" style="background-color: #fffdf0; border: 1px solid #ffe58f; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.9em; color: #555;">
+    <p><strong>The Unexciting Reality:</strong> Markets move, inflation is a thief. This isn't professional advice—it's just math. Treat this guide like a map, but remember: you’re the one who has to do the driving.</p>
+</div>
 
             <button id="download-btn" class="download-button">
                 Download Goal Plan 📥
