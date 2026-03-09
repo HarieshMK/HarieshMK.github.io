@@ -228,6 +228,28 @@ permalink: /calculators/goal-planner/
         .calc-inputs, .calc-results { width: 100%; }
         .calc-results { position: static; }
     }
+   /* Consolidated Dynamic Resizing */
+.result-box h2 {
+    font-family: 'JetBrains Mono', monospace;
+    color: #0f172a;
+    margin: 0;
+    /* This handles both size and safety */
+    font-size: clamp(1.2rem, 4vw, 1.8rem); 
+    word-break: break-all;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Specific override for the blue Highlight box */
+.highlight h2 {
+    color: #ffffff !important;
+    font-size: clamp(1.5rem, 5vw, 2.2rem); 
+}
+
+/* Ensure Dark Mode text color remains correct */
+.dark-theme .result-box h2 {
+    color: #f1f5f9 !important;
+}
 </style>
 
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
