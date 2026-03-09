@@ -133,21 +133,22 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. MASTER CONTAINER - Using Flex for better theme compatibility */
+    /* 1. MASTER CONTAINER */
     .calculator-container { 
         display: flex;
-        flex-wrap: wrap; /* Allows stacking on mobile */
+        flex-wrap: wrap; 
         gap: 30px; 
         margin: 20px 0; 
-        font-family: 'Inter', -apple-system, sans-serif; 
+        font-family: 'Inter', sans-serif; 
         width: 100%;
         max-width: 1100px;
+        align-items: flex-start; /* Keeps results box at top */
     }
 
     /* 2. INPUTS (LEFT) */
     .calc-inputs { 
-        flex: 1.2; /* Takes 1.2 parts of space */
-        min-width: 320px; /* Prevents getting too squished */
+        flex: 1.2; 
+        min-width: 320px; 
         display: flex;
         flex-direction: column;
         gap: 15px;
@@ -155,7 +156,7 @@ permalink: /calculators/goal-planner/
 
     /* 3. RESULTS (RIGHT) */
     .calc-results { 
-        flex: 1; /* Takes 1 part of space */
+        flex: 1; 
         min-width: 320px;
         background: #f8fafc; 
         padding: 25px; 
@@ -165,17 +166,15 @@ permalink: /calculators/goal-planner/
         display: flex;
         flex-direction: column;
         gap: 20px;
-        height: fit-content; /* Stops the box from stretching too long */
+        height: auto;
     }
 
-    /* Input Row Handling */
-    .input-row { 
-        display: flex; 
-        gap: 15px; 
-        width: 100%;
-    }
+    /* Row Fixes */
+    .input-row { display: flex; gap: 15px; width: 100%; }
     .flex-1 { flex: 1; }
 
+    /* Group Styling */
+    .input-group { margin-bottom: 5px; }
     .input-group label { 
         display: block; 
         font-weight: 700; 
@@ -184,6 +183,7 @@ permalink: /calculators/goal-planner/
         color: #1e293b; 
     }
 
+    /* Form Elements */
     input[type="date"], .full-width-input, input[type="number"] { 
         width: 100%; 
         padding: 12px;
@@ -195,40 +195,38 @@ permalink: /calculators/goal-planner/
 
     /* Results UI Styling */
     .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
-    .result-box h2 { font-size: 2rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
+    .result-box h2 { font-size: 1.8rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
 
     .highlight { 
         background: #0ea5e9; 
-        padding: 22px; 
+        padding: 20px; 
         border-radius: 18px; 
         color: white;
         text-align: center;
     }
-    .highlight h2 { color: #ffffff; font-size: 2.4rem; }
+    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; }
     .highlight .label { color: rgba(255,255,255,0.9); }
 
     .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; }
-    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; }
+    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
+    .remaining-text, .journey-text { font-size: 0.85rem; color: #64748b; margin: 4px 0; }
 
     .download-button { 
         width: 100%; background: #0f172a; color: white; border: none; 
         padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; 
     }
 
-    /* Dark Mode Theme Support */
-    .dark-theme .calculator-container { color: #f1f5f9; }
-    .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
+    /* Theme Overrides */
     .dark-theme .input-group label { color: #f1f5f9; }
+    .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
     .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff; }
-    .dark-theme input, .dark-theme select { background: #020617; border-color: #334155; color: #38bdf8; }
 
-    /* Slider Styling */
     .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
     .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
 
     @media (max-width: 850px) {
         .calculator-container { flex-direction: column; }
-        .calc-inputs, .calc-results { flex: 1; width: 100%; }
+        .calc-inputs, .calc-results { width: 100%; }
     }
 </style>
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
