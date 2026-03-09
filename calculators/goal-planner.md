@@ -133,28 +133,30 @@ permalink: /calculators/goal-planner/
 </div>
 
 <style>
-    /* 1. MASTER LAYOUT - FORCED DIRECTION */
+    /* 1. MASTER CONTAINER - Using Flex for better theme compatibility */
     .calculator-container { 
-        display: grid;
-        grid-template-columns: 1.2fr 1fr; 
-        gap: 35px; 
+        display: flex;
+        flex-wrap: wrap; /* Allows stacking on mobile */
+        gap: 30px; 
         margin: 20px 0; 
         font-family: 'Inter', -apple-system, sans-serif; 
-        align-items: start;
-        /* Forced left-to-right flow */
-        direction: ltr !important; 
+        width: 100%;
+        max-width: 1100px;
     }
 
-    /* 2. INPUTS COLUMN (LEFT) - FORCED ORDER 1 */
+    /* 2. INPUTS (LEFT) */
     .calc-inputs { 
+        flex: 1.2; /* Takes 1.2 parts of space */
+        min-width: 320px; /* Prevents getting too squished */
         display: flex;
         flex-direction: column;
         gap: 15px;
-        order: 1 !important; 
     }
 
-    /* 3. RESULTS COLUMN (RIGHT) - FORCED ORDER 2 */
+    /* 3. RESULTS (RIGHT) */
     .calc-results { 
+        flex: 1; /* Takes 1 part of space */
+        min-width: 320px;
         background: #f8fafc; 
         padding: 25px; 
         border-radius: 24px; 
@@ -163,11 +165,15 @@ permalink: /calculators/goal-planner/
         display: flex;
         flex-direction: column;
         gap: 20px;
-        order: 2 !important; 
+        height: fit-content; /* Stops the box from stretching too long */
     }
 
-    /* Keep your existing input-row and date styling */
-    .input-row { display: flex; gap: 15px; width: 100%; }
+    /* Input Row Handling */
+    .input-row { 
+        display: flex; 
+        gap: 15px; 
+        width: 100%;
+    }
     .flex-1 { flex: 1; }
 
     .input-group label { 
@@ -185,45 +191,44 @@ permalink: /calculators/goal-planner/
         border-radius: 10px; 
         font-family: 'JetBrains Mono', monospace;
         box-sizing: border-box;
-        font-size: 0.95rem;
     }
 
-    /* PREMIUM RESULTS STYLING */
+    /* Results UI Styling */
     .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
     .result-box h2 { font-size: 2rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
 
     .highlight { 
-        background: #0ea5e9 !important; 
+        background: #0ea5e9; 
         padding: 22px; 
         border-radius: 18px; 
-        color: white !important;
+        color: white;
         text-align: center;
     }
-    .highlight h2 { color: #ffffff !important; font-size: 2.4rem; }
-    .highlight .label { color: rgba(255,255,255,0.9) !important; }
+    .highlight h2 { color: #ffffff; font-size: 2.4rem; }
+    .highlight .label { color: rgba(255,255,255,0.9); }
 
     .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; }
-    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; font-size: 1.15rem; }
-    .remaining-text, .journey-text { font-size: 0.8rem; margin: 2px 0 !important; color: #64748b; }
+    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; }
 
-    #goal-nudge { font-size: 0.9rem; text-align: center; font-weight: 600; margin: 10px 0 0 0; }
-    .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    .download-button { 
+        width: 100%; background: #0f172a; color: white; border: none; 
+        padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+    }
 
-    /* DARK MODE VISIBILITY */
+    /* Dark Mode Theme Support */
     .dark-theme .calculator-container { color: #f1f5f9; }
     .dark-theme .calc-results { background: #1e293b; border-color: #334155; }
     .dark-theme .input-group label { color: #f1f5f9; }
-    .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff !important; }
-    .dark-theme .countdown-box { background: #0f172a; }
-    .dark-theme .remaining-text, .dark-theme .journey-text, .dark-theme .timeline-hint { color: #94a3b8 !important; }
-    .dark-theme input, .dark-theme select { background: #020617; border-color: #334155; color: #38bdf8 !important; }
+    .dark-theme .result-box h2, .dark-theme .countdown-box h3 { color: #ffffff; }
+    .dark-theme input, .dark-theme select { background: #020617; border-color: #334155; color: #38bdf8; }
 
-    /* Mobile Responsive Toggle */
+    /* Slider Styling */
+    .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
+
     @media (max-width: 850px) {
-        .calculator-container { grid-template-columns: 1fr; }
-        .calc-results { order: 2 !important; } 
-        .calc-inputs { order: 1 !important; }
+        .calculator-container { flex-direction: column; }
+        .calc-inputs, .calc-results { flex: 1; width: 100%; }
     }
 </style>
-
 <script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
