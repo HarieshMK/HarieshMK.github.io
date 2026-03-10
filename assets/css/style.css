@@ -193,16 +193,30 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .dark-theme .calc-icon { background: #0f172a; }
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
+
+
 .floating-auth {
   position: fixed;
   top: 20px;
-  right: 70px; /* Offset it from your theme toggle */
+  right: 80px; /* Adjusted to sit nicely next to your theme toggle */
   z-index: 1000;
 }
 
-#auth-btn {
-  padding: 8px 16px;
-  background: var(--button-bg); /* Use your existing variables */
-  border-radius: 5px;
+.btn-auth {
+  padding: 10px 20px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px; /* Slightly rounded for a modern look */
+  border: 1px solid var(--text-color); /* Matches your site's border theme */
+  background: transparent;
+  color: var(--text-color);
   cursor: pointer;
+  transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect for a premium feel */
+.btn-auth:hover {
+  background: var(--text-color);
+  color: var(--bg-color);
 }
