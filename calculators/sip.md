@@ -135,18 +135,19 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
   </div>
 
   <div class="calc-results">
-    <div id="current-progress" style="display: none;">
-      <h4 class="input-header">Investments as on today</h4>
-      <div class="result-item">
-        <span>Time Invested</span>
-        <strong id="completed-tenure">0y 0m</strong>
-      </div>
-      <div class="result-item">
-        <span>Estimated Amount Today</span>
-        <strong id="value-today">₹0</strong>
-      </div>
-      <hr style="border: 0; border-top: 2px dashed #e2e8f0; margin: 15px 0;">
+<div id="current-progress" style="display: none;">
+  <h4 class="input-header">Investments as on today</h4>
+  <div class="result-item">
+    <span>Amount Today</span>
+    <strong id="value-today">₹0</strong>
+    <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px; display: flex; gap: 10px;">
+      <span>Inv: <b id="inv-today">₹0</b></span>
+      <span>|</span>
+      <span>Gain: <b id="gain-today">₹0</b></span>
     </div>
+  </div>
+  <hr style="border: 0; border-top: 2px dashed #e2e8f0; margin: 15px 0;">
+</div>
 
     <h4 class="input-header">Future Expectation</h4>
     <div class="result-item">
