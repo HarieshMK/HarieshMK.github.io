@@ -14,7 +14,6 @@ window.addEventListener('DOMContentLoaded', function() {
         nudge: getEl('goal-nudge'), downloadBtn: getEl('download-btn')
     };
 
-    // Smart Configuration with durations (y)
     const config = {
         "Custom Plan": { p: 500000, r: 10, i: 6, y: 5, m: "Your money, your rules. Let's start with a blank slate. 🎯" },
         "Own Wedding": { p: 1500000, r: 12, i: 8, y: 3, m: "It's one day, not a lifestyle. 💍" },
@@ -51,6 +50,13 @@ window.addEventListener('DOMContentLoaded', function() {
         const totalYears = Math.max(0.1, (d2 - d1) / 31557600000);
         const yearsRemaining = Math.max(0.08, (d2 - now) / 31557600000);
         
+        // Update Deadline Date
+        if (els.deadlineD) {
+            els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { 
+                day: 'numeric', month: 'short', year: 'numeric' 
+            });
+        }
+        
         if(els.yText) els.yText.innerText = totalYears.toFixed(1);
 
         const p = parseFloat(els.price.value) || 0;
@@ -74,7 +80,6 @@ window.addEventListener('DOMContentLoaded', function() {
         if (els.timeLeft) els.timeLeft.innerText = daysLeft > 0 ? `${Math.floor(daysLeft/30)} Months, ${daysLeft%30} Days left` : "Goal Date Reached! 🏁";
     }
 
-    // Goal Selector Listener with Smart Dates
     if(els.goal) {
         els.goal.addEventListener('change', function() {
             const t = config[this.value];
@@ -101,15 +106,12 @@ window.addEventListener('DOMContentLoaded', function() {
         slider.addEventListener('input', () => { input.value = slider.value; calculate(isCorp); });
     }
 
-    // Sync inputs and sliders
     sync(els.price, els.priceS); sync(els.sipRet, els.sipRetS); sync(els.corpus, els.corpusS); 
     sync(els.corpRet, els.corpRetS, true); sync(els.infl, els.inflS);
     
-    // Set event listeners for dates
     els.startD.addEventListener('change', () => calculate(false));
     els.targetD.addEventListener('change', () => calculate(false));
     
-    // Automatically load the 'Custom Plan' on page load
     els.goal.value = "Custom Plan";
     els.goal.dispatchEvent(new Event('change'));
 });
