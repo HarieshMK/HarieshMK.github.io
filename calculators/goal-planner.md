@@ -253,5 +253,3 @@ permalink: /calculators/goal-planner/
     color: #f1f5f9 !important;
 }
 </style>
-
-<script src="{{ '/assets/js/goal-planner.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
