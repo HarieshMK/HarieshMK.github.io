@@ -169,5 +169,3 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     </div>
   </div>
 </div>
-
-<script src="{{ '/assets/js/sip-calc.js' | relative_url }}"></script>
