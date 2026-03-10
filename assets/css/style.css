@@ -194,6 +194,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
 
+/* ===== 15. SIGN UP BUTTON STYLE ===== */
 
 .floating-auth {
   position: fixed;
@@ -207,16 +208,23 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
-  border-radius: 8px; /* Slightly rounded for a modern look */
-  border: 1px solid var(--text-color); /* Matches your site's border theme */
+  border-radius: 8px;
+  
+  /* The "Thick Border" look */
+  border: 2px solid var(--text-color); 
+  
   background: transparent;
   color: var(--text-color);
   cursor: pointer;
-  transition: all 0.3s ease; /* Smooth transition */
+  
+  /* Smooth animation when switching modes or hovering */
+  transition: all 0.3s ease; 
 }
 
-/* Hover effect for a premium feel */
+/* Hover effect: Let's make it invert to show it's clickable */
 .btn-auth:hover {
   background: var(--text-color);
   color: var(--bg-color);
+  /* Optional: slightly thicker shadow to make it 'pop' */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
