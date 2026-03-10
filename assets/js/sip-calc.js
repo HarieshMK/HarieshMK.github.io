@@ -121,7 +121,3 @@ function autoScaleNumbers() {
 
         autoScaleNumbers();
     }
-
-    calculateSIP();
-    window.addEventListener('resize', autoScaleNumbers);
-});
