@@ -1,6 +1,7 @@
 window.addEventListener('DOMContentLoaded', function() {
     const getEl = (id) => document.getElementById(id);
     
+    // 1. Initialize all elements
     const els = {
         goal: getEl('goal-name'), startD: getEl('start-date'), targetD: getEl('target-date'),
         price: getEl('current-price'), priceS: getEl('current-price-slider'),
@@ -11,9 +12,12 @@ window.addEventListener('DOMContentLoaded', function() {
         outCost: getEl('future-cost'), outSIP: getEl('required-sip'),
         yText: getEl('years-val'), riskL: getEl('risk-label'),
         deadlineD: getEl('deadline-date'), timeLeft: getEl('time-left'),
-        nudge: getEl('goal-nudge'), downloadBtn: getEl('download-btn')
+        nudge: getEl('goal-nudge'), downloadBtn: getEl('download-btn'),
+        hasCorpusCheck: getEl('has-corpus-check'),
+        corpusSection: getEl('corpus-section')
     };
 
+    // 2. Configuration for goals
     const config = {
         "Custom Plan": { p: 500000, r: 10, i: 6, y: 5, m: "Your money, your rules. Let's start with a blank slate. 🎯" },
         "Own Wedding": { p: 1500000, r: 12, i: 8, y: 3, m: "It's one day, not a lifestyle. 💍" },
@@ -41,6 +45,7 @@ window.addEventListener('DOMContentLoaded', function() {
         "Foreign Vacation": { p: 700000, r: 9, i: 10, y: 2, m: "Don't pay for it after returning. 🗽" }
     };
 
+    // 3. The Core Engine
     function calculate(isManualCorpRet = false) {
         if (!els.startD.value || !els.targetD.value) return;
 
@@ -50,7 +55,6 @@ window.addEventListener('DOMContentLoaded', function() {
         const totalYears = Math.max(0.1, (d2 - d1) / 31557600000);
         const yearsRemaining = Math.max(0.08, (d2 - now) / 31557600000);
         
-        // Update Deadline Date
         if (els.deadlineD) {
             els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { 
                 day: 'numeric', month: 'short', year: 'numeric' 
@@ -60,17 +64,21 @@ window.addEventListener('DOMContentLoaded', function() {
         if(els.yText) els.yText.innerText = totalYears.toFixed(1);
 
         const p = parseFloat(els.price.value) || 0;
-        const existing = parseFloat(els.corpus.value) || 0;
         const inflation = parseFloat(els.infl.value) || 0;
         const rSIP = parseFloat(els.sipRet.value) || 0;
 
-        if (!isManualCorpRet) {
+        // Logical Checkbox Handling
+        const hasCorpus = els.hasCorpusCheck.checked;
+        const existing = hasCorpus ? (parseFloat(els.corpus.value) || 0) : 0;
+        const corpRet = hasCorpus ? parseFloat(els.corpRet.value) : 0;
+
+        if (!isManualCorpRet && hasCorpus) {
             let rate = yearsRemaining < 4 ? 6 : (yearsRemaining <= 7 ? 8 : 10);
             els.corpRet.value = els.corpRetS.value = rate;
             if(els.riskL) els.riskL.innerText = rate === 6 ? "(Safe)" : (rate === 8 ? "(Moderate)" : "(Aggressive)");
         }
         
-        const gapData = FinanceEngine.calculateGoalGap(p, existing, inflation, parseFloat(els.corpRet.value), totalYears);
+        const gapData = FinanceEngine.calculateGoalGap(p, existing, inflation, corpRet, totalYears);
         const requiredSIP = FinanceEngine.calculateRequiredSIP(gapData.gap, rSIP, yearsRemaining);
 
         if(els.outCost) els.outCost.innerText = "₹" + FinanceEngine.formatIndian(gapData.futureCost);
@@ -80,6 +88,12 @@ window.addEventListener('DOMContentLoaded', function() {
         if (els.timeLeft) els.timeLeft.innerText = daysLeft > 0 ? `${Math.floor(daysLeft/30)} Months, ${daysLeft%30} Days left` : "Goal Date Reached! 🏁";
     }
 
+    // 4. Event Listeners
+    els.hasCorpusCheck.addEventListener('change', function() {
+        els.corpusSection.style.display = this.checked ? 'block' : 'none';
+        calculate(false);
+    });
+
     if(els.goal) {
         els.goal.addEventListener('change', function() {
             const t = config[this.value];
@@ -88,14 +102,11 @@ window.addEventListener('DOMContentLoaded', function() {
                 els.sipRet.value = els.sipRetS.value = t.r;
                 els.infl.value = els.inflS.value = t.i;
                 if(els.nudge) els.nudge.innerText = t.m;
-
                 const start = new Date();
                 const end = new Date();
                 end.setFullYear(end.getFullYear() + t.y);
-
                 els.startD.valueAsDate = start;
                 els.targetD.valueAsDate = end;
-
                 calculate(false);
             }
         });
@@ -108,10 +119,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
     sync(els.price, els.priceS); sync(els.sipRet, els.sipRetS); sync(els.corpus, els.corpusS); 
     sync(els.corpRet, els.corpRetS, true); sync(els.infl, els.inflS);
-    
     els.startD.addEventListener('change', () => calculate(false));
     els.targetD.addEventListener('change', () => calculate(false));
     
+    // 5. Initialize
     els.goal.value = "Custom Plan";
     els.goal.dispatchEvent(new Event('change'));
 });
