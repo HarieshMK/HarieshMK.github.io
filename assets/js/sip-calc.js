@@ -74,48 +74,54 @@ function autoScaleNumbers() {
 }
     
     function calculateSIP() {
-        const P = parseFloat(monthlySIP.value) || 0;
-        const L = parseFloat(lumpSumInput.value) || 0;
-        const r = (parseFloat(returnRate.value) / 100) / 12;
-        const n = parseFloat(yearsInput.value) * 12;
-        const inf = parseFloat(inflationInput.value) / 100;
-
-        const futureValueSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n;
-        const futureValueLump = L * Math.pow(1 + r, n);
-        
-        const totalValue = futureValueSIP + futureValueLump;
-        const totalInvested = (P * n) + L;
-        const estimatedReturns = totalValue - totalInvested;
-        
-        const realFutureValue = totalValue / Math.pow(1 + inf, parseFloat(yearsInput.value));
-
-        totalInvestedDisplay.innerText = "₹" + Math.round(totalInvested).toLocaleString('en-IN');
-        totalReturnsDisplay.innerText = "₹" + Math.round(estimatedReturns).toLocaleString('en-IN');
-        totalValueDisplay.innerText = "₹" + Math.round(totalValue).toLocaleString('en-IN');
-        
-        if (realFutureDisplay) {
-            realFutureDisplay.innerText = "₹" + Math.round(realFutureValue).toLocaleString('en-IN');
+        // Ensure the engine is loaded
+        if (typeof FinanceEngine === 'undefined') {
+            console.error("FinanceEngine is not loaded! Check your script tags.");
+            return;
         }
 
-        if (dateInput && dateInput.value) {
+        const P = parseFloat(monthlySIP.value) || 0;
+        const L = parseFloat(lumpSumInput.value) || 0;
+        const annualR = parseFloat(returnRate.value) || 0;
+        const years = parseFloat(yearsInput.value) || 0;
+        const inf = parseFloat(inflationInput.value) || 0;
+
+        // Debugging: Right-click your page -> Inspect -> Console to see these
+        console.log("Inputs:", {P, L, annualR, years});
+
+        // 1. Core Future Value
+        const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
+        
+        // 2. Real Value (Inflation adjusted)
+        const realFutureValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
+
+        // UI UPDATES
+        totalInvestedDisplay.innerText = "₹" + FinanceEngine.formatIndian(results.totalInvested);
+        totalReturnsDisplay.innerText = "₹" + FinanceEngine.formatIndian(results.estimatedReturns);
+        totalValueDisplay.innerText = "₹" + FinanceEngine.formatIndian(results.totalValue);
+        
+        if (realFutureDisplay) {
+            realFutureDisplay.innerText = "₹" + FinanceEngine.formatIndian(realFutureValue);
+        }
+
+        // 3. Progress Section Logic
+        if (dateInput && dateInput.value && progressSection) {
             let start = new Date(dateInput.value);
             let today = new Date();
             let nPassed = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
-            let effectivePassed = Math.max(0, Math.min(nPassed, n));
+            let monthsTotal = years * 12;
+            let effectivePassed = Math.max(0, Math.min(nPassed, monthsTotal));
 
             if (effectivePassed > 0) {
-                if (progressSection) progressSection.style.display = 'block';
-                
-                let valTodaySIP = r > 0 ? P * ((Math.pow(1 + r, effectivePassed) - 1) / r) * (1 + r) : P * effectivePassed;
-                let valTodayLump = L * Math.pow(1 + r, effectivePassed);
-                let totalToday = valTodaySIP + valTodayLump;
-                let realValToday = totalToday / Math.pow(1 + inf, effectivePassed / 12);
+                progressSection.style.display = 'block';
+                const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectivePassed / 12);
+                const realValToday = FinanceEngine.adjustForInflation(progressResults.totalValue, inf, effectivePassed / 12);
 
                 if (completedTenure) completedTenure.innerText = `${Math.floor(effectivePassed / 12)}y ${effectivePassed % 12}m`;
-                if (valueTodayDisplay) valueTodayDisplay.innerText = "₹" + Math.round(totalToday).toLocaleString('en-IN');
-                if (realValueTodayDisplay) realValueTodayDisplay.innerText = "₹" + Math.round(realValToday).toLocaleString('en-IN');
+                if (valueTodayDisplay) valueTodayDisplay.innerText = "₹" + FinanceEngine.formatIndian(progressResults.totalValue);
+                if (realValueTodayDisplay) realValueTodayDisplay.innerText = "₹" + FinanceEngine.formatIndian(realValToday);
             } else {
-                if (progressSection) progressSection.style.display = 'none';
+                progressSection.style.display = 'none';
             }
         }
 
