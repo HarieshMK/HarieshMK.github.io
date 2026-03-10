@@ -110,6 +110,11 @@
     </footer>
   </div>
 
-  <script src="{{ '/assets/css/script.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/finance-engine.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/script.js' | relative_url }}"></script>
+{% if page.url contains 'calculators' %}
+  <script src="{{ '/assets/js/sip-calc.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/goal-planner.js' | relative_url }}"></script>
+{% endif %}
 </body>
 </html>
