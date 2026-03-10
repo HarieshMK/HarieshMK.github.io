@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Smart Configuration with durations (y)
     const config = {
+        "Custom Plan": { p: 500000, r: 10, i: 6, y: 5, m: "Your money, your rules. Let's start with a blank slate. 🎯" },
         "Own Wedding": { p: 1500000, r: 12, i: 8, y: 3, m: "It's one day, not a lifestyle. 💍" },
         "Siblings Wedding": { p: 500000, r: 10, i: 8, y: 2, m: "Be generous, but keep your sanity. 🥂" },
         "Emergency Fund": { p: 600000, r: 8, i: 6, y: 1, m: "Things break, jobs get lost. 🛡️" },
@@ -100,10 +101,15 @@ window.addEventListener('DOMContentLoaded', function() {
         slider.addEventListener('input', () => { input.value = slider.value; calculate(isCorp); });
     }
 
+    // Sync inputs and sliders
     sync(els.price, els.priceS); sync(els.sipRet, els.sipRetS); sync(els.corpus, els.corpusS); 
     sync(els.corpRet, els.corpRetS, true); sync(els.infl, els.inflS);
+    
+    // Set event listeners for dates
     els.startD.addEventListener('change', () => calculate(false));
     els.targetD.addEventListener('change', () => calculate(false));
     
-    calculate();
+    // Automatically load the 'Custom Plan' on page load
+    els.goal.value = "Custom Plan";
+    els.goal.dispatchEvent(new Event('change'));
 });
