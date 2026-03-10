@@ -132,5 +132,5 @@
 
         calculate();
     };
-    init();
+    window.addEventListener('DOMContentLoaded', init);
 })();
