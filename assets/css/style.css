@@ -204,27 +204,24 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 }
 
 .btn-auth {
+  display: inline-block;
   padding: 10px 20px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
   border-radius: 8px;
   
-  /* The "Thick Border" look */
-  border: 2px solid var(--text-color); 
+  /* Force the border to appear */
+  border: 2px solid var(--text-color) !important; 
   
   background: transparent;
   color: var(--text-color);
   cursor: pointer;
-  
-  /* Smooth animation when switching modes or hovering */
-  transition: all 0.3s ease; 
+  transition: all 0.3s ease;
 }
 
-/* Hover effect: Let's make it invert to show it's clickable */
+/* This handles the Hover effect for BOTH light and dark mode */
 .btn-auth:hover {
   background: var(--text-color);
-  color: var(--bg-color);
-  /* Optional: slightly thicker shadow to make it 'pop' */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: var(--bg-color); /* This should invert the text color to the background color */
 }
