@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
         returnSlider: document.getElementById('return-rate-slider'),
         yearsInput: document.getElementById('years'),
         yearsSlider: document.getElementById('years-slider'),
+        invToday: document.getElementById('inv-today'),
+        gainToday: document.getElementById('gain-today'),
         // Note: Using your sip.md ID 'initial-lump-sum'
         lumpSumInput: document.getElementById('initial-lump-sum'),
         lumpSumSlider: document.getElementById('lump-sum-slider'),
@@ -72,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(elements.totalValue) elements.totalValue.innerText = "₹" + format(totalValue);
         if(elements.realFuture) elements.realFuture.innerText = "₹" + format(realValue);
 
-        // --- PROGRESS LOGIC (Bringing it back) ---
+        // --- PROGRESS LOGIC ---
         if (elements.dateInput && elements.dateInput.value) {
             const startDate = new Date(elements.dateInput.value);
             const today = new Date();
@@ -86,8 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12) : 
                     { totalValue: ( (annualR/1200 > 0) ? P * ((Math.pow(1 + annualR/1200, effectiveMonths) - 1) / (annualR/1200)) * (1 + annualR/1200) : P * effectiveMonths) + (L * Math.pow(1 + annualR/1200, effectiveMonths)) };
                 
+                // New logic to calculate split
+                const investedToday = (P * effectiveMonths) + L;
+                const gainToday = progressResults.totalValue - investedToday;
+
                 if (elements.completedTenure) elements.completedTenure.innerText = `${Math.floor(effectiveMonths / 12)}y ${effectiveMonths % 12}m`;
                 if (elements.valueTodayDisplay) elements.valueTodayDisplay.innerText = "₹" + format(progressResults.totalValue);
+                
+                // Update new fields
+                if (elements.invToday) elements.invToday.innerText = "₹" + format(investedToday);
+                if (elements.gainToday) elements.gainToday.innerText = "₹" + format(gainToday);
+
             } else if (elements.progressSection) {
                 elements.progressSection.style.display = 'none';
             }
