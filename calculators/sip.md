@@ -141,7 +141,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     <span>Amount Today</span>
     <strong id="value-today">₹0</strong>
     <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px; display: flex; gap: 10px;">
-      <span>Inv: <b id="inv-today">₹0</b></span>
+      <span>Invested: <b id="inv-today">₹0</b></span>
       <span>|</span>
       <span>Gain: <b id="gain-today">₹0</b></span>
     </div>
