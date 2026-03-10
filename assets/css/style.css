@@ -10,7 +10,7 @@ body {
   max-width: 850px; margin: 0 auto; background: #ffffff; padding: 60px 50px; 
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
-h1, h2, h3, h4, h5, h6 { 
+h1, h2, h3, h4, h5, h6 {
   font-family: 'Lora', serif; color: #0f172a; font-weight: 700; 
   letter-spacing: -0.02em; margin-top: 1.5em; margin-bottom: 0.5em;
 }
