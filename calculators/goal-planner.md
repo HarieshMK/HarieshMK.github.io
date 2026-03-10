@@ -15,39 +15,43 @@ permalink: /calculators/goal-planner/
             <div class="input-group">
                 <label>What are we planning for?</label>
                 <select id="goal-name" class="full-width-input">
-                    <option value="" disabled selected>Select a goal...</option>
-                    <optgroup label="Family & Life Events">
-                        <option value="Own Wedding">My Own Wedding 🤵</option>
-                        <option value="Siblings Wedding">Sibling's Wedding 🥂</option>
-                        <option value="Emergency Fund">Emergency Fund 🛡️</option>
-                        <option value="Jewelry Purchase">Jewelry Purchase ✨</option>
-                        <option value="Home Renovation">Home Renovation 🔨</option>
-                        <option value="Home Appliances">Home Appliances 📺</option>
-                    </optgroup>
-                    <optgroup label="Education">
-                        <option value="School Admission">Child's School Admission 🏫</option>
-                        <option value="Yearly School Fees">Child's Yearly School Fees 📚</option>
-                        <option value="Child UG India">Child's UG (India) 🎓</option>
-                        <option value="Child UG Foreign">Child's UG (Foreign) 🌍</option>
-                        <option value="Child PG India">Child's PG (India) 🏛️</option>
-                        <option value="Child PG Foreign">Child's PG (Foreign) ✈️</option>
-                        <option value="My Own PG">My Own PG/MBA 📖</option>
-                    </optgroup>
-                    <optgroup label="Assets & Business">
-                        <option value="Dream House">Dream House 🏰</option>
-                        <option value="House Downpayment">House Downpayment 💰</option>
-                        <option value="New Car">New Car 🚗</option>
-                        <option value="Car Downpayment">Car Downpayment 🏎️</option>
-                        <option value="Business Start">Starting a Business 💼</option>
-                        <option value="Retirement Fund">Retirement Fund 🏝️</option>
-                    </optgroup>
-                    <optgroup label="Travel & Recurring">
-                        <option value="Health Insurance">Health Insurance (Yearly) 🏥</option>
-                        <option value="Car Insurance">Car Insurance (Yearly) 🚗</option>
-                        <option value="Local Vacation">Local Vacation 🏔️</option>
-                        <option value="Foreign Vacation">Foreign Vacation 🗽</option>
-                    </optgroup>
-                </select>
+    <option value="Custom Plan">Custom Plan (Start from scratch) 🎯</option>
+    
+    <optgroup label="Family & Life Events">
+        <option value="Own Wedding">My Own Wedding 🤵</option>
+        <option value="Siblings Wedding">Sibling's Wedding 🥂</option>
+        <option value="Emergency Fund">Emergency Fund 🛡️</option>
+        <option value="Jewelry Purchase">Jewelry Purchase ✨</option>
+        <option value="Home Renovation">Home Renovation 🔨</option>
+        <option value="Home Appliances">Home Appliances 📺</option>
+    </optgroup>
+    
+    <optgroup label="Education">
+        <option value="School Admission">Child's School Admission 🏫</option>
+        <option value="Yearly School Fees">Child's Yearly School Fees 📚</option>
+        <option value="Child UG India">Child's UG (India) 🎓</option>
+        <option value="Child UG Foreign">Child's UG (Foreign) 🌍</option>
+        <option value="Child PG India">Child's PG (India) 🏛️</option>
+        <option value="Child PG Foreign">Child's PG (Foreign) ✈️</option>
+        <option value="My Own PG">My Own PG/MBA 📖</option>
+    </optgroup>
+
+    <optgroup label="Assets & Business">
+        <option value="Dream House">Dream House 🏰</option>
+        <option value="House Downpayment">House Downpayment 💰</option>
+        <option value="New Car">New Car 🚗</option>
+        <option value="Car Downpayment">Car Downpayment 🏎️</option>
+        <option value="Business Start">Starting a Business 💼</option>
+        <option value="Retirement Fund">Retirement Fund 🏝️</option>
+    </optgroup>
+
+    <optgroup label="Travel & Recurring">
+        <option value="Health Insurance">Health Insurance (Yearly) 🏥</option>
+        <option value="Car Insurance">Car Insurance (Yearly) 🚗</option>
+        <option value="Local Vacation">Local Vacation 🏔️</option>
+        <option value="Foreign Vacation">Foreign Vacation 🗽</option>
+    </optgroup>
+</select>
             </div>
 
             <div class="input-row">
