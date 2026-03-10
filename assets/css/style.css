@@ -193,3 +193,16 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .dark-theme .calc-icon { background: #0f172a; }
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
+.floating-auth {
+  position: fixed;
+  top: 20px;
+  right: 70px; /* Offset it from your theme toggle */
+  z-index: 1000;
+}
+
+#auth-btn {
+  padding: 8px 16px;
+  background: var(--button-bg); /* Use your existing variables */
+  border-radius: 5px;
+  cursor: pointer;
+}
