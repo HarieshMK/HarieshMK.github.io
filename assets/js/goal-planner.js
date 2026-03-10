@@ -2,7 +2,6 @@
     const init = function() {
         const getEl = (id) => document.getElementById(id);
         
-        // 1. Map all elements
         const els = {
             goal: getEl('goal-name'),
             startD: getEl('start-date'),
@@ -25,28 +24,10 @@
             timeLeft: getEl('time-left'),
             totalDur: getEl('total-duration'),
             nudge: getEl('goal-nudge'),
-            downloadBtn: getEl('download-btn'),
-            printDate: getEl('print-date')
+            downloadBtn: getEl('download-btn')
         };
 
-        // Date Defaults
-        const today = new Date();
-        const future = new Date();
-        future.setFullYear(today.getFullYear() + 5);
-        if(els.startD) els.startD.value = today.toISOString().split('T')[0];
-        if(els.targetD) els.targetD.value = future.toISOString().split('T')[0];
-
-        if(els.printDate) {
-            els.printDate.innerText = new Date().toLocaleDateString('en-IN', { 
-                day: 'numeric', month: 'long', year: 'numeric' 
-            });
-        }
-
-        const formatIndian = (num) => {
-            if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
-            if (num >= 100000) return (num / 100000).toFixed(2) + " L";
-            return Math.round(num).toLocaleString('en-IN');
-        };
+        const format = (num) => (typeof FinanceEngine !== 'undefined') ? FinanceEngine.formatIndian(num) : Math.round(num).toLocaleString('en-IN');
 
         const config = {
             "Own Wedding": { p: 1500000, r: 12, i: 8, m: "It's one day, not a lifestyle. Keep the budget in check so you're not starting your marriage with an EMI. 💍" },
@@ -75,38 +56,21 @@
         };
 
         function calculate(isManualCorpRet = false) {
-            if (!els.startD || !els.targetD) return;
+            if (!els.startD.value || !els.targetD.value) return;
 
             const d1 = new Date(els.startD.value);
             const d2 = new Date(els.targetD.value);
             const now = new Date();
-
-            let totalYears = (d2 - d1) / (1000 * 60 * 60 * 24 * 365.25);
-            totalYears = Math.max(0.1, totalYears);
-            if(els.yText) els.yText.innerText = totalYears.toFixed(1);
-
-            let remainingMs = d2 - now;
             
-            // Update Countdown UI
-            if (els.deadlineD) {
-                els.deadlineD.innerText = d2.toLocaleDateString('en-IN', { month: 'short', year: 'numeric', day: 'numeric' });
-                
-                if (remainingMs > 0) {
-                    const totalDaysLeft = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
-                    const months = Math.floor(totalDaysLeft / 30);
-                    const days = totalDaysLeft % 30;
-                    els.timeLeft.innerText = `${months} Months, ${days} Days left`;
-                    els.totalDur.innerText = `Total Journey: ${totalYears.toFixed(1)} Years`;
-                } else {
-                    els.timeLeft.innerText = "Goal Date Reached! 🏁";
-                }
-            }
+            const totalYears = Math.max(0.1, (d2 - d1) / 31557600000);
+            const yearsRemaining = Math.max(0.08, (d2 - now) / 31557600000);
+            
+            if(els.yText) els.yText.innerText = totalYears.toFixed(1);
 
             const p = parseFloat(els.price.value) || 0;
             const existing = parseFloat(els.corpus.value) || 0;
             const inflation = (parseFloat(els.infl.value) || 0) / 100;
             const rSIP = (parseFloat(els.sipRet.value) || 0) / 100;
-            const yearsRemaining = Math.max(0.08, (remainingMs / (1000 * 60 * 60 * 24 * 365.25)));
 
             if (!isManualCorpRet) {
                 let rate = 10; let label = "(Aggressive)";
@@ -122,26 +86,23 @@
             const gap = Math.max(0, futureCost - grownSavings);
 
             const mRate = rSIP / 12;
-            const monthsRemaining = yearsRemaining * 12;
-            let sip = 0;
-            if (gap > 0 && mRate > 0) {
-                sip = (gap * mRate) / (Math.pow(1 + mRate, monthsRemaining) - 1);
-            }
+            const months = yearsRemaining * 12;
+            const sip = (mRate > 0) ? (gap * mRate) / (Math.pow(1 + mRate, months) - 1) : (gap / months);
 
-            if(els.outCost) els.outCost.innerText = "₹" + Math.round(futureCost).toLocaleString('en-IN');
-            if(els.outSIP) els.outSIP.innerText = "₹" + Math.round(sip).toLocaleString('en-IN');
+            if(els.outCost) els.outCost.innerText = "₹" + format(futureCost);
+            if(els.outSIP) els.outSIP.innerText = "₹" + format(sip);
             
-            const pText = getEl('current-price-text');
-            const cText = getEl('existing-corpus-text');
-            if(pText) pText.innerText = "(" + formatIndian(p) + ")";
-            if(cText) cText.innerText = "(" + formatIndian(existing) + ")";
+            const daysLeft = Math.floor((d2 - now) / 86400000);
+            if (els.timeLeft) {
+                els.timeLeft.innerText = daysLeft > 0 ? `${Math.floor(daysLeft/30)} Months, ${daysLeft%30} Days left` : "Goal Date Reached! 🏁";
+            }
         }
 
-        const sync = (input, slider, isCorp = false) => {
+        function sync(input, slider, isCorp = false) {
             if(!input || !slider) return;
             input.addEventListener('input', () => { slider.value = input.value; calculate(isCorp); });
             slider.addEventListener('input', () => { input.value = slider.value; calculate(isCorp); });
-        };
+        }
 
         sync(els.price, els.priceS); 
         sync(els.sipRet, els.sipRetS);
