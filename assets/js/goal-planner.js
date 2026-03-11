@@ -1,7 +1,7 @@
 window.addEventListener('DOMContentLoaded', function() {
     const getEl = (id) => document.getElementById(id);
     
-    // 1. Initialize all elements
+    // 1. Initialize all elements (Logic remains the same)
     const els = {
         goal: getEl('goal-name'), startD: getEl('start-date'), targetD: getEl('target-date'),
         price: getEl('current-price'), priceS: getEl('current-price-slider'),
@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', function() {
         corpusSection: getEl('corpus-section')
     };
 
-    // 2. Configuration for goals
+    // 2. Configuration for goals (Untouched)
     const config = {
         "Custom Plan": { p: 500000, r: 10, i: 6, y: 5, m: "Your money, your rules. Let's start with a blank slate. 🎯" },
         "Own Wedding": { p: 1500000, r: 12, i: 8, y: 3, m: "It's one day, not a lifestyle. 💍" },
@@ -45,7 +45,7 @@ window.addEventListener('DOMContentLoaded', function() {
         "Foreign Vacation": { p: 700000, r: 9, i: 10, y: 2, m: "Don't pay for it after returning. 🗽" }
     };
 
-    // 3. The Core Engine
+    // 3. The Core Engine (Logic Unchanged)
     function calculate(isManualCorpRet = false) {
         if (!els.startD.value || !els.targetD.value) return;
 
@@ -67,7 +67,6 @@ window.addEventListener('DOMContentLoaded', function() {
         const inflation = parseFloat(els.infl.value) || 0;
         const rSIP = parseFloat(els.sipRet.value) || 0;
 
-        // Logical Checkbox Handling
         const hasCorpus = els.hasCorpusCheck.checked;
         const existing = hasCorpus ? (parseFloat(els.corpus.value) || 0) : 0;
         const corpRet = hasCorpus ? parseFloat(els.corpRet.value) : 0;
@@ -86,9 +85,15 @@ window.addEventListener('DOMContentLoaded', function() {
         
         const daysLeft = Math.floor((d2 - now) / 86400000);
         if (els.timeLeft) els.timeLeft.innerText = daysLeft > 0 ? `${Math.floor(daysLeft/30)} Months, ${daysLeft%30} Days left` : "Goal Date Reached! 🏁";
+
+        // --- STYLING TRIGGER ---
+        // This triggers the same visual scaling/animation used in the SIP Calculator
+        if (typeof window.autoScaleNumbers === 'function') {
+            window.autoScaleNumbers();
+        }
     }
 
-    // 4. Event Listeners
+    // 4. Event Listeners (Styles preserved)
     els.hasCorpusCheck.addEventListener('change', function() {
         els.corpusSection.style.display = this.checked ? 'block' : 'none';
         calculate(false);
