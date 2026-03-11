@@ -1,31 +1,33 @@
 // assets/js/auth-check.js
 
-// 1. Logic to run when the page loads to set the initial UI
 async function updateAuthUI(session) {
-    const authBtn = document.getElementById('auth-btn');
-    const logoutBtn = document.getElementById('logout-btn');
+    const authBtn = document.getElementById('auth-btn'); // The "Sign In" button
+    const profileBox = document.getElementById('user-profile-box'); // The new container
+    const nameDisplay = document.getElementById('user-display-name'); // The "Hey, Name" div
 
     if (session) {
-        authBtn.textContent = session.user.user_metadata.full_name || "Account";
-        authBtn.href = '/dashboard';
-        if (logoutBtn) logoutBtn.style.display = 'inline';
+        // Logged In: Hide button, Show profile stack
+        authBtn.style.display = 'none';
+        profileBox.style.display = 'flex'; // matches our flex-direction: column CSS
+        
+        const fullName = session.user.user_metadata.full_name || "Member";
+        nameDisplay.textContent = `Hey, ${fullName}`;
     } else {
-        authBtn.textContent = 'Sign In / Register';
-        authBtn.href = '/login';
-        if (logoutBtn) logoutBtn.style.display = 'none';
+        // Logged Out: Show button, Hide profile stack
+        authBtn.style.display = 'inline-block';
+        profileBox.style.display = 'none';
     }
 }
 
-// 2. Attach the listener once
+// Attach the listener
 window.supabase.auth.onAuthStateChange((event, session) => {
     updateAuthUI(session);
 });
 
-// 3. Attach the Logout button listener once
+// Initial load check
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     
-    // Check current session immediately on load
     window.supabase.auth.getSession().then(({ data }) => {
         updateAuthUI(data.session);
     });
@@ -34,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             await window.supabase.auth.signOut();
-            window.location.href = '/'; // Redirect home after logout
+            window.location.href = '/'; 
         });
     }
 });
