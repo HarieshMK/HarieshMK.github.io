@@ -47,10 +47,12 @@
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
-  <div class="floating-auth">
-  <div id="auth-controls">
-    <a href="#" id="auth-btn" class="auth-btn">Sign In / Register</a>
-    <a href="#" id="logout-btn" class="auth-btn" style="display:none;">Logout</a>
+ <div class="floating-auth" id="auth-container">
+  <a href="/login" id="auth-btn" class="nav-link">Sign In / Register</a>
+
+  <div id="user-profile-box" style="display:none; text-align: right;">
+    <div id="user-display-name" class="user-greeting"></div>
+    <a href="#" id="logout-btn" class="nav-link">Logout</a>
   </div>
 </div>
   
