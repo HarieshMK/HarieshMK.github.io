@@ -6,4 +6,5 @@ if (typeof window.supabase === 'undefined') {
   window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
   
   console.log("Supabase initialized successfully!");
+  console.log("Supabase Client:", window.supabase);
 }
