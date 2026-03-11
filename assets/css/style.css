@@ -1,3 +1,14 @@
+/* ===== 0. GLOBAL COLOR VARIABLES ===== */
+:root {
+  --text-color: #000000;
+  --bg-color: #ffffff;
+}
+
+.dark-theme {
+  --text-color: #ffffff;
+  --bg-color: #0f172a; /* Your site's dark background */
+}
+
 /* ===== 1. CORE STYLES & PREMIUM TYPOGRAPHY ===== */
 html { scroll-behavior: smooth; } 
 body {
@@ -189,81 +200,53 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
 
-/* ===== 14. AUTHENTICATION UI (Buttons & Profile Stack) ===== */
+/* ===== 14. AUTHENTICATION UI (Premium Card - Isolated) ===== */
 
 /* The main floating container */
 .floating-auth {
   position: fixed;
   top: 25px;
-  right: 85px; /* Aligns with your theme toggle */
+  right: 85px;
   z-index: 1000;
-  text-align: right; /* Ensures stack is right-aligned */
+  text-align: right;
 }
 
-/* 1. The Sign In Button Style */
+/* 1. Sign In Button (The current one you like) */
 .auth-link {
-  text-decoration: none;
-  color: #64748b;
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  padding: 10px 22px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  text-decoration: none; color: #64748b; font-weight: 700;
+  font-size: 0.85rem; text-transform: uppercase;
+  padding: 10px 22px; border-radius: 10px;
+  border: 2px solid #64748b; transition: all 0.3s ease;
   display: inline-block;
-  border: 2px solid #64748b; 
 }
 
-.auth-link:hover {
-  color: #38bdf8 !important;
-  border-color: #38bdf8 !important;
-  background-color: rgba(56, 189, 248, 0.08) !important;
-  transform: translateY(-1px);
-}
-
-/* 2. The Logged-In Profile Stack */
+/* 2. Premium Profile Card (Isolated) */
 .profile-card {
   padding: 15px 20px;
-  border: 1px solid #64748b; /* Border color */
+  border: 1px solid #64748b;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center content */
-  gap: 8px;
-  background: var(--bg-color); /* Automatically matches your theme background */
+  align-items: center;
+  gap: 5px;
+  background: #ffffff; /* Matches your light mode container */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .user-greeting {
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--text-color); /* Automatically black or white */
-  margin: 0;
+  font-weight: 800; font-size: 1rem; color: #0f172a; margin: 0;
 }
 
 .logout-link {
-  font-size: 0.75rem;
-  color: #94a3b8; /* Subtle grey */
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: all 0.2s;
+  font-size: 0.75rem; color: #94a3b8; text-decoration: none;
+  cursor: pointer; transition: color 0.2s;
 }
 
-.logout-link:hover {
-  color: #64748b; /* Darker grey on hover */
-  border-bottom: 1px solid #64748b;
+/* 3. Dark Mode Overrides (Isolated to this card only) */
+.dark-theme .profile-card {
+  background: #0f172a; /* Your dark background */
+  border-color: #334155;
 }
 
-/* 3. Dark Mode Support */
-.dark-theme .auth-link, 
-.dark-theme .user-greeting {
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-}
-
-.dark-theme .auth-link:hover {
-  background-color: rgba(56, 189, 248, 0.15) !important;
-}
-
-.dark-theme .logout-link {
-  color: #cbd5e1;
-}
+.dark-theme .user-greeting { color: #ffffff; }
+.dark-theme .auth-link { color: #ffffff; border-color: #ffffff; }
