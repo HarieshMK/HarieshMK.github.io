@@ -40,30 +40,40 @@ async function handleSignup(email, password, fullName) {
 
 // --- LOGIN FUNCTION ---
 async function handleLogin(email, password) {
-    showAuthMessage(""); // Clear previous messages
+    showAuthMessage(""); 
 
-    if (!email || !password) {
-        showAuthMessage("Please enter your email and password.");
+    // Playful validation logic
+    if (!email && !password) {
+        showAuthMessage("Empty fields? We can't log you in if you're a ghost. 👻");
+        return;
+    }
+    if (!email) {
+        showAuthMessage("Don't forget your email! How will we know it's you?");
+        return;
+    }
+    if (!password) {
+        showAuthMessage("Pssst... you forgot the password!");
         return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    // Now proceed with the actual call
+    const { data, error } = await window.supabase.auth.signInWithPassword({
         email: email,
         password: password
     });
 
     if (error) {
-        // This will now show "Invalid login credentials" in red on the page
-        showAuthMessage(error.message); 
+        // Supabase error messages are technical; let's make them readable
+        if (error.message === "Invalid login credentials") {
+            showAuthMessage("That email/password combo doesn't exist. Check your spelling?");
+        } else {
+            showAuthMessage(error.message);
+        }
     } else {
-        showAuthMessage("Login successful! Redirecting...", false);
-        // Delay slightly so they can see the success message
-        setTimeout(() => {
-            window.location.href = '/'; 
-        }, 1000);
+        showAuthMessage("Welcome back! Redirecting...", false);
+        setTimeout(() => { window.location.href = '/'; }, 1000);
     }
 }
-
 // --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('btn-login');
