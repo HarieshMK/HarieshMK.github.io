@@ -147,12 +147,7 @@ table th { background-color: #f8fafc; font-weight: 700; color: #0f172a; white-sp
 /* ===== 12. IMAGE SAFETY ===== */
 img { max-width: 100%; height: auto; border-radius: 8px; }
  
-/* ===== 13. SHARE BUTTON STYLES ===== */
-.share-section { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #e2e8f0; }
-.share-btn { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 8px; color: #64748b; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
-.share-btn:hover { background: #f1f5f9; color: #38bdf8; border-color: #38bdf8; }
-.dark-theme .share-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
-/* ===== 14. CALCULATOR HUB STYLES ===== */
+/* ===== 13. CALCULATOR HUB STYLES ===== */
 .calculator-grid { 
   display: grid; 
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
@@ -194,34 +189,50 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .dark-theme .calc-card h3 { color: #ffffff; }
 .dark-theme .calc-card p { color: #94a3b8; }
 
-/* ===== 15. SIGN UP BUTTON STYLE ===== */
-
+/* ===== 14. SIGN UP BUTTON STYLE (Consistent with Nav) ===== */
 .floating-auth {
-  position: fixed;
-  top: 20px;
-  right: 80px; /* Adjusted to sit nicely next to your theme toggle */
+  position: fixed; /* Keeps it visible while scrolling */
+  top: 25px;
+  right: 85px; /* Positioned near your theme toggle */
   z-index: 1000;
 }
 
-.btn-auth {
-  display: inline-block;
-  padding: 10px 20px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  border-radius: 8px;
-  
-  /* Force the border to appear */
-  border: 2px solid var(--text-color) !important; 
-  
-  background: transparent;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* We ensure the list inside the float doesn't have extra margins */
+.floating-auth .nav-list {
+  margin: 0;
+  padding: 0;
 }
 
-/* This handles the Hover effect for BOTH light and dark mode */
-.btn-auth:hover {
-  background: var(--text-color);
-  color: var(--bg-color); /* This should invert the text color to the background color */
+/* This makes the auth link look exactly like your Home/About buttons */
+.auth-link {
+  text-decoration: none;
+  color: #64748b; /* Same as your nav color */
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  display: inline-block;
+  
+  /* Adding the border you liked for emphasis */
+  border: 2px solid #64748b; 
+}
+
+/* Dark Mode Support: Matching your existing Dark Mode Nav styles */
+.dark-theme .auth-link {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* Hover Effect: Matching your existing Nav hover */
+.auth-link:hover {
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+.dark-theme .auth-link:hover {
+  background-color: rgba(56, 189, 248, 0.15) !important;
 }
