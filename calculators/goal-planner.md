@@ -4,7 +4,7 @@ title: Smart Goal Planner
 permalink: /calculators/goal-planner/
 ---
 
-<div class="calculator-wrapper">
+<div class="calculator-container"> 
     <div class="calc-header">
         <h1>Smart Goal Planner</h1>
     </div>
