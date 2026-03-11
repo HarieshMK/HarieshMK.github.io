@@ -4,7 +4,7 @@ title: SIP Calculator
 permalink: /calculators/sip/
 ---
 
-<link rel="stylesheet" href="/css/global-styles.css">
+<link rel="stylesheet" href="assets/css/global-styles.css">
 
 # SIP Calculator
 Estimate the wealth you can create through monthly Systematic Investment Plans.
