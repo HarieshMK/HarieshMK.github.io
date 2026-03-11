@@ -1,3 +1,5 @@
+console.log("Auth Logic has loaded!");
+
 // assets/js/auth-logic.js
 
 // --- HELPER: Display messages to the user ---
