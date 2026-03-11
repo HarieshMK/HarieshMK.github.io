@@ -57,21 +57,21 @@ async function handleLogin(email, password) {
     }
 
     // Now proceed with the actual call
-    const { data, error } = await window.supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-    });
+   try {
+        const { data, error } = await window.supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
 
-    if (error) {
-        // Supabase error messages are technical; let's make them readable
-        if (error.message === "Invalid login credentials") {
-            showAuthMessage("That email/password combo doesn't exist. Check your spelling?");
-        } else {
+        if (error) {
             showAuthMessage(error.message);
+        } else {
+            showAuthMessage("Login successful!", false);
+            setTimeout(() => { window.location.href = '/'; }, 1000);
         }
-    } else {
-        showAuthMessage("Welcome back! Redirecting...", false);
-        setTimeout(() => { window.location.href = '/'; }, 1000);
+    } catch (err) {
+        console.error("Critical Auth Error:", err);
+        showAuthMessage("Connection error. Check console.");
     }
 }
 // --- EVENT LISTENERS ---
