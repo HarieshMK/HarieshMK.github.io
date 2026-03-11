@@ -47,17 +47,11 @@
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
-  <div id="auth-container" class="floating-auth">
-  <button id="auth-btn" class="btn-auth">Sign In / Register</button>
+  <div class="floating-auth">
+  <ul class="nav-list">
+    <li><a href="/login" id="auth-btn" class="auth-link">Sign In / Register</a></li>
+  </ul>
 </div>
-  
-  {% if page.layout == "post" %}
-<div class="share-section">
-  <button id="copy-link-btn" class="share-btn">
-    <i class="fas fa-link"></i> Copy Link
-  </button>
-</div>
-{% endif %}
 
   <div class="container">
     <header>
@@ -76,11 +70,6 @@
     </header>
 
     <main>{{ content }}</main>
-<div class="share-section">
-  <button id="copy-link-btn" class="share-btn">
-    <i class="fas fa-link"></i> Copy Link
-  </button>
-</div>
     
     <footer>
       <div class="footer-grid">
