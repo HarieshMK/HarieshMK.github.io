@@ -222,32 +222,35 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 }
 
 /* 2. The Logged-In Profile Stack */
-#user-profile-box {
+.profile-card {
+  padding: 15px 20px;
+  border: 1px solid #64748b; /* Border color */
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Keeps name and logout aligned right */
-  gap: 2px;
+  align-items: center; /* Center content */
+  gap: 8px;
+  background: var(--bg-color); /* Automatically matches your theme background */
 }
 
 .user-greeting {
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: #64748b; /* Matches your brand color */
-  margin-bottom: 2px;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-color); /* Automatically black or white */
+  margin: 0;
 }
 
 .logout-link {
-  text-decoration: none;
-  color: #94a3b8; 
   font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s;
+  color: #94a3b8; /* Subtle grey */
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s;
 }
 
 .logout-link:hover {
-  color: #ef4444; /* Subtle red hover for logout action */
-  text-decoration: underline;
+  color: #64748b; /* Darker grey on hover */
+  border-bottom: 1px solid #64748b;
 }
 
 /* 3. Dark Mode Support */
