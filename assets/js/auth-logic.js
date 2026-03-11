@@ -20,7 +20,7 @@ async function handleSignup(email, password, fullName) {
         return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await window.supabase.auth.signUp({
         email: email,
         password: password,
         options: {
