@@ -13,6 +13,8 @@ permalink: /login/
     
     <input type="password" id="login-password" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--text-color); background: transparent; color: var(--text-color);">
 
+    <div id="auth-msg" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 15px; min-height: 1.2em;"></div>
+
     <button id="btn-login" class="auth-link" style="width: 100%; cursor: pointer;">Login</button>
     
     <p style="margin-top: 20px; font-size: 0.9rem;">Don't have an account? <a href="/signup" style="color: #38bdf8;">Register here</a></p>
