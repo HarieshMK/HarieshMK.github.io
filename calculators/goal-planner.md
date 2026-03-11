@@ -3,9 +3,8 @@ layout: default
 title: Smart Goal Planner
 permalink: /calculators/goal-planner/
 ---
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 
-<div markdown="0" class="calculator-wrapper">
+<div class="calculator-wrapper">
     <div class="calc-header">
         <h1>Smart Goal Planner</h1>
     </div>
@@ -108,6 +107,7 @@ permalink: /calculators/goal-planner/
                 </div>
             </div>
         </div> 
+
         <div class="calc-results">
             <div class="result-box">
                 <span class="label">Future Cost</span>
@@ -140,121 +140,5 @@ permalink: /calculators/goal-planner/
                 Download Goal Plan 📥
             </button>
         </div>
-        </div>
     </div>
-    
-<style>
-    /* 1. CONTAINER & LAYOUT */
-    .calculator-wrapper { max-width: 1050px; margin: 0px auto; padding: 5px; font-family: 'Inter', sans-serif; }
-    .calc-header h1 { margin-bottom: 15px; color: #0f172a; }
-    .calc-main-body { display: flex; flex-direction: row; gap: 20px; align-items: flex-start; }
-    .calc-inputs { flex: 1.4; display: flex; flex-direction: column; gap: 10px; }
-    
-    /* 2. PREMIUM RESULTS CARD (LIGHT MODE) */
-    .calc-results { 
-        flex: 1; background: #f8fafc; padding: 30px; border-radius: 24px; 
-        border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); 
-        position: sticky; top: 20px; 
-    }
-    .result-box { margin-bottom: 20px; }
-    .result-box .label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
-    .result-box h2 { font-size: 1.8rem; margin: 0; font-family: 'JetBrains Mono', monospace; color: #0f172a; }
-    
-    .highlight { background: #0ea5e9; padding: 25px; border-radius: 18px; color: white; text-align: center; }
-    .highlight h2 { color: #ffffff !important; font-size: 2.2rem; }
-    .highlight .label { color: rgba(255,255,255,0.9); }
-
-    /* COUNTDOWN BOX (LIGHT MODE) */
-    .countdown-box { background: #ffffff; padding: 15px; border-radius: 14px; border-left: 5px solid #0ea5e9; margin: 20px 0; }
-    .countdown-box h3 { font-family: 'JetBrains Mono', monospace; margin: 2px 0; color: #0f172a; font-size: 1.2rem; }
-    .remaining-text, .journey-text { font-size: 0.85rem; color: #475569; margin: 4px 0; font-weight: 500; }
-    
-    .download-button { width: 100%; background: #0f172a; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
-    /* 3. INPUT ELEMENTS */
-    input[type="date"], .full-width-input, input[type="number"] { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 10px; font-family: 'JetBrains Mono', monospace; box-sizing: border-box; }
-    .slider { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin: 12px 0; outline: none; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0ea5e9; border-radius: 50%; border: 3px solid #fff; cursor: pointer; }
-
-   /* 4. DARK MODE OVERRIDES - UPDATED SELECTOR */
-    .dark-theme { background-color: #0b1120 !important; color: #f1f5f9 !important; }
-    .dark-theme .calc-header h1 { color: #ffffff !important; }
-    .dark-theme .calc-results { background: #111827 !important; border-color: #1f2937 !important; }
-    
-    /* Targeting the countdown box */
-    .dark-theme .countdown-box { background: #1f2937 !important; border-color: #0ea5e9 !important; }
-    
-    .dark-theme .countdown-box h3 { 
-        color: #000000 !important; 
-        background: #ffffff !important; 
-        padding: 4px 8px !important; 
-        border-radius: 6px !important; 
-        display: inline-block !important; 
-    }
-    
-    .dark-theme .remaining-text, 
-    .dark-theme .journey-text { 
-        color: #e2e8f0 !important; 
-        font-weight: 600 !important; 
-    }
-    
-    .dark-theme input[type="date"], 
-    .dark-theme .full-width-input, 
-    .dark-theme input[type="number"] { background: #0b1120 !important; border-color: #374151 !important; color: white !important; }
-
-/* --- Disclaimer Box --- */
-.calc-disclaimer {
-  margin-top: 20px;
-  padding: 20px;
-  background: #fffbeb;
-  border-radius: 14px;
-  border-left: 5px solid #f59e0b;
-}
-
-.calc-disclaimer p { 
-  font-size: 0.8rem; 
-  color: #92400e; 
-  margin: 0; /* Updated to 0 to match your snippet */
-  line-height: 1.5; 
-}
-
-/* Dark Mode adjustment for the Amber style */
-.dark-theme .calc-disclaimer {
-  background: #fffbeb !important; /* Darker amber background */
-  border-left-color: #f59e0b !important;
-}
-
-.dark-theme .calc-disclaimer p {
-  color: #92400e !important; /* Lighter text for readability */
-}
-    /* 5. RESPONSIVE */
-    @media (max-width: 850px) {
-        .calc-main-body { flex-direction: column; }
-        .calc-inputs, .calc-results { width: 100%; }
-        .calc-results { position: static; }
-    }
-   /* 6. Prevent wrapping and force dynamic scaling */
-/* Add this to your style block */
-.result-box h2 {
-    font-size: 1.8rem; /* Default size */
-    /* This makes the font shrink dynamically as the screen narrows */
-    font-size: clamp(0.8rem, 4vw, 1.8rem); 
-    /* Force single line, no wrapping */
-    white-space: nowrap; 
-    /* If still too long, show ellipsis instead of breaking layout */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* Ensure it doesn't push the container width */
-    max-width: 100%;
-}
-
-/* Specific fix for the blue highlight box */
-.highlight h2 {
-    font-size: clamp(1rem, 5vw, 2.2rem) !important;
-}
-
-/* 3. Ensure Dark Mode text remains visible */
-.dark-theme .result-box h2 {
-    color: #f1f5f9 !important;
-}
-</style>
+</div>
