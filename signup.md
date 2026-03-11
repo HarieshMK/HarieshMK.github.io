@@ -15,6 +15,8 @@ permalink: /signup/
     
     <input type="password" id="signup-password" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid var(--text-color); background: transparent; color: var(--text-color);">
 
+    <div id="auth-msg" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 15px; min-height: 1.2em;"></div>
+
     <button id="btn-signup" class="auth-link" style="width: 100%; cursor: pointer;">Register</button>
     
     <p style="margin-top: 20px; font-size: 0.9rem;">Already a member? <a href="/login" style="color: #38bdf8;">Sign in here</a></p>
