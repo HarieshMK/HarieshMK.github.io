@@ -59,12 +59,14 @@ permalink: /calculators/goal-planner/
         <p style="font-size: 0.85rem; color: #64748b; margin-top: -15px; margin-bottom: 20px;">Total Duration: <span id="years-val" style="font-weight: 700; color: #0ea5e9;">5.0</span> Years</p>
 
         <div class="input-group">
-            <div class="label-row">
-                <label>Current Cost Today (₹) <span id="current-price-readable" style="font-size: 0.8rem; color: #0ea5e9; margin-left: 5px;"></span></label>
-                <input type="number" id="current-price" value="500000">
-            </div>
-            <input type="range" id="current-price-slider" class="slider" min="10000" max="10000000" step="5000" value="500000">
-        </div>
+    <div class="label-row">
+        <label>Current Cost Today (₹)
+            <span id="current-price-readable" class="input-readable"></span>
+        </label>
+        <input type="number" id="current-price" value="500000">
+    </div>
+    <input type="range" id="current-price-slider" class="slider" min="10000" max="10000000" step="5000" value="500000">
+</div>
 
         <div class="input-group">
             <div class="label-row">
