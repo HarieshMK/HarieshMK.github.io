@@ -97,11 +97,14 @@
 
 
 @media (max-width: 768px) {
-  /* Ensure the container itself doesn't overflow */
+  /* 1. Force the container to compensate for the parent's padding */
   .calculator-container { 
     padding: 15px !important; 
-    width: 100%; 
-    overflow-x: hidden; /* This prevents horizontal scrolling */
+    width: calc(100vw - 30px) !important; /* Subtracts the padding to keep it inside the screen */
+    margin-left: -15px !important; /* Pulls the box to the left edge to align with the main content */
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    gap: 15px !important; /* Slightly tighten the gap on mobile */
   }
 
   /* Force the label-row to be responsive */
@@ -116,17 +119,17 @@
     width: 100%; 
   }
 
-  /* CRITICAL: Force input to fit strictly within the parent width */
-  .label-row input[type="number"] {
-    width: 100% !important; /* Forces it to fill the mobile container */
-    max-width: 100% !important;
-    box-sizing: border-box; /* This is the key: prevents overflow */
+/* 2. Fix the input box sizing */
+  .label-row input[type="number"] { 
+    width: 100% !important; 
+    box-sizing: border-box !important; /* Includes border/padding in width */
   }
 
-  /* Fixes the off-center issue in the Result section ONLY on mobile */
+ /* 3. Force the result centering */
   .calc-results {
     align-items: center !important;
-    text-align: center;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   /* Fixes internal item centering */
