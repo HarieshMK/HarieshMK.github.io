@@ -46,7 +46,7 @@ permalink: /calculators/goal-planner/
             </select>
         </div>
 
-        <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+        <div style="display: flex; gap: 20px; margin-bottom: 25px;">
             <div class="input-group" style="flex: 1;">
                 <label style="display: block; margin-bottom: 8px; font-weight: 700;">Start Date</label>
                 <input type="date" id="start-date" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #f1f5f9;">
@@ -56,11 +56,11 @@ permalink: /calculators/goal-planner/
                 <input type="date" id="target-date" style="width: 100%; padding: 8px; border-radius: 10px; border: 2px solid #f1f5f9;">
             </div>
         </div>
-        <p style="font-size: 0.85rem; color: #64748b; margin-top: -15px; margin-bottom: 20px;">Total Duration: <span id="years-val" style="font-weight: 700; color: #0ea5e9;">5</span> Years</p>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: -15px; margin-bottom: 20px;">Total Duration: <span id="years-val" style="font-weight: 700; color: #0ea5e9;">5.0</span> Years</p>
 
         <div class="input-group">
             <div class="label-row">
-                <label>Current Cost Today (₹)</label>
+                <label>Current Cost Today (₹) <span id="current-price-readable" style="font-size: 0.8rem; color: #0ea5e9; margin-left: 5px;"></span></label>
                 <input type="number" id="current-price" value="500000">
             </div>
             <input type="range" id="current-price-slider" class="slider" min="10000" max="10000000" step="5000" value="500000">
@@ -91,10 +91,10 @@ permalink: /calculators/goal-planner/
         <div id="corpus-section" style="display: none;">
             <div class="input-group">
                 <div class="label-row">
-                    <label>Current Savings (₹)</label>
+                    <label>Current Savings (₹) <span id="existing-corpus-readable" style="font-size: 0.8rem; color: #0ea5e9; margin-left: 5px;"></span></label>
                     <input type="number" id="existing-corpus" value="0">
                 </div>
-                <input type="range" id="existing-corpus-slider" class="slider" min="0" max="5000000" step="5000" value="0">
+                <input type="range" id="existing-corpus-slider" class="slider" min="0" max="10000000" step="5000" value="0">
             </div>
             
             <div class="input-group">
@@ -127,7 +127,7 @@ permalink: /calculators/goal-planner/
         </div>
 
         <div class="result-item">
-            <span>The Boss Nudge</span>
+            <span>The Reality Check</span>
             <p id="goal-nudge" style="text-align: center; font-size: 0.9rem; color: #475569; padding: 0 10px;">Ready to be a BOSS? 🚀</p>
         </div>
 
@@ -135,7 +135,7 @@ permalink: /calculators/goal-planner/
             <p><strong>The Unexciting Reality:</strong> Markets move, inflation is a thief. This isn't professional advice—it's just math.</p>
         </div>
 
-        <button id="download-btn" class="download-button" style="width: 100%; margin-top: 15px; background: #0ea5e9; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer;">
+        <button id="download-btn" class="download-button" style="width: 100%; margin-top: 15px;">
             Download Goal Plan 📥
         </button>
     </div>
