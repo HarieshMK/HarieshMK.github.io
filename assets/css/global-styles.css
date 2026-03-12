@@ -117,9 +117,21 @@
   }
 
   /* CRITICAL: Force input to fit strictly within the parent width */
-  .label-row input[type="number"] { 
-    width: 100% !important; 
-    box-sizing: border-box; /* This is the key to preventing overflow */
-    -webkit-appearance: none; /* Helps with mobile browser rendering */
+  .label-row input[type="number"] {
+    width: 100% !important; /* Forces it to fill the mobile container */
+    max-width: 100% !important;
+    box-sizing: border-box; /* This is the key: prevents overflow */
+  }
+
+  /* Fixes the off-center issue in the Result section ONLY on mobile */
+  .calc-results {
+    align-items: center !important;
+    text-align: center;
+  }
+  
+  /* Fixes internal item centering */
+  .result-item {
+    width: 100% !important;
+    align-items: center !important;
   }
 }
