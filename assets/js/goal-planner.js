@@ -8,8 +8,10 @@ window.addEventListener('DOMContentLoaded', function() {
         targetD: getEl('target-date'),
         price: getEl('current-price'), 
         priceS: getEl('current-price-slider'),
+        priceLabel: getEl('current-price-readable'), // New: For "10 L" reading
         corpus: getEl('existing-corpus'), 
         corpusS: getEl('existing-corpus-slider'),
+        corpusLabel: getEl('existing-corpus-readable'), // New: For "10 L" reading
         corpRet: getEl('corpus-returns'), 
         corpRetS: getEl('corpus-returns-slider'),
         sipRet: getEl('goal-returns'), 
@@ -27,7 +29,6 @@ window.addEventListener('DOMContentLoaded', function() {
         corpusSection: getEl('corpus-section')
     };
 
-    // 2. Configuration for goals
     const config = {
         "Custom Plan": { p: 500000, r: 12, i: 6, y: 5, m: "Your money, your rules. Let's start with a blank slate. 🎯" },
         "Own Wedding": { p: 1500000, r: 12, i: 8, y: 3, m: "It's one day, not a lifestyle. 💍" },
@@ -55,6 +56,13 @@ window.addEventListener('DOMContentLoaded', function() {
         "Foreign Vacation": { p: 700000, r: 9, i: 10, y: 2, m: "Don't pay for it after returning. 🗽" }
     };
 
+    // Helper: Converts 1000000 to "(10 L)"
+    function formatToIndianWord(num) {
+        if (num >= 10000000) return `(${(num / 10000000).toFixed(2)} Cr)`;
+        if (num >= 100000) return `(${(num / 100000).toFixed(2)} L)`;
+        return "";
+    }
+
     // 3. The Core Engine
     function calculate(isManualCorpRet = false) {
         if (!els.startD.value || !els.targetD.value) return;
@@ -77,8 +85,13 @@ window.addEventListener('DOMContentLoaded', function() {
         const inflation = parseFloat(els.infl.value) || 0;
         const rSIP = parseFloat(els.sipRet.value) || 0;
 
+        // Update Reading Labels
+        if(els.priceLabel) els.priceLabel.innerText = formatToIndianWord(p);
+        
         const hasCorpus = els.hasCorpusCheck.checked;
         const existing = hasCorpus ? (parseFloat(els.corpus.value) || 0) : 0;
+        if(els.corpusLabel) els.corpusLabel.innerText = formatToIndianWord(existing);
+
         const corpRet = hasCorpus ? parseFloat(els.corpRet.value) : 0;
 
         if (!isManualCorpRet && hasCorpus) {
@@ -106,6 +119,18 @@ window.addEventListener('DOMContentLoaded', function() {
         calculate(false);
     });
 
+    // Download Button Logic
+    if(els.downloadBtn) {
+        els.downloadBtn.addEventListener('click', function() {
+            // Trigger the global capture function if it exists
+            if (typeof window.captureCalculator === 'function') {
+                window.captureCalculator('printable-area', 'My-Goal-Plan');
+            } else {
+                window.print(); // Fallback
+            }
+        });
+    }
+
     if(els.goal) {
         els.goal.addEventListener('change', function() {
             const t = config[this.value];
@@ -125,6 +150,7 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     function sync(input, slider, isCorp = false) {
+        if(!input || !slider) return;
         input.addEventListener('input', () => { slider.value = input.value; calculate(isCorp); });
         slider.addEventListener('input', () => { input.value = slider.value; calculate(isCorp); });
     }
