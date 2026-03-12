@@ -97,42 +97,55 @@
 
 
 @media (max-width: 768px) {
-  /* 1. Force the container to compensate for the parent's padding */
-  .calculator-container { 
-    padding: 15px !important; 
-    width: calc(100vw - 30px) !important; /* Subtracts the padding to keep it inside the screen */
-    margin-left: -15px !important; /* Pulls the box to the left edge to align with the main content */
+  /* 1. Full Container Override */
+  .calculator-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important; /* Tightened gap for mobile */
+    background: #ffffff !important;
+    padding: 15px !important;
+    border-radius: 24px !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-top: 20px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+    width: calc(100vw - 30px) !important;
+    margin-left: -15px !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
-    gap: 15px !important; /* Slightly tighten the gap on mobile */
   }
 
-  /* Force the label-row to be responsive */
-  .label-row { 
-    flex-direction: column; 
-    align-items: flex-start; 
-    gap: 8px; 
-    width: 100%; 
+  /* 2. Responsive Input Rows */
+  .label-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
   }
 
-  .label-row label { 
-    width: 100%; 
+  .label-row label {
+    width: 100% !important;
   }
 
-/* 2. Fix the input box sizing */
-  .label-row input[type="number"] { 
-    width: 100% !important; 
-    box-sizing: border-box !important; /* Includes border/padding in width */
-  }
-
- /* 3. Force the result centering */
-  .calc-results {
-    align-items: center !important;
+  .label-row input[type="number"] {
     width: 100% !important;
     box-sizing: border-box !important;
   }
-  
-  /* Fixes internal item centering */
+
+  /* 3. Centered Results */
+  .calc-results {
+    flex: 1 !important;
+    width: 100% !important;
+    background: #f8fafc !important;
+    padding: 15px !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
   .result-item {
     width: 100% !important;
     align-items: center !important;
