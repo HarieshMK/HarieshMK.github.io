@@ -97,33 +97,28 @@
 
 
 @media (max-width: 768px) {
-  /* 1. Full Container Override */
+  /* 1. Simplify the Container */
   .calculator-container {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 15px !important; /* Tightened gap for mobile */
+    gap: 15px !important;
     background: #ffffff !important;
     padding: 15px !important;
-    border-radius: 24px !important;
+    border-radius: 20px !important;
     border: 1px solid #e2e8f0 !important;
-    margin-top: 20px !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
-    width: calc(100vw - 30px) !important;
-    margin-left: -15px !important;
+    
+    /* THE FIX: Use width: auto and margin to handle spacing */
+    width: auto !important; 
+    margin: 20px 5px !important; /* Small side margins prevent edge clipping */
+    
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
+    overflow: hidden !important; /* Prevents internal items from pushing the container */
   }
 
-  /* 2. Responsive Input Rows */
+  /* 2. Responsive Inputs */
   .label-row {
-    display: flex !important;
     flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-
-  .label-row label {
+    align-items: stretch !important; /* Stretch inputs to full width */
     width: 100% !important;
   }
 
@@ -134,15 +129,10 @@
 
   /* 3. Centered Results */
   .calc-results {
-    flex: 1 !important;
     width: 100% !important;
-    background: #f8fafc !important;
-    padding: 15px !important;
-    border-radius: 20px !important;
-    display: flex !important;
-    flex-direction: column !important;
     align-items: center !important;
     text-align: center !important;
+    padding: 15px !important;
     box-sizing: border-box !important;
   }
 
