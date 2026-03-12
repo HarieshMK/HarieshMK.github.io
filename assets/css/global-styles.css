@@ -99,7 +99,7 @@
 @media (max-width: 768px) {
   /* Ensure the container itself doesn't overflow */
   .calculator-container { 
-    padding: 20px 15px !important; 
+    padding: 15px !important; 
     width: 100%; 
     overflow-x: hidden; /* This prevents horizontal scrolling */
   }
