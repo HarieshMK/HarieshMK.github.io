@@ -34,8 +34,16 @@
 .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; width: 100%; }
 .label-row label { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
 .label-row input[type="number"] {
-  width: 120px; padding: 8px 12px; border: 2px solid #f1f5f9; border-radius: 10px;
+  width: 100px; padding: 8px 12px; border: 2px solid #f1f5f9; border-radius: 10px;
   font-weight: 700; color: #0369a1; font-family: 'JetBrains Mono', monospace; background: #fff;
+}
+/* This keeps the "L/Cr" text perfectly under the label */
+.input-readable {
+  display: block;
+  font-size: 0.75rem;
+  color: #0ea5e9;
+  margin-top: 2px;
+  font-weight: 400;
 }
 
 /* Sliders */
