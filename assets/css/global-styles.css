@@ -96,17 +96,30 @@
 .dark-theme .result-item strong { color: #ffffff !important; }
 
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .calculator-container { padding: 20px 15px !important; }
-  .label-row {flex-direction: column; align-items: flex-start;}
-  .label-row label {width: 100%; margin-bottom: 5px;}
-  .label-row input[type="number"] { width: 100% !important; /* Force input to full width */ }
-}
-@media print {
-  #printable-area { 
-    border: none !important; 
-    box-shadow: none !important; 
-    padding: 0 !important; 
+  /* Ensure the container itself doesn't overflow */
+  .calculator-container { 
+    padding: 20px 15px !important; 
+    width: 100%; 
+    overflow-x: hidden; /* This prevents horizontal scrolling */
+  }
+
+  /* Force the label-row to be responsive */
+  .label-row { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 8px; 
+    width: 100%; 
+  }
+
+  .label-row label { 
+    width: 100%; 
+  }
+
+  /* CRITICAL: Force input to fit strictly within the parent width */
+  .label-row input[type="number"] { 
+    width: 100% !important; 
+    box-sizing: border-box; /* This is the key to preventing overflow */
+    -webkit-appearance: none; /* Helps with mobile browser rendering */
   }
 }
