@@ -120,16 +120,11 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     // Download Button Logic
-    if(els.downloadBtn) {
-        els.downloadBtn.addEventListener('click', function() {
-            // Trigger the global capture function if it exists
-            if (typeof window.captureCalculator === 'function') {
-                window.captureCalculator('printable-area', 'My-Goal-Plan');
-            } else {
-                window.print(); // Fallback
-            }
-        });
-    }
+if(els.downloadBtn) {
+    els.downloadBtn.addEventListener('click', function() {
+        window.print();
+    });
+}
 
     if(els.goal) {
         els.goal.addEventListener('change', function() {
