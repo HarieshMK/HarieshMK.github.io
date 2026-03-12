@@ -95,49 +95,45 @@
 .dark-theme .label-row input[type="number"] { background: #020617; border-color: #334155; color: #38bdf8; }
 .dark-theme .result-item strong { color: #ffffff !important; }
 
-
 @media (max-width: 768px) {
-  /* 1. Simplify the Container */
+  /* 1. Reset Container for full mobile control */
   .calculator-container {
     display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 15px !important;
-    background: #ffffff !important;
+    flex-direction: column !important; /* Forces vertical stacking */
+    width: 100% !important; 
+    max-width: 100% !important;
+    margin: 10px 0 !important; 
     padding: 15px !important;
-    border-radius: 20px !important;
-    border: 1px solid #e2e8f0 !important;
-    
-    /* THE FIX: Use width: auto and margin to handle spacing */
-    width: auto !important; 
-    margin: 20px 5px !important; /* Small side margins prevent edge clipping */
-    
     box-sizing: border-box !important;
-    overflow: hidden !important; /* Prevents internal items from pushing the container */
+    overflow-x: hidden !important; /* Hard lock on overflow */
   }
 
-  /* 2. Responsive Inputs */
+  /* 2. Fix Input Row and Inputs */
   .label-row {
     flex-direction: column !important;
-    align-items: stretch !important; /* Stretch inputs to full width */
+    align-items: stretch !important;
     width: 100% !important;
+    margin-bottom: 15px !important;
   }
 
   .label-row input[type="number"] {
     width: 100% !important;
+    max-width: 100% !important; /* Prevents overflow behind the card */
     box-sizing: border-box !important;
   }
 
-  /* 3. Centered Results */
+  /* 3. Fix Results container */
   .calc-results {
     width: 100% !important;
-    align-items: center !important;
-    text-align: center !important;
+    margin-top: 10px !important;
     padding: 15px !important;
     box-sizing: border-box !important;
   }
 
+  /* 4. Fix Results content alignment */
   .result-item {
     width: 100% !important;
     align-items: center !important;
+    box-sizing: border-box !important;
   }
 }
