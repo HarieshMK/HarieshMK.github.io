@@ -19,7 +19,7 @@ body {
   background-color: #f8fafc; color: #334155; font-family: 'Inter', -apple-system, sans-serif; 
   font-size: 18px; line-height: 1.7; margin: 0; padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease; overflow-x: hidden;
- -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 .container {
   max-width: 850px; margin: 0 auto; background: #ffffff; padding: 60px 50px; 
@@ -54,9 +54,14 @@ header .tagline { color: #64748b; font-size: 1.1rem; font-style: italic; margin:
 .nav-list li a:hover { color: #38bdf8 !important; background-color: rgba(56, 189, 248, 0.08) !important; transform: translateY(-1px); }
 .nav-list li a.active { color: #0f172a !important; background: rgba(255, 255, 255, 0.5) !important; backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important; border: 1px solid rgba(226, 232, 240, 0.8) !important; }
 
+/* REVISED MOBILE OVERRIDES */
 @media (max-width: 480px) {
+  .container { padding: 30px 15px !important; width: 100%; }
   .nav-list li { width: 100%; }
   .nav-list li a { display: block; text-align: center; padding: 12px; }
+  header h1 { font-size: 1.8rem; }
+  header .tagline { font-size: 0.95rem; }
+  .floating-auth { right: 10px !important; top: 10px !important; transform: scale(0.8) !important; transform-origin: top right; }
 }
 
 /* ===== 3. BLOG CARDS & HOVER ===== */
@@ -81,6 +86,7 @@ header .tagline { color: #64748b; font-size: 1.1rem; font-style: italic; margin:
 /* ===== 4. FOOTER SECTION ===== */
 footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
 .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
+@media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr; gap: 30px; } }
 .footer-col h4 { font-size: 1.1rem; margin-top: 0; margin-bottom: 15px; color: #0f172a; }
 .footer-col ul { list-style: none; padding: 0; margin: 0; }
 .footer-col ul li { margin-bottom: 10px; }
@@ -208,13 +214,14 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 /* The main floating container */
 .floating-auth {
   position: fixed;
-  top: 25px;
-  right: 85px;
+  top: 15px;
+  right: 15px;
   z-index: 1000;
   text-align: right;
+  transform: scale(0.9);
 }
 
-/* 1. Sign In Button (The current one you like) */
+/* 1. Sign In Button */
 .auth-link {
   text-decoration: none; color: #64748b; font-weight: 700;
   font-size: 0.85rem; text-transform: uppercase;
@@ -227,18 +234,18 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .profile-card {
   padding: 20px 24px;
   background: var(--bg-color);
-  border: 1px solid rgba(100, 116, 139, 0.2); /* Softer border */
-  border-radius: 16px; /* Slightly more rounded */
+  border: 1px solid rgba(100, 116, 139, 0.2); 
+  border-radius: 16px; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px; /* More breathing room */
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); /* Soft, elevated shadow */
+  gap: 12px; 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); 
   backdrop-filter: blur(8px);
 }
 
 .user-greeting {
-  font-family: 'Lora', serif; /* Use your brand font for the name */
+  font-family: 'Lora', serif; 
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--text-color);
@@ -257,7 +264,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .logout-link {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #64748b; /* Neutral grey, not "error" red */
+  color: #64748b; 
   text-decoration: none;
   padding: 4px 12px;
   border-radius: 6px;
@@ -268,9 +275,10 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
   background: rgba(100, 116, 139, 0.1);
   color: var(--text-color);
 }
+
 /* 3. Dark Mode Overrides (Isolated to this card only) */
 .dark-theme .profile-card {
-  background: #0f172a; /* Your dark background */
+  background: #0f172a; 
   border-color: #334155;
 }
 
