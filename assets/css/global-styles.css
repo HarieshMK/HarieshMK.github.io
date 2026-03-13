@@ -98,42 +98,42 @@
 @media (max-width: 768px) {
   /* 1. Reset Container for full mobile control */
   .calculator-container {
-    display: flex !important;
-    flex-direction: column !important; /* Forces vertical stacking */
-    width: 100% !important; 
-    max-width: 100% !important;
-    margin: 10px 0 !important; 
-    padding: 15px !important;
-    box-sizing: border-box !important;
-    overflow-x: hidden !important; /* Hard lock on overflow */
+    display: flex;
+    flex-direction: column; /* Forces vertical stacking */
+    width: 100%; 
+    max-width: 100%;
+    margin: 10px 0; 
+    padding: 15px;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Hard lock on overflow */
   }
 
   /* 2. Fix Input Row and Inputs */
   .label-row {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    margin-bottom: 15px !important;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    margin-bottom: 15px;
   }
 
   .label-row input[type="number"] {
-    width: 100% !important;
-    max-width: 100% !important; /* Prevents overflow behind the card */
-    box-sizing: border-box !important;
+    width: 100%;
+    max-width: 100%; /* Prevents overflow behind the card */
+    box-sizing: border-box;
   }
 
   /* 3. Fix Results container */
   .calc-results {
-    width: 100% !important;
-    margin-top: 10px !important;
-    padding: 15px !important;
-    box-sizing: border-box !important;
+    width: 100%;
+    margin-top: 10px;
+    padding: 15px;
+    box-sizing: border-box;
   }
 
   /* 4. Fix Results content alignment */
   .result-item {
-    width: 100% !important;
-    align-items: center !important;
-    box-sizing: border-box !important;
+    width: 100%;
+    align-items: center;
+    box-sizing: border-box;
   }
 }
