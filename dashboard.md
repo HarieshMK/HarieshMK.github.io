@@ -34,30 +34,14 @@ async function deleteGoal(goalId) {
     else { alert("Goal deleted successfully."); location.reload(); }
 }
 
-async function deleteTransaction(transId) {
-    if (!confirm("Delete this transaction record? This will affect your goal calculations.")) return;
-    
-    const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', transId);
-
-    if (error) {
-        alert("Error deleting record: " + error.message);
-    } else {
-        alert("Transaction removed.");
-        location.reload(); 
-    }
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { window.location.href = "/login/"; return; }
 
     const { data: goals, error } = await supabase
-    .from('goals')
-    .select('*, goal_allocations (*), transactions (*)')
-    .eq('user_id', session.user.id);
+        .from('goals')
+        .select('*, goal_allocations (*), transactions (*)')
+        .eq('user_id', session.user.id);
 
     if (error) {
         document.getElementById('loading-text').innerText = "Error loading goals.";
@@ -68,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const countEl = document.getElementById('total-goals-count');
     const netWorthEl = document.getElementById('total-net-worth');
     
-    if (goals.length === 0) {
+    if (!goals || goals.length === 0) {
         grid.innerHTML = "<p>No goals found. Start by adding one!</p>";
         return;
     }
@@ -81,13 +65,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const card = document.createElement('div');
         card.className = "post-card";
         
+        // 1. Calculations
         const yearsToGoal = (new Date(goal.target_date) - new Date(goal.start_date)) / (1000 * 60 * 60 * 24 * 365);
         const inflatedPrice = goal.target_price * Math.pow((1 + (goal.inflation_rate/100)), yearsToGoal);
 
         let totalInvested = 0;
         let currentPortfolioValue = 0;
 
-        // A. SIP/Lumpsum Logic
+        // SIP/Lumpsum Growth Math
         goal.goal_allocations.forEach(alloc => {
             const startDate = new Date(alloc.allocation_start_date);
             const today = new Date();
@@ -109,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // B. Manual Ledger Logic
+        // Manual Transaction Growth Math
         if (goal.transactions && goal.transactions.length > 0) {
             goal.transactions.forEach(trans => {
                 const transDate = new Date(trans.transaction_date);
@@ -126,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         overallNetWorth += currentPortfolioValue;
         const progressPercent = (currentPortfolioValue / inflatedPrice) * 100;
 
+        // 2. UI Injection
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <h3 style="margin: 0; color: #38bdf8;">${goal.goal_name}</h3>
@@ -140,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span>${progressPercent.toFixed(1)}%</span>
                 </div>
                 <div style="width: 100%; background: #1e293b; height: 6px; border-radius: 10px; overflow: hidden;">
-                    <div style="width: ${Math.min(progressPercent, 100)}%; background: #4ade80; height: 100%;"></div>
+                    <div style="width: ${Math.max(0, Math.min(progressPercent, 100))}%; background: #4ade80; height: 100%;"></div>
                 </div>
             </div>
             
@@ -157,11 +143,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn" style="flex: 1; font-size: 0.8rem;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
-                        ➕ Log
+                    <button class="btn" style="flex: 1.2; font-size: 0.75rem; white-space: nowrap;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
+                        Add Entry ➕
                     </button>
-                    <button class="btn" style="flex: 1; font-size: 0.8rem; background: #1e293b; color: white;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
-                        📜 History
+                    <button class="btn" style="flex: 1.8; font-size: 0.75rem; background: #1e293b; color: white; white-space: nowrap;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
+                        Transaction History 📜
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px;">
