@@ -73,8 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 id: null
             });
 
-            // Subsequent Transactions: Snap to preferred day
-            let nextDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, preferredDay);
             
           // Subsequent Transactions: Snap to preferred day with natural rollover
             let monthOffset = 1;
