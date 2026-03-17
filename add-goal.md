@@ -92,11 +92,14 @@ permalink: /add-goal/
     select.addEventListener('change', (e) => {
         document.getElementById('expected_returns').value = InvestmentRegistry[e.target.value].returns;
     });
-    document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
+    
+    // Set initial return value
+    if (select.value) {
+        document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
+    }
 
     modeSelect.addEventListener('change', (e) => {
         const val = e.target.value;
-        
         if (val === "SIP") {
             amountLabel.innerText = "Monthly SIP Amount";
             amountInput.placeholder = "₹ per month";
@@ -118,7 +121,7 @@ permalink: /add-goal/
         }
     });
 
-    // 3. Form Submission
+    // 3. Form Submission logic
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
@@ -126,11 +129,17 @@ permalink: /add-goal/
         btn.disabled = true;
 
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { alert("Please login first!"); return; }
+        if (!session) { 
+            alert("Please login first!"); 
+            btn.disabled = false;
+            btn.innerText = "Save Goal & Start Tracking";
+            return; 
+        }
 
         const userId = session.user.id;
 
-        // Step A: Create Goal
+        // --- Step A: Create Goal ---
+        console.log("Creating Goal...");
         const { data: goalData, error: goalError } = await supabase
             .from('goals')
             .insert([{
@@ -144,53 +153,48 @@ permalink: /add-goal/
             .select();
 
         if (goalError) {
+            console.error("Goal Error:", goalError);
             alert("Error saving goal: " + goalError.message);
             btn.disabled = false;
             btn.innerText = "Save Goal & Start Tracking";
             return;
         }
 
-        // Step B: Create Allocation and Materialize History
-const goalId = goalData[0].id;
-const start = new Date(document.getElementById('start_date').value);
-const today = new Date();
-const sipAmount = parseFloat(amountInput.value);
-const preferredDay = sipDateInput.value ? parseInt(sipDateInput.value) : start.getDate();
+        const goalId = goalData[0].id;
+        const start = new Date(document.getElementById('start_date').value);
+        const today = new Date();
+        const sipAmount = parseFloat(amountInput.value) || 0;
+        const preferredDay = sipDateInput.value ? parseInt(sipDateInput.value) : start.getDate();
 
-let transactionsToInsert = [];
+        // --- Step B: Prepare Transaction List ---
+        let transactionsToInsert = [];
 
-// 1. If SIP mode, generate all historical transactions up to today
-if (modeSelect.value === 'SIP') {
-    let monthOffset = 0;
-    let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
-    
-    // The first transaction might be on the start_date itself
-    // Then subsequent ones follow the preferredDay
-    while (nextDate <= today) {
-        transactionsToInsert.push({
-            goal_id: goalId,
-            user_id: userId,
-            transaction_date: nextDate.toISOString().split('T')[0],
-            amount: sipAmount,
-            description: 'System Generated SIP'
-        });
-        
-        monthOffset++;
-        nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
-    }
-} 
-// 2. If Lumpsum, just one transaction
-else if (modeSelect.value === 'Lumpsum') {
-    transactionsToInsert.push({
-        goal_id: goalId,
-        user_id: userId,
-        transaction_date: start.toISOString().split('T')[0],
-        amount: parseFloat(amountInput.value),
-        description: 'Lumpsum Investment'
-    });
-}
+        if (modeSelect.value === 'SIP') {
+            let monthOffset = 0;
+            let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
+            while (nextDate <= today) {
+                transactionsToInsert.push({
+                    goal_id: goalId,
+                    user_id: userId,
+                    transaction_date: nextDate.toISOString().split('T')[0],
+                    amount: sipAmount,
+                    description: 'System Generated SIP'
+                });
+                monthOffset++;
+                nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
+            }
+        } else if (modeSelect.value === 'Lumpsum') {
+            transactionsToInsert.push({
+                goal_id: goalId,
+                user_id: userId,
+                transaction_date: start.toISOString().split('T')[0],
+                amount: sipAmount,
+                description: 'Lumpsum Investment'
+            });
+        }
 
-// Step C: Save everything to Supabase
+        // --- Step C: Save Allocation & Transactions ---
+        console.log("Saving Allocation and Transactions...");
         const { error: allocError } = await supabase
             .from('goal_allocations')
             .insert([{
@@ -201,26 +205,23 @@ else if (modeSelect.value === 'Lumpsum') {
                 expected_returns: document.getElementById('expected_returns').value,
                 allocation_start_date: document.getElementById('start_date').value,
                 monthly_investment: modeSelect.value === 'SIP' ? sipAmount : 0,
-                sip_date: preferredDay
+                sip_date: modeSelect.value === 'SIP' ? preferredDay : null
             }]);
 
-        if (allocError) {
-            alert("Error adding allocation: " + allocError.message);
-            btn.disabled = false;
-            btn.innerText = "Save Goal & Start Tracking";
-            return;
-        }
-
-        // CRITICAL FIX: Wait for transactions to finish before redirecting
         if (transactionsToInsert.length > 0) {
-            const { error: transError } = await supabase.from('transactions').insert(transactionsToInsert);
-            if (transError) {
-                alert("Goal created, but transactions failed: " + transError.message);
-            }
+            const { error: transError } = await supabase
+                .from('transactions')
+                .insert(transactionsToInsert);
+            
+            if (transError) console.error("Transaction Error:", transError);
         }
 
-        // ONLY redirect once everything above is done
-        alert("Goal Created Successfully!");
-        window.location.href = "/dashboard/";
+        if (allocError) {
+            alert("Goal created, but error adding allocation: " + allocError.message);
+        } else {
+            console.log("Success! Redirecting...");
+            alert("Goal Created Successfully!");
+            window.location.href = "/dashboard/";
+        }
     });
 </script>
