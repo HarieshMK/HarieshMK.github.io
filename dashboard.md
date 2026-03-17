@@ -6,18 +6,18 @@ permalink: /dashboard/
 
 <div class="dashboard-container" style="padding: 20px; max-width: 1000px; margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h2>📊 My Financial Goals</h2>
-        <a href="/add-goal/" class="btn" style="text-decoration: none; font-size: 0.9rem;">+ Add New Goal</a>
+        <h2 style="margin: 0;">📊 My Financial Goals</h2>
+        <a href="/add-goal/" class="auth-link" style="text-decoration: none; border-color: #0ea5e9; color: #0ea5e9;">+ Add New Goal</a>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
-        <div class="post-card" style="text-align: center;">
-            <p style="color: #64748b; margin-bottom: 5px;">Total Goals</p>
-            <h3 id="total-goals-count">0</h3>
+        <div class="post-card" style="text-align: center; margin-bottom: 0 !important;">
+            <p style="color: #64748b; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Total Goals</p>
+            <h3 id="total-goals-count" style="margin: 0; font-family: 'JetBrains Mono', monospace;">0</h3>
         </div>
-        <div class="post-card" style="text-align: center;">
-            <p style="color: #64748b; margin-bottom: 5px;">Est. Net Worth</p>
-            <h3 id="total-net-worth">₹0</h3>
+        <div class="post-card" style="text-align: center; margin-bottom: 0 !important;">
+            <p style="color: #64748b; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Est. Net Worth</p>
+            <h3 id="total-net-worth" style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #0ea5e9;">₹0</h3>
         </div>
     </div>
 
@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let totalInvested = 0;
         let currentPortfolioValue = 0;
 
-        // SIP/Lumpsum Growth Math
         goal.goal_allocations.forEach(alloc => {
             const startDate = new Date(alloc.allocation_start_date);
             const today = new Date();
@@ -94,7 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // Manual Transaction Growth Math
         if (goal.transactions && goal.transactions.length > 0) {
             goal.transactions.forEach(trans => {
                 const transDate = new Date(trans.transaction_date);
@@ -102,7 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const yearsSinceTrans = (today - transDate) / (1000 * 60 * 60 * 24 * 365);
                 const benchmarkReturn = goal.goal_allocations[0]?.expected_returns || 12;
                 const growthFactor = Math.pow(1 + (benchmarkReturn / 100), Math.max(0, yearsSinceTrans));
-
                 totalInvested += parseFloat(trans.amount);
                 currentPortfolioValue += parseFloat(trans.amount) * growthFactor;
             });
@@ -111,10 +108,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         overallNetWorth += currentPortfolioValue;
         const progressPercent = (currentPortfolioValue / inflatedPrice) * 100;
 
-        // 2. UI Injection
+        // 2. UI Injection with site-native classes
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-family: 'Lora', serif !important;">${goal.goal_name}</h3>
+                <h3 style="margin: 0; font-family: 'Lora', serif !important; font-size: 1.5rem;">${goal.goal_name}</h3>
                 <span class="post-date" style="margin: 0 !important;">Due: ${new Date(goal.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span>
             </div>
 
@@ -128,30 +125,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
             
-            <div class="calc-results" style="flex-direction: row; padding: 15px; gap: 10px; margin-bottom: 20px; min-width: 0;">
+            <div class="calc-results" style="flex-direction: row; padding: 15px; gap: 10px; margin-bottom: 25px; min-width: 0; background: var(--bg-color); border: 1px solid rgba(100, 116, 139, 0.1);">
                 <div class="result-item" style="flex: 1; border: none; padding: 0;">
-                    <span>Invested</span>
-                    <strong style="font-size: 1.2rem;">₹${Math.round(totalInvested).toLocaleString('en-IN')}</strong>
+                    <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;">Invested</span>
+                    <strong style="font-size: 1.2rem; font-family: 'JetBrains Mono', monospace;">₹${Math.round(totalInvested).toLocaleString('en-IN')}</strong>
                 </div>
-                <div style="width: 1px; background: #e2e8f0; align-self: stretch;"></div>
+                <div style="width: 1px; background: rgba(100, 116, 139, 0.2); align-self: stretch;"></div>
                 <div class="result-item" style="flex: 1; border: none; padding: 0;">
-                    <span>Current Value</span>
-                    <strong style="font-size: 1.2rem; color: #0ea5e9 !important;">₹${Math.round(currentPortfolioValue).toLocaleString('en-IN')}</strong>
+                    <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;">Current Value</span>
+                    <strong style="font-size: 1.2rem; color: #0ea5e9 !important; font-family: 'JetBrains Mono', monospace;">₹${Math.round(currentPortfolioValue).toLocaleString('en-IN')}</strong>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <button class="auth-link" style="width: 100%; text-align: center; border-color: #0ea5e9; color: #0ea5e9; cursor: pointer;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
-                    Add Entry ➕
+                <button class="auth-link" style="width: 100%; text-align: center; border-color: #0ea5e9; color: #0ea5e9; background: transparent; cursor: pointer;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
+                    ADD TRANSACTION ➕
                 </button>
-                <button class="auth-link" style="width: 100%; text-align: center; cursor: pointer;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
-                    History 📜
+                <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
+                    HISTORY 📜
                 </button>
-                <button class="auth-link" style="width: 100%; text-align: center; border-color: #ef4444; color: #ef4444; cursor: pointer;" onclick="deleteGoal('${goal.id}')">
-                    🗑️ Delete
+                <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" onclick="alert('Edit coming soon!')">
+                    EDIT GOAL ✏️
                 </button>
-                <button class="auth-link" style="width: 100%; text-align: center; cursor: pointer;" onclick="alert('Edit coming soon!')">
-                    ✏️ Edit Goal
+                <button class="auth-link" style="width: 100%; text-align: center; border-color: #ef4444; color: #ef4444; background: transparent; cursor: pointer;" onclick="deleteGoal('${goal.id}')">
+                    DELETE GOAL 🗑️
                 </button>
             </div>
         `;
