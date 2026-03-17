@@ -53,7 +53,7 @@ permalink: /add-goal/
             </div>
             <div>
                 <label>Expected Returns (%)</label>
-                <input type="number" id="expected_returns" step="0.1" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <input type="number" id="expected_returns" step="any" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
              </div>
         </div>
 
