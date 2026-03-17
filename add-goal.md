@@ -150,22 +150,63 @@ permalink: /add-goal/
             return;
         }
 
-        // Step B: Create Allocation
-        const goalId = goalData[0].id;
-        const { error: allocError } = await supabase
-            .from('goal_allocations')
-            .insert([{
-                goal_id: goalId,
-                user_id: userId,
-                instrument_name: select.value,
-                investment_mode: modeSelect.value,
-                expected_returns: document.getElementById('expected_returns').value,
-                allocation_start_date: document.getElementById('start_date').value,
-                current_value_override: modeSelect.value === 'Lumpsum' ? amountInput.value : 0,
-                monthly_investment: modeSelect.value === 'SIP' ? amountInput.value : 0,
-                sip_date: modeSelect.value === 'SIP' && sipDateInput.value ? parseInt(sipDateInput.value) : null
-            }]);
+        // Step B: Create Allocation and Materialize History
+const goalId = goalData[0].id;
+const start = new Date(document.getElementById('start_date').value);
+const today = new Date();
+const sipAmount = parseFloat(amountInput.value);
+const preferredDay = sipDateInput.value ? parseInt(sipDateInput.value) : start.getDate();
 
+let transactionsToInsert = [];
+
+// 1. If SIP mode, generate all historical transactions up to today
+if (modeSelect.value === 'SIP') {
+    let monthOffset = 0;
+    let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
+    
+    // The first transaction might be on the start_date itself
+    // Then subsequent ones follow the preferredDay
+    while (nextDate <= today) {
+        transactionsToInsert.push({
+            goal_id: goalId,
+            user_id: userId,
+            transaction_date: nextDate.toISOString().split('T')[0],
+            amount: sipAmount,
+            description: 'System Generated SIP'
+        });
+        
+        monthOffset++;
+        nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
+    }
+} 
+// 2. If Lumpsum, just one transaction
+else if (modeSelect.value === 'Lumpsum') {
+    transactionsToInsert.push({
+        goal_id: goalId,
+        user_id: userId,
+        transaction_date: start.toISOString().split('T')[0],
+        amount: parseFloat(amountInput.value),
+        description: 'Lumpsum Investment'
+    });
+}
+
+// Step C: Save everything to Supabase
+const { error: allocError } = await supabase
+    .from('goal_allocations')
+    .insert([{
+        goal_id: goalId,
+        user_id: userId,
+        instrument_name: select.value,
+        investment_mode: modeSelect.value,
+        expected_returns: document.getElementById('expected_returns').value,
+        allocation_start_date: document.getElementById('start_date').value,
+        monthly_investment: modeSelect.value === 'SIP' ? sipAmount : 0,
+        sip_date: preferredDay
+    }]);
+
+if (transactionsToInsert.length > 0) {
+    await supabase.from('transactions').insert(transactionsToInsert);
+}
         if (allocError) {
             alert("Goal created, but error adding allocation: " + allocError.message);
         } else {
