@@ -191,27 +191,37 @@ else if (modeSelect.value === 'Lumpsum') {
 }
 
 // Step C: Save everything to Supabase
-const { error: allocError } = await supabase
-    .from('goal_allocations')
-    .insert([{
-        goal_id: goalId,
-        user_id: userId,
-        instrument_name: select.value,
-        investment_mode: modeSelect.value,
-        expected_returns: document.getElementById('expected_returns').value,
-        allocation_start_date: document.getElementById('start_date').value,
-        monthly_investment: modeSelect.value === 'SIP' ? sipAmount : 0,
-        sip_date: preferredDay
-    }]);
+        const { error: allocError } = await supabase
+            .from('goal_allocations')
+            .insert([{
+                goal_id: goalId,
+                user_id: userId,
+                instrument_name: select.value,
+                investment_mode: modeSelect.value,
+                expected_returns: document.getElementById('expected_returns').value,
+                allocation_start_date: document.getElementById('start_date').value,
+                monthly_investment: modeSelect.value === 'SIP' ? sipAmount : 0,
+                sip_date: preferredDay
+            }]);
 
-if (transactionsToInsert.length > 0) {
-    await supabase.from('transactions').insert(transactionsToInsert);
-}
         if (allocError) {
-            alert("Goal created, but error adding allocation: " + allocError.message);
-        } else {
-            alert("Goal Created Successfully!");
-            window.location.href = "/dashboard/";
+            alert("Error adding allocation: " + allocError.message);
+            btn.disabled = false;
+            btn.innerText = "Save Goal & Start Tracking";
+            return;
+        }
+
+        // CRITICAL FIX: Wait for transactions to finish before redirecting
+        if (transactionsToInsert.length > 0) {
+            const { error: transError } = await supabase.from('transactions').insert(transactionsToInsert);
+            if (transError) {
+                alert("Goal created, but transactions failed: " + transError.message);
+            }
+        }
+
+        // ONLY redirect once everything above is done
+        alert("Goal Created Successfully!");
+        window.location.href = "/dashboard/";
         }
     });
 </script>
