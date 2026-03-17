@@ -87,21 +87,23 @@ permalink: /add-goal/
     document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
 
     modeSelect.addEventListener('change', (e) => {
-        if (e.target.value === "SIP") {
-            amountLabel.innerText = "Monthly SIP Amount";
-            amountInput.placeholder = "₹ per month";
-            amountInput.disabled = false;
-        } else if (e.target.value === "Lumpsum") {
-            amountLabel.innerText = "Lumpsum Amount";
-            amountInput.placeholder = "₹ one-time";
-            amountInput.disabled = false;
-        } else {
-            amountLabel.innerText = "Manual Mode";
-            amountInput.placeholder = "Log via dashboard";
-            amountInput.disabled = true;
-            amountInput.value = "";
-        }
-    });
+    const val = e.target.value; // This will now be "SIP", "Lumpsum", or "Manual"
+    
+    if (val === "SIP") {
+        amountLabel.innerText = "Monthly SIP Amount";
+        amountInput.placeholder = "₹ per month";
+        amountInput.disabled = false;
+    } else if (val === "Lumpsum") {
+        amountLabel.innerText = "Lumpsum Amount";
+        amountInput.placeholder = "₹ one-time";
+        amountInput.disabled = false;
+    } else {
+        amountLabel.innerText = "Manual Mode";
+        amountInput.placeholder = "Log via dashboard";
+        amountInput.disabled = true;
+        amountInput.value = "";
+    }
+});
 
     // 3. Form Submission
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
@@ -135,7 +137,7 @@ permalink: /add-goal/
             return;
         }
 
-        // Step B: Create Allocation (Now including current_value_override or amount logic)
+        // Step B: Create Allocation
         const goalId = goalData[0].id;
         const { error: allocError } = await supabase
             .from('goal_allocations')
@@ -146,8 +148,10 @@ permalink: /add-goal/
                 investment_mode: modeSelect.value,
                 expected_returns: document.getElementById('expected_returns').value,
                 allocation_start_date: document.getElementById('start_date').value,
-                // If Lumpsum, we treat the amount as the starting value
-                current_value_override: modeSelect.value === 'Lumpsum' ? amountInput.value : 0
+                // Save the starting seed for Lumpsum
+                current_value_override: modeSelect.value === 'Lumpsum' ? amountInput.value : 0,
+                // Save the monthly amount for SIP (assuming you have this column)
+                monthly_investment: modeSelect.value === 'SIP' ? amountInput.value : 0
             }]);
 
         if (allocError) {
