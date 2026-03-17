@@ -33,6 +33,21 @@ async function deleteGoal(goalId) {
     if (error) { alert("Error deleting goal: " + error.message); } 
     else { alert("Goal deleted successfully."); location.reload(); }
 }
+    async function deleteTransaction(transId) {
+    if (!confirm("Delete this transaction record? This will affect your goal calculations.")) return;
+    
+    const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transId);
+
+    if (error) {
+        alert("Error deleting record: " + error.message);
+    } else {
+        alert("Transaction removed.");
+        location.reload(); // Re-calculates everything instantly
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -144,15 +159,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
 
-            <div style="font-size: 0.8rem; border-top: 1px solid #333; padding-top: 10px;">
-                <p style="color: #64748b; margin: 0 0 5px 0;">Instruments</p>
-                ${goal.goal_allocations.map(a => `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                        <span>${a.instrument_name} <small style="color: #38bdf8;">[${a.investment_mode}]</small></span>
-                        <span>${a.expected_returns}%</span>
-                    </div>
-                `).join('')}
+            <div style="font-size: 0.8rem; border-top: 1px solid #333; padding-top: 10px; margin-bottom: 10px;">
+                <p style="color: #64748b; margin: 0 0 8px 0; font-weight: bold;">📜 Manual Logs</p>
+                <div style="max-height: 100px; overflow-y: auto; padding-right: 5px;">
+                    ${goal.transactions && goal.transactions.length > 0 ? 
+                        goal.transactions.map(t => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; background: #1e293b44; padding: 6px; border-radius: 4px; border-left: 2px solid #38bdf8;">
+                                <span style="font-size: 0.75rem;">
+                                    <span style="color: #64748b;">${new Date(t.transaction_date).toLocaleDateString('en-IN', {day:'2-digit', month:'short'})}:</span> 
+                                    ₹${Math.round(t.amount).toLocaleString('en-IN')}
+                                </span>
+                                <button onclick="deleteTransaction('${t.id}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold; padding: 0 5px;">✕</button>
+                            </div>
+                        `).join('') : 
+                        '<p style="color: #444; font-style: italic; font-size: 0.7rem;">No manual entries yet.</p>'
+                    }
+                </div>
             </div>
+
+            <details style="font-size: 0.75rem; color: #64748b; cursor: pointer;">
+                <summary style="margin-bottom: 5px;">View Strategy Details</summary>
+                <div style="background: #000; padding: 8px; border-radius: 4px;">
+                    ${goal.goal_allocations.map(a => `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                            <span>${a.instrument_name} <small style="color: #38bdf8;">[${a.investment_mode}]</small></span>
+                            <span>${a.expected_returns}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </details>
 
             <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
                 <button class="btn" style="width: 100%; font-size: 0.8rem;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
@@ -168,8 +203,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
         `;
-        grid.appendChild(card);
-    });
 
     netWorthEl.innerText = "₹" + Math.round(overallNetWorth).toLocaleString('en-IN');
 });
