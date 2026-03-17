@@ -11,7 +11,7 @@ permalink: /goal-history/
         </button>
         <div style="display: flex; gap: 10px; align-items: center;">
             <button onclick="downloadCSV()" class="auth-link" style="font-size: 0.75rem; padding: 5px 10px; border-color: #4ade80; color: #4ade80; background: transparent; cursor: pointer;">
-                📥 CSV
+                📥 Download CSV
             </button>
             <h2 id="goal-title" style="margin: 0; font-size: 1.2rem; color: #64748b;">Loading History...</h2>
         </div>
@@ -47,74 +47,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     const goalId = urlParams.get('goal_id');
     if (!goalId) { window.location.href = "/dashboard/"; return; }
 
-    const { data: goal, error } = await supabase
+    // 1. Fetch the goal name and all physical transactions
+    const { data: goal, error: goalError } = await supabase
         .from('goals')
-        .select('*, goal_allocations (*), transactions (*)')
+        .select('goal_name, transactions (*)')
         .eq('id', goalId)
         .single();
 
-    if (error || !goal) return;
+    if (goalError || !goal) {
+        console.error("Error fetching history:", goalError);
+        return;
+    }
 
     document.getElementById('goal-title').innerText = goal.goal_name;
     const tbody = document.getElementById('history-table-body');
-    let combinedHistory = [];
+    
+    // 2. Map transactions for the table
+    let history = (goal.transactions || []).map(t => ({
+        date: new Date(t.transaction_date),
+        type: t.description || 'Investment', // Shows 'System Generated SIP', etc.
+        amount: parseFloat(t.amount),
+        id: t.id
+    }));
 
-    goal.goal_allocations.forEach(alloc => {
-        if (alloc.investment_mode === 'SIP') {
-            const startDate = new Date(alloc.allocation_start_date);
-            const today = new Date();
-            const preferredDay = alloc.sip_date || startDate.getDate(); 
-            
-            // 1st Transaction: Actual Start Date
-            combinedHistory.push({
-                date: new Date(startDate),
-                type: 'SIP (Initial)',
-                amount: parseFloat(alloc.monthly_investment),
-                id: null
-            });
+    // 3. Sort by date descending (Newest first)
+    history.sort((a, b) => b.date - a.date);
 
-            
-          // Subsequent Transactions: Snap to preferred day with natural rollover
-            let monthOffset = 1;
-            let nextDate = new Date(startDate.getFullYear(), startDate.getMonth() + monthOffset, preferredDay);
-
-            while (nextDate <= today) {
-                combinedHistory.push({
-                    date: new Date(nextDate),
-                    type: 'SIP (Auto)',
-                    amount: parseFloat(alloc.monthly_investment),
-                    id: null
-                });
-                
-                // Always calculate from the original Start Date + Offset
-                // This ensures if Feb rolls to March 1st, the next month still targets the 31st (May)
-                monthOffset++;
-                nextDate = new Date(startDate.getFullYear(), startDate.getMonth() + monthOffset, preferredDay);
-            }
-        } else if (alloc.investment_mode === 'Lumpsum') {
-            combinedHistory.push({
-                date: new Date(alloc.allocation_start_date),
-                type: 'Lumpsum',
-                amount: parseFloat(alloc.current_value_override || 0),
-                id: null
-            });
-        }
-    });
-
-    if (goal.transactions) {
-        goal.transactions.forEach(t => {
-            combinedHistory.push({ date: new Date(t.transaction_date), type: 'Manual Log', amount: parseFloat(t.amount), id: t.id });
-        });
+    // 4. Render Rows
+    if (history.length === 0) {
+        document.getElementById('empty-msg').style.display = "block";
+    } else {
+        renderRows(history);
     }
 
-    combinedHistory.sort((a, b) => b.date - a.date);
-    renderRows(combinedHistory);
-    window.currentHistoryData = combinedHistory;
+    window.currentHistoryData = history;
 });
 
 function renderRows(data) {
     const tbody = document.getElementById('history-table-body');
-    if (data.length === 0) { document.getElementById('empty-msg').style.display = "block"; return; }
+    tbody.innerHTML = ''; // Clear existing
     
     data.forEach(item => {
         const row = document.createElement('tr');
@@ -122,11 +93,15 @@ function renderRows(data) {
         row.innerHTML = `
             <td style="padding: 15px 20px;">${item.date.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</td>
             <td style="padding: 15px 20px;">
-                <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #64748b; color: #64748b; text-transform: uppercase;">${item.type}</span>
+                <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid #38bdf8; color: #38bdf8; text-transform: uppercase;">
+                    ${item.type}
+                </span>
             </td>
-            <td style="padding: 15px 20px; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹${Math.round(item.amount).toLocaleString('en-IN')}</td>
+            <td style="padding: 15px 20px; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">
+                ₹${Math.round(item.amount).toLocaleString('en-IN')}
+            </td>
             <td style="padding: 15px 20px; text-align: right;">
-                ${item.id ? `<button onclick="deleteRow('${item.id}')" style="background:rgba(239, 68, 68, 0.1); border:1px solid #ef4444; color:#ef4444; border-radius:4px; cursor:pointer; padding:4px 8px;">🗑️</button>` : `<span style="color:#475569; font-size: 0.8rem;">🔒</span>`}
+                <button onclick="deleteRow('${item.id}')" style="background:rgba(239, 68, 68, 0.1); border:1px solid #ef4444; color:#ef4444; border-radius:4px; cursor:pointer; padding:4px 8px;">🗑️</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -140,7 +115,7 @@ function downloadCSV() {
     let csvContent = "Date,Type,Amount\n";
     data.forEach(item => {
         const formattedDate = item.date.toISOString().split('T')[0];
-        csvContent += `${formattedDate},${item.type},${item.amount}\n`;
+        csvContent += `${formattedDate},"${item.type}",${item.amount}\n`;
     });
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -153,7 +128,7 @@ function downloadCSV() {
 }
 
 async function deleteRow(id) {
-    if (!confirm("Are you sure? This will remove this manual entry.")) return;
+    if (!confirm("Are you sure? This will remove this entry and affect your total returns (XIRR).")) return;
     const { error } = await supabase.from('transactions').delete().eq('id', id);
     if (error) alert("Error: " + error.message);
     else location.reload();
