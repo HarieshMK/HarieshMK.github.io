@@ -92,11 +92,14 @@ permalink: /add-goal/
     select.addEventListener('change', (e) => {
         document.getElementById('expected_returns').value = InvestmentRegistry[e.target.value].returns;
     });
-    document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
+    
+    // Set initial return value safely
+    if (select.value && InvestmentRegistry[select.value]) {
+        document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
+    }
 
     modeSelect.addEventListener('change', (e) => {
         const val = e.target.value;
-        
         if (val === "SIP") {
             amountLabel.innerText = "Monthly SIP Amount";
             amountInput.placeholder = "₹ per month";
@@ -126,11 +129,16 @@ permalink: /add-goal/
         btn.disabled = true;
 
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { alert("Please login first!"); return; }
+        if (!session) { 
+            alert("Please login first!"); 
+            btn.disabled = false;
+            btn.innerText = "Save Goal & Start Tracking";
+            return; 
+        }
 
         const userId = session.user.id;
 
-        // Step A: Create Goal
+        // --- STEP A: Create Goal ---
         const { data: goalData, error: goalError } = await supabase
             .from('goals')
             .insert([{
@@ -150,8 +158,43 @@ permalink: /add-goal/
             return;
         }
 
-        // Step B: Create Allocation
         const goalId = goalData[0].id;
+        const startDateVal = document.getElementById('start_date').value;
+        const start = new Date(startDateVal);
+        const today = new Date();
+        const sipAmount = parseFloat(amountInput.value) || 0;
+        const preferredDay = (modeSelect.value === 'SIP' && sipDateInput.value) ? parseInt(sipDateInput.value) : start.getDate();
+
+        // --- STEP B: Generate Transaction History (NEW) ---
+        let transactionsToInsert = [];
+        
+        if (modeSelect.value === 'SIP') {
+            let monthOffset = 0;
+            while (true) {
+                let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
+                if (nextDate > today) break;
+
+                transactionsToInsert.push({
+                    goal_id: goalId,
+                    user_id: userId,
+                    transaction_date: nextDate.toISOString().split('T')[0],
+                    amount: sipAmount,
+                    description: 'System Generated SIP'
+                });
+                monthOffset++;
+                if (monthOffset > 600) break; // Safety stop
+            }
+        } else if (modeSelect.value === 'Lumpsum') {
+            transactionsToInsert.push({
+                goal_id: goalId,
+                user_id: userId,
+                transaction_date: start.toISOString().split('T')[0],
+                amount: sipAmount,
+                description: 'Lumpsum Investment'
+            });
+        }
+
+        // --- STEP C: Create Allocation ---
         const { error: allocError } = await supabase
             .from('goal_allocations')
             .insert([{
@@ -160,11 +203,17 @@ permalink: /add-goal/
                 instrument_name: select.value,
                 investment_mode: modeSelect.value,
                 expected_returns: document.getElementById('expected_returns').value,
-                allocation_start_date: document.getElementById('start_date').value,
-                current_value_override: modeSelect.value === 'Lumpsum' ? amountInput.value : 0,
-                monthly_investment: modeSelect.value === 'SIP' ? amountInput.value : 0,
-                sip_date: modeSelect.value === 'SIP' && sipDateInput.value ? parseInt(sipDateInput.value) : null
+                allocation_start_date: startDateVal,
+                current_value_override: modeSelect.value === 'Lumpsum' ? sipAmount : 0,
+                monthly_investment: modeSelect.value === 'SIP' ? sipAmount : 0,
+                sip_date: modeSelect.value === 'SIP' ? preferredDay : null
             }]);
+
+        // --- STEP D: Insert Transactions into Supabase (NEW) ---
+        if (transactionsToInsert.length > 0) {
+            const { error: transError } = await supabase.from('transactions').insert(transactionsToInsert);
+            if (transError) console.error("Transaction Error:", transError);
+        }
 
         if (allocError) {
             alert("Goal created, but error adding allocation: " + allocError.message);
