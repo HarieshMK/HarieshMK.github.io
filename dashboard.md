@@ -21,22 +21,36 @@ permalink: /dashboard/
         </div>
     </div>
 
-    <div id="goals-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+    <div id="goals-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;">
         <p id="loading-text">Fetching your financial data...</p>
     </div>
 </div>
 
 <script>
+// Function moved outside to be globally accessible by the buttons
+async function deleteGoal(goalId) {
+    if (!confirm("Are you sure? This will delete the goal and all recorded investments permanently.")) return;
+
+    const { error } = await supabase
+        .from('goals')
+        .delete()
+        .eq('id', goalId);
+
+    if (error) {
+        alert("Error deleting goal: " + error.message);
+    } else {
+        alert("Goal deleted successfully.");
+        location.reload();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Check Session
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
         window.location.href = "/login/";
         return;
     }
 
-    // 2. Fetch Goals and their Allocations
-    // We use a "Join" here to get the instrument details at the same time
     const { data: goals, error } = await supabase
         .from('goals')
         .select(`
@@ -59,16 +73,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    grid.innerHTML = ""; // Clear loading text
+    grid.innerHTML = ""; 
     countEl.innerText = goals.length;
 
-    // 3. Loop through goals and create cards
     goals.forEach(goal => {
         const card = document.createElement('div');
         card.className = "post-card";
         
-        // Simple Logic for Target with Inflation
-        // Formula: FV = PV * (1 + r)^n
+        // Inflation math
         const years = (new Date(goal.target_date) - new Date(goal.start_date)) / (1000 * 60 * 60 * 24 * 365);
         const inflatedPrice = goal.target_price * Math.pow((1 + (goal.inflation_rate/100)), years);
 
@@ -76,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <h3 style="margin: 0; color: #38bdf8;">${goal.goal_name}</h3>
                 <span style="font-size: 0.75rem; background: #1e293b; padding: 4px 8px; border-radius: 4px;">
-                    ${goal.target_date}
+                    Target: ${goal.target_date}
                 </span>
             </div>
             <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
@@ -92,20 +104,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
 
-            <div style="margin-top: 15px;">
-                <p style="color: #64748b; margin: 0; font-size: 0.8rem;">Instruments</p>
+            <div style="margin-top: 15px; background: #000; padding: 10px; border-radius: 6px;">
+                <p style="color: #64748b; margin: 0 0 5px 0; font-size: 0.8rem;">Instruments</p>
                 ${goal.goal_allocations.map(a => `
                     <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px;">
-                        <span>${a.instrument_name} (${a.investment_mode})</span>
+                        <span>${a.instrument_name} <strong style="color: #38bdf8;">[${a.investment_mode}]</strong></span>
                         <span style="color: #4ade80;">${a.expected_returns}%</span>
                     </div>
                 `).join('')}
             </div>
 
-            <div style="margin-top: 20px;">
-                <button class="btn" style="width: 100%; font-size: 0.8rem; padding: 8px;" onclick="alert('Transaction logging coming soon!')">
-                    Log Transaction
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn" style="width: 100%; font-size: 0.8rem; padding: 8px;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
+                    ➕ Log Transaction
                 </button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" style="flex: 1; background: #1e293b; color: #ef4444; border: 1px solid #ef4444; font-size: 0.8rem;" onclick="deleteGoal('${goal.id}')">
+                        🗑️ Delete
+                    </button>
+                    <button class="btn" style="flex: 2; font-size: 0.8rem;" onclick="alert('Edit feature coming soon!')">
+                        ✏️ Edit Goal
+                    </button>
+                </div>
             </div>
         `;
         grid.appendChild(card);
