@@ -113,51 +113,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 2. UI Injection
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <h3 style="margin: 0; color: #38bdf8;">${goal.goal_name}</h3>
-                <span style="font-size: 0.75rem; background: #1e293b; padding: 4px 8px; border-radius: 4px;">
-                    Due: ${new Date(goal.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}
-                </span>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px;">
+                <h3 style="margin: 0; font-family: 'Lora', serif !important;">${goal.goal_name}</h3>
+                <span class="post-date" style="margin: 0 !important;">Due: ${new Date(goal.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span>
             </div>
 
-            <div style="margin: 15px 0;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-bottom: 5px;">
-                    <span>Goal Progress</span>
-                    <span>${progressPercent.toFixed(1)}%</span>
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px; font-weight: 700;">
+                    <span style="color: #64748b;">Goal Progress</span>
+                    <span style="color: #0ea5e9;">${progressPercent.toFixed(1)}%</span>
                 </div>
-                <div style="width: 100%; background: #1e293b; height: 6px; border-radius: 10px; overflow: hidden;">
-                    <div style="width: ${Math.max(0, Math.min(progressPercent, 100))}%; background: #4ade80; height: 100%;"></div>
+                <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden;">
+                    <div style="width: ${Math.max(0, Math.min(progressPercent, 100))}%; background: #0ea5e9; height: 100%;"></div>
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem; background: #111; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                <div>
-                    <p style="color: #64748b; margin: 0;">Invested</p>
-                    <p style="margin: 5px 0 0 0;">₹${Math.round(totalInvested).toLocaleString('en-IN')}</p>
+            <div class="calc-results" style="flex-direction: row; padding: 15px; gap: 10px; margin-bottom: 20px; min-width: 0;">
+                <div class="result-item" style="flex: 1; border: none; padding: 0;">
+                    <span>Invested</span>
+                    <strong style="font-size: 1.2rem;">₹${Math.round(totalInvested).toLocaleString('en-IN')}</strong>
                 </div>
-                <div>
-                    <p style="color: #64748b; margin: 0;">Current Value</p>
-                    <p style="margin: 5px 0 0 0; color: #4ade80; font-weight: bold;">₹${Math.round(currentPortfolioValue).toLocaleString('en-IN')}</p>
+                <div style="width: 1px; background: #e2e8f0; align-self: stretch;"></div>
+                <div class="result-item" style="flex: 1; border: none; padding: 0;">
+                    <span>Current Value</span>
+                    <strong style="font-size: 1.2rem; color: #0ea5e9 !important;">₹${Math.round(currentPortfolioValue).toLocaleString('en-IN')}</strong>
                 </div>
             </div>
 
-            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn" style="flex: 1.2; font-size: 0.75rem; white-space: nowrap;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
-                        Add Entry ➕
-                    </button>
-                    <button class="btn" style="flex: 1.8; font-size: 0.75rem; background: #1e293b; color: white; white-space: nowrap;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
-                        Transaction History 📜
-                    </button>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn" style="flex: 1; background: transparent; color: #ef4444; border: 1px solid #ef4444; font-size: 0.75rem;" onclick="deleteGoal('${goal.id}')">
-                        🗑️ Delete Goal
-                    </button>
-                    <button class="btn" style="flex: 1; font-size: 0.75rem;" onclick="alert('Edit coming soon!')">
-                        ✏️ Edit Goal
-                    </button>
-                </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button class="auth-link" style="width: 100%; text-align: center; border-color: #0ea5e9; color: #0ea5e9; cursor: pointer;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
+                    Add Entry ➕
+                </button>
+                <button class="auth-link" style="width: 100%; text-align: center; cursor: pointer;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
+                    History 📜
+                </button>
+                <button class="auth-link" style="width: 100%; text-align: center; border-color: #ef4444; color: #ef4444; cursor: pointer;" onclick="deleteGoal('${goal.id}')">
+                    🗑️ Delete
+                </button>
+                <button class="auth-link" style="width: 100%; text-align: center; cursor: pointer;" onclick="alert('Edit coming soon!')">
+                    ✏️ Edit Goal
+                </button>
             </div>
         `;
         grid.appendChild(card);
