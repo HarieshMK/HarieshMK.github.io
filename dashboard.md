@@ -139,16 +139,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <button class="auth-link" style="width: 100%; text-align: center; border-color: #0ea5e9; color: #0ea5e9; background: transparent; cursor: pointer;" onclick="window.location.href='/log-transaction/?goal_id=${goal.id}'">
-                    ADD TRANSACTION ➕
+                    Add transaction ➕
                 </button>
                 <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
-                    HISTORY 📜
+                    Transaction history📜
                 </button>
                 <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" onclick="alert('Edit coming soon!')">
-                    EDIT GOAL ✏️
+                    Edit goal ✏️
                 </button>
                 <button class="auth-link" style="width: 100%; text-align: center; border-color: #ef4444; color: #ef4444; background: transparent; cursor: pointer;" onclick="deleteGoal('${goal.id}')">
-                    DELETE GOAL 🗑️
+                    Delete goal 🗑️
                 </button>
             </div>
         `;
