@@ -45,9 +45,9 @@ permalink: /add-goal/
             <div>
                 <label>Investment Mode</label>
                 <select id="investment_mode" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-                    <option value="SIP">Monthly SIP</option>
-                    <option value="Lumpsum">One-time Lumpsum</option>
-                    <option value="Manual">Manual (Self-Log)</option>
+                    <option value="SIP">SIP</option>
+                    <option value="Lumpsum">Lumpsum</option>
+                    <option value="Manual">Manual</option>
                 </select>
             </div>
             <div>
