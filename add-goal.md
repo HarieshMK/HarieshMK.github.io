@@ -222,6 +222,5 @@ else if (modeSelect.value === 'Lumpsum') {
         // ONLY redirect once everything above is done
         alert("Goal Created Successfully!");
         window.location.href = "/dashboard/";
-        }
     });
 </script>
