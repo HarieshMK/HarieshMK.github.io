@@ -56,6 +56,12 @@ permalink: /add-goal/
             </div>
         </div>
 
+        <div id="sip_date_container" style="margin-bottom: 15px;">
+            <label>Preferred SIP Day (1-31)</label>
+            <input type="number" id="sip_date" min="1" max="31" placeholder="e.g. 5" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Transactions after Month 1 will snap to this date. (e.g. Apr 31 rolls to May 1).</p>
+        </div>
+
         <div>
             <label>Expected Returns (%)</label>
             <input type="number" id="expected_returns" step="any" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
@@ -71,6 +77,8 @@ permalink: /add-goal/
     const modeSelect = document.getElementById('investment_mode');
     const amountLabel = document.getElementById('amount_label');
     const amountInput = document.getElementById('investment_amount');
+    const sipDateContainer = document.getElementById('sip_date_container');
+    const sipDateInput = document.getElementById('sip_date');
 
     // 1. Setup Instrument Dropdown
     Object.keys(InvestmentRegistry).forEach(option => {
@@ -80,30 +88,35 @@ permalink: /add-goal/
         select.appendChild(el);
     });
 
-    // 2. Handle UI Changes (Returns & Labels)
+    // 2. Handle UI Changes
     select.addEventListener('change', (e) => {
         document.getElementById('expected_returns').value = InvestmentRegistry[e.target.value].returns;
     });
     document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
 
     modeSelect.addEventListener('change', (e) => {
-    const val = e.target.value; // This will now be "SIP", "Lumpsum", or "Manual"
-    
-    if (val === "SIP") {
-        amountLabel.innerText = "Monthly SIP Amount";
-        amountInput.placeholder = "₹ per month";
-        amountInput.disabled = false;
-    } else if (val === "Lumpsum") {
-        amountLabel.innerText = "Lumpsum Amount";
-        amountInput.placeholder = "₹ one-time";
-        amountInput.disabled = false;
-    } else {
-        amountLabel.innerText = "Manual Mode";
-        amountInput.placeholder = "Log via dashboard";
-        amountInput.disabled = true;
-        amountInput.value = "";
-    }
-});
+        const val = e.target.value;
+        
+        if (val === "SIP") {
+            amountLabel.innerText = "Monthly SIP Amount";
+            amountInput.placeholder = "₹ per month";
+            amountInput.disabled = false;
+            sipDateContainer.style.display = "block";
+        } else if (val === "Lumpsum") {
+            amountLabel.innerText = "Lumpsum Amount";
+            amountInput.placeholder = "₹ one-time";
+            amountInput.disabled = false;
+            sipDateContainer.style.display = "none";
+            sipDateInput.value = "";
+        } else {
+            amountLabel.innerText = "Manual Mode";
+            amountInput.placeholder = "Log via dashboard";
+            amountInput.disabled = true;
+            amountInput.value = "";
+            sipDateContainer.style.display = "none";
+            sipDateInput.value = "";
+        }
+    });
 
     // 3. Form Submission
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
@@ -148,14 +161,13 @@ permalink: /add-goal/
                 investment_mode: modeSelect.value,
                 expected_returns: document.getElementById('expected_returns').value,
                 allocation_start_date: document.getElementById('start_date').value,
-                // Save the starting seed for Lumpsum
                 current_value_override: modeSelect.value === 'Lumpsum' ? amountInput.value : 0,
-                // Save the monthly amount for SIP (assuming you have this column)
-                monthly_investment: modeSelect.value === 'SIP' ? amountInput.value : 0
+                monthly_investment: modeSelect.value === 'SIP' ? amountInput.value : 0,
+                sip_date: modeSelect.value === 'SIP' && sipDateInput.value ? parseInt(sipDateInput.value) : null
             }]);
 
         if (allocError) {
-            alert("Goal created, but error adding allocation.");
+            alert("Goal created, but error adding allocation: " + allocError.message);
         } else {
             alert("Goal Created Successfully!");
             window.location.href = "/dashboard/";
