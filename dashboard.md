@@ -33,7 +33,8 @@ async function deleteGoal(goalId) {
     if (error) { alert("Error deleting goal: " + error.message); } 
     else { alert("Goal deleted successfully."); location.reload(); }
 }
-    async function deleteTransaction(transId) {
+
+async function deleteTransaction(transId) {
     if (!confirm("Delete this transaction record? This will affect your goal calculations.")) return;
     
     const { error } = await supabase
@@ -45,7 +46,7 @@ async function deleteGoal(goalId) {
         alert("Error deleting record: " + error.message);
     } else {
         alert("Transaction removed.");
-        location.reload(); // Re-calculates everything instantly
+        location.reload(); 
     }
 }
 
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const { data: goals, error } = await supabase
     .from('goals')
-    .select('*, goal_allocations (*), transactions (*)') // Added transactions
+    .select('*, goal_allocations (*), transactions (*)')
     .eq('user_id', session.user.id);
 
     if (error) {
@@ -80,56 +81,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         const card = document.createElement('div');
         card.className = "post-card";
         
-        // 1. Inflation Math (Future Target)
         const yearsToGoal = (new Date(goal.target_date) - new Date(goal.start_date)) / (1000 * 60 * 60 * 24 * 365);
         const inflatedPrice = goal.target_price * Math.pow((1 + (goal.inflation_rate/100)), yearsToGoal);
 
-        // 2. SIP/Lumpsum Logic Engine
         let totalInvested = 0;
         let currentPortfolioValue = 0;
 
-       // A. Calculate Virtual SIP/Lumpsum Growth (The "Plan")
-    goal.goal_allocations.forEach(alloc => {
-        const startDate = new Date(alloc.allocation_start_date);
-        const today = new Date();
-        const monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
-        const monthlyRate = (parseFloat(alloc.expected_returns) / 100) / 12;
-
-        if (alloc.investment_mode === 'SIP') {
-            const monthlyAmt = parseFloat(alloc.monthly_investment || 0);
-            totalInvested += monthlyAmt * (monthsPassed + 1); 
-            if (monthlyRate > 0) {
-                currentPortfolioValue += monthlyAmt * ((Math.pow(1 + monthlyRate, monthsPassed + 1) - 1) / monthlyRate) * (1 + monthlyRate);
-            } else {
-                currentPortfolioValue += monthlyAmt * (monthsPassed + 1);
-            }
-        } else if (alloc.investment_mode === 'Lumpsum') {
-            const principal = parseFloat(alloc.current_value_override || 0);
-            totalInvested += principal;
-            currentPortfolioValue += principal * Math.pow(1 + (parseFloat(alloc.expected_returns) / 100), (monthsPassed / 12));
-        }
-    });
-        // B. Calculate Manual Ledger Growth (The "Extra")
-    if (goal.transactions && goal.transactions.length > 0) {
-        goal.transactions.forEach(trans => {
-            const transDate = new Date(trans.transaction_date);
+        // A. SIP/Lumpsum Logic
+        goal.goal_allocations.forEach(alloc => {
+            const startDate = new Date(alloc.allocation_start_date);
             const today = new Date();
-            const yearsSinceTrans = (today - transDate) / (1000 * 60 * 60 * 24 * 365);
-            
-            // Assume the manual transaction grows at the average expected return of the goal
-            // (We take the first allocation's return as the benchmark)
-            const benchmarkReturn = goal.goal_allocations[0]?.expected_returns || 12;
-            const growthFactor = Math.pow(1 + (benchmarkReturn / 100), yearsSinceTrans);
+            const monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
+            const monthlyRate = (parseFloat(alloc.expected_returns) / 100) / 12;
 
-            totalInvested += parseFloat(trans.amount);
-            currentPortfolioValue += parseFloat(trans.amount) * growthFactor;
+            if (alloc.investment_mode === 'SIP') {
+                const monthlyAmt = parseFloat(alloc.monthly_investment || 0);
+                totalInvested += monthlyAmt * (monthsPassed + 1); 
+                if (monthlyRate > 0) {
+                    currentPortfolioValue += monthlyAmt * ((Math.pow(1 + monthlyRate, monthsPassed + 1) - 1) / monthlyRate) * (1 + monthlyRate);
+                } else {
+                    currentPortfolioValue += monthlyAmt * (monthsPassed + 1);
+                }
+            } else if (alloc.investment_mode === 'Lumpsum') {
+                const principal = parseFloat(alloc.current_value_override || 0);
+                totalInvested += principal;
+                currentPortfolioValue += principal * Math.pow(1 + (parseFloat(alloc.expected_returns) / 100), (monthsPassed / 12));
+            }
         });
-    }
+
+        // B. Manual Ledger Logic
+        if (goal.transactions && goal.transactions.length > 0) {
+            goal.transactions.forEach(trans => {
+                const transDate = new Date(trans.transaction_date);
+                const today = new Date();
+                const yearsSinceTrans = (today - transDate) / (1000 * 60 * 60 * 24 * 365);
+                const benchmarkReturn = goal.goal_allocations[0]?.expected_returns || 12;
+                const growthFactor = Math.pow(1 + (benchmarkReturn / 100), Math.max(0, yearsSinceTrans));
+
+                totalInvested += parseFloat(trans.amount);
+                currentPortfolioValue += parseFloat(trans.amount) * growthFactor;
+            });
+        }
 
         overallNetWorth += currentPortfolioValue;
         const progressPercent = (currentPortfolioValue / inflatedPrice) * 100;
 
-        // 3. Render Card HTML
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <h3 style="margin: 0; color: #38bdf8;">${goal.goal_name}</h3>
@@ -203,6 +199,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
         `;
+        grid.appendChild(card);
+    });
 
     netWorthEl.innerText = "₹" + Math.round(overallNetWorth).toLocaleString('en-IN');
 });
