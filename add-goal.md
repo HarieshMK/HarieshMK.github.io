@@ -53,8 +53,8 @@ permalink: /add-goal/
             </div>
             <div>
                 <label>Expected Returns (%)</label>
-                <input type="number" id="expected_returns" step="0.1" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #111; color: #888;" readonly>
-            </div>
+                <input type="number" id="expected_returns" step="0.1" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+             </div>
         </div>
 
         <button type="submit" id="submit-btn" class="btn" style="width: 100%; cursor: pointer;">Save Goal & Start Tracking</button>
@@ -73,10 +73,11 @@ permalink: /add-goal/
     });
 
     // 2. Automatically update returns when instrument changes
-    select.addEventListener('change', (e) => {
-        const selected = e.target.value;
-        document.getElementById('expected_returns').value = InvestmentRegistry[selected].returns;
-    });
+select.addEventListener('change', (e) => {
+    const selected = e.target.value;
+    // This updates the box whenever a new instrument is picked
+    document.getElementById('expected_returns').value = InvestmentRegistry[selected].returns;
+});
 
     // Trigger initial value
     document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
