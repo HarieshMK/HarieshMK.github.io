@@ -21,16 +21,17 @@ permalink: /goal-history/
                 <thead>
                     <tr style="border-bottom: 2px solid #1e293b; color: #64748b; text-align: left; background: #0f172a;">
                         <th style="padding: 15px 20px;">Date</th>
+                        <th style="padding: 15px 20px;">Type</th>
                         <th style="padding: 15px 20px;">Amount</th>
                         <th style="padding: 15px 20px; text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="history-table-body">
-                    </tbody>
+                </tbody>
             </table>
         </div>
         <p id="empty-msg" style="display:none; text-align:center; padding: 40px; color: #64748b; font-style: italic;">
-            No transactions recorded for this goal yet.
+            No transactions found for this goal yet.
         </p>
     </div>
 </div>
@@ -42,43 +43,89 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!goalId) { window.location.href = "/dashboard/"; return; }
 
-    // 1. Fetch Goal Name for the Header
-    const { data: goalData } = await supabase
+    // 1. Fetch Goal, Allocations, and Manual Transactions
+    const { data: goal, error } = await supabase
         .from('goals')
-        .select('goal_name')
+        .select('*, goal_allocations (*), transactions (*)')
         .eq('id', goalId)
         .single();
 
-    if (goalData) {
-        document.getElementById('goal-title').innerText = goalData.goal_name;
+    if (error || !goal) {
+        document.getElementById('goal-title').innerText = "Error loading history";
+        return;
     }
 
-    // 2. Fetch Transactions (Newest First)
-    const { data: trans, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('goal_id', goalId)
-        .order('transaction_date', { ascending: false });
-
+    document.getElementById('goal-title').innerText = goal.goal_name;
     const tbody = document.getElementById('history-table-body');
-    
-    if (!trans || trans.length === 0) {
+    let combinedHistory = [];
+
+    // 2. Process SIP Logic (Virtual Entries)
+    goal.goal_allocations.forEach(alloc => {
+        if (alloc.investment_mode === 'SIP') {
+            const startDate = new Date(alloc.allocation_start_date);
+            const today = new Date();
+            let currentMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+
+            while (currentMonth <= today) {
+                combinedHistory.push({
+                    date: new Date(currentMonth),
+                    type: 'SIP (Auto)',
+                    amount: parseFloat(alloc.monthly_investment),
+                    id: null // No delete for virtual entries
+                });
+                currentMonth.setMonth(currentMonth.getMonth() + 1);
+            }
+        }
+        // Handle Lumpsum as a single entry
+        else if (alloc.investment_mode === 'Lumpsum') {
+            combinedHistory.push({
+                date: new Date(alloc.allocation_start_date),
+                type: 'Lumpsum',
+                amount: parseFloat(alloc.current_value_override),
+                id: null
+            });
+        }
+    });
+
+    // 3. Process Manual Transactions (Database Entries)
+    if (goal.transactions && goal.transactions.length > 0) {
+        goal.transactions.forEach(t => {
+            combinedHistory.push({
+                date: new Date(t.transaction_date),
+                type: 'Manual Log',
+                amount: parseFloat(t.amount),
+                id: t.id // Keep ID for deletion
+            });
+        });
+    }
+
+    // 4. Sort: Newest First
+    combinedHistory.sort((a, b) => b.date - a.date);
+
+    if (combinedHistory.length === 0) {
         document.getElementById('empty-msg').style.display = "block";
         return;
     }
 
-    trans.forEach(t => {
+    // 5. Render Rows
+    combinedHistory.forEach(item => {
         const row = document.createElement('tr');
         row.style.borderBottom = "1px solid #1e293b";
-        row.style.transition = "background 0.2s";
         
         row.innerHTML = `
-            <td style="padding: 15px 20px;">${new Date(t.transaction_date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</td>
-            <td style="padding: 15px 20px; font-weight: bold; color: #4ade80;">₹${Math.round(t.amount).toLocaleString('en-IN')}</td>
+            <td style="padding: 15px 20px;">${item.date.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</td>
+            <td style="padding: 15px 20px;">
+                <span style="font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; border: 1px solid ${item.id ? '#38bdf8' : '#64748b'}; color: ${item.id ? '#38bdf8' : '#64748b'};">
+                    ${item.type}
+                </span>
+            </td>
+            <td style="padding: 15px 20px; font-weight: bold; color: #4ade80;">₹${Math.round(item.amount).toLocaleString('en-IN')}</td>
             <td style="padding: 15px 20px; text-align: right;">
-                <button onclick="deleteRow('${t.id}')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; border-radius: 4px; cursor: pointer; padding: 4px 8px; font-size: 0.9rem;" title="Delete Record">
-                    🗑️
-                </button>
+                ${item.id ? `
+                    <button onclick="deleteRow('${item.id}')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; border-radius: 4px; cursor: pointer; padding: 4px 8px; font-size: 0.9rem;" title="Delete Record">
+                        🗑️
+                    </button>
+                ` : `<span style="color: #475569; font-size: 0.8rem;">Locked</span>`}
             </td>
         `;
         tbody.appendChild(row);
@@ -86,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function deleteRow(id) {
-    if (!confirm("Are you sure you want to delete this transaction record? This cannot be undone.")) return;
+    if (!confirm("Are you sure? This will only remove this specific manual entry.")) return;
     const { error } = await supabase.from('transactions').delete().eq('id', id);
     if (error) alert("Error: " + error.message);
     else location.reload();
