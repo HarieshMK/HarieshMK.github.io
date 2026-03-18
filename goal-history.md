@@ -38,6 +38,24 @@ permalink: /goal-history/
         <p id="empty-msg" style="display:none; text-align:center; padding: 40px; color: #64748b; font-style: italic;">
             No transactions found for this goal yet.
         </p>
+        <div id="edit-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+    <div class="post-card" style="width: 90%; max-width: 400px; padding: 25px; position: relative;">
+        <h3 style="margin-top: 0; margin-bottom: 20px;">✏️ Edit Transaction</h3>
+        
+        <input type="hidden" id="edit-tx-id">
+        
+        <label style="display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Transaction Date</label>
+        <input type="date" id="edit-tx-date" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+
+        <label style="display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Amount (₹)</label>
+        <input type="number" id="edit-tx-amount" step="any" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button onclick="closeModal()" style="background: transparent; border: 1px solid #333; color: #64748b; padding: 10px; border-radius: 6px; cursor: pointer;">Cancel</button>
+            <button id="save-tx-btn" onclick="saveTransactionUpdate()" class="btn" style="padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;">Save Changes</button>
+        </div>
+    </div>
+</div>
     </div>
 </div>
 
@@ -85,9 +103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function renderRows(data) {
     const tbody = document.getElementById('history-table-body');
-    tbody.innerHTML = ''; // Clear existing
+    tbody.innerHTML = ''; 
     
     data.forEach(item => {
+        // Format date for the input value (YYYY-MM-DD)
+        const rawDate = item.date.toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD format perfectly
+
         const row = document.createElement('tr');
         row.style.borderBottom = "1px solid #1e293b";
         row.innerHTML = `
@@ -100,8 +121,16 @@ function renderRows(data) {
             <td style="padding: 15px 20px; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">
                 ₹${Math.round(item.amount).toLocaleString('en-IN')}
             </td>
-            <td style="padding: 15px 20px; text-align: right;">
-                <button onclick="deleteRow('${item.id}')" style="background:rgba(239, 68, 68, 0.1); border:1px solid #ef4444; color:#ef4444; border-radius:4px; cursor:pointer; padding:4px 8px;">🗑️</button>
+            <td style="padding: 15px 20px; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                <button onclick="openEditModal('${item.id}', '${rawDate}', ${item.amount})" 
+                        style="background:rgba(56, 189, 248, 0.1); border:1px solid #38bdf8; color:#38bdf8; border-radius:4px; cursor:pointer; padding:4px 8px;">
+                    ✏️
+                </button>
+                <span style="color: #1e293b;">|</span>
+                <button onclick="deleteRow('${item.id}')" 
+                        style="background:rgba(239, 68, 68, 0.1); border:1px solid #ef4444; color:#ef4444; border-radius:4px; cursor:pointer; padding:4px 8px;">
+                    🗑️
+                </button>
             </td>
         `;
         tbody.appendChild(row);
@@ -132,5 +161,48 @@ async function deleteRow(id) {
     const { error } = await supabase.from('transactions').delete().eq('id', id);
     if (error) alert("Error: " + error.message);
     else location.reload();
+}
+    function openEditModal(id, date, amount) {
+    document.getElementById('edit-tx-id').value = id;
+    document.getElementById('edit-tx-date').value = date;
+    document.getElementById('edit-tx-amount').value = amount;
+    
+    const modal = document.getElementById('edit-modal');
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+}
+
+async function saveTransactionUpdate() {
+    const id = document.getElementById('edit-tx-id').value;
+    const newDate = document.getElementById('edit-tx-date').value;
+    const newAmount = parseFloat(document.getElementById('edit-tx-amount').value);
+    const btn = document.getElementById('save-tx-btn');
+
+    if (!newDate || isNaN(newAmount)) {
+        alert("Please enter valid data");
+        return;
+    }
+
+    btn.innerText = "Saving...";
+    btn.disabled = true;
+
+    const { error } = await supabase
+        .from('transactions')
+        .update({ 
+            transaction_date: newDate, 
+            amount: newAmount 
+        })
+        .eq('id', id);
+
+    if (error) {
+        alert("Error updating transaction: " + error.message);
+        btn.innerText = "Save Changes";
+        btn.disabled = false;
+    } else {
+        location.reload(); // Refresh to show updated data
+    }
 }
 </script>
