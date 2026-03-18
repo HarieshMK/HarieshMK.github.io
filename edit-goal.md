@@ -7,7 +7,7 @@ permalink: /edit-goal/
 <div class="post-card" style="max-width: 600px; margin: 20px auto;">
     <h2 id="page-title">🛠 Edit Your Goal</h2>
     
-    <div id="choice-section" style="margin-bottom: 30px;">
+    <div id="choice-section" style="display: none; margin-bottom: 30px;">
         <p style="color: #64748b;">How would you like to apply these changes?</p>
         
         <div onclick="selectMode('mistake')" class="mode-card" style="border: 1px solid #333; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.3s;">
@@ -54,7 +54,7 @@ permalink: /edit-goal/
         <input type="number" id="investment_amount" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
 
         <button type="submit" id="submit-btn" class="btn" style="width: 100%; cursor: pointer; padding: 12px; font-weight: bold;">Apply Changes</button>
-        <p onclick="location.reload()" style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 15px; cursor: pointer;">← Change Mode</p>
+        <p id="change-mode-link" onclick="location.reload()" style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 15px; cursor: pointer;">← Change Mode</p>
     </form>
 </div>
 
@@ -75,11 +75,15 @@ permalink: /edit-goal/
             
             // AUTO-ROUTING LOGIC
             if (mode === 'Lumpsum' || mode === 'Manual') {
-                // Skip Choice Section for non-SIP goals
+                // 1. Hide the change mode link for non-SIP
+                document.getElementById('change-mode-link').style.display = 'none';
+                
+                // 2. Go straight to form
                 selectMode('mistake'); 
             } else {
-                // Stay on choice section for SIP
+                // SIP goals: Show the choice section
                 document.getElementById('choice-section').style.display = 'block';
+                document.getElementById('change-mode-link').style.display = 'block';
             }
             
             fillFormData(data);
