@@ -72,27 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let totalInvested = 0;
         let currentPortfolioValue = 0;
 
-        goal.goal_allocations.forEach(alloc => {
-            const startDate = new Date(alloc.allocation_start_date);
-            const today = new Date();
-            const monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
-            const monthlyRate = (parseFloat(alloc.expected_returns) / 100) / 12;
-
-            if (alloc.investment_mode === 'SIP') {
-                const monthlyAmt = parseFloat(alloc.monthly_investment || 0);
-                totalInvested += monthlyAmt * (monthsPassed + 1); 
-                if (monthlyRate > 0) {
-                    currentPortfolioValue += monthlyAmt * ((Math.pow(1 + monthlyRate, monthsPassed + 1) - 1) / monthlyRate) * (1 + monthlyRate);
-                } else {
-                    currentPortfolioValue += monthlyAmt * (monthsPassed + 1);
-                }
-            } else if (alloc.investment_mode === 'Lumpsum') {
-                const principal = parseFloat(alloc.current_value_override || 0);
-                totalInvested += principal;
-                currentPortfolioValue += principal * Math.pow(1 + (parseFloat(alloc.expected_returns) / 100), (monthsPassed / 12));
-            }
-        });
-
         if (goal.transactions && goal.transactions.length > 0) {
             goal.transactions.forEach(trans => {
                 const transDate = new Date(trans.transaction_date);
