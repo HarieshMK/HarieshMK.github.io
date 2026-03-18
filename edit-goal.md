@@ -34,28 +34,36 @@ permalink: /edit-goal/
         </div>
 
         <label>Goal Name</label>
-        <input type="text" id="goal_name" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div>
-                <label>Target Amount</label>
-                <input type="number" id="target_price" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            <input type="text" id="goal_name" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>Target Amount</label>
+                    <input type="number" id="target_price" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                </div>
+                <div>
+                    <label>Expected Returns (%)</label>
+                    <input type="number" id="expected_returns" step="any" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                </div>
             </div>
-            <div>
-                <label>Expected Returns (%)</label>
-                <input type="number" id="expected_returns" step="any" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label id="start_date_label">Start Date</label>
+                    <input type="date" id="start_date" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                </div>
+                <div>
+                    <label id="target_date_label">Target Date (End Date)</label>
+                    <input type="date" id="target_date" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                </div>
             </div>
-        </div>
-
-        <label id="start_date_label">Start Date</label>
-        <input type="date" id="start_date" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-
-        <label id="amount_label">Monthly SIP Amount</label>
-        <input type="number" id="investment_amount" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-
-        <button type="submit" id="submit-btn" class="btn" style="width: 100%; cursor: pointer; padding: 12px; font-weight: bold;">Apply Changes</button>
-        <p id="change-mode-link" onclick="location.reload()" style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 15px; cursor: pointer;">← Change Mode</p>
-    </form>
+            
+            <label id="amount_label">Monthly SIP Amount</label>
+            <input type="number" id="investment_amount" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            
+            <button type="submit" id="submit-btn" class="btn" style="width: 100%; cursor: pointer; padding: 12px; font-weight: bold;">Apply Changes</button>
+            <p id="change-mode-link" onclick="location.reload()" style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 15px; cursor: pointer;">← Change Mode</p>
+        </form>
 </div>
 
 <script>
@@ -91,26 +99,24 @@ permalink: /edit-goal/
     };
 
     function fillFormData(data) {
-    const goalNameInput = document.getElementById('goal_name');
-    const targetPriceInput = document.getElementById('target_price');
-    const startDateInput = document.getElementById('start_date');
+    // 1. Map all basic fields
+    document.getElementById('goal_name').value = data.goal_name;
+    document.getElementById('target_price').value = data.target_price;
+    document.getElementById('start_date').value = data.start_date;
+    document.getElementById('target_date').value = data.target_date; // <--- Correctly placed
+
+    const alloc = data.goal_allocations[0];
+    document.getElementById('expected_returns').value = alloc.expected_returns;
+    
+    const mode = alloc.investment_mode;
     const amountInput = document.getElementById('investment_amount');
     const amountLabel = document.getElementById('amount_label');
     const manualWarning = document.getElementById('manual-warning');
 
-    // Fill basic info
-    goalNameInput.value = data.goal_name;
-    targetPriceInput.value = data.target_price;
-    startDateInput.value = data.start_date;
-    
-    const alloc = data.goal_allocations[0];
-    document.getElementById('expected_returns').value = alloc.expected_returns;
-    const mode = alloc.investment_mode;
-
-    // Logic for different Investment Modes
+    // 2. Mode-specific UI adjustments
     if (mode === 'Manual') {
         manualWarning.style.display = 'block';
-        amountInput.style.display = 'none'; // Hide amount for manual
+        amountInput.style.display = 'none'; 
         if(amountLabel) amountLabel.style.display = 'none';
     } else if (mode === 'Lumpsum') {
         manualWarning.style.display = 'none';
@@ -118,7 +124,6 @@ permalink: /edit-goal/
         amountInput.value = alloc.current_value_override;
         amountInput.disabled = false;
     } else {
-        // SIP Mode
         manualWarning.style.display = 'none';
         amountLabel.innerText = "Monthly SIP Amount";
         amountInput.value = alloc.monthly_investment;
@@ -148,31 +153,39 @@ document.getElementById('goal-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const mode = document.getElementById('edit_mode').value;
     const btn = document.getElementById('submit-btn');
-    btn.innerText = "Applying...";
-    btn.disabled = true;
-
-    const { data: { session } } = await supabase.auth.getSession();
-    const userId = session.user.id;
-
+    
     // Fetch current values from the form
     const newName = document.getElementById('goal_name').value;
     const newTarget = parseFloat(document.getElementById('target_price').value);
     const newReturns = parseFloat(document.getElementById('expected_returns').value);
     const newAmount = parseFloat(document.getElementById('investment_amount').value) || 0;
     const newStart = document.getElementById('start_date').value;
+    const newTargetDate = document.getElementById('target_date').value;
+
+    // --- CRITICAL VALIDATION FIRST ---
+    if (newTargetDate && newStart && new Date(newTargetDate) <= new Date(newStart)) {
+        alert("Target Date must be after the Start Date!");
+        return; // Stop everything here
+    }
+
+    btn.innerText = "Applying...";
+    btn.disabled = true;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session.user.id;
 
     const { data: currentAlloc } = await supabase.from('goal_allocations').select('*').eq('goal_id', goalId).single();
     const investMode = currentAlloc.investment_mode;
 
     if (mode === 'mistake') {
         // --- PATH A: FIX A MISTAKE ---
-        // 1. Update Goal Table (Name, Target, Start Date)
         await supabase.from('goals').update({ 
             goal_name: newName, 
             target_price: newTarget, 
-            start_date: newStart 
+            start_date: newStart,
+            target_date: newTargetDate
         }).eq('id', goalId);
-
+        
         // 2. Update Allocation Table (Returns + Amount)
         let allocUpdate = { 
             expected_returns: parseFloat(newReturns), // Force float precision
@@ -209,7 +222,7 @@ document.getElementById('goal-form').addEventListener('submit', async (e) => {
         if (!effDate) { alert("Please select an effective date!"); btn.disabled = false; return; }
 
         // 1. Update Goal Table (Target Amount might have changed too!)
-        await supabase.from('goals').update({ target_price: newTarget }).eq('id', goalId);
+        await supabase.from('goals').update({ target_price: newTarget, target_date: newTargetDate }).eq('id', goalId);
 
         // 2. Update Allocation Table
         await supabase.from('goal_allocations').update({ 
