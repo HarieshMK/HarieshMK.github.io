@@ -140,79 +140,96 @@ permalink: /edit-goal/
     }
 
     // 2. The Final Submission Brain
-    document.getElementById('goal-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const mode = document.getElementById('edit_mode').value;
-        const btn = document.getElementById('submit-btn');
-        btn.innerText = "Applying...";
-        btn.disabled = true;
+document.getElementById('goal-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const mode = document.getElementById('edit_mode').value;
+    const btn = document.getElementById('submit-btn');
+    btn.innerText = "Applying...";
+    btn.disabled = true;
 
-        const { data: { session } } = await supabase.auth.getSession();
-        const userId = session.user.id;
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session.user.id;
 
-        // Fetch current values
-        const newName = document.getElementById('goal_name').value;
-        const newTarget = document.getElementById('target_price').value;
-        const newReturns = document.getElementById('expected_returns').value;
-        const newAmount = parseFloat(document.getElementById('investment_amount').value) || 0;
-        const newStart = document.getElementById('start_date').value;
+    // Fetch current values from the form
+    const newName = document.getElementById('goal_name').value;
+    const newTarget = parseFloat(document.getElementById('target_price').value);
+    const newReturns = parseFloat(document.getElementById('expected_returns').value);
+    const newAmount = parseFloat(document.getElementById('investment_amount').value) || 0;
+    const newStart = document.getElementById('start_date').value;
 
-        // First, get the Investment Mode to know how to update allocations
-        const { data: currentAlloc } = await supabase.from('goal_allocations').select('*').eq('goal_id', goalId).single();
-        const investMode = currentAlloc.investment_mode;
+    const { data: currentAlloc } = await supabase.from('goal_allocations').select('*').eq('goal_id', goalId).single();
+    const investMode = currentAlloc.investment_mode;
 
-        if (mode === 'mistake') {
-            // A. Update Goal
-            await supabase.from('goals').update({ goal_name: newName, target_price: newTarget, start_date: newStart }).eq('id', goalId);
+    if (mode === 'mistake') {
+        // --- PATH A: FIX A MISTAKE ---
+        // 1. Update Goal Table (Name, Target, Start Date)
+        await supabase.from('goals').update({ 
+            goal_name: newName, 
+            target_price: newTarget, 
+            start_date: newStart 
+        }).eq('id', goalId);
 
-            // B. Update Allocation (Handle Lumpsum vs SIP)
-            let allocUpdate = { expected_returns: newReturns, allocation_start_date: newStart };
-            if (investMode === 'SIP') allocUpdate.monthly_investment = newAmount;
-            if (investMode === 'Lumpsum') allocUpdate.current_value_override = newAmount;
+        // 2. Update Allocation Table (Returns + Amount)
+        let allocUpdate = { 
+            expected_returns: newReturns, 
+            allocation_start_date: newStart 
+        };
+        if (investMode === 'SIP') allocUpdate.monthly_investment = newAmount;
+        if (investMode === 'Lumpsum') allocUpdate.current_value_override = newAmount;
+        
+        await supabase.from('goal_allocations').update(allocUpdate).eq('goal_id', goalId);
+
+        // 3. Re-generate Transactions
+        if (investMode !== 'Manual') {
+            await supabase.from('transactions').delete().eq('goal_id', goalId);
             
-            await supabase.from('goal_allocations').update(allocUpdate).eq('goal_id', goalId);
-
-            // C. Transaction Cleanup (Only for Auto Modes)
-            if (investMode !== 'Manual') {
-                await supabase.from('transactions').delete().eq('goal_id', goalId);
-                
-                // Re-generate if SIP or Lumpsum
-                if (investMode === 'SIP') {
-                    let txs = [];
-                    let d = new Date(newStart);
-                    let today = new Date();
-                    let offset = 0;
-                    while (true) {
-                        let next = new Date(d.getFullYear(), d.getMonth() + offset, d.getDate());
-                        if (next > today) break;
-                        txs.push({ goal_id: goalId, user_id: userId, transaction_date: next.toISOString().split('T')[0], amount: newAmount });
-                        offset++;
-                    }
-                    if (txs.length > 0) await supabase.from('transactions').insert(txs);
-                } else if (investMode === 'Lumpsum') {
-                    await supabase.from('transactions').insert([{ goal_id: goalId, user_id: userId, transaction_date: newStart, amount: newAmount }]);
+            if (investMode === 'SIP') {
+                let txs = [];
+                let d = new Date(newStart);
+                let today = new Date();
+                let offset = 0;
+                while (true) {
+                    let next = new Date(d.getFullYear(), d.getMonth() + offset, d.getDate());
+                    if (next > today) break;
+                    txs.push({ goal_id: goalId, user_id: userId, transaction_date: next.toISOString().split('T')[0], amount: newAmount });
+                    offset++;
                 }
+                if (txs.length > 0) await supabase.from('transactions').insert(txs);
+            } else if (investMode === 'Lumpsum') {
+                await supabase.from('transactions').insert([{ goal_id: goalId, user_id: userId, transaction_date: newStart, amount: newAmount }]);
             }
-        } else {
-            // Update Strategy Logic (SIP ONLY)
-            const effDate = document.getElementById('effective_date').value;
-            await supabase.from('goal_allocations').update({ monthly_investment: newAmount, expected_returns: newReturns, last_strategy_update: effDate }).eq('goal_id', goalId);
-            await supabase.from('transactions').delete().eq('goal_id', goalId).gte('transaction_date', effDate);
-            
-            // Fill future from effective date
-            let txs = [];
-            let d = new Date(effDate);
-            let today = new Date();
-            let offset = 0;
-            while (true) {
-                let next = new Date(d.getFullYear(), d.getMonth() + offset, d.getDate());
-                if (next > today) break;
-                txs.push({ goal_id: goalId, user_id: userId, transaction_date: next.toISOString().split('T')[0], amount: newAmount });
-                offset++;
-            }
-            if (txs.length > 0) await supabase.from('transactions').insert(txs);
         }
+    } else {
+        // --- PATH B: UPDATE STRATEGY ---
+        const effDate = document.getElementById('effective_date').value;
+        if (!effDate) { alert("Please select an effective date!"); btn.disabled = false; return; }
 
-        window.location.href = "/dashboard/";
-    });
+        // 1. Update Goal Table (Target Amount might have changed too!)
+        await supabase.from('goals').update({ target_price: newTarget }).eq('id', goalId);
+
+        // 2. Update Allocation Table
+        await supabase.from('goal_allocations').update({ 
+            monthly_investment: newAmount, 
+            expected_returns: newReturns, 
+            last_strategy_update: effDate 
+        }).eq('goal_id', goalId);
+
+        // 3. Future Transactions
+        await supabase.from('transactions').delete().eq('goal_id', goalId).gte('transaction_date', effDate);
+        
+        let txs = [];
+        let d = new Date(effDate);
+        let today = new Date();
+        let offset = 0;
+        while (true) {
+            let next = new Date(d.getFullYear(), d.getMonth() + offset, d.getDate());
+            if (next > today) break;
+            txs.push({ goal_id: goalId, user_id: userId, transaction_date: next.toISOString().split('T')[0], amount: newAmount });
+            offset++;
+        }
+        if (txs.length > 0) await supabase.from('transactions').insert(txs);
+    }
+
+    window.location.href = "/dashboard/";
+});
 </script>
