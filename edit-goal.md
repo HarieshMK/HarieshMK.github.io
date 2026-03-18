@@ -171,7 +171,7 @@ document.getElementById('goal-form').addEventListener('submit', async (e) => {
 
         // 2. Update Allocation Table (Returns + Amount)
         let allocUpdate = { 
-            expected_returns: newReturns, 
+            expected_returns: parseFloat(newReturns), // Force float precision
             allocation_start_date: newStart 
         };
         if (investMode === 'SIP') allocUpdate.monthly_investment = newAmount;
