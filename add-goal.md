@@ -179,7 +179,6 @@ permalink: /add-goal/
                     user_id: userId,
                     transaction_date: nextDate.toISOString().split('T')[0],
                     amount: sipAmount,
-                    description: 'System Generated SIP'
                 });
                 monthOffset++;
                 if (monthOffset > 600) break; // Safety stop
@@ -190,7 +189,6 @@ permalink: /add-goal/
                 user_id: userId,
                 transaction_date: start.toISOString().split('T')[0],
                 amount: sipAmount,
-                description: 'Lumpsum Investment'
             });
         }
 
