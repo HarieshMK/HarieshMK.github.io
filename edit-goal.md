@@ -165,6 +165,8 @@ document.getElementById('goal-form').addEventListener('submit', async (e) => {
     // --- CRITICAL VALIDATION FIRST ---
     if (newTargetDate && newStart && new Date(newTargetDate) <= new Date(newStart)) {
         alert("Target Date must be after the Start Date!");
+        btn.innerText = "Apply Changes"; // Reset text
+        btn.disabled = false;            // Re-enable button
         return; // Stop everything here
     }
 
