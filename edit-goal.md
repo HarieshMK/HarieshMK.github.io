@@ -24,6 +24,10 @@ permalink: /edit-goal/
     <form id="goal-form" style="display: none;">
         <input type="hidden" id="edit_mode">
 
+        <div id="manual-warning" style="display: none; background: rgba(234, 179, 8, 0.1); border: 1px solid #eab308; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: #eab308;">
+            <strong>Note:</strong> For Manual goals, changing settings here only updates the goal's targets. To fix specific past entries, please use the <strong>Transaction History</strong> page.
+        </div>
+
         <div id="effective-date-container" style="display: none; background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <label style="color: #3b82f6;">📅 When should this change start?</label>
             <input type="date" id="effective_date" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
@@ -46,7 +50,7 @@ permalink: /edit-goal/
         <label id="start_date_label">Start Date</label>
         <input type="date" id="start_date" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
 
-        <label>Monthly SIP Amount</label>
+        <label id="amount_label">Monthly SIP Amount</label>
         <input type="number" id="investment_amount" style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
 
         <button type="submit" id="submit-btn" class="btn" style="width: 100%; cursor: pointer; padding: 12px; font-weight: bold;">Apply Changes</button>
@@ -58,7 +62,66 @@ permalink: /edit-goal/
     const urlParams = new URLSearchParams(window.location.search);
     const goalId = urlParams.get('id');
 
-    // 1. Initial UI Setup
+    // 1. Initial Load & Auto-Routing
+    window.onload = async function() {
+        const { data, error } = await supabase
+            .from('goals')
+            .select(`*, goal_allocations(*)`)
+            .eq('id', goalId)
+            .single();
+
+        if (data) {
+            const mode = data.goal_allocations[0].investment_mode;
+            
+            // AUTO-ROUTING LOGIC
+            if (mode === 'Lumpsum' || mode === 'Manual') {
+                // Skip Choice Section for non-SIP goals
+                selectMode('mistake'); 
+            } else {
+                // Stay on choice section for SIP
+                document.getElementById('choice-section').style.display = 'block';
+            }
+            
+            fillFormData(data);
+        }
+    };
+
+    function fillFormData(data) {
+    const goalNameInput = document.getElementById('goal_name');
+    const targetPriceInput = document.getElementById('target_price');
+    const startDateInput = document.getElementById('start_date');
+    const amountInput = document.getElementById('investment_amount');
+    const amountLabel = document.getElementById('amount_label');
+    const manualWarning = document.getElementById('manual-warning');
+
+    // Fill basic info
+    goalNameInput.value = data.goal_name;
+    targetPriceInput.value = data.target_price;
+    startDateInput.value = data.start_date;
+    
+    const alloc = data.goal_allocations[0];
+    document.getElementById('expected_returns').value = alloc.expected_returns;
+    const mode = alloc.investment_mode;
+
+    // Logic for different Investment Modes
+    if (mode === 'Manual') {
+        manualWarning.style.display = 'block';
+        amountInput.style.display = 'none'; // Hide amount for manual
+        if(amountLabel) amountLabel.style.display = 'none';
+    } else if (mode === 'Lumpsum') {
+        manualWarning.style.display = 'none';
+        amountLabel.innerText = "Lumpsum Amount";
+        amountInput.value = alloc.current_value_override;
+        amountInput.disabled = false;
+    } else {
+        // SIP Mode
+        manualWarning.style.display = 'none';
+        amountLabel.innerText = "Monthly SIP Amount";
+        amountInput.value = alloc.monthly_investment;
+        amountInput.disabled = false;
+    }
+}
+
     function selectMode(mode) {
         document.getElementById('choice-section').style.display = 'none';
         document.getElementById('goal-form').style.display = 'block';
@@ -73,136 +136,81 @@ permalink: /edit-goal/
         } else {
             document.getElementById('page-title').innerText = "🔴 Fix a Mistake";
             document.getElementById('effective-date-container').style.display = 'none';
-            document.getElementById('goal_name').readOnly = false;
-            document.getElementById('start_date').readOnly = false;
-            document.getElementById('start_date').style.opacity = '1';
-        }
-        loadExistingData();
-    }
-
-    // 2. Load Data from Supabase
-    async function loadExistingData() {
-        const { data, error } = await supabase
-            .from('goals')
-            .select(`*, goal_allocations(*)`)
-            .eq('id', goalId)
-            .single();
-
-        if (data) {
-            document.getElementById('goal_name').value = data.goal_name;
-            document.getElementById('target_price').value = data.target_price;
-            document.getElementById('start_date').value = data.start_date;
-            
-            const alloc = data.goal_allocations[0];
-            document.getElementById('expected_returns').value = alloc.expected_returns;
-            document.getElementById('investment_amount').value = 
-                alloc.investment_mode === 'SIP' ? alloc.monthly_investment : alloc.current_value_override;
         }
     }
 
-    // 3. The "Brain" - Saving the Changes
+    // 2. The Final Submission Brain
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const mode = document.getElementById('edit_mode').value;
         const btn = document.getElementById('submit-btn');
-        btn.innerText = "Processing...";
+        btn.innerText = "Applying...";
         btn.disabled = true;
 
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session.user.id;
 
-        // Common values from form
+        // Fetch current values
         const newName = document.getElementById('goal_name').value;
         const newTarget = document.getElementById('target_price').value;
         const newReturns = document.getElementById('expected_returns').value;
         const newAmount = parseFloat(document.getElementById('investment_amount').value) || 0;
         const newStart = document.getElementById('start_date').value;
 
+        // First, get the Investment Mode to know how to update allocations
+        const { data: currentAlloc } = await supabase.from('goal_allocations').select('*').eq('goal_id', goalId).single();
+        const investMode = currentAlloc.investment_mode;
+
         if (mode === 'mistake') {
-            // --- PATH 1: FIX A MISTAKE (REWRITE EVERYTHING) ---
+            // A. Update Goal
+            await supabase.from('goals').update({ goal_name: newName, target_price: newTarget, start_date: newStart }).eq('id', goalId);
+
+            // B. Update Allocation (Handle Lumpsum vs SIP)
+            let allocUpdate = { expected_returns: newReturns, allocation_start_date: newStart };
+            if (investMode === 'SIP') allocUpdate.monthly_investment = newAmount;
+            if (investMode === 'Lumpsum') allocUpdate.current_value_override = newAmount;
             
-            // A. Update the Main Goal
-            await supabase.from('goals').update({
-                goal_name: newName,
-                target_price: newTarget,
-                start_date: newStart
-            }).eq('id', goalId);
+            await supabase.from('goal_allocations').update(allocUpdate).eq('goal_id', goalId);
 
-            // B. Update the Allocation
-            await supabase.from('goal_allocations').update({
-                expected_returns: newReturns,
-                monthly_investment: newAmount, // Assuming SIP for simplicity
-                allocation_start_date: newStart
-            }).eq('goal_id', goalId);
-
-            // C. Clean and Re-generate Transactions
-            await supabase.from('transactions').delete().eq('goal_id', goalId);
-
-            let transactionsToInsert = [];
-            let start = new Date(newStart);
-            let today = new Date();
-            let monthOffset = 0;
-
-            while (true) {
-                let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, start.getDate());
-                if (nextDate > today) break;
-
-                transactionsToInsert.push({
-                    goal_id: goalId,
-                    user_id: userId,
-                    transaction_date: nextDate.toISOString().split('T')[0],
-                    amount: newAmount
-                });
-                monthOffset++;
-                if (monthOffset > 600) break;
+            // C. Transaction Cleanup (Only for Auto Modes)
+            if (investMode !== 'Manual') {
+                await supabase.from('transactions').delete().eq('goal_id', goalId);
+                
+                // Re-generate if SIP or Lumpsum
+                if (investMode === 'SIP') {
+                    let txs = [];
+                    let d = new Date(newStart);
+                    let today = new Date();
+                    let offset = 0;
+                    while (true) {
+                        let next = new Date(d.getFullYear(), d.getMonth() + offset, d.getDate());
+                        if (next > today) break;
+                        txs.push({ goal_id: goalId, user_id: userId, transaction_date: next.toISOString().split('T')[0], amount: newAmount });
+                        offset++;
+                    }
+                    if (txs.length > 0) await supabase.from('transactions').insert(txs);
+                } else if (investMode === 'Lumpsum') {
+                    await supabase.from('transactions').insert([{ goal_id: goalId, user_id: userId, transaction_date: newStart, amount: newAmount }]);
+                }
             }
-
-            if (transactionsToInsert.length > 0) {
-                await supabase.from('transactions').insert(transactionsToInsert);
-            }
-
-            alert("Mistake fixed and history rebuilt!");
-
         } else {
-            // --- PATH 2: UPDATE STRATEGY (FUTURE ONLY) ---
+            // Update Strategy Logic (SIP ONLY)
             const effDate = document.getElementById('effective_date').value;
-            if (!effDate) { alert("Please select an effective date!"); btn.disabled = false; return; }
-
-            // A. Update Allocation & log the strategy change date
-            await supabase.from('goal_allocations').update({
-                monthly_investment: newAmount,
-                expected_returns: newReturns,
-                last_strategy_update: effDate
-            }).eq('goal_id', goalId);
-
-            // B. Delete only future transactions (from Effective Date onwards)
+            await supabase.from('goal_allocations').update({ monthly_investment: newAmount, expected_returns: newReturns, last_strategy_update: effDate }).eq('goal_id', goalId);
             await supabase.from('transactions').delete().eq('goal_id', goalId).gte('transaction_date', effDate);
-
-            // C. Generate new transactions from Effective Date to Today
-            let transactionsToInsert = [];
-            let startEff = new Date(effDate);
+            
+            // Fill future from effective date
+            let txs = [];
+            let d = new Date(effDate);
             let today = new Date();
-            let monthOffset = 0;
-
+            let offset = 0;
             while (true) {
-                let nextDate = new Date(startEff.getFullYear(), startEff.getMonth() + monthOffset, startEff.getDate());
-                if (nextDate > today) break;
-
-                transactionsToInsert.push({
-                    goal_id: goalId,
-                    user_id: userId,
-                    transaction_date: nextDate.toISOString().split('T')[0],
-                    amount: newAmount
-                });
-                monthOffset++;
-                if (monthOffset > 600) break;
+                let next = new Date(d.getFullYear(), d.getMonth() + offset, d.getDate());
+                if (next > today) break;
+                txs.push({ goal_id: goalId, user_id: userId, transaction_date: next.toISOString().split('T')[0], amount: newAmount });
+                offset++;
             }
-
-            if (transactionsToInsert.length > 0) {
-                await supabase.from('transactions').insert(transactionsToInsert);
-            }
-
-            alert("Strategy updated from " + effDate);
+            if (txs.length > 0) await supabase.from('transactions').insert(txs);
         }
 
         window.location.href = "/dashboard/";
