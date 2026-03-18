@@ -144,7 +144,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" onclick="window.location.href='/goal-history/?goal_id=${goal.id}'">
                     Transaction history📜
                 </button>
-                <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" onclick="alert('Edit coming soon!')">
+                <button class="auth-link" style="width: 100%; text-align: center; background: transparent; cursor: pointer;" 
+                    onclick="window.location.href='/edit-goal/?id=${goal.id}'">
                     Edit goal ✏️
                 </button>
                 <button class="auth-link" style="width: 100%; text-align: center; border-color: #ef4444; color: #ef4444; background: transparent; cursor: pointer;" onclick="deleteGoal('${goal.id}')">
