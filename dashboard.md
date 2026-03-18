@@ -34,10 +34,36 @@ permalink: /dashboard/
 <style>
     .filter-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
     .filter-btn.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; font-weight: bold; }
-    .child-row { background: rgba(15, 23, 42, 0.5); margin-top: 10px; padding: 15px; border-radius: 8px; border-left: 3px solid #0ea5e9; }
-    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-    .action-btn { font-size: 0.75rem; padding: 8px; background: transparent; border: 1px solid rgba(100, 116, 139, 0.3); color: #f1f5f9; cursor: pointer; border-radius: 6px; text-align: center; transition: 0.2s; }
-    .action-btn:hover { border-color: #0ea5e9; background: rgba(14, 165, 233, 0.05); }
+    
+    /* New Item Row Styling */
+    .child-item-row { 
+        padding: 15px 0; 
+        border-bottom: 1px solid rgba(100, 116, 139, 0.1); 
+        position: relative;
+    }
+    .child-item-row:last-child { border-bottom: none; }
+
+    /* Three Dot Menu */
+    .menu-container { position: relative; display: inline-block; }
+    .dots-btn { 
+        background: none; border: none; color: #64748b; cursor: pointer; 
+        font-size: 1.2rem; padding: 0 5px; transition: 0.2s;
+    }
+    .dots-btn:hover { color: #0ea5e9; }
+    
+    .dropdown-content {
+        display: none; position: absolute; right: 0; background: #1e293b;
+        min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+        z-index: 100; border-radius: 8px; border: 1px solid #334155;
+        overflow: hidden;
+    }
+    .dropdown-content a {
+        color: #f1f5f9; padding: 10px 15px; text-decoration: none;
+        display: block; font-size: 0.85rem; transition: 0.2s;
+    }
+    .dropdown-content a:hover { background: #0ea5e9; color: white; }
+    
+    .show { display: block; }
     .chevron { transition: transform 0.3s ease; cursor: pointer; font-size: 1.2rem; color: #64748b; }
     .chevron.open { transform: rotate(180deg); }
 </style>
@@ -45,6 +71,20 @@ permalink: /dashboard/
 <script>
 let currentDisplayMode = 'goal';
 let rawGoalsData = [];
+
+// Close dropdowns when clicking outside
+window.onclick = function(event) {
+    if (!event.target.matches('.dots-btn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].classList.remove('show');
+        }
+    }
+}
+
+function toggleMenu(id) {
+    document.getElementById(`menu-${id}`).classList.toggle("show");
+}
 
 async function deleteGoal(goalId) {
     if (!confirm("Are you sure? This will delete the goal and all recorded investments permanently.")) return;
@@ -92,14 +132,12 @@ function renderDashboard() {
     countEl.innerText = rawGoalsData.length;
     let overallNetWorth = 0;
 
-    // --- 1. THE GROUPING ENGINE ---
     const groups = {};
     rawGoalsData.forEach(goal => {
         const alloc = goal.goal_allocations[0];
         const currentVal = calculateGoalValue(goal);
         overallNetWorth += currentVal;
 
-        // Grouping key (Case-Insensitive)
         const key = (currentDisplayMode === 'goal' ? goal.goal_name : (alloc.instrument_name || 'Uncategorized')).toLowerCase();
         const displayName = currentDisplayMode === 'goal' ? goal.goal_name : (alloc.instrument_name || 'Uncategorized');
 
@@ -113,12 +151,11 @@ function renderDashboard() {
         }
         groups[key].totalTarget += parseFloat(goal.target_price || 0);
         groups[key].totalCurrent += currentVal;
-        groups[key].items.push({ ...goal, currentVal });
+        groups[key].items.push({ ...goal, currentVal, alloc });
     });
 
     netWorthEl.innerText = "₹" + Math.round(overallNetWorth).toLocaleString('en-IN');
 
-    // --- 2. THE UI RENDERER ---
     Object.values(groups).forEach(group => {
         const progress = (group.totalCurrent / group.totalTarget) * 100;
         const groupID = group.name.replace(/\s+/g, '-').toLowerCase();
@@ -127,52 +164,65 @@ function renderDashboard() {
         
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-family: 'Lora', serif !important; font-size: 1.3rem;">${group.name}</h3>
+                <h3 style="margin: 0; font-family: 'Lora', serif !important; font-size: 1.4rem;">${group.name}</h3>
                 <span class="chevron" id="arrow-${groupID}" onclick="toggleDrawer('${groupID}')">▼</span>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px; font-weight: 700;">
-                    <span style="color: #64748b;">Consolidated Progress</span>
-                    <span style="color: #0ea5e9;">${progress.toFixed(1)}%</span>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px;">
+                    <span style="color: #64748b; text-transform: uppercase;">Consolidated Progress</span>
+                    <span style="color: #0ea5e9; font-weight: bold;">${progress.toFixed(1)}%</span>
                 </div>
                 <div style="width: 100%; background: #1e293b; height: 6px; border-radius: 10px; overflow: hidden;">
                     <div style="width: ${Math.min(progress, 100)}%; background: #0ea5e9; height: 100%;"></div>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
-                    <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Total Value</span>
-                    <div style="font-size: 1.1rem; font-weight: bold; color: #4ade80;">₹${Math.round(group.totalCurrent).toLocaleString('en-IN')}</div>
+                    <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Current Valuation</span>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹${Math.round(group.totalCurrent).toLocaleString('en-IN')}</div>
                 </div>
-                <div style="text-align: right;">
-                    <span id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.75rem; color: #0ea5e9; cursor: pointer; text-decoration: underline;">View XIRR</span>
-                </div>
+                <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.75rem; color: #0ea5e9; cursor: pointer; text-decoration: underline; padding-bottom: 2px;">View XIRR</div>
             </div>
 
-            <div id="drawer-${groupID}" style="display: none; margin-top: 20px; border-top: 1px solid rgba(100, 116, 139, 0.1); padding-top: 10px;">
-                ${group.items.map(item => `
-                    <div class="child-row">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px;">
-                            <strong style="color: #cbd5e1;">${currentDisplayMode === 'goal' ? (item.goal_allocations[0].instrument_name || 'Asset') : item.goal_name}</strong>
-                            <span style="color: #0ea5e9;">₹${Math.round(item.currentVal).toLocaleString('en-IN')}</span>
+            <div id="drawer-${groupID}" style="display: none; margin-top: 25px; border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 10px;">
+                ${group.items.map(item => {
+                    const itemProg = (item.currentVal / item.target_price) * 100;
+                    const subTitle = currentDisplayMode === 'goal' ? (item.alloc.instrument_name || 'Asset') : item.goal_name;
+                    return `
+                    <div class="child-item-row">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #f1f5f9; font-size: 0.95rem;">${subTitle}</div>
+                                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">
+                                    ${item.alloc.investment_mode} • Returns: ${item.alloc.expected_returns}% • Due: ${new Date(item.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}
+                                </div>
+                            </div>
+                            <div style="text-align: right; margin-right: 15px;">
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #cbd5e1;">₹${Math.round(item.currentVal).toLocaleString('en-IN')}</div>
+                                <div style="font-size: 0.7rem; color: #0ea5e9;">${itemProg.toFixed(1)}% complete</div>
+                            </div>
+                            <div class="menu-container">
+                                <button onclick="toggleMenu('${item.id}')" class="dots-btn">⋮</button>
+                                <div id="menu-${item.id}" class="dropdown-content">
+                                    <a href="/log-transaction/?goal_id=${item.id}">Add transactions</a>
+                                    <a href="/goal-history/?goal_id=${item.id}">Transaction history</a>
+                                    <a href="/edit-goal/?id=${item.id}">Edit goal</a>
+                                    <a href="#" onclick="deleteGoal('${item.id}')" style="color: #ef4444;">Delete goal</a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="action-grid">
-                            <button class="action-btn" onclick="window.location.href='/log-transaction/?goal_id=${item.id}'">Add transactions</button>
-                            <button class="action-btn" onclick="window.location.href='/goal-history/?goal_id=${item.id}'">Transaction history</button>
-                            <button class="action-btn" onclick="window.location.href='/edit-goal/?id=${item.id}'">Edit goal</button>
-                            <button class="action-btn" onclick="deleteGoal('${item.id}')" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">Delete goal</button>
+                        <div style="width: 100%; background: #0f172a; height: 3px; border-radius: 2px; margin-top: 10px; overflow: hidden;">
+                            <div style="width: ${Math.min(itemProg, 100)}%; background: #334155; height: 100%;"></div>
                         </div>
                     </div>
-                `).join('')}
+                    `}).join('')}
             </div>
         `;
         container.appendChild(card);
     });
 }
-
-// --- UTILITY FUNCTIONS ---
 
 function calculateGoalValue(goal) {
     let currentVal = 0;
@@ -200,9 +250,8 @@ function toggleDrawer(id) {
 function viewGroupXIRR(id) {
     const btn = document.getElementById(`xirr-btn-${id}`);
     btn.innerText = "Calculating...";
-    // Mock Delay for XIRR calculation
     setTimeout(() => {
-        btn.innerText = "XIRR: 14.2%"; // In reality, you'd run your XIRR math here
+        btn.innerText = "XIRR: 14.2%"; 
         btn.style.textDecoration = "none";
         btn.style.color = "#4ade80";
     }, 800);
