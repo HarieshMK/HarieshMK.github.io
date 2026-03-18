@@ -77,7 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const transDate = new Date(trans.transaction_date);
                 const today = new Date();
                 const yearsSinceTrans = (today - transDate) / (1000 * 60 * 60 * 24 * 365);
-                const benchmarkReturn = goal.goal_allocations[0]?.expected_returns || 12;
+                // Force the value to a Float to ensure 6.88 doesn't become 6 or 7
+                const benchmarkReturn = parseFloat(goal.goal_allocations[0]?.expected_returns) || 12;
+                console.log(`Goal: ${goal.goal_name} | Using Return Rate: ${benchmarkReturn}%`);
                 const growthFactor = Math.pow(1 + (benchmarkReturn / 100), Math.max(0, yearsSinceTrans));
                 totalInvested += parseFloat(trans.amount);
                 currentPortfolioValue += parseFloat(trans.amount) * growthFactor;
