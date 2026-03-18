@@ -58,7 +58,7 @@ permalink: /edit-goal/
     const urlParams = new URLSearchParams(window.location.search);
     const goalId = urlParams.get('id');
 
-    // UI Toggle Function
+    // 1. Initial UI Setup
     function selectMode(mode) {
         document.getElementById('choice-section').style.display = 'none';
         document.getElementById('goal-form').style.display = 'block';
@@ -67,17 +67,20 @@ permalink: /edit-goal/
         if (mode === 'strategy') {
             document.getElementById('page-title').innerText = "🔵 Update Strategy";
             document.getElementById('effective-date-container').style.display = 'block';
-            // Disable historical fields
             document.getElementById('goal_name').readOnly = true;
             document.getElementById('start_date').readOnly = true;
             document.getElementById('start_date').style.opacity = '0.5';
         } else {
             document.getElementById('page-title').innerText = "🔴 Fix a Mistake";
             document.getElementById('effective-date-container').style.display = 'none';
+            document.getElementById('goal_name').readOnly = false;
+            document.getElementById('start_date').readOnly = false;
+            document.getElementById('start_date').style.opacity = '1';
         }
         loadExistingData();
     }
 
+    // 2. Load Data from Supabase
     async function loadExistingData() {
         const { data, error } = await supabase
             .from('goals')
@@ -92,33 +95,116 @@ permalink: /edit-goal/
             
             const alloc = data.goal_allocations[0];
             document.getElementById('expected_returns').value = alloc.expected_returns;
-            document.getElementById('investment_amount').value = alloc.monthly_investment;
+            document.getElementById('investment_amount').value = 
+                alloc.investment_mode === 'SIP' ? alloc.monthly_investment : alloc.current_value_override;
         }
     }
 
-    // FORM SUBMISSION LOGIC (The "Brain")
+    // 3. The "Brain" - Saving the Changes
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const mode = document.getElementById('edit_mode').value;
         const btn = document.getElementById('submit-btn');
-        btn.innerText = "Applying...";
+        btn.innerText = "Processing...";
         btn.disabled = true;
 
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session.user.id;
+
+        // Common values from form
+        const newName = document.getElementById('goal_name').value;
+        const newTarget = document.getElementById('target_price').value;
+        const newReturns = document.getElementById('expected_returns').value;
+        const newAmount = parseFloat(document.getElementById('investment_amount').value) || 0;
+        const newStart = document.getElementById('start_date').value;
+
         if (mode === 'mistake') {
-            // 1. Delete ALL old transactions for this goal
+            // --- PATH 1: FIX A MISTAKE (REWRITE EVERYTHING) ---
+            
+            // A. Update the Main Goal
+            await supabase.from('goals').update({
+                goal_name: newName,
+                target_price: newTarget,
+                start_date: newStart
+            }).eq('id', goalId);
+
+            // B. Update the Allocation
+            await supabase.from('goal_allocations').update({
+                expected_returns: newReturns,
+                monthly_investment: newAmount, // Assuming SIP for simplicity
+                allocation_start_date: newStart
+            }).eq('goal_id', goalId);
+
+            // C. Clean and Re-generate Transactions
             await supabase.from('transactions').delete().eq('goal_id', goalId);
-            
-            // 2. Update Goal & Allocation with new values
-            // ... (We will write the full UPDATE logic in the next step) ...
-            alert("Mistake fixed! Re-generating history...");
+
+            let transactionsToInsert = [];
+            let start = new Date(newStart);
+            let today = new Date();
+            let monthOffset = 0;
+
+            while (true) {
+                let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, start.getDate());
+                if (nextDate > today) break;
+
+                transactionsToInsert.push({
+                    goal_id: goalId,
+                    user_id: userId,
+                    transaction_date: nextDate.toISOString().split('T')[0],
+                    amount: newAmount
+                });
+                monthOffset++;
+                if (monthOffset > 600) break;
+            }
+
+            if (transactionsToInsert.length > 0) {
+                await supabase.from('transactions').insert(transactionsToInsert);
+            }
+
+            alert("Mistake fixed and history rebuilt!");
+
         } else {
-            // 1. Find and delete ONLY transactions AFTER the effective date
+            // --- PATH 2: UPDATE STRATEGY (FUTURE ONLY) ---
             const effDate = document.getElementById('effective_date').value;
+            if (!effDate) { alert("Please select an effective date!"); btn.disabled = false; return; }
+
+            // A. Update Allocation & log the strategy change date
+            await supabase.from('goal_allocations').update({
+                monthly_investment: newAmount,
+                expected_returns: newReturns,
+                last_strategy_update: effDate
+            }).eq('goal_id', goalId);
+
+            // B. Delete only future transactions (from Effective Date onwards)
             await supabase.from('transactions').delete().eq('goal_id', goalId).gte('transaction_date', effDate);
-            
-            // 2. Update Allocation & log the Strategy Change
-            alert("Strategy Updated!");
+
+            // C. Generate new transactions from Effective Date to Today
+            let transactionsToInsert = [];
+            let startEff = new Date(effDate);
+            let today = new Date();
+            let monthOffset = 0;
+
+            while (true) {
+                let nextDate = new Date(startEff.getFullYear(), startEff.getMonth() + monthOffset, startEff.getDate());
+                if (nextDate > today) break;
+
+                transactionsToInsert.push({
+                    goal_id: goalId,
+                    user_id: userId,
+                    transaction_date: nextDate.toISOString().split('T')[0],
+                    amount: newAmount
+                });
+                monthOffset++;
+                if (monthOffset > 600) break;
+            }
+
+            if (transactionsToInsert.length > 0) {
+                await supabase.from('transactions').insert(transactionsToInsert);
+            }
+
+            alert("Strategy updated from " + effDate);
         }
+
         window.location.href = "/dashboard/";
     });
 </script>
