@@ -137,10 +137,19 @@ permalink: /log-transaction/
         });
     });
 
-    async function deleteRecent(id, elementId) {
-        if(!confirm("Delete this transaction?")) return;
+    // SILENT DELETE (For Edit)
+    async function silentDelete(id, elementId) {
         const { error } = await supabase.from('transactions').delete().eq('id', id);
-        if(!error) document.getElementById(elementId).remove();
+        if(!error) {
+            const el = document.getElementById(elementId);
+            if(el) el.remove();
+        }
+    }
+
+    // CONFIRMED DELETE (For Delete Button)
+    async function confirmDelete(id, elementId) {
+        if(!confirm("Are you sure you want to delete this transaction permanently?")) return;
+        await silentDelete(id, elementId);
     }
 
     function editRecent(id, elementId, goalId, amount, date, type) {
@@ -150,8 +159,8 @@ permalink: /log-transaction/
         document.getElementById('transaction_date').value = date;
         document.getElementById('transaction_type').value = type;
         
-        // 2. Remove the old record so the user can "replace" it
-        deleteRecent(id, elementId);
+        // 2. Silently remove the old record without asking "Are you sure?"
+        silentDelete(id, elementId);
         
         // 3. Scroll back to top
         document.getElementById('form-top').scrollIntoView({ behavior: 'smooth' });
@@ -180,8 +189,8 @@ permalink: /log-transaction/
                     ₹${Math.abs(amount).toLocaleString('en-IN')}
                 </div>
                 <div style="display: flex; gap: 8px;">
-                    <button onclick="editRecent('${id}', '${elementId}', '${goalId}', ${amount}, '${date}', '${type}')" style="background: none; border: none; color: #0ea5e9; cursor: pointer; font-size: 0.8rem;">Edit</button>
-                    <button onclick="deleteRecent('${id}', '${elementId}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem;">Del</button>
+                    <button onclick="editRecent('${id}', '${elementId}', '${goalId}', ${amount}, '${date}', '${type}')" style="background: none; border: none; color: #0ea5e9; cursor: pointer; font-size: 0.8rem; font-weight: bold;">Edit</button>
+                    <button onclick="confirmDelete('${id}', '${elementId}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; font-weight: bold;">Del</button>
                 </div>
             </div>
         `;
