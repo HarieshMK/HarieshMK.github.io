@@ -6,7 +6,7 @@ permalink: /log-transaction/
 
 <div class="log-container" style="max-width: 600px; margin: 20px auto; padding: 0 20px;">
     
-    <div class="post-card" style="margin-bottom: 30px;">
+    <div class="post-card" id="form-top" style="margin-bottom: 30px; position: relative;">
         <h2 style="margin-top: 0;">💸 Log Investment</h2>
         <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 25px;">Record an actual investment made towards your goal.</p>
 
@@ -47,16 +47,15 @@ permalink: /log-transaction/
     <div style="border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 25px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0; font-size: 1.1rem; color: #f1f5f9;">Recent Activity</h3>
-            <span style="font-size: 0.75rem; color: #64748b; background: rgba(30, 41, 59, 0.8); padding: 2px 8px; border-radius: 4px;">Session Log</span>
+            <span style="font-size: 0.75rem; color: #64748b;">This Session</span>
         </div>
         
         <div id="recent-list" style="display: flex; flex-direction: column; gap: 10px;">
             <p id="no-recent" style="color: #475569; font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px;">
-                No transactions added in this session yet.
+                No transactions added yet.
             </p>
         </div>
     </div>
-
 </div>
 
 <div id="toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000;">
@@ -65,27 +64,25 @@ permalink: /log-transaction/
 
 <script>
     let lastClicked = 'another';
+    let currentUserSessionId = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) { window.location.href = "/login/"; return; }
+        currentUserSessionId = session.user.id;
 
         const goalSelect = document.getElementById('goal_select');
         const urlParams = new URLSearchParams(window.location.search);
         const preSelectedGoal = urlParams.get('goal_id');
 
-        // Setup Button Clicks
         document.getElementById('btn-another').onclick = () => lastClicked = 'another';
         document.getElementById('btn-finish').onclick = () => lastClicked = 'finish';
-
-        // Set default date to today
         document.getElementById('transaction_date').valueAsDate = new Date();
 
-        // 1. Fetch Goals
         const { data: goals, error } = await supabase
             .from('goals')
             .select('id, goal_name')
-            .eq('user_id', session.user.id);
+            .eq('user_id', currentUserSessionId);
 
         if (error || !goals) {
             goalSelect.innerHTML = '<option>Error loading goals</option>';
@@ -96,12 +93,10 @@ permalink: /log-transaction/
             `<option value="${g.id}" ${g.id === preSelectedGoal ? 'selected' : ''}>${g.goal_name}</option>`
         ).join('');
 
-        // 2. Handle Submission
         document.getElementById('transaction-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const submitBtn = document.getElementById('btn-another');
-            const originalText = submitBtn.innerText;
             submitBtn.innerText = "Saving...";
             submitBtn.disabled = true;
 
@@ -110,81 +105,97 @@ permalink: /log-transaction/
             const amount = parseFloat(document.getElementById('amount').value);
             const type = document.getElementById('transaction_type').value;
             const date = document.getElementById('transaction_date').value;
-            
             const finalAmount = type === 'Sell' ? -Math.abs(amount) : Math.abs(amount);
 
-            const { error: transError } = await supabase
+            const { data: insertedData, error: transError } = await supabase
                 .from('transactions')
                 .insert([{
                     goal_id: goalId,
-                    user_id: session.user.id,
+                    user_id: currentUserSessionId,
                     transaction_date: date,
                     amount: finalAmount,
                     transaction_type: type
-                }]);
+                }]).select();
 
             if (transError) {
                 alert("Error: " + transError.message);
                 submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
+                submitBtn.innerText = "Save and Add Another";
             } else {
-                // Update the bottom activity list
-                updateActivityUI(goalName, finalAmount, date);
+                updateActivityUI(insertedData[0].id, goalName, goalId, finalAmount, date, type);
 
                 if (lastClicked === 'finish') {
                     window.location.href = "/dashboard/";
                 } else {
-                    // Feedback and Reset
                     showToast();
                     document.getElementById('amount').value = '';
                     document.getElementById('amount').focus();
                     submitBtn.disabled = false;
-                    submitBtn.innerText = originalText;
+                    submitBtn.innerText = "Save and Add Another";
                 }
             }
         });
     });
 
-    function showToast() {
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    async function deleteRecent(id, elementId) {
+        if(!confirm("Delete this transaction?")) return;
+        const { error } = await supabase.from('transactions').delete().eq('id', id);
+        if(!error) document.getElementById(elementId).remove();
     }
 
-    function updateActivityUI(name, amount, date) {
+    function editRecent(id, elementId, goalId, amount, date, type) {
+        // 1. Fill form with old values
+        document.getElementById('goal_select').value = goalId;
+        document.getElementById('amount').value = Math.abs(amount);
+        document.getElementById('transaction_date').value = date;
+        document.getElementById('transaction_type').value = type;
+        
+        // 2. Remove the old record so the user can "replace" it
+        deleteRecent(id, elementId);
+        
+        // 3. Scroll back to top
+        document.getElementById('form-top').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function updateActivityUI(id, name, goalId, amount, date, type) {
         const list = document.getElementById('recent-list');
         const emptyMsg = document.getElementById('no-recent');
         if (emptyMsg) emptyMsg.remove();
 
         const formattedDate = new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
         const color = amount >= 0 ? '#4ade80' : '#f87171';
-        const prefix = amount >= 0 ? '+' : '';
+        const elementId = `recent-${id}`;
 
         const entry = document.createElement('div');
+        entry.id = elementId;
         entry.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e293b; border-radius: 8px; border-left: 4px solid " + color + "; margin-bottom: 8px; animation: fadeIn 0.3s ease;";
         
         entry.innerHTML = `
-            <div>
+            <div style="flex: 1;">
                 <div style="font-size: 0.9rem; color: #f1f5f9; font-weight: 600;">${name}</div>
-                <div style="font-size: 0.75rem; color: #64748b;">${formattedDate}</div>
+                <div style="font-size: 0.75rem; color: #64748b;">${formattedDate} • <span style="color: ${color}">${amount >= 0 ? 'Buy' : 'Sell'}</span></div>
             </div>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: ${color}; font-weight: bold;">
-                ${prefix}₹${Math.abs(amount).toLocaleString('en-IN')}
+            <div style="text-align: right; display: flex; align-items: center; gap: 15px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: ${color}; font-weight: bold;">
+                    ₹${Math.abs(amount).toLocaleString('en-IN')}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="editRecent('${id}', '${elementId}', '${goalId}', ${amount}, '${date}', '${type}')" style="background: none; border: none; color: #0ea5e9; cursor: pointer; font-size: 0.8rem;">Edit</button>
+                    <button onclick="deleteRecent('${id}', '${elementId}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem;">Del</button>
+                </div>
             </div>
         `;
 
         list.insertBefore(entry, list.firstChild);
-        
-        // Keep the list to a maximum of 5 items for cleanliness
-        if (list.children.length > 5) {
-            list.removeChild(list.lastChild);
-        }
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2000);
     }
 </script>
 
 <style>
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
