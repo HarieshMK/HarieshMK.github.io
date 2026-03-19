@@ -53,11 +53,53 @@ permalink: /dashboard/
     .show { display: block; }
     .chevron { transition: transform 0.3s ease; cursor: pointer; font-size: 1.2rem; color: #64748b; }
     .chevron.open { transform: rotate(180deg); }
+    .xirr-clickable { color: #0ea5e9; cursor: pointer; text-decoration: underline; }
 </style>
 
 <script>
 let currentDisplayMode = 'goal';
 let rawGoalsData = [];
+
+// --- XIRR MATH CORE ---
+function calculateXIRR(cashFlows, dates) {
+    if (cashFlows.length < 2) return 0;
+    let rate = 0.1; 
+    const maxIter = 50;
+    for (let i = 0; i < maxIter; i++) {
+        let f = 0, df = 0;
+        for (let j = 0; j < cashFlows.length; j++) {
+            const t = (dates[j] - dates[0]) / (1000 * 60 * 60 * 24 * 365.25);
+            f += cashFlows[j] / Math.pow(1 + rate, t);
+            df -= t * cashFlows[j] / Math.pow(1 + rate, t + 1);
+        }
+        let nextRate = rate - f / df;
+        if (Math.abs(nextRate - rate) < 1e-5) return nextRate;
+        rate = nextRate;
+    }
+    return rate;
+}
+
+function runXIRR(element, transactions, currentVal) {
+    element.innerText = "...";
+    setTimeout(() => {
+        if (!transactions || transactions.length === 0) {
+            element.innerText = "0%"; return;
+        }
+        const flows = transactions.map(t => -parseFloat(t.amount));
+        const dates = transactions.map(t => new Date(t.transaction_date));
+        flows.push(currentVal);
+        dates.push(new Date());
+
+        const result = calculateXIRR(flows, dates);
+        const finalVal = (result * 100).toFixed(1) + "%";
+        
+        element.innerText = finalVal;
+        element.style.textDecoration = "none";
+        element.style.color = "#4ade80";
+        element.style.fontFamily = "'JetBrains Mono', monospace";
+        element.onclick = null;
+    }, 300);
+}
 
 window.onclick = function(event) {
     if (!event.target.matches('.dots-btn')) {
@@ -120,11 +162,12 @@ function renderDashboard() {
         const displayName = currentDisplayMode === 'goal' ? goal.goal_name : (alloc.instrument_name || 'Uncategorized');
 
         if (!groups[key]) {
-            groups[key] = { name: displayName, totalTarget: 0, totalCurrent: 0, totalInvested: 0, items: [] };
+            groups[key] = { name: displayName, totalTarget: 0, totalCurrent: 0, totalInvested: 0, items: [], allTransactions: [] };
         }
         groups[key].totalTarget += parseFloat(goal.target_price || 0);
         groups[key].totalCurrent += stats.current;
         groups[key].totalInvested += stats.invested;
+        groups[key].allTransactions.push(...(goal.transactions || []));
         groups[key].items.push({ ...goal, stats, alloc });
     });
 
@@ -175,7 +218,7 @@ function renderDashboard() {
                 </div>
                 <div style="text-align: right;">
                     <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">XIRR</div>
-                    <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.85rem; color: #0ea5e9; cursor: pointer; text-decoration: underline; font-weight: 600;">View XIRR</div>
+                    <div id="xirr-btn-${groupID}" class="xirr-clickable" style="font-size: 0.85rem; font-weight: 600;">View XIRR</div>
                 </div>
             </div>
 
@@ -193,7 +236,7 @@ function renderDashboard() {
                             <div style="flex: 1;">
                                 <div style="font-weight: 600; color: #f1f5f9; font-size: 0.95rem;">${subTitle} ${statusBadge}</div>
                                 <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">
-                                    ${item.alloc.investment_mode} • Returns: ${item.alloc.expected_returns}% • Due: ${new Date(item.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}
+                                    XIRR: <span id="xirr-sub-${item.id}" class="xirr-clickable" style="font-size: 0.7rem;">View</span> • Due: ${new Date(item.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}
                                 </div>
                             </div>
                             <div style="text-align: right; margin-right: 15px;">
@@ -219,6 +262,17 @@ function renderDashboard() {
             </div>
         `;
         container.appendChild(card);
+
+        // Bind main group XIRR
+        document.getElementById(`xirr-btn-${groupID}`).onclick = function() {
+            runXIRR(this, group.allTransactions, group.totalCurrent);
+        };
+        // Bind sub-item XIRR
+        group.items.forEach(item => {
+            document.getElementById(`xirr-sub-${item.id}`).onclick = function() {
+                runXIRR(this, item.transactions, item.stats.current);
+            };
+        });
     });
 }
 
@@ -247,16 +301,5 @@ function toggleDrawer(id) {
     d.style.display = isOpen ? 'none' : 'block';
     a.classList.toggle('open', !isOpen);
     a.innerText = isOpen ? '▼' : '▲';
-}
-
-function viewGroupXIRR(id) {
-    const btn = document.getElementById(`xirr-btn-${id}`);
-    btn.innerText = "...";
-    setTimeout(() => {
-        btn.innerText = "14.2%"; 
-        btn.style.textDecoration = "none";
-        btn.style.color = "#4ade80";
-        btn.style.fontFamily = "'JetBrains Mono', monospace";
-    }, 800);
 }
 </script>
