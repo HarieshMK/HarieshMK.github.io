@@ -4,103 +4,146 @@ title: My Financial Goals
 permalink: /dashboard/
 ---
 
-<div id="asset-modal" style="display:none; position:fixed; z-index:5000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
-    <div class="post-card" style="max-width: 800px; margin: 50px auto; max-height: 85vh; overflow-y: auto; border: 1px solid #334155; background: #000;">
+<div id="asset-modal" style="display:none; position:fixed; z-index:5000; left:0; top:0; width:100%; height:100%; background:rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);">
+    <div class="post-card" style="max-width: 800px; margin: 50px auto; max-height: 85vh; overflow-y: auto; border: 1px solid #1e293b; background: #0f172a;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0;">📈 Update Market Values</h2>
-            <button onclick="closeAssetModal()" style="background:none; border:none; color:#64748b; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <h2 style="margin: 0; font-size: 1.5rem;">📈 Update Market Values</h2>
+            <button onclick="closeAssetModal()" style="background:none; border:none; color:#64748b; font-size: 2rem; cursor:pointer; line-height: 1;">&times;</button>
         </div>
-        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Enter current values from your broker apps. If left at 0, the system will use Estimated Values.</p>
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 25px;">Enter current values from your broker apps. If left at 0, the system uses Estimated Values.</p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
             <thead>
-                <tr style="text-align: left; border-bottom: 1px solid #334155; color: #64748b;">
-                    <th style="padding: 10px;">Broker</th>
-                    <th style="padding: 10px;">Instrument</th>
-                    <th style="padding: 10px; text-align: right;">Current Market Value</th>
+                <tr style="text-align: left; border-bottom: 1px solid #334155; color: #94a3b8;">
+                    <th style="padding: 12px;">Broker</th>
+                    <th style="padding: 12px;">Instrument</th>
+                    <th style="padding: 12px; text-align: right;">Current Market Value</th>
                 </tr>
             </thead>
             <tbody id="asset-table-body"></tbody>
         </table>
-        <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+        <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end;">
             <button onclick="closeAssetModal()" class="filter-btn">Cancel</button>
-            <button id="save-assets-btn" onclick="saveMarketValues()" class="filter-btn active" style="padding: 8px 25px;">Save All Changes</button>
+            <button id="save-assets-btn" onclick="saveMarketValues()" class="filter-btn active" style="padding: 10px 30px;">Save All Changes</button>
         </div>
     </div>
 </div>
 
-<div class="dashboard-container" style="padding: 20px; max-width: 1000px; margin: 0 auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h2 style="margin: 0;">📊 My Financial Goals</h2>
+<div class="dashboard-container" style="padding: 20px; max-width: 1000px; margin: 0 auto; font-family: 'Inter', -apple-system, sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+        <h2 style="margin: 0; font-weight: 800; letter-spacing: -0.02em;">📊 My Financial Goals</h2>
         <div style="display: flex; gap: 12px;">
-            <button onclick="openAssetModal()" class="filter-btn" style="border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05);">Update Portfolio</button>
-            <a href="/add-goal/" class="auth-link" style="text-decoration: none; border-color: #0ea5e9; color: #0ea5e9;">+ Add New Goal</a>
+            <button onclick="openAssetModal()" class="filter-btn" style="border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.05);">Update Portfolio</button>
+            <a href="/add-goal/" class="auth-link" style="text-decoration: none; border: 1px solid #0ea5e9; color: #0ea5e9; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">+ Add New Goal</a>
         </div>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
-        <div class="post-card" style="text-align: center; margin-bottom: 0 !important;">
-            <p style="color: #64748b; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Active Goals</p>
-            <h3 id="total-goals-count" style="margin: 0; font-family: 'JetBrains Mono', monospace;">0</h3>
+        <div class="post-card" style="text-align: center; border-color: #1e293b;">
+            <p style="color: #64748b; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Active Goals</p>
+            <h3 id="total-goals-count" style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 1.8rem;">0</h3>
         </div>
-        <div class="post-card" style="text-align: center; margin-bottom: 0 !important;">
-            <p style="color: #64748b; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Est. Net Worth</p>
-            <h3 id="total-net-worth" style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #0ea5e9;">₹0</h3>
+        <div class="post-card" style="text-align: center; border-color: #1e293b;">
+            <p style="color: #64748b; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Est. Net Worth</p>
+            <h3 id="total-net-worth" style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #38bdf8; font-size: 1.8rem;">₹0</h3>
         </div>
     </div>
 
-    <div style="display: flex; justify-content: center; margin-bottom: 30px; gap: 10px;">
+    <div style="display: flex; justify-content: center; margin-bottom: 35px; gap: 12px;">
         <button id="btn-group-goal" onclick="setDisplayMode('goal')" class="filter-btn active">Group by Goal</button>
         <button id="btn-group-asset" onclick="setDisplayMode('asset')" class="filter-btn">Group by Instrument</button>
     </div>
 
-    <div id="dashboard-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;"></div>
+    <div id="dashboard-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px;"></div>
 </div>
 
 <style>
     :root {
         --accent: #0ea5e9;
+        --accent-hover: #0284c7;
+        --bg-card: #0f172a;
         --border-muted: #1e293b;
-        --track: #0f172a;
+        --track: #1e293b;
     }
-    .filter-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
-    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: bold; }
-    
+
+    /* Core Card Styling */
     .post-card { 
-        background: #000; border: 1px solid var(--border-muted); padding: 20px; border-radius: 12px; transition: z-index 0s;
+        background: var(--bg-card); 
+        border: 1px solid var(--border-muted); 
+        padding: 24px; 
+        border-radius: 20px; 
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
         position: relative;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    /* Z-index fix: Elevate the card that has an open dropdown */
-    .post-card.active-card { z-index: 1000 !important; border-color: #334155; }
+    .post-card.active-card { z-index: 1000 !important; border-color: var(--accent); ring: 2px solid var(--accent); }
 
-    /* Progress Bar Styles */
-    .progress-track { width: 100%; background: var(--track); height: 8px; border-radius: 10px; border: 1px solid #334155; overflow: hidden; position: relative; }
-    .progress-fill { background: var(--accent); height: 100%; transition: width 1s ease-in-out; position: relative; box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
-    .progress-fill::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 4px; background: #fff; filter: blur(2px); opacity: 0.6; }
-
-    /* Tree structure */
-    .drawer-content { position: relative; padding-left: 20px; margin-top: 15px; }
-    .drawer-content::before { content: ''; position: absolute; left: 5px; top: 0; bottom: 20px; width: 1px; background: #334155; }
-    
-    .child-item-row { 
-        position: relative; padding: 15px 0 15px 15px; border-bottom: 1px solid rgba(100, 116, 139, 0.05); 
+    .filter-btn { 
+        background: #1e293b; border: 1px solid #334155; color: #94a3b8; 
+        padding: 10px 20px; border-radius: 12px; cursor: pointer; 
+        transition: 0.2s; font-size: 0.9rem; font-weight: 500;
     }
-    .child-item-row::before { content: ''; position: absolute; left: -15px; top: 25px; width: 15px; height: 1px; background: #334155; }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); }
 
-    .dropdown-content { display: none; position: absolute; right: 0; background: #1e293b; min-width: 160px; z-index: 2000; border-radius: 8px; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .dropdown-content a { color: #f1f5f9; padding: 10px 15px; text-decoration: none; display: block; font-size: 0.8rem; }
-    .dropdown-content a:hover { background: var(--accent); }
-    .show { display: block !important; }
+    /* Premium Progress Bar */
+    .progress-track { width: 100%; background: var(--track); height: 12px; border-radius: 20px; overflow: hidden; position: relative; }
+    .progress-fill { background: var(--accent); height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .progress-fill::after { 
+        content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 30px; 
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2)); 
+    }
 
+    /* Drawer & Tree UI */
+    .drawer-content { position: relative; padding-left: 15px; margin-top: 20px; border-top: 1px solid #1e293b; }
+    .child-item-row { position: relative; padding: 20px 0 20px 25px; border-bottom: 1px solid rgba(30, 41, 59, 0.5); }
+    .child-item-row::before { 
+        content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; 
+        background: linear-gradient(to bottom, var(--accent), transparent); opacity: 0.3;
+    }
+
+    /* Actions Menu Styling */
+    .dots-btn { 
+        background: #1e293b; color: #94a3b8; border: 1px solid #334155; 
+        width: 32px; height: 32px; border-radius: 8px; cursor: pointer; 
+        display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .dots-btn:hover { background: #334155; color: #fff; }
+
+    .dropdown-content { 
+        display: none; position: absolute; right: 0; top: 40px; background: #1e293b; 
+        min-width: 180px; z-index: 2000; border-radius: 12px; border: 1px solid #334155; 
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .dropdown-content a { color: #f1f5f9; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.85rem; transition: 0.2s; }
+    .dropdown-content a:hover { background: var(--accent); color: white; }
+    .show { display: block !important; animation: fadeIn 0.2s ease; }
+
+    /* Values & Typography */
+    .mono-value { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
     .gain-positive { color: #4ade80; }
     .gain-negative { color: #f87171; }
-    .info-icon { display: inline-block; width: 14px; height: 14px; background: #334155; color: #94a3b8; border-radius: 50%; font-size: 10px; line-height: 14px; text-align: center; cursor: help; margin-left: 5px; border: 1px solid #475569; }
-    .xirr-clickable { color: var(--accent); cursor: pointer; text-decoration: underline; }
+    .info-icon { display: inline-block; width: 14px; height: 14px; background: #334155; color: #38bdf8; border-radius: 50%; font-size: 10px; line-height: 14px; text-align: center; cursor: help; margin-left: 5px; }
+    .xirr-clickable { color: var(--accent); cursor: pointer; font-weight: 700; border-bottom: 1px dashed var(--accent); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
-// (Previous Logic Functions: openAssetModal, closeAssetModal, saveMarketValues, normalize, getStats - UNTOUCHED)
 let currentDisplayMode = 'goal';
 let rawGoalsData = [];
+
+// ... [Keep helper functions: openAssetModal, closeAssetModal, saveMarketValues, normalize, getStats exactly as they were] ...
+
+function normalize(s) { return s ? s.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unk'; }
+function getStats(g) {
+    let inv = 0, theo = 0;
+    const ret = parseFloat(g.goal_allocations?.[0]?.expected_returns) || 12;
+    (g.transactions || []).forEach(t => {
+        const amt = parseFloat(t.amount) || 0; inv += amt;
+        const y = Math.max(0, (new Date() - new Date(t.transaction_date)) / 31557600000);
+        theo += amt * Math.pow(1 + (ret / 100), y);
+    });
+    return { inv, theo };
+}
 
 function openAssetModal() {
     const assets = {};
@@ -112,13 +155,18 @@ function openAssetModal() {
     });
     document.getElementById('asset-table-body').innerHTML = Object.keys(assets).map(k => `
         <tr style="border-bottom: 1px solid #1e293b;">
-            <td style="padding: 12px;">${assets[k].b}</td>
-            <td style="padding: 12px;">${assets[k].i}</td>
-            <td style="padding: 12px; text-align: right;"><input type="number" class="asset-input" data-key="${k}" value="${assets[k].v}"></td>
+            <td style="padding: 15px; font-weight: 600;">${assets[k].b}</td>
+            <td style="padding: 15px; color: #94a3b8;">${assets[k].i}</td>
+            <td style="padding: 15px; text-align: right;">
+                <input type="number" class="asset-input" data-key="${k}" value="${assets[k].v}" 
+                style="background:#020617; border:1px solid #334155; color:#38bdf8; padding:8px; border-radius:8px; font-family:'JetBrains Mono'; text-align:right; width:140px;">
+            </td>
         </tr>`).join('');
     document.getElementById('asset-modal').style.display = 'block';
 }
+
 function closeAssetModal() { document.getElementById('asset-modal').style.display = 'none'; }
+
 async function saveMarketValues() {
     const btn = document.getElementById('save-assets-btn');
     btn.innerText = "Saving..."; btn.disabled = true;
@@ -128,17 +176,6 @@ async function saveMarketValues() {
     });
     await Promise.all(updates);
     location.reload();
-}
-function normalize(s) { return s ? s.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unk'; }
-function getStats(g) {
-    let inv = 0, theo = 0;
-    const ret = parseFloat(g.goal_allocations?.[0]?.expected_returns) || 12;
-    (g.transactions || []).forEach(t => {
-        const amt = parseFloat(t.amount) || 0; inv += amt;
-        const y = Math.max(0, (new Date() - new Date(t.transaction_date)) / 31557600000);
-        theo += amt * Math.pow(1 + (ret / 100), y);
-    });
-    return { inv, theo };
 }
 
 function renderDashboard() {
@@ -196,30 +233,36 @@ function renderDashboard() {
         card.id = `card-${grp.id}`;
         
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-family: 'Lora', serif; font-size: 1.2rem;">${grp.name}</h3>
-                <span class="chevron" id="arrow-${grp.id}" onclick="toggleDrawer('${grp.id}')" style="cursor:pointer; color:#64748b;">▼</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: -0.01em;">${grp.name}</h3>
+                <span class="chevron" id="arrow-${grp.id}" onclick="toggleDrawer('${grp.id}')" style="cursor:pointer; background: #1e293b; padding: 6px; border-radius: 8px; color:#64748b; font-size: 0.8rem;">▼</span>
             </div>
 
-            <div style="margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 6px; letter-spacing: 0.05em; color: #64748b;">
+            <div style="margin-bottom: 30px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 8px; letter-spacing: 0.05em; color: #94a3b8; font-weight: 700;">
                     <span>PROGRESS</span>
-                    <span style="color: var(--accent); font-weight: bold;">${prog.toFixed(1)}%</span>
+                    <span style="color: var(--accent);">${prog.toFixed(1)}%</span>
                 </div>
                 <div class="progress-track"><div class="progress-fill" style="width: ${prog}%"></div></div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; border-top: 1px solid rgba(100,116,139,0.1); padding-top: 15px;">
-                <div><div style="font-size: 0.6rem; color: #64748b;">INVESTED</div><div style="font-size: 0.85rem; font-weight: 600;">₹${Math.round(grp.inv).toLocaleString('en-IN')}</div></div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
                 <div>
-                    <div style="font-size: 0.6rem; color: #64748b;">CURRENT ${grp.est ? `<span class="info-icon" title="Estimated">i</span>` : ''}</div>
-                    <div style="font-size: 0.85rem; color: #fff;">₹${Math.round(grp.cur).toLocaleString('en-IN')}</div>
+                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Invested</div>
+                    <div class="mono-value" style="font-size: 1.1rem; color: #cbd5e1;">₹${Math.round(grp.inv).toLocaleString('en-IN')}</div>
                 </div>
                 <div>
-                    <div style="font-size: 0.6rem; color: #64748b;">GAIN</div>
-                    <div style="font-size: 0.85rem;" class="${gainAmt >= 0 ? 'gain-positive' : 'gain-negative'}">₹${Math.round(gainAmt).toLocaleString('en-IN')} (${gainPerc.toFixed(1)}%)</div>
+                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Current ${grp.est ? `<span class="info-icon" title="Estimated">i</span>` : ''}</div>
+                    <div class="mono-value" style="font-size: 1.1rem; color: #38bdf8;">₹${Math.round(grp.cur).toLocaleString('en-IN')}</div>
                 </div>
-                <div style="text-align: right;"><div style="font-size: 0.6rem; color: #64748b;">XIRR</div><div id="xirr-btn-${grp.id}" class="xirr-clickable">View</div></div>
+                <div>
+                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Gain</div>
+                    <div class="mono-value ${gainAmt >= 0 ? 'gain-positive' : 'gain-negative'}" style="font-size: 1rem;">₹${Math.round(gainAmt).toLocaleString('en-IN')} (${gainPerc.toFixed(1)}%)</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">XIRR</div>
+                    <div id="xirr-btn-${grp.id}" class="xirr-clickable mono-value" style="font-size: 1.1rem;">View</div>
+                </div>
             </div>
 
             <div id="drawer-${grp.id}" style="display: none;" class="drawer-content">
@@ -230,45 +273,44 @@ function renderDashboard() {
                     
                     return `
                     <div class="child-item-row">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <div style="flex: 1;">
-                                <div style="font-size: 0.85rem; font-weight: 500;">${currentDisplayMode === 'goal' ? (item.goal_allocations?.[0]?.instrument_name || 'Asset') : item.goal_name}</div>
-                                <div style="font-size: 0.7rem; color: #64748b;">${item.goal_allocations?.[0]?.broker_name || ''}</div>
+                                <div style="font-size: 1rem; font-weight: 700; color: #f1f5f9;">${currentDisplayMode === 'goal' ? (item.goal_allocations?.[0]?.instrument_name || 'Asset') : item.goal_name}</div>
+                                <div style="font-size: 0.75rem; color: #64748b; font-weight: 500;">${item.goal_allocations?.[0]?.broker_name || 'Manual'}</div>
                             </div>
-                            <div style="text-align: right;">
-                                <button onclick="toggleMenu('${item.id}', '${grp.id}')" class="dots-btn" style="padding: 5px; font-size: 1rem;">⋮</button>
+                            <div style="position: relative;">
+                                <button onclick="event.stopPropagation(); toggleMenu('${item.id}', '${grp.id}')" class="dots-btn">⋮</button>
                                 <div id="menu-${item.id}" class="dropdown-content">
-                                    <a href="/log-transaction/?goal_id=${item.id}">Add transactions</a>
-                                    <a href="/goal-history/?goal_id=${item.id}">History</a>
-                                    <a href="/edit-goal/?id=${item.id}">Edit</a>
-                                    <a href="#" onclick="deleteGoal('${item.id}')" style="color: #ef4444;">Delete</a>
+                                    <a href="/log-transaction/?goal_id=${item.id}">Add Transaction</a>
+                                    <a href="/goal-history/?goal_id=${item.id}">View History</a>
+                                    <a href="/edit-goal/?id=${item.id}">Edit Goal</a>
+                                    <a href="#" onclick="deleteGoal('${item.id}')" style="color: #f87171; border-top: 1px solid rgba(255,255,255,0.05);">Delete</a>
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px;">
-                            <div><div style="font-size: 0.55rem; color: #64748b;">INV</div><div style="font-size: 0.75rem;">₹${Math.round(item.s.inv).toLocaleString('en-IN')}</div></div>
-                            <div><div style="font-size: 0.55rem; color: #64748b;">CUR</div><div style="font-size: 0.75rem;">₹${Math.round(item.curVal).toLocaleString('en-IN')}</div></div>
-                            <div><div style="font-size: 0.55rem; color: #64748b;">GAIN</div><div style="font-size: 0.75rem;" class="${iGainAmt >= 0 ? 'gain-positive' : 'gain-negative'}">${iGainPerc.toFixed(1)}%</div></div>
-                            <div style="text-align: right;"><div style="font-size: 0.55rem; color: #64748b;">XIRR</div><div id="xirr-child-${item.id}" class="xirr-clickable" style="font-size:0.75rem;">View</div></div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
+                            <div><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">INV</div><div class="mono-value" style="font-size: 0.85rem;">₹${Math.round(item.s.inv).toLocaleString('en-IN')}</div></div>
+                            <div><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">CUR</div><div class="mono-value" style="font-size: 0.85rem;">₹${Math.round(item.curVal).toLocaleString('en-IN')}</div></div>
+                            <div><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">GAIN</div><div class="mono-value ${iGainAmt >= 0 ? 'gain-positive' : 'gain-negative'}" style="font-size: 0.85rem;">${iGainPerc.toFixed(1)}%</div></div>
+                            <div style="text-align: right;"><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">XIRR</div><div id="xirr-child-${item.id}" class="xirr-clickable mono-value" style="font-size: 0.85rem;">View</div></div>
                         </div>
 
-                        <div class="progress-track" style="height: 4px; border: none; background: #1e293b;"><div class="progress-fill" style="width: ${itemProg}%; background: #64748b; box-shadow: none;"></div></div>
+                        <div class="progress-track" style="height: 6px; background: #020617;"><div class="progress-fill" style="width: ${itemProg}%; background: #475569;"></div></div>
                     </div>`;
                 }).join('')}
             </div>`;
             
         container.appendChild(card);
         
-        // Load XIRR for main goal
         document.getElementById(`xirr-btn-${grp.id}`).onclick = function() { runXIRR(this, grp.txs, grp.cur); };
-        
-        // Load XIRR for children
         grp.items.forEach(item => {
             document.getElementById(`xirr-child-${item.id}`).onclick = function() { runXIRR(this, item.transactions || [], item.curVal); };
         });
     });
 }
+
+// ... [Keep calculateXIRR, runXIRR, toggleDrawer unchanged] ...
 
 function calculateXIRR(flows, dates) {
     let r = 0.1;
@@ -305,13 +347,12 @@ function toggleMenu(itemId, cardId) {
     const card = document.getElementById(`card-${cardId}`);
     const isVisible = m.classList.contains("show");
     
-    // Close others and reset z-indexes
     document.querySelectorAll('.dropdown-content').forEach(el => el.classList.remove('show'));
     document.querySelectorAll('.post-card').forEach(c => c.classList.remove('active-card'));
     
     if (!isVisible) {
         m.classList.add("show");
-        card.classList.add("active-card"); // Bring the card to front
+        card.classList.add("active-card");
     }
 }
 
@@ -324,7 +365,6 @@ function setDisplayMode(m) {
 
 async function deleteGoal(id) { if (confirm("Delete this goal?")) { await supabase.from('goals').delete().eq('id', id); location.reload(); } }
 
-// Global click to close menus
 window.onclick = e => { 
     if (!e.target.matches('.dots-btn')) {
         document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
