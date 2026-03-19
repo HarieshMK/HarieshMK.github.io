@@ -19,7 +19,7 @@ permalink: /add-goal/
             </div>
             <div>
                 <label>Inflation Rate (%)</label>
-                <input type="number" id="inflation_rate" value="6" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <input type="number" id="inflation_rate" value="6" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
             </div>
         </div>
 
@@ -47,12 +47,14 @@ permalink: /add-goal/
         </div>
 
         <label>Select Instrument</label>
-        <select id="instrument_select" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;"></select>
+        <select id="instrument_select" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            <option value="" disabled selected>Choose an instrument...</option>
+        </select>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             <div>
                 <label>Investment Mode</label>
-                <select id="investment_mode" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <select id="investment_mode" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
                     <option value="SIP">SIP</option>
                     <option value="Lumpsum">Lumpsum</option>
                     <option value="Manual">Manual</option>
@@ -60,19 +62,19 @@ permalink: /add-goal/
             </div>
             <div>
                 <label id="amount_label">Monthly SIP Amount</label>
-                <input type="number" id="investment_amount" placeholder="₹ per month" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <input type="number" id="investment_amount" placeholder="₹ per month" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
             </div>
         </div>
 
         <div id="sip_date_container" style="margin-bottom: 15px;">
             <label>Preferred SIP Day (1-31)</label>
             <input type="number" id="sip_date" min="1" max="31" placeholder="e.g. 5" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-            <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Transactions after Month 1 will snap to this date.</p>
+            <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Required for SIP mode.</p>
         </div>
 
         <div>
             <label>Expected Returns (%)</label>
-            <input type="number" id="expected_returns" step="any" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            <input type="number" id="expected_returns" step="any" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
         </div>
 
         <button type="submit" id="submit-btn" class="btn" style="width: 100%; cursor: pointer;">Save Goal & Start Tracking</button>
@@ -116,12 +118,10 @@ permalink: /add-goal/
 
     // 3. Handle UI Changes
     select.addEventListener('change', (e) => {
-        document.getElementById('expected_returns').value = InvestmentRegistry[e.target.value].returns;
+        if (InvestmentRegistry[e.target.value]) {
+            document.getElementById('expected_returns').value = InvestmentRegistry[e.target.value].returns;
+        }
     });
-    
-    if (select.value && InvestmentRegistry[select.value]) {
-        document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
-    }
 
     modeSelect.addEventListener('change', (e) => {
         const val = e.target.value;
@@ -129,19 +129,25 @@ permalink: /add-goal/
             amountLabel.innerText = "Monthly SIP Amount";
             amountInput.placeholder = "₹ per month";
             amountInput.disabled = false;
+            amountInput.required = true;
             sipDateContainer.style.display = "block";
+            sipDateInput.required = true;
         } else if (val === "Lumpsum") {
             amountLabel.innerText = "Lumpsum Amount";
             amountInput.placeholder = "₹ one-time";
             amountInput.disabled = false;
+            amountInput.required = true;
             sipDateContainer.style.display = "none";
+            sipDateInput.required = false;
             sipDateInput.value = "";
         } else {
             amountLabel.innerText = "Manual Mode";
             amountInput.placeholder = "Log via dashboard";
             amountInput.disabled = true;
+            amountInput.required = false;
             amountInput.value = "";
             sipDateContainer.style.display = "none";
+            sipDateInput.required = false;
             sipDateInput.value = "";
         }
     });
@@ -149,6 +155,13 @@ permalink: /add-goal/
     // 4. Form Submission
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Manual Validation Check
+        if (modeSelect.value === 'SIP' && !sipDateInput.value) {
+            alert("Please provide a Preferred SIP Day.");
+            return;
+        }
+
         const btn = document.getElementById('submit-btn');
         btn.innerText = "Saving...";
         btn.disabled = true;
