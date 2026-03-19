@@ -26,18 +26,26 @@ permalink: /add-goal/
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             <div>
                 <label>Start Date</label>
-                <input type="date" id="start_date" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <input type="date" id="start_date" required style="width: 100%; padding: 10px; margin-bottom: 5px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
             </div>
             <div>
                 <label>Target Date (Maturity)</label>
-                <input type="date" id="target_date" required style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <input type="date" id="target_date" required style="width: 100%; padding: 10px; margin-bottom: 5px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
             </div>
         </div>
+        
+        <div id="goal-duration-text" style="font-size: 0.8rem; color: #94a3b8; font-style: italic; margin-bottom: 15px; text-align: right; display: none;"></div>
 
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
 
         <h3>🚀 Investment Strategy</h3>
         
+        <div style="margin-bottom: 15px;">
+            <label>AMC / Broker / Platform <span style="color: #ef4444;">*</span></label>
+            <input type="text" id="broker_name" placeholder="e.g. Zerodha, HDFC Bank, ICICI Prudential, etc." required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+            <p style="font-size: 0.7rem; color: #64748b; margin-top: 5px;">Used to group investments for accurate XIRR and value tracking.</p>
+        </div>
+
         <label>Select Instrument</label>
         <select id="instrument_select" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;"></select>
 
@@ -59,7 +67,7 @@ permalink: /add-goal/
         <div id="sip_date_container" style="margin-bottom: 15px;">
             <label>Preferred SIP Day (1-31)</label>
             <input type="number" id="sip_date" min="1" max="31" placeholder="e.g. 5" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-            <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Transactions after Month 1 will snap to this date. (e.g. Apr 31 rolls to May 1).</p>
+            <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Transactions after Month 1 will snap to this date.</p>
         </div>
 
         <div>
@@ -79,6 +87,9 @@ permalink: /add-goal/
     const amountInput = document.getElementById('investment_amount');
     const sipDateContainer = document.getElementById('sip_date_container');
     const sipDateInput = document.getElementById('sip_date');
+    const startDateInput = document.getElementById('start_date');
+    const targetDateInput = document.getElementById('target_date');
+    const durationDisplay = document.getElementById('goal-duration-text');
 
     // 1. Setup Instrument Dropdown
     Object.keys(InvestmentRegistry).forEach(option => {
@@ -88,12 +99,26 @@ permalink: /add-goal/
         select.appendChild(el);
     });
 
-    // 2. Handle UI Changes
+    // 2. Duration Logic
+    function updateDuration() {
+        const start = new Date(startDateInput.value);
+        const end = new Date(targetDateInput.value);
+        if (startDateInput.value && targetDateInput.value && end > start) {
+            const diffYears = ((end - start) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(1);
+            durationDisplay.innerText = `* Planned for ${diffYears} years`;
+            durationDisplay.style.display = 'block';
+        } else {
+            durationDisplay.style.display = 'none';
+        }
+    }
+    startDateInput.addEventListener('change', updateDuration);
+    targetDateInput.addEventListener('change', updateDuration);
+
+    // 3. Handle UI Changes
     select.addEventListener('change', (e) => {
         document.getElementById('expected_returns').value = InvestmentRegistry[e.target.value].returns;
     });
     
-    // Set initial return value safely
     if (select.value && InvestmentRegistry[select.value]) {
         document.getElementById('expected_returns').value = InvestmentRegistry[select.value].returns;
     }
@@ -121,7 +146,7 @@ permalink: /add-goal/
         }
     });
 
-    // 3. Form Submission
+    // 4. Form Submission
     document.getElementById('goal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
@@ -137,6 +162,7 @@ permalink: /add-goal/
         }
 
         const userId = session.user.id;
+        const brokerName = document.getElementById('broker_name').value.trim();
 
         // --- STEP A: Create Goal ---
         const { data: goalData, error: goalError } = await supabase
@@ -165,15 +191,13 @@ permalink: /add-goal/
         const sipAmount = parseFloat(amountInput.value) || 0;
         const preferredDay = (modeSelect.value === 'SIP' && sipDateInput.value) ? parseInt(sipDateInput.value) : start.getDate();
 
-        // --- STEP B: Generate Transaction History (NEW) ---
+        // --- STEP B: Generate Transaction History ---
         let transactionsToInsert = [];
-        
         if (modeSelect.value === 'SIP') {
             let monthOffset = 0;
             while (true) {
                 let nextDate = new Date(start.getFullYear(), start.getMonth() + monthOffset, preferredDay);
                 if (nextDate > today) break;
-
                 transactionsToInsert.push({
                     goal_id: goalId,
                     user_id: userId,
@@ -181,7 +205,7 @@ permalink: /add-goal/
                     amount: sipAmount,
                 });
                 monthOffset++;
-                if (monthOffset > 600) break; // Safety stop
+                if (monthOffset > 600) break;
             }
         } else if (modeSelect.value === 'Lumpsum') {
             transactionsToInsert.push({
@@ -198,6 +222,7 @@ permalink: /add-goal/
             .insert([{
                 goal_id: goalId,
                 user_id: userId,
+                broker_name: brokerName,
                 instrument_name: select.value,
                 investment_mode: modeSelect.value,
                 expected_returns: document.getElementById('expected_returns').value,
@@ -207,7 +232,7 @@ permalink: /add-goal/
                 sip_date: modeSelect.value === 'SIP' ? preferredDay : null
             }]);
 
-        // --- STEP D: Insert Transactions into Supabase (NEW) ---
+        // --- STEP D: Insert Transactions ---
         if (transactionsToInsert.length > 0) {
             const { error: transError } = await supabase.from('transactions').insert(transactionsToInsert);
             if (transError) console.error("Transaction Error:", transError);
