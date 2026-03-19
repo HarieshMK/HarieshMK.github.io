@@ -35,7 +35,6 @@ permalink: /dashboard/
     .filter-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
     .filter-btn.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; font-weight: bold; }
     
-    /* New Item Row Styling */
     .child-item-row { 
         padding: 15px 0; 
         border-bottom: 1px solid rgba(100, 116, 139, 0.1); 
@@ -43,7 +42,6 @@ permalink: /dashboard/
     }
     .child-item-row:last-child { border-bottom: none; }
 
-    /* Three Dot Menu */
     .menu-container { position: relative; display: inline-block; }
     .dots-btn { 
         background: none; border: none; color: #64748b; cursor: pointer; 
@@ -72,7 +70,6 @@ permalink: /dashboard/
 let currentDisplayMode = 'goal';
 let rawGoalsData = [];
 
-// Close dropdowns when clicking outside
 window.onclick = function(event) {
     if (!event.target.matches('.dots-btn')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -157,44 +154,55 @@ function renderDashboard() {
     netWorthEl.innerText = "₹" + Math.round(overallNetWorth).toLocaleString('en-IN');
 
     Object.values(groups).forEach(group => {
-        const progress = (group.totalCurrent / group.totalTarget) * 100;
-        const groupID = group.name.replace(/\s+/g, '-').toLowerCase();
+        const totalTarget = parseFloat(group.totalTarget) || 0;
+        const totalCurrent = parseFloat(group.totalCurrent) || 0;
+        const rawProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
+        const safeProgress = isNaN(rawProgress) ? 0 : Math.min(rawProgress, 100);
+        const groupID = group.items[0].id; 
+        
         const card = document.createElement('div');
         card.className = "post-card";
         
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; font-family: 'Lora', serif !important; font-size: 1.4rem;">${group.name}</h3>
-                <span class="chevron" id="arrow-${groupID}" onclick="toggleDrawer('${groupID}')">▼</span>
+                <span class="chevron" id="arrow-${groupID}" onclick="event.stopPropagation(); toggleDrawer('${groupID}')" style="padding: 5px; cursor: pointer;">▼</span>
             </div>
 
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px;">
                     <span style="color: #64748b; text-transform: uppercase;">Consolidated Progress</span>
-                    <span style="color: #0ea5e9; font-weight: bold;">${progress.toFixed(1)}%</span>
+                    <span style="color: #0ea5e9; font-weight: bold;">${safeProgress.toFixed(1)}%</span>
                 </div>
                 <div style="width: 100%; background: #1e293b; height: 6px; border-radius: 10px; overflow: hidden;">
-                    <div style="width: ${Math.min(progress, 100)}%; background: #0ea5e9; height: 100%;"></div>
+                    <div style="width: ${safeProgress}%; background: #0ea5e9; height: 100%;"></div>
                 </div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
                     <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Current Valuation</span>
-                    <div style="font-size: 1.2rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹${Math.round(group.totalCurrent).toLocaleString('en-IN')}</div>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">
+                        ₹${Math.round(totalCurrent).toLocaleString('en-IN')}
+                    </div>
                 </div>
                 <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.75rem; color: #0ea5e9; cursor: pointer; text-decoration: underline; padding-bottom: 2px;">View XIRR</div>
             </div>
 
             <div id="drawer-${groupID}" style="display: none; margin-top: 25px; border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 10px;">
                 ${group.items.map(item => {
-                    const itemProg = (item.currentVal / item.target_price) * 100;
+                    const itemTarget = parseFloat(item.target_price) || 0;
+                    const rawItemProg = itemTarget > 0 ? (item.currentVal / itemTarget) * 100 : 0;
+                    const itemProg = isNaN(rawItemProg) ? 0 : Math.min(rawItemProg, 100);
                     const subTitle = currentDisplayMode === 'goal' ? (item.alloc.instrument_name || 'Asset') : item.goal_name;
+                    const statusBadge = item.currentVal === 0 ? 
+                        `<span style="font-size: 0.6rem; background: rgba(234, 179, 8, 0.2); color: #eab308; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">PENDING LOG</span>` : '';
+
                     return `
                     <div class="child-item-row">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #f1f5f9; font-size: 0.95rem;">${subTitle}</div>
+                                <div style="font-weight: 600; color: #f1f5f9; font-size: 0.95rem;">${subTitle} ${statusBadge}</div>
                                 <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">
                                     ${item.alloc.investment_mode} • Returns: ${item.alloc.expected_returns}% • Due: ${new Date(item.target_date).toLocaleDateString('en-IN', {month:'short', year:'numeric'})}
                                 </div>
@@ -214,10 +222,11 @@ function renderDashboard() {
                             </div>
                         </div>
                         <div style="width: 100%; background: #0f172a; height: 3px; border-radius: 2px; margin-top: 10px; overflow: hidden;">
-                            <div style="width: ${Math.min(itemProg, 100)}%; background: #334155; height: 100%;"></div>
+                            <div style="width: ${itemProg}%; background: #334155; height: 100%;"></div>
                         </div>
                     </div>
-                    `}).join('')}
+                    `;
+                }).join('')}
             </div>
         `;
         container.appendChild(card);
@@ -227,12 +236,14 @@ function renderDashboard() {
 function calculateGoalValue(goal) {
     let currentVal = 0;
     if (goal.transactions && goal.transactions.length > 0) {
+        const now = new Date();
+        const benchmarkReturn = parseFloat(goal.goal_allocations[0]?.expected_returns) || 12;
+
         goal.transactions.forEach(trans => {
             const transDate = new Date(trans.transaction_date);
-            const yearsSinceTrans = (new Date() - transDate) / (1000 * 60 * 60 * 24 * 365);
-            const benchmarkReturn = parseFloat(goal.goal_allocations[0]?.expected_returns) || 12;
-            const growthFactor = Math.pow(1 + (benchmarkReturn / 100), Math.max(0, yearsSinceTrans));
-            currentVal += parseFloat(trans.amount) * growthFactor;
+            const yearsSinceTrans = Math.max(0, (now - transDate) / (1000 * 60 * 60 * 24 * 365.25));
+            const growthFactor = Math.pow(1 + (benchmarkReturn / 100), yearsSinceTrans);
+            currentVal += (parseFloat(trans.amount) || 0) * growthFactor;
         });
     }
     return currentVal;
