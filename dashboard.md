@@ -168,9 +168,9 @@ function renderDashboard() {
                 </div>
                 <div>
                     <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Absolute Gain</div>
-                    <div style="font-size: 0.95rem; font-weight: bold; color: ${gain >= 0 ? '#4ade80' : '#f87171'}; font-family: 'JetBrains Mono', monospace;">
+                    <div style="font-size: 0.95rem; font-weight: bold; color: ${gain >= 0 ? '#4ade80' : '#f87171'}; font-family: 'JetBrains Mono', monospace; display: flex; align-items: baseline;">
                         ${gain >= 0 ? '+' : ''}${Math.round(gain).toLocaleString('en-IN')}
-                        <span style="font-size: 0.6rem; display: block; font-weight: normal;">(${gainPct.toFixed(1)}%)</span>
+                        <span style="font-size: 0.65rem; margin-left: 5px; font-weight: normal; opacity: 0.9;">(${gainPct.toFixed(1)}%)</span>
                     </div>
                 </div>
                 <div style="text-align: right;">
