@@ -113,7 +113,7 @@ function renderDashboard() {
     const groups = {};
     rawGoalsData.forEach(goal => {
         const alloc = goal.goal_allocations[0];
-        const stats = calculateGoalStats(goal); // Get both Invested and Current
+        const stats = calculateGoalStats(goal);
         overallNetWorth += stats.current;
 
         const key = (currentDisplayMode === 'goal' ? goal.goal_name : (alloc.instrument_name || 'Uncategorized')).toLowerCase();
@@ -157,25 +157,27 @@ function renderDashboard() {
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-bottom: 15px; border-top: 1px solid rgba(100, 116, 139, 0.1); padding-top: 15px;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; border-top: 1px solid rgba(100, 116, 139, 0.1); padding-top: 15px;">
                 <div>
-                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Invested</div>
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Invested</div>
                     <div style="font-size: 0.95rem; font-weight: bold; color: #cbd5e1; font-family: 'JetBrains Mono', monospace;">₹${Math.round(totalInvested).toLocaleString('en-IN')}</div>
                 </div>
                 <div>
-                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Valuation</div>
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Current Value</div>
                     <div style="font-size: 0.95rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹${Math.round(totalCurrent).toLocaleString('en-IN')}</div>
                 </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Abs. Gain</div>
+                <div>
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Absolute Gain</div>
                     <div style="font-size: 0.95rem; font-weight: bold; color: ${gain >= 0 ? '#4ade80' : '#f87171'}; font-family: 'JetBrains Mono', monospace;">
                         ${gain >= 0 ? '+' : ''}${Math.round(gain).toLocaleString('en-IN')}
-                        <span style="font-size: 0.6rem; display: block;">(${gainPct.toFixed(1)}%)</span>
+                        <span style="font-size: 0.6rem; display: block; font-weight: normal;">(${gainPct.toFixed(1)}%)</span>
                     </div>
                 </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">XIRR</div>
+                    <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.85rem; color: #0ea5e9; cursor: pointer; text-decoration: underline; font-weight: 600;">View XIRR</div>
+                </div>
             </div>
-
-            <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.75rem; color: #0ea5e9; cursor: pointer; text-decoration: underline;">View XIRR</div>
 
             <div id="drawer-${groupID}" style="display: none; margin-top: 25px; border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 10px;">
                 ${group.items.map(item => {
@@ -249,11 +251,12 @@ function toggleDrawer(id) {
 
 function viewGroupXIRR(id) {
     const btn = document.getElementById(`xirr-btn-${id}`);
-    btn.innerText = "Calculating...";
+    btn.innerText = "...";
     setTimeout(() => {
-        btn.innerText = "XIRR: 14.2%"; 
+        btn.innerText = "14.2%"; 
         btn.style.textDecoration = "none";
         btn.style.color = "#4ade80";
+        btn.style.fontFamily = "'JetBrains Mono', monospace";
     }, 800);
 }
 </script>
