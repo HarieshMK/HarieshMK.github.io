@@ -70,6 +70,28 @@ permalink: /dashboard/
     .post-card { background: #000; border: 1px solid #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     .child-item-row { padding: 12px 0; border-bottom: 1px solid rgba(100, 116, 139, 0.1); }
     .asset-input { background: #000; border: 1px solid #334155; color: #fff; padding: 5px 10px; border-radius: 4px; width: 120px; font-family: 'JetBrains Mono', monospace; }
+    .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #1e293b;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    z-index: 1001;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.dropdown-content a {
+    color: #cbd5e1;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.85rem;
+}
+.dropdown-content a:hover {
+    background-color: #334155;
+}
 </style>
 
 <script>
@@ -79,82 +101,6 @@ let rawGoalsData = [];
 // --- ASSET MODAL LOGIC ---
 function openAssetModal() {
     const uniqueAssets = {};
-    rawGoalsData.forEach(goal => {
-        const alloc = goal.goal_allocations?.[0];
-        if (alloc) {
-            const key = (alloc.broker_name || 'Unspecified') + '|' + (alloc.instrument_name || 'Uncategorized');
-            if (!uniqueAssets[key]) {
-                uniqueAssets[key] = {
-                    broker: alloc.broker_name || 'Unspecified',
-                    instrument: alloc.instrument_name || 'Uncategorized',
-                    lastValue: alloc.current_value_override || 0
-                };
-            }
-        }
-    });
-
-    const tbody = document.getElementById('asset-table-body');
-    tbody.innerHTML = '';
-    Object.keys(uniqueAssets).forEach((key, index) => {
-        const asset = uniqueAssets[key];
-        const row = `
-            <tr style="border-bottom: 1px solid rgba(51, 65, 85, 0.5);">
-                <td style="padding: 12px;">${index + 1}</td>
-                <td style="padding: 12px; color: #cbd5e1;">${asset.broker}</td>
-                <td style="padding: 12px; color: #cbd5e1;">${asset.instrument}</td>
-                <td style="padding: 12px; color: #64748b;">₹${Math.round(asset.lastValue).toLocaleString('en-IN')}</td>
-                <td style="padding: 12px;">
-                    <input type="number" class="asset-input" data-key="${key}" value="${asset.lastValue}">
-                </td>
-            </tr>
-        `;
-        tbody.insertAdjacentHTML('beforeend', row);
-    });
-
-    document.getElementById('asset-modal').style.display = 'block';
-}
-
-function closeAssetModal() {
-    document.getElementById('asset-modal').style.display = 'none';
-}
-
-async function saveMarketValues() {
-    const btn = document.getElementById('save-assets-btn');
-    btn.innerText = "Saving...";
-    btn.disabled = true;
-
-    const inputs = document.querySelectorAll('.asset-input');
-    const updates = Array.from(inputs).map(input => {
-        const [broker, instrument] = input.getAttribute('data-key').split('|');
-        const newValue = parseFloat(input.value) || 0;
-
-        // Logic: Update ALL allocations that match this Broker + Instrument
-        return supabase
-            .from('goal_allocations')
-            .update({ current_value_override: newValue })
-            .match({ broker_name: broker, instrument_name: instrument });
-    });
-
-    try {
-        await Promise.all(updates);
-        location.reload(); // Refresh to trigger weightage engine with new values
-    } catch (err) {
-        alert("Error saving values: " + err.message);
-        btn.innerText = "Save All Changes";
-        btn.disabled = false;
-    }
-}
-
-
-    <script>
-let currentDisplayMode = 'goal';
-let rawGoalsData = [];
-
-// --- ASSET MODAL LOGIC (FIXED) ---
-function openAssetModal() {
-    const uniqueAssets = {};
-    
-    // FIX: Iterate through ALL allocations in every goal, not just the first one [0]
     rawGoalsData.forEach(goal => {
         if (goal.goal_allocations && goal.goal_allocations.length > 0) {
             goal.goal_allocations.forEach(alloc => {
@@ -172,14 +118,14 @@ function openAssetModal() {
 
     const tbody = document.getElementById('asset-table-body');
     tbody.innerHTML = '';
-    
     const assetKeys = Object.keys(uniqueAssets);
+    
     if (assetKeys.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#64748b;">No investments found to update.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#64748b;">No investments found.</td></tr>';
     } else {
         assetKeys.forEach((key, index) => {
             const asset = uniqueAssets[key];
-            const row = `
+            tbody.insertAdjacentHTML('beforeend', `
                 <tr style="border-bottom: 1px solid rgba(51, 65, 85, 0.5);">
                     <td style="padding: 12px;">${index + 1}</td>
                     <td style="padding: 12px; color: #cbd5e1;">${asset.broker}</td>
@@ -189,11 +135,9 @@ function openAssetModal() {
                         <input type="number" class="asset-input" data-key="${key}" value="${asset.lastValue}">
                     </td>
                 </tr>
-            `;
-            tbody.insertAdjacentHTML('beforeend', row);
+            `);
         });
     }
-
     document.getElementById('asset-modal').style.display = 'block';
 }
 
@@ -211,8 +155,6 @@ async function saveMarketValues() {
     const updates = Array.from(inputs).map(input => {
         const [broker, instrument] = input.getAttribute('data-key').split('|');
         const newValue = parseFloat(input.value) || 0;
-
-        // Logic: Update ALL entries matching this combo
         return supabase
             .from('goal_allocations')
             .update({ current_value_override: newValue })
@@ -220,111 +162,105 @@ async function saveMarketValues() {
     });
 
     try {
-        const results = await Promise.all(updates);
-        const errors = results.filter(r => r.error);
-        if (errors.length > 0) throw errors[0].error;
-        
+        await Promise.all(updates);
         location.reload(); 
     } catch (err) {
-        alert("Error saving values: " + err.message);
+        alert("Error saving: " + err.message);
         btn.innerText = originalText;
         btn.disabled = false;
     }
 }
 
-// --- CORE UTILS & MATH ---
-function normalizeKey(str) {
-    return str ? str.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown';
+// --- MATH & UTILS ---
+function normalizeKey(str) { return str ? str.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown'; }
+
+function calculateXIRR(cashFlows, dates) {
+    if (cashFlows.length < 2) return 0;
+    let rate = 0.1; 
+    for (let i = 0; i < 50; i++) {
+        let f = 0, df = 0;
+        for (let j = 0; j < cashFlows.length; j++) {
+            const t = (dates[j] - dates[0]) / (31557600000); // ms in a year
+            f += cashFlows[j] / Math.pow(1 + rate, t);
+            df -= t * cashFlows[j] / Math.pow(1 + rate, t + 1);
+        }
+        let nextRate = rate - f / df;
+        if (Math.abs(nextRate - rate) < 1e-5) return nextRate;
+        rate = nextRate;
+    }
+    return rate;
+}
+
+function runXIRR(element, transactions, currentVal) {
+    element.innerText = "...";
+    setTimeout(() => {
+        if (!transactions || transactions.length === 0) { element.innerText = "0%"; return; }
+        const flows = transactions.map(t => -parseFloat(t.amount));
+        const dates = transactions.map(t => new Date(t.transaction_date));
+        flows.push(currentVal);
+        dates.push(new Date());
+        const result = calculateXIRR(flows, dates);
+        element.innerText = (result * 100).toFixed(1) + "%";
+        element.style.color = "#4ade80";
+    }, 300);
 }
 
 function calculateGoalStats(goal) {
-    let invested = 0;
-    let theoreticalValue = 0;
-    
+    let invested = 0, theoreticalValue = 0;
     if (goal.transactions && goal.transactions.length > 0) {
         const now = new Date();
-        // Use the first allocation's return rate as the benchmark for growth logic
         const benchmarkReturn = parseFloat(goal.goal_allocations?.[0]?.expected_returns) || 12;
-
         goal.transactions.forEach(trans => {
             const amt = parseFloat(trans.amount) || 0;
             invested += amt;
-            const transDate = new Date(trans.transaction_date);
-            const years = Math.max(0, (now - transDate) / (1000 * 60 * 60 * 24 * 365.25));
+            const years = Math.max(0, (now - new Date(trans.transaction_date)) / 31557600000);
             theoreticalValue += amt * Math.pow(1 + (benchmarkReturn / 100), years);
         });
     }
     return { invested, theoreticalValue };
 }
 
-// ... [Keep your XIRR math functions here] ...
-
-async function deleteGoal(goalId) {
-    if (!confirm("Are you sure? This will delete the goal and all recorded investments permanently.")) return;
-    const { error } = await supabase.from('goals').delete().eq('id', goalId);
-    if (error) { alert("Error deleting goal: " + error.message); } else { location.reload(); }
+// --- RENDER & UI ---
+function setDisplayMode(mode) {
+    currentDisplayMode = mode;
+    document.getElementById('btn-group-goal').classList.toggle('active', mode === 'goal');
+    document.getElementById('btn-group-asset').classList.toggle('active', mode === 'asset');
+    renderDashboard();
 }
 
-function toggleMenu(id) { 
-    event.stopPropagation();
-    const menu = document.getElementById(`menu-${id}`);
-    const wasShowing = menu.classList.contains("show");
-    // Close others
-    document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
-    if (!wasShowing) menu.classList.add("show");
-}
-
-window.onclick = function(event) {
-    if (!event.target.matches('.dots-btn')) {
-        document.querySelectorAll(".dropdown-content").forEach(d => d.classList.remove('show'));
-    }
-}
-
-// --- MAIN RENDER ENGINE ---
 function renderDashboard() {
     const container = document.getElementById('dashboard-cards-container');
     const countEl = document.getElementById('total-goals-count');
     const netWorthEl = document.getElementById('total-net-worth');
     
     if (!rawGoalsData || rawGoalsData.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; text-align:center; grid-column: 1/-1;'>No goals found. Start by adding one!</p>";
+        container.innerHTML = "<p style='color:#64748b; text-align:center; grid-column: 1/-1;'>No goals found.</p>";
         return;
     }
 
     container.innerHTML = "";
     countEl.innerText = rawGoalsData.length;
     let overallNetWorth = 0;
+    const buckets = {};
+    const groups = {};
 
-    const buckets = {}; 
-    const groups = {};  
-
-    // Phase 1: Instrument Bucketing (Weights)
     rawGoalsData.forEach(goal => {
         const stats = calculateGoalStats(goal);
-        
         (goal.goal_allocations || []).forEach(alloc => {
-            const bName = alloc.broker_name || 'Unspecified';
-            const iName = alloc.instrument_name || 'Uncategorized';
-            const bucketKey = normalizeKey(bName + iName);
-
-            if (!buckets[bucketKey]) {
-                buckets[bucketKey] = { theoreticalTotal: 0, actualOverride: 0 };
-            }
+            const bucketKey = normalizeKey((alloc.broker_name || 'Unspecified') + (alloc.instrument_name || 'Uncategorized'));
+            if (!buckets[bucketKey]) buckets[bucketKey] = { theoreticalTotal: 0, actualOverride: 0 };
             buckets[bucketKey].theoreticalTotal += stats.theoreticalValue;
             buckets[bucketKey].actualOverride = parseFloat(alloc.current_value_override) || 0;
         });
     });
 
-    // Phase 2: Pro-Rata Distribution & Grouping
     rawGoalsData.forEach(goal => {
         const stats = calculateGoalStats(goal);
         let finalValue = 0;
-
-        if (goal.goal_allocations && goal.goal_allocations.length > 0) {
+        if (goal.goal_allocations?.length > 0) {
             goal.goal_allocations.forEach(alloc => {
                 const bucketKey = normalizeKey((alloc.broker_name || 'Unspecified') + (alloc.instrument_name || 'Uncategorized'));
                 const bucket = buckets[bucketKey];
-                
                 const weight = bucket.theoreticalTotal > 0 ? (stats.theoreticalValue / bucket.theoreticalTotal) : 1;
                 finalValue += bucket.actualOverride > 0 ? (bucket.actualOverride * weight) : stats.theoreticalValue;
             });
@@ -338,9 +274,8 @@ function renderDashboard() {
         const groupKey = currentDisplayMode === 'goal' ? goal.id : normalizeKey(goal.goal_allocations?.[0]?.instrument_name || 'Uncategorized');
         const displayName = currentDisplayMode === 'goal' ? goal.goal_name : (goal.goal_allocations?.[0]?.instrument_name || 'Uncategorized');
 
-        if (!groups[groupKey]) {
-            groups[groupKey] = { name: displayName, id: groupKey, totalTarget: 0, totalCurrent: 0, totalInvested: 0, items: [], allTransactions: [] };
-        }
+        if (!groups[groupKey]) groups[groupKey] = { name: displayName, id: groupKey, totalTarget: 0, totalCurrent: 0, totalInvested: 0, items: [], allTransactions: [] };
+        
         groups[groupKey].totalTarget += parseFloat(goal.target_price || 0);
         groups[groupKey].totalCurrent += finalValue;
         groups[groupKey].totalInvested += stats.invested;
@@ -350,24 +285,16 @@ function renderDashboard() {
 
     netWorthEl.innerText = "₹" + Math.round(overallNetWorth).toLocaleString('en-IN');
 
-    // Phase 3: Building the Cards
     Object.values(groups).forEach(group => {
-        const totalTarget = group.totalTarget || 0;
-        const totalCurrent = group.totalCurrent || 0;
-        const totalInvested = group.totalInvested || 0;
-        const gain = totalCurrent - totalInvested;
-        const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
-        const progress = totalTarget > 0 ? Math.min((totalCurrent / totalTarget) * 100, 100) : 0;
-        const groupID = group.id;
-        
+        const progress = group.totalTarget > 0 ? Math.min((group.totalCurrent / group.totalTarget) * 100, 100) : 0;
+        const gain = group.totalCurrent - group.totalInvested;
         const card = document.createElement('div');
         card.className = "post-card";
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; font-family: 'Lora', serif; font-size: 1.4rem;">${group.name}</h3>
-                <span class="chevron" id="arrow-${groupID}" onclick="toggleDrawer('${groupID}')" style="padding: 5px; cursor: pointer; color:#64748b;">▼</span>
+                <span id="arrow-${group.id}" onclick="toggleDrawer('${group.id}')" style="cursor: pointer; color:#64748b;">▼</span>
             </div>
-
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px;">
                     <span style="color: #64748b; text-transform: uppercase;">Progress</span>
@@ -377,33 +304,28 @@ function renderDashboard() {
                     <div style="width: ${progress}%; background: #0ea5e9; height: 100%;"></div>
                 </div>
             </div>
-
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; border-top: 1px solid rgba(100, 116, 139, 0.1); padding-top: 15px;">
                 <div>
                     <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Invested</div>
-                    <div style="font-size: 0.85rem; font-weight: bold; color: #cbd5e1; font-family: 'JetBrains Mono';">₹${Math.round(totalInvested).toLocaleString('en-IN')}</div>
+                    <div style="font-size: 0.85rem; font-weight: bold; color: #cbd5e1; font-family: 'JetBrains Mono';">₹${Math.round(group.totalInvested).toLocaleString('en-IN')}</div>
                 </div>
                 <div>
                     <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Current</div>
-                    <div style="font-size: 0.85rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono';">₹${Math.round(totalCurrent).toLocaleString('en-IN')}</div>
+                    <div style="font-size: 0.85rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono';">₹${Math.round(group.totalCurrent).toLocaleString('en-IN')}</div>
                 </div>
                 <div>
                     <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Gain</div>
                     <div style="font-size: 0.8rem; font-weight: bold; color: ${gain >= 0 ? '#4ade80' : '#f87171'};">
-                        ${gainPct.toFixed(1)}%
+                        ${group.totalInvested > 0 ? ((gain / group.totalInvested) * 100).toFixed(1) : 0}%
                     </div>
                 </div>
                 <div style="text-align: right;">
                     <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">XIRR</div>
-                    <div id="xirr-btn-${groupID}" class="xirr-clickable" style="font-size: 0.8rem; color: #0ea5e9; cursor: pointer; text-decoration: underline;">View</div>
+                    <div id="xirr-btn-${group.id}" style="font-size: 0.8rem; color: #0ea5e9; cursor: pointer; text-decoration: underline;">View</div>
                 </div>
             </div>
-
-            <div id="drawer-${groupID}" style="display: none; margin-top: 15px; border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 10px;">
-                ${group.items.map(item => {
-                    const itemTarget = parseFloat(item.target_price) || 0;
-                    const itemProg = itemTarget > 0 ? Math.min((item.currentVal / itemTarget) * 100, 100) : 0;
-                    return `
+            <div id="drawer-${group.id}" style="display: none; margin-top: 15px; border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 10px;">
+                ${group.items.map(item => `
                     <div class="child-item-row" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                         <div>
                             <div style="font-size: 0.9rem; font-weight: 500;">${currentDisplayMode === 'goal' ? (item.goal_allocations?.[0]?.instrument_name || 'Asset') : item.goal_name}</div>
@@ -411,25 +333,17 @@ function renderDashboard() {
                         </div>
                         <div style="text-align: right; display: flex; align-items: center; gap: 15px;">
                             <div style="font-size: 0.85rem; font-family: 'JetBrains Mono'; color: #cbd5e1;">₹${Math.round(item.currentVal).toLocaleString('en-IN')}</div>
-                            <div class="menu-container" style="position: relative;">
-                                <button onclick="toggleMenu('${item.id}')" class="dots-btn" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:1.2rem;">⋮</button>
-                                <div id="menu-${item.id}" class="dropdown-content">
-                                    <a href="/log-transaction/?goal_id=${item.id}">Add Transaction</a>
-                                    <a href="/edit-goal/?id=${item.id}">Edit</a>
-                                    <a href="#" onclick="deleteGoal('${item.id}')" style="color: #ef4444;">Delete</a>
-                                </div>
+                            <button onclick="toggleMenu('${item.id}')" class="dots-btn" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:1.2rem;">⋮</button>
+                            <div id="menu-${item.id}" class="dropdown-content" style="display:none; position:absolute; right:20px; background:#1e293b; border:1px solid #334155; z-index:100;">
+                                <a href="/log-transaction/?goal_id=${item.id}" style="display:block; padding:8px; color:#fff; text-decoration:none;">Add Txn</a>
+                                <a href="#" onclick="deleteGoal('${item.id}')" style="display:block; padding:8px; color:#ef4444; text-decoration:none;">Delete</a>
                             </div>
                         </div>
-                    </div>`;
-                }).join('')}
+                    </div>`).join('')}
             </div>
         `;
         container.appendChild(card);
-
-        // Bind XIRR
-        document.getElementById(`xirr-btn-${groupID}`).onclick = function() {
-            runXIRR(this, group.allTransactions, group.totalCurrent);
-        };
+        document.getElementById(`xirr-btn-${group.id}`).onclick = function() { runXIRR(this, group.allTransactions, group.totalCurrent); };
     });
 }
 
@@ -441,17 +355,25 @@ function toggleDrawer(id) {
     a.innerText = isOpen ? '▼' : '▲';
 }
 
+function toggleMenu(id) {
+    const m = document.getElementById(`menu-${id}`);
+    const isVisible = m.style.display === 'block';
+    document.querySelectorAll('.dropdown-content').forEach(el => el.style.display = 'none');
+    m.style.display = isVisible ? 'none' : 'block';
+}
+
+async function deleteGoal(id) {
+    if (confirm("Delete this goal?")) {
+        await supabase.from('goals').delete().eq('id', id);
+        location.reload();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { window.location.href = "/login/"; return; }
-
-    const { data: goals, error } = await supabase
-        .from('goals')
-        .select('*, goal_allocations (*), transactions (*)')
-        .eq('user_id', session.user.id);
-
-    if (error) { document.getElementById('loading-text').innerText = "Error loading goals."; return; }
-    rawGoalsData = goals;
+    if (!session) return window.location.href = "/login/";
+    const { data: goals } = await supabase.from('goals').select('*, goal_allocations (*), transactions (*)').eq('user_id', session.user.id);
+    rawGoalsData = goals || [];
     renderDashboard();
 });
 </script>
