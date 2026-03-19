@@ -35,30 +35,19 @@ permalink: /dashboard/
     .filter-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
     .filter-btn.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; font-weight: bold; }
     
-    .child-item-row { 
-        padding: 15px 0; 
-        border-bottom: 1px solid rgba(100, 116, 139, 0.1); 
-        position: relative;
-    }
+    .child-item-row { padding: 15px 0; border-bottom: 1px solid rgba(100, 116, 139, 0.1); position: relative; }
     .child-item-row:last-child { border-bottom: none; }
 
     .menu-container { position: relative; display: inline-block; }
-    .dots-btn { 
-        background: none; border: none; color: #64748b; cursor: pointer; 
-        font-size: 1.2rem; padding: 0 5px; transition: 0.2s;
-    }
+    .dots-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 1.2rem; padding: 0 5px; transition: 0.2s; }
     .dots-btn:hover { color: #0ea5e9; }
     
     .dropdown-content {
         display: none; position: absolute; right: 0; background: #1e293b;
         min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-        z-index: 100; border-radius: 8px; border: 1px solid #334155;
-        overflow: hidden;
+        z-index: 100; border-radius: 8px; border: 1px solid #334155; overflow: hidden;
     }
-    .dropdown-content a {
-        color: #f1f5f9; padding: 10px 15px; text-decoration: none;
-        display: block; font-size: 0.85rem; transition: 0.2s;
-    }
+    .dropdown-content a { color: #f1f5f9; padding: 10px 15px; text-decoration: none; display: block; font-size: 0.85rem; transition: 0.2s; }
     .dropdown-content a:hover { background: #0ea5e9; color: white; }
     
     .show { display: block; }
@@ -73,21 +62,16 @@ let rawGoalsData = [];
 window.onclick = function(event) {
     if (!event.target.matches('.dots-btn')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
-        for (var i = 0; i < dropdowns.length; i++) {
-            dropdowns[i].classList.remove('show');
-        }
+        for (var i = 0; i < dropdowns.length; i++) { dropdowns[i].classList.remove('show'); }
     }
 }
 
-function toggleMenu(id) {
-    document.getElementById(`menu-${id}`).classList.toggle("show");
-}
+function toggleMenu(id) { document.getElementById(`menu-${id}`).classList.toggle("show"); }
 
 async function deleteGoal(goalId) {
     if (!confirm("Are you sure? This will delete the goal and all recorded investments permanently.")) return;
     const { error } = await supabase.from('goals').delete().eq('id', goalId);
-    if (error) { alert("Error deleting goal: " + error.message); } 
-    else { location.reload(); }
+    if (error) { alert("Error deleting goal: " + error.message); } else { location.reload(); }
 }
 
 function setDisplayMode(mode) {
@@ -106,10 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .select('*, goal_allocations (*), transactions (*)')
         .eq('user_id', session.user.id);
 
-    if (error) {
-        document.getElementById('loading-text').innerText = "Error loading goals.";
-        return;
-    }
+    if (error) { document.getElementById('loading-text').innerText = "Error loading goals."; return; }
 
     rawGoalsData = goals;
     renderDashboard();
@@ -132,37 +113,34 @@ function renderDashboard() {
     const groups = {};
     rawGoalsData.forEach(goal => {
         const alloc = goal.goal_allocations[0];
-        const currentVal = calculateGoalValue(goal);
-        overallNetWorth += currentVal;
+        const stats = calculateGoalStats(goal); // Get both Invested and Current
+        overallNetWorth += stats.current;
 
         const key = (currentDisplayMode === 'goal' ? goal.goal_name : (alloc.instrument_name || 'Uncategorized')).toLowerCase();
         const displayName = currentDisplayMode === 'goal' ? goal.goal_name : (alloc.instrument_name || 'Uncategorized');
 
         if (!groups[key]) {
-            groups[key] = {
-                name: displayName,
-                totalTarget: 0,
-                totalCurrent: 0,
-                items: []
-            };
+            groups[key] = { name: displayName, totalTarget: 0, totalCurrent: 0, totalInvested: 0, items: [] };
         }
         groups[key].totalTarget += parseFloat(goal.target_price || 0);
-        groups[key].totalCurrent += currentVal;
-        groups[key].items.push({ ...goal, currentVal, alloc });
+        groups[key].totalCurrent += stats.current;
+        groups[key].totalInvested += stats.invested;
+        groups[key].items.push({ ...goal, stats, alloc });
     });
 
     netWorthEl.innerText = "₹" + Math.round(overallNetWorth).toLocaleString('en-IN');
 
     Object.values(groups).forEach(group => {
-        const totalTarget = parseFloat(group.totalTarget) || 0;
-        const totalCurrent = parseFloat(group.totalCurrent) || 0;
-        const rawProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
-        const safeProgress = isNaN(rawProgress) ? 0 : Math.min(rawProgress, 100);
+        const totalTarget = group.totalTarget || 0;
+        const totalCurrent = group.totalCurrent || 0;
+        const totalInvested = group.totalInvested || 0;
+        const gain = totalCurrent - totalInvested;
+        const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
+        const progress = totalTarget > 0 ? Math.min((totalCurrent / totalTarget) * 100, 100) : 0;
         const groupID = group.items[0].id; 
         
         const card = document.createElement('div');
         card.className = "post-card";
-        
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0; font-family: 'Lora', serif !important; font-size: 1.4rem;">${group.name}</h3>
@@ -172,30 +150,39 @@ function renderDashboard() {
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 6px;">
                     <span style="color: #64748b; text-transform: uppercase;">Consolidated Progress</span>
-                    <span style="color: #0ea5e9; font-weight: bold;">${safeProgress.toFixed(1)}%</span>
+                    <span style="color: #0ea5e9; font-weight: bold;">${progress.toFixed(1)}%</span>
                 </div>
                 <div style="width: 100%; background: #1e293b; height: 6px; border-radius: 10px; overflow: hidden;">
-                    <div style="width: ${safeProgress}%; background: #0ea5e9; height: 100%;"></div>
+                    <div style="width: ${progress}%; background: #0ea5e9; height: 100%;"></div>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-bottom: 15px; border-top: 1px solid rgba(100, 116, 139, 0.1); padding-top: 15px;">
                 <div>
-                    <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Current Valuation</span>
-                    <div style="font-size: 1.2rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">
-                        ₹${Math.round(totalCurrent).toLocaleString('en-IN')}
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Invested</div>
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #cbd5e1; font-family: 'JetBrains Mono', monospace;">₹${Math.round(totalInvested).toLocaleString('en-IN')}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Valuation</div>
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹${Math.round(totalCurrent).toLocaleString('en-IN')}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase;">Abs. Gain</div>
+                    <div style="font-size: 0.95rem; font-weight: bold; color: ${gain >= 0 ? '#4ade80' : '#f87171'}; font-family: 'JetBrains Mono', monospace;">
+                        ${gain >= 0 ? '+' : ''}${Math.round(gain).toLocaleString('en-IN')}
+                        <span style="font-size: 0.6rem; display: block;">(${gainPct.toFixed(1)}%)</span>
                     </div>
                 </div>
-                <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.75rem; color: #0ea5e9; cursor: pointer; text-decoration: underline; padding-bottom: 2px;">View XIRR</div>
             </div>
+
+            <div id="xirr-btn-${groupID}" onclick="viewGroupXIRR('${groupID}')" style="font-size: 0.75rem; color: #0ea5e9; cursor: pointer; text-decoration: underline;">View XIRR</div>
 
             <div id="drawer-${groupID}" style="display: none; margin-top: 25px; border-top: 1px solid rgba(100, 116, 139, 0.2); padding-top: 10px;">
                 ${group.items.map(item => {
                     const itemTarget = parseFloat(item.target_price) || 0;
-                    const rawItemProg = itemTarget > 0 ? (item.currentVal / itemTarget) * 100 : 0;
-                    const itemProg = isNaN(rawItemProg) ? 0 : Math.min(rawItemProg, 100);
+                    const itemProg = itemTarget > 0 ? Math.min((item.stats.current / itemTarget) * 100, 100) : 0;
                     const subTitle = currentDisplayMode === 'goal' ? (item.alloc.instrument_name || 'Asset') : item.goal_name;
-                    const statusBadge = item.currentVal === 0 ? 
+                    const statusBadge = item.stats.invested === 0 ? 
                         `<span style="font-size: 0.6rem; background: rgba(234, 179, 8, 0.2); color: #eab308; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">PENDING LOG</span>` : '';
 
                     return `
@@ -208,7 +195,7 @@ function renderDashboard() {
                                 </div>
                             </div>
                             <div style="text-align: right; margin-right: 15px;">
-                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #cbd5e1;">₹${Math.round(item.currentVal).toLocaleString('en-IN')}</div>
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #cbd5e1;">₹${Math.round(item.stats.current).toLocaleString('en-IN')}</div>
                                 <div style="font-size: 0.7rem; color: #0ea5e9;">${itemProg.toFixed(1)}% complete</div>
                             </div>
                             <div class="menu-container">
@@ -233,20 +220,22 @@ function renderDashboard() {
     });
 }
 
-function calculateGoalValue(goal) {
-    let currentVal = 0;
+function calculateGoalStats(goal) {
+    let invested = 0;
+    let current = 0;
     if (goal.transactions && goal.transactions.length > 0) {
         const now = new Date();
         const benchmarkReturn = parseFloat(goal.goal_allocations[0]?.expected_returns) || 12;
 
         goal.transactions.forEach(trans => {
+            const amt = parseFloat(trans.amount) || 0;
+            invested += amt;
             const transDate = new Date(trans.transaction_date);
-            const yearsSinceTrans = Math.max(0, (now - transDate) / (1000 * 60 * 60 * 24 * 365.25));
-            const growthFactor = Math.pow(1 + (benchmarkReturn / 100), yearsSinceTrans);
-            currentVal += (parseFloat(trans.amount) || 0) * growthFactor;
+            const years = Math.max(0, (now - transDate) / (1000 * 60 * 60 * 24 * 365.25));
+            current += amt * Math.pow(1 + (benchmarkReturn / 100), years);
         });
     }
-    return currentVal;
+    return { invested, current };
 }
 
 function toggleDrawer(id) {
