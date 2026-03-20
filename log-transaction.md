@@ -36,8 +36,8 @@ permalink: /log-transaction/
                 </div>
             </div>
 
-            <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Notes / Share Name</label>
-            <input type="text" id="share_name" placeholder="e.g. COLPAL or SIP Installment" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none;">
+            <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Share Name</label>
+            <input type="text" id="share_name" placeholder="e.g. RELIANCE/ HDFC, etc" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none;">
 
             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
                 <button type="submit" id="btn-another" class="btn" style="background: #0ea5e9; color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem;">
