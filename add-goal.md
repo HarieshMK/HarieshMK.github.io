@@ -253,6 +253,8 @@ permalink: /add-goal/
 
         if (allocError) {
             alert("Goal created, but error adding allocation: " + allocError.message);
+            btn.disabled = false;
+            btn.innerText = "Save Goal & Start Tracking";
         } else {
             alert("Goal Created Successfully!");
             window.location.href = "/dashboard/";
