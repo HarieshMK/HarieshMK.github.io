@@ -68,60 +68,76 @@ async function handleFile(file) {
 function processRawArray(rows) {
     parsedData = [];
     let headerRowIndex = -1;
-    let headers = [];
+    let colMap = {};
 
-    // 1. Find the Anchor Row (The row containing 'symbol' or 'trade_id')
+    // 1. FIND THE HEADER ROW & MAP COLUMNS WITH PRIORITY
     for (let i = 0; i < rows.length; i++) {
         const cols = rows[i].map(c => String(c || '').trim().toLowerCase());
-        if (cols.includes('symbol') || cols.includes('trade_id') || cols.includes('scheme name')) {
+        
+        // Look for keywords that identify this as a trade table
+        if (cols.some(c => c.includes('symbol') || c.includes('scrip') || c.includes('scheme') || c.includes('trade_id'))) {
             headerRowIndex = i;
-            headers = cols;
+            
+            cols.forEach((name, idx) => {
+                // DATE: Prefer 'trade' or 'execution' dates over generic 'date'
+                if (name.includes('trade date') || name.includes('execution date') || name.includes('trade_date')) colMap.date = idx;
+                else if (name.includes('date') && colMap.date === undefined) colMap.date = idx;
+
+                // SHARE/SYMBOL: Prefer 'symbol' or 'isin'
+                if (name.includes('symbol') || name.includes('isin')) colMap.share = idx;
+                else if ((name.includes('scrip') || name.includes('scheme') || name.includes('name')) && colMap.share === undefined) colMap.share = idx;
+
+                // PRICE: We want Average/Buy Price, NOT Last Traded Price (LTP)
+                if (name.includes('avg') || name.includes('average')) colMap.price = idx;
+                else if ((name.includes('buy price') || name.includes('rate')) && colMap.price === undefined) colMap.price = idx;
+                else if (name.includes('price') && !name.includes('last') && colMap.price === undefined) colMap.price = idx;
+                else if (name.includes('price') && colMap.price === undefined) colMap.price = idx; // Last resort
+
+                // QUANTITY
+                if (name.includes('qty') || name.includes('quantity') || name.includes('units')) colMap.qty = idx;
+
+                // TYPE (Buy/Sell)
+                if (name.includes('type') || name.includes('side') || name.includes('transaction_type')) colMap.type = idx;
+
+                // TOTAL AMOUNT (Used if available to avoid manual calculation errors)
+                if (name.includes('net amount') || name.includes('total') || name.includes('settlement')) colMap.amount = idx;
+                else if (name.includes('amount') && colMap.amount === undefined) colMap.amount = idx;
+            });
             break;
         }
     }
 
     if (headerRowIndex === -1) {
-        alert("Could not detect a valid trade table. Please ensure the file contains a 'symbol' or 'scheme name' column.");
+        alert("Could not detect trade table headers. Ensure the file contains columns like 'Symbol', 'Quantity', and 'Price'.");
         return;
     }
 
-    // 2. Process rows appearing AFTER the header
+    // 2. PROCESS THE DATA ROWS
     const dataRows = rows.slice(headerRowIndex + 1);
-    
     dataRows.forEach(row => {
-        // Create a temporary object mapping header names to row values
-        let entry = {};
-        headers.forEach((h, idx) => {
-            entry[h] = row[idx];
-        });
+        const rawShare = row[colMap.share];
+        if (!rawShare || String(rawShare).trim() === "") return; // Skip empty rows
 
-        // ZERODHA LOGIC (Look for 'symbol' or 'trade_id')
-        if (entry['symbol'] || entry['trade_id']) {
-            const qty = parseFloat(entry['quantity']) || 0;
-            const price = parseFloat(entry['price']) || 0;
-            const type = String(entry['trade_type'] || '').toLowerCase();
-            const isBuy = type === 'buy';
-            
-            if (qty > 0) {
-                parsedData.push({ 
-                    date: entry['trade date'] || entry['date'], 
-                    share: String(entry['symbol']).toUpperCase(), 
-                    amount: isBuy ? (qty * price) : -(qty * price) 
-                });
-            }
-        } 
-        // ICICI PRU LOGIC
-        else if (entry['scheme name'] || entry['folio no']) {
-            const dateStr = entry['date'] || '';
-            const rawAmt = parseFloat(String(entry['amount'] || '').replace(/,/g, ''));
-            const type = String(entry['transaction type'] || '').toLowerCase();
-            const isTax = type.includes('stamp') || type.includes('tax');
+        const rawDate = row[colMap.date];
+        const rawType = String(row[colMap.type] || '').toLowerCase();
+        const rawQty = parseFloat(String(row[colMap.qty] || '0').replace(/,/g, ''));
+        const rawPrice = parseFloat(String(row[colMap.price] || '0').replace(/,/g, ''));
+        const rawTotal = parseFloat(String(row[colMap.amount] || '0').replace(/,/g, ''));
 
-            if (dateStr && !isNaN(rawAmt) && !isTax) {
-                parsedData.push({ date: dateStr, share: entry['scheme name'], amount: rawAmt });
-            } else if (isTax && !isNaN(rawAmt) && parsedData.length > 0) {
-                parsedData[parsedData.length - 1].amount += rawAmt;
-            }
+        // Logic for Buy vs Sell impact
+        // Detects 'sell', 'redemption', 'out', or 'dr' as negative transactions
+        const isSell = rawType.includes('sell') || rawType.includes('redemption') || rawType.includes('out') || rawType === 's';
+        
+        // Calculate amount: Use Total if provided, otherwise Qty * Price
+        let finalAmount = (!isNaN(rawTotal) && rawTotal !== 0) ? Math.abs(rawTotal) : (rawQty * rawPrice);
+        if (isSell) finalAmount = -Math.abs(finalAmount);
+
+        if (!isNaN(finalAmount) && finalAmount !== 0) {
+            parsedData.push({
+                date: rawDate ? String(rawDate).split(' ')[0] : new Date().toISOString().split('T')[0],
+                share: String(rawShare).toUpperCase(),
+                amount: finalAmount
+            });
         }
     });
 
