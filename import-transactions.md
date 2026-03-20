@@ -68,38 +68,41 @@ async function handleFile(file) {
 function processRawArray(rows) {
     parsedData = [];
     let headerRowIndex = -1;
-    let colMap = {};
+    let colMap = { date: undefined, share: undefined, price: undefined, qty: undefined, type: undefined, amount: undefined };
 
     // 1. FIND THE HEADER ROW & MAP COLUMNS WITH PRIORITY
     for (let i = 0; i < rows.length; i++) {
         const cols = rows[i].map(c => String(c || '').trim().toLowerCase());
         
-        // Look for keywords that identify this as a trade table
         if (cols.some(c => c.includes('symbol') || c.includes('scrip') || c.includes('scheme') || c.includes('trade_id'))) {
             headerRowIndex = i;
             
             cols.forEach((name, idx) => {
-                // DATE: Prefer 'trade' or 'execution' dates over generic 'date'
+                // DATE
                 if (name.includes('trade date') || name.includes('execution date') || name.includes('trade_date')) colMap.date = idx;
                 else if (name.includes('date') && colMap.date === undefined) colMap.date = idx;
 
-                // SHARE/SYMBOL: Prefer 'symbol'
-                if (name.includes('symbol') || name.includes('script')) colMap.share = idx;
-                else if name.includes('scheme') || name.includes('name')) && colMap.share === undefined) colMap.share = idx;
+                // SHARE/SYMBOL: Strictly prioritize 'symbol' and 'name' over ISIN
+                // We check !name.includes('isin') to prevent it from stealing the 'share' slot
+                if ((name.includes('symbol') || name.includes('scrip') || name.includes('script')) && !name.includes('isin')) {
+                    colMap.share = idx;
+                } else if ((name.includes('scheme') || name.includes('name')) && colMap.share === undefined) {
+                    colMap.share = idx;
+                }
 
-                // PRICE: We want Average/Buy Price, NOT Last Traded Price (LTP)
+                // PRICE (Anti-LTP Logic)
                 if (name.includes('avg') || name.includes('average')) colMap.price = idx;
                 else if ((name.includes('buy price') || name.includes('rate')) && colMap.price === undefined) colMap.price = idx;
                 else if (name.includes('price') && !name.includes('last') && colMap.price === undefined) colMap.price = idx;
-                else if (name.includes('price') && colMap.price === undefined) colMap.price = idx; // Last resort
+                else if (name.includes('price') && colMap.price === undefined) colMap.price = idx;
 
                 // QUANTITY
                 if (name.includes('qty') || name.includes('quantity') || name.includes('units')) colMap.qty = idx;
 
-                // TYPE (Buy/Sell)
+                // TYPE
                 if (name.includes('type') || name.includes('side') || name.includes('transaction_type')) colMap.type = idx;
 
-                // TOTAL AMOUNT (Used if available to avoid manual calculation errors)
+                // TOTAL AMOUNT
                 if (name.includes('net amount') || name.includes('total') || name.includes('settlement')) colMap.amount = idx;
                 else if (name.includes('amount') && colMap.amount === undefined) colMap.amount = idx;
             });
@@ -116,7 +119,7 @@ function processRawArray(rows) {
     const dataRows = rows.slice(headerRowIndex + 1);
     dataRows.forEach(row => {
         const rawShare = row[colMap.share];
-        if (!rawShare || String(rawShare).trim() === "") return; // Skip empty rows
+        if (!rawShare || String(rawShare).trim() === "") return;
 
         const rawDate = row[colMap.date];
         const rawType = String(row[colMap.type] || '').toLowerCase();
@@ -124,11 +127,8 @@ function processRawArray(rows) {
         const rawPrice = parseFloat(String(row[colMap.price] || '0').replace(/,/g, ''));
         const rawTotal = parseFloat(String(row[colMap.amount] || '0').replace(/,/g, ''));
 
-        // Logic for Buy vs Sell impact
-        // Detects 'sell', 'redemption', 'out', or 'dr' as negative transactions
         const isSell = rawType.includes('sell') || rawType.includes('redemption') || rawType.includes('out') || rawType === 's';
         
-        // Calculate amount: Use Total if provided, otherwise Qty * Price
         let finalAmount = (!isNaN(rawTotal) && rawTotal !== 0) ? Math.abs(rawTotal) : (rawQty * rawPrice);
         if (isSell) finalAmount = -Math.abs(finalAmount);
 
