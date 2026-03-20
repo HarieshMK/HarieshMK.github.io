@@ -5,14 +5,17 @@ permalink: /log-transaction/
 ---
 
 <div class="log-container" style="max-width: 600px; margin: 20px auto; padding: 0 20px;">
-    
-    <div class="post-card" id="form-top" style="margin-bottom: 30px; position: relative;">
-        <h2 style="margin-top: 0;">💸 Log Investment</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-family: 'Lora';">💸 Log Investment</h2>
+        <a href="/import-transactions/" class="btn-modern primary" style="text-decoration: none; background: #000; color: #fff; padding: 8px 16px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">⚡ Bulk Import</a>
+    </div>
+
+    <div class="post-card" id="form-top" style="margin-bottom: 30px; position: relative; background: var(--d-card-bg); border: 1px solid var(--d-border); padding: 25px; border-radius: 16px;">
         <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 25px;">Record an actual investment made towards your goal.</p>
 
         <form id="transaction-form">
             <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Select Goal</label>
-            <select id="goal_select" required style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none; appearance: none;">
+            <select id="goal_select" required style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none;">
                 <option value="">Loading your goals...</option>
             </select>
 
@@ -22,7 +25,7 @@ permalink: /log-transaction/
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div>
                     <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Amount (₹)</label>
-                    <input type="number" id="amount" placeholder="0.00" required style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none;">
+                    <input type="number" id="amount" step="0.01" placeholder="0.00" required style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none;">
                 </div>
                 <div>
                     <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Type</label>
@@ -32,6 +35,9 @@ permalink: /log-transaction/
                     </select>
                 </div>
             </div>
+
+            <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Notes / Share Name</label>
+            <input type="text" id="share_name" placeholder="e.g. COLPAL or SIP Installment" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none;">
 
             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
                 <button type="submit" id="btn-another" class="btn" style="background: #0ea5e9; color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem;">
@@ -49,18 +55,13 @@ permalink: /log-transaction/
             <h3 style="margin: 0; font-size: 1.1rem; color: #f1f5f9;">Recent Activity</h3>
             <span style="font-size: 0.75rem; color: #64748b;">This Session</span>
         </div>
-        
         <div id="recent-list" style="display: flex; flex-direction: column; gap: 10px;">
-            <p id="no-recent" style="color: #475569; font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px;">
-                No transactions added yet.
-            </p>
+            <p id="no-recent" style="color: #475569; font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px;">No transactions added yet.</p>
         </div>
     </div>
 </div>
 
-<div id="toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000;">
-    ✅ Transaction Saved!
-</div>
+<div id="toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000;">✅ Transaction Saved!</div>
 
 <script>
     let lastClicked = 'another';
@@ -79,23 +80,13 @@ permalink: /log-transaction/
         document.getElementById('btn-finish').onclick = () => lastClicked = 'finish';
         document.getElementById('transaction_date').valueAsDate = new Date();
 
-        const { data: goals, error } = await supabase
-            .from('goals')
-            .select('id, goal_name')
-            .eq('user_id', currentUserSessionId);
-
-        if (error || !goals) {
-            goalSelect.innerHTML = '<option>Error loading goals</option>';
-            return;
+        const { data: goals } = await supabase.from('goals').select('id, goal_name').eq('user_id', currentUserSessionId);
+        if (goals) {
+            goalSelect.innerHTML = goals.map(g => `<option value="${g.id}" ${g.id === preSelectedGoal ? 'selected' : ''}>${g.goal_name}</option>`).join('');
         }
-
-        goalSelect.innerHTML = goals.map(g => 
-            `<option value="${g.id}" ${g.id === preSelectedGoal ? 'selected' : ''}>${g.goal_name}</option>`
-        ).join('');
 
         document.getElementById('transaction-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const submitBtn = document.getElementById('btn-another');
             submitBtn.innerText = "Saving...";
             submitBtn.disabled = true;
@@ -105,30 +96,28 @@ permalink: /log-transaction/
             const amount = parseFloat(document.getElementById('amount').value);
             const type = document.getElementById('transaction_type').value;
             const date = document.getElementById('transaction_date').value;
+            const shareName = document.getElementById('share_name').value || 'N/A';
             const finalAmount = type === 'Sell' ? -Math.abs(amount) : Math.abs(amount);
 
-            const { data: insertedData, error: transError } = await supabase
-                .from('transactions')
-                .insert([{
-                    goal_id: goalId,
-                    user_id: currentUserSessionId,
-                    transaction_date: date,
-                    amount: finalAmount,
-                    transaction_type: type
-                }]).select();
+            const { data: insertedData, error } = await supabase.from('transactions').insert([{
+                goal_id: goalId,
+                user_id: currentUserSessionId,
+                transaction_date: date,
+                amount: finalAmount,
+                share_name: shareName
+            }]).select();
 
-            if (transError) {
-                alert("Error: " + transError.message);
+            if (error) {
+                alert("Error: " + error.message);
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Save and Add Another";
             } else {
-                updateActivityUI(insertedData[0].id, goalName, goalId, finalAmount, date, type);
-
-                if (lastClicked === 'finish') {
-                    window.location.href = "/dashboard/";
-                } else {
+                updateActivityUI(insertedData[0].id, goalName, goalId, finalAmount, date, shareName);
+                if (lastClicked === 'finish') window.location.href = "/dashboard/";
+                else {
                     showToast();
                     document.getElementById('amount').value = '';
+                    document.getElementById('share_name').value = '';
                     document.getElementById('amount').focus();
                     submitBtn.disabled = false;
                     submitBtn.innerText = "Save and Add Another";
@@ -137,74 +126,53 @@ permalink: /log-transaction/
         });
     });
 
-    // SILENT DELETE (For Edit)
     async function silentDelete(id, elementId) {
         const { error } = await supabase.from('transactions').delete().eq('id', id);
-        if(!error) {
-            const el = document.getElementById(elementId);
-            if(el) el.remove();
-        }
+        if(!error) document.getElementById(elementId)?.remove();
     }
 
-    // CONFIRMED DELETE (For Delete Button)
     async function confirmDelete(id, elementId) {
-        if(!confirm("Are you sure you want to delete this transaction permanently?")) return;
+        if(!confirm("Delete transaction?")) return;
         await silentDelete(id, elementId);
     }
 
-    function editRecent(id, elementId, goalId, amount, date, type) {
-        // 1. Fill form with old values
+    function editRecent(id, elementId, goalId, amount, date, share) {
         document.getElementById('goal_select').value = goalId;
         document.getElementById('amount').value = Math.abs(amount);
         document.getElementById('transaction_date').value = date;
-        document.getElementById('transaction_type').value = type;
-        
-        // 2. Silently remove the old record without asking "Are you sure?"
+        document.getElementById('share_name').value = share === 'N/A' ? '' : share;
+        document.getElementById('transaction_type').value = amount >= 0 ? 'Buy' : 'Sell';
         silentDelete(id, elementId);
-        
-        // 3. Scroll back to top
         document.getElementById('form-top').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function updateActivityUI(id, name, goalId, amount, date, type) {
+    function updateActivityUI(id, name, goalId, amount, date, share) {
         const list = document.getElementById('recent-list');
-        const emptyMsg = document.getElementById('no-recent');
-        if (emptyMsg) emptyMsg.remove();
-
+        document.getElementById('no-recent')?.remove();
         const formattedDate = new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
         const color = amount >= 0 ? '#4ade80' : '#f87171';
         const elementId = `recent-${id}`;
-
         const entry = document.createElement('div');
         entry.id = elementId;
-        entry.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e293b; border-radius: 8px; border-left: 4px solid " + color + "; margin-bottom: 8px; animation: fadeIn 0.3s ease;";
-        
+        entry.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1e293b; border-radius: 8px; border-left: 4px solid " + color + "; margin-bottom: 8px;";
         entry.innerHTML = `
             <div style="flex: 1;">
                 <div style="font-size: 0.9rem; color: #f1f5f9; font-weight: 600;">${name}</div>
-                <div style="font-size: 0.75rem; color: #64748b;">${formattedDate} • <span style="color: ${color}">${amount >= 0 ? 'Buy' : 'Sell'}</span></div>
+                <div style="font-size: 0.75rem; color: #64748b;">${formattedDate} • ${share}</div>
             </div>
             <div style="text-align: right; display: flex; align-items: center; gap: 15px;">
-                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: ${color}; font-weight: bold;">
-                    ₹${Math.abs(amount).toLocaleString('en-IN')}
-                </div>
+                <div style="font-family: 'JetBrains Mono'; font-size: 0.9rem; color: ${color}; font-weight: bold;">₹${Math.abs(amount).toLocaleString('en-IN')}</div>
                 <div style="display: flex; gap: 8px;">
-                    <button onclick="editRecent('${id}', '${elementId}', '${goalId}', ${amount}, '${date}', '${type}')" style="background: none; border: none; color: #0ea5e9; cursor: pointer; font-size: 0.8rem; font-weight: bold;">Edit</button>
-                    <button onclick="confirmDelete('${id}', '${elementId}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; font-weight: bold;">Del</button>
+                    <button onclick="editRecent('${id}', '${elementId}', '${goalId}', ${amount}, '${date}', '${share}')" style="background: none; border: none; color: #0ea5e9; cursor: pointer; font-size: 0.8rem;">Edit</button>
+                    <button onclick="confirmDelete('${id}', '${elementId}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem;">Del</button>
                 </div>
-            </div>
-        `;
-
+            </div>`;
         list.insertBefore(entry, list.firstChild);
     }
 
     function showToast() {
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        const t = document.getElementById('toast');
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
     }
 </script>
-
-<style>
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-</style>
