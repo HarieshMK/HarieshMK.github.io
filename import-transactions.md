@@ -83,9 +83,9 @@ function processRawArray(rows) {
                 if (name.includes('trade date') || name.includes('execution date') || name.includes('trade_date')) colMap.date = idx;
                 else if (name.includes('date') && colMap.date === undefined) colMap.date = idx;
 
-                // SHARE/SYMBOL: Prefer 'symbol' or 'isin'
-                if (name.includes('symbol') || name.includes('isin')) colMap.share = idx;
-                else if ((name.includes('scrip') || name.includes('scheme') || name.includes('name')) && colMap.share === undefined) colMap.share = idx;
+                // SHARE/SYMBOL: Prefer 'symbol'
+                if (name.includes('symbol') || name.includes('script')) colMap.share = idx;
+                else if ((name.includes('isin') || name.includes('scheme') || name.includes('name')) && colMap.share === undefined) colMap.share = idx;
 
                 // PRICE: We want Average/Buy Price, NOT Last Traded Price (LTP)
                 if (name.includes('avg') || name.includes('average')) colMap.price = idx;
