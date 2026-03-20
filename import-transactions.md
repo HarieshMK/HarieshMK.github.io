@@ -85,7 +85,7 @@ function processRawArray(rows) {
 
                 // SHARE/SYMBOL: Prefer 'symbol'
                 if (name.includes('symbol') || name.includes('script')) colMap.share = idx;
-                else if ((name.includes('isin') || name.includes('scheme') || name.includes('name')) && colMap.share === undefined) colMap.share = idx;
+                else if name.includes('scheme') || name.includes('name')) && colMap.share === undefined) colMap.share = idx;
 
                 // PRICE: We want Average/Buy Price, NOT Last Traded Price (LTP)
                 if (name.includes('avg') || name.includes('average')) colMap.price = idx;
