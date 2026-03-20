@@ -44,46 +44,95 @@ document.getElementById('file-input').onchange = (e) => handleFile(e.target.file
 
 async function handleFile(file) {
     if (!file) return;
+    
     if (file.name.endsWith('.csv')) {
-        Papa.parse(file, { header: true, skipEmptyLines: true, complete: (res) => processRows(res.data) });
+        // We set header: false so we can manually find the real header row
+        Papa.parse(file, { 
+            header: false, 
+            skipEmptyLines: true, 
+            complete: (res) => processRawArray(res.data) 
+        });
     } else {
         const reader = new FileReader();
         reader.onload = (e) => {
             const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-            processRows(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            // Convert to raw array (rows and columns) instead of JSON objects
+            const rawArray = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            processRawArray(rawArray);
         };
         reader.readAsArrayBuffer(file);
     }
 }
 
-function processRows(rows) {
+function processRawArray(rows) {
     parsedData = [];
-    rows.forEach(row => {
-        // ZERODHA LOGIC
-        if (row.trade_id || row.symbol) {
-            const qty = parseFloat(row.quantity) || 0;
-            const price = parseFloat(row.price) || 0;
-            const isBuy = (row.trade_type || '').toLowerCase() === 'buy';
-            parsedData.push({ date: row.trade_date, share: row.symbol, amount: isBuy ? (qty * price) : -(qty * price) });
+    let headerRowIndex = -1;
+    let headers = [];
+
+    // 1. Find the Anchor Row (The row containing 'symbol' or 'trade_id')
+    for (let i = 0; i < rows.length; i++) {
+        const cols = rows[i].map(c => String(c || '').trim().toLowerCase());
+        if (cols.includes('symbol') || cols.includes('trade_id') || cols.includes('scheme name')) {
+            headerRowIndex = i;
+            headers = cols;
+            break;
+        }
+    }
+
+    if (headerRowIndex === -1) {
+        alert("Could not detect a valid trade table. Please ensure the file contains a 'symbol' or 'scheme name' column.");
+        return;
+    }
+
+    // 2. Process rows appearing AFTER the header
+    const dataRows = rows.slice(headerRowIndex + 1);
+    
+    dataRows.forEach(row => {
+        // Create a temporary object mapping header names to row values
+        let entry = {};
+        headers.forEach((h, idx) => {
+            entry[h] = row[idx];
+        });
+
+        // ZERODHA LOGIC (Look for 'symbol' or 'trade_id')
+        if (entry['symbol'] || entry['trade_id']) {
+            const qty = parseFloat(entry['quantity']) || 0;
+            const price = parseFloat(entry['price']) || 0;
+            const type = String(entry['trade_type'] || '').toLowerCase();
+            const isBuy = type === 'buy';
+            
+            if (qty > 0) {
+                parsedData.push({ 
+                    date: entry['trade_date'] || entry['date'], 
+                    share: String(entry['symbol']).toUpperCase(), 
+                    amount: isBuy ? (qty * price) : -(qty * price) 
+                });
+            }
         } 
-        // ICICI PRU LOGIC (with Tax Accumulation)
-        else if (row['Scheme Name'] || row['Folio no']) {
-            const dateStr = row['Date'] || '';
-            const rawAmt = parseFloat(String(row['Amount'] || '').replace(/,/g, ''));
-            const isTax = String(row['Transaction Type'] || '').toLowerCase().includes('stamp') || String(row['Transaction Type'] || '').toLowerCase().includes('tax');
+        // ICICI PRU LOGIC
+        else if (entry['scheme name'] || entry['folio no']) {
+            const dateStr = entry['date'] || '';
+            const rawAmt = parseFloat(String(entry['amount'] || '').replace(/,/g, ''));
+            const type = String(entry['transaction type'] || '').toLowerCase();
+            const isTax = type.includes('stamp') || type.includes('tax');
 
             if (dateStr && !isNaN(rawAmt) && !isTax) {
-                parsedData.push({ date: dateStr, share: row['Scheme Name'], amount: rawAmt });
+                parsedData.push({ date: dateStr, share: entry['scheme name'], amount: rawAmt });
             } else if (isTax && !isNaN(rawAmt) && parsedData.length > 0) {
-                // Bundle tax into the previous transaction
                 parsedData[parsedData.length - 1].amount += rawAmt;
             }
         }
     });
+
     displayPreview();
 }
 
 function displayPreview() {
+    if (parsedData.length === 0) {
+        alert("No valid transactions found in the table.");
+        return;
+    }
     document.getElementById('preview-body').innerHTML = parsedData.map(d => `
         <tr style="border-bottom: 1px solid #334155;"><td style="padding: 10px 0;">${d.date}</td><td>${d.share}</td><td>₹${d.amount.toFixed(2)}</td></tr>
     `).join('');
@@ -94,6 +143,7 @@ function displayPreview() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
     const { data: goals } = await supabase.from('goals').select('id, goal_name').eq('user_id', session.user.id);
     document.getElementById('import-goal-id').innerHTML = goals.map(g => `<option value="${g.id}">${g.goal_name}</option>`).join('');
 });
@@ -102,6 +152,7 @@ document.getElementById('process-btn').onclick = async () => {
     const btn = document.getElementById('process-btn');
     const goalId = document.getElementById('import-goal-id').value;
     const { data: { session } } = await supabase.auth.getSession();
+    
     btn.innerText = "Processing...";
     btn.disabled = true;
 
@@ -114,7 +165,12 @@ document.getElementById('process-btn').onclick = async () => {
     }));
 
     const { error } = await supabase.from('transactions').insert(entries);
-    if (error) alert(error.message);
-    else window.location.href = "/dashboard/";
+    if (error) {
+        alert(error.message);
+        btn.innerText = "Import Transactions";
+        btn.disabled = false;
+    } else {
+        window.location.href = "/dashboard/";
+    }
 };
 </script>
