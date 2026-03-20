@@ -104,7 +104,7 @@ function processRawArray(rows) {
             
             if (qty > 0) {
                 parsedData.push({ 
-                    date: entry['trade_date'] || entry['date'], 
+                    date: entry['trade date'] || entry['date'], 
                     share: String(entry['symbol']).toUpperCase(), 
                     amount: isBuy ? (qty * price) : -(qty * price) 
                 });
