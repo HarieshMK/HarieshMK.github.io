@@ -4,134 +4,157 @@ title: My Financial Goals
 permalink: /dashboard/
 ---
 
-<div id="asset-modal" style="display:none; position:fixed; z-index:5000; left:0; top:0; width:100%; height:100%; background:rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);">
-    <div class="post-card" style="max-width: 800px; margin: 50px auto; max-height: 85vh; overflow-y: auto; border: 1px solid #1e293b; background: #0f172a;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; font-size: 1.5rem;">📈 Update Market Values</h2>
-            <button onclick="closeAssetModal()" style="background:none; border:none; color:#64748b; font-size: 2rem; cursor:pointer; line-height: 1;">&times;</button>
-        </div>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 25px;">Enter current values from your broker apps. If left at 0, the system uses Estimated Values.</p>
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
-            <thead>
-                <tr style="text-align: left; border-bottom: 1px solid #334155; color: #94a3b8;">
-                    <th style="padding: 12px;">Broker</th>
-                    <th style="padding: 12px;">Instrument</th>
-                    <th style="padding: 12px; text-align: right;">Current Market Value</th>
-                </tr>
-            </thead>
-            <tbody id="asset-table-body"></tbody>
-        </table>
-        <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: flex-end;">
-            <button onclick="closeAssetModal()" class="filter-btn">Cancel</button>
-            <button id="save-assets-btn" onclick="saveMarketValues()" class="filter-btn active" style="padding: 10px 30px;">Save All Changes</button>
-        </div>
-    </div>
-</div>
-
-<div class="dashboard-container" style="padding: 20px; max-width: 1000px; margin: 0 auto; font-family: 'Inter', -apple-system, sans-serif;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
-        <h2 style="margin: 0; font-weight: 800; letter-spacing: -0.02em;">📊 My Financial Goals</h2>
-        <div style="display: flex; gap: 12px;">
-            <button onclick="openAssetModal()" class="filter-btn" style="border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.05);">Update Portfolio</button>
-            <a href="/add-goal/" class="auth-link" style="text-decoration: none; border: 1px solid #0ea5e9; color: #0ea5e9; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">+ Add New Goal</a>
-        </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
-        <div class="post-card" style="text-align: center; border-color: #1e293b;">
-            <p style="color: #64748b; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Active Goals</p>
-            <h3 id="total-goals-count" style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 1.8rem;">0</h3>
-        </div>
-        <div class="post-card" style="text-align: center; border-color: #1e293b;">
-            <p style="color: #64748b; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Est. Net Worth</p>
-            <h3 id="total-net-worth" style="margin: 0; font-family: 'JetBrains Mono', monospace; color: #38bdf8; font-size: 1.8rem;">₹0</h3>
-        </div>
-    </div>
-
-    <div style="display: flex; justify-content: center; margin-bottom: 35px; gap: 12px;">
-        <button id="btn-group-goal" onclick="setDisplayMode('goal')" class="filter-btn active">Group by Goal</button>
-        <button id="btn-group-asset" onclick="setDisplayMode('asset')" class="filter-btn">Group by Instrument</button>
-    </div>
-
-    <div id="dashboard-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px;"></div>
-</div>
-
 <style>
+    /* Bridge between Dashboard and your Global CSS */
     :root {
-        --accent: #0ea5e9;
-        --accent-hover: #0284c7;
-        --bg-card: #0f172a;
-        --border-muted: #1e293b;
-        --track: #1e293b;
+        --d-accent: #0ea5e9;
+        --d-accent-soft: rgba(14, 165, 233, 0.1);
+        --d-card-bg: #ffffff;
+        --d-border: #e2e8f0;
+        --d-text-main: #0f172a;
+        --d-text-muted: #64748b;
     }
 
-    /* Core Card Styling */
-    .post-card { 
-        background: var(--bg-card); 
-        border: 1px solid var(--border-muted); 
-        padding: 24px; 
-        border-radius: 20px; 
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .dark-theme {
+        --d-card-bg: #1e293b;
+        --d-border: #334155;
+        --d-text-main: #ffffff;
+        --d-text-muted: #94a3b8;
+    }
+
+    /* Tighten the Dashboard Layout */
+    .dashboard-container { 
+        padding: 0 10px; 
+        max-width: 1000px; 
+        margin: 0 auto; 
+    }
+
+    /* Premium Card Overrides */
+    .goal-card {
+        background: var(--d-card-bg);
+        border: 1px solid var(--d-border);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    .post-card.active-card { z-index: 1000 !important; border-color: var(--accent); ring: 2px solid var(--accent); }
-
-    .filter-btn { 
-        background: #1e293b; border: 1px solid #334155; color: #94a3b8; 
-        padding: 10px 20px; border-radius: 12px; cursor: pointer; 
-        transition: 0.2s; font-size: 0.9rem; font-weight: 500;
+    .goal-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--d-accent);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
-    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); }
+    .active-card { border-color: var(--d-accent) !important; ring: 2px solid var(--d-accent); }
 
-    /* Premium Progress Bar */
-    .progress-track { width: 100%; background: var(--track); height: 12px; border-radius: 20px; overflow: hidden; position: relative; }
-    .progress-fill { background: var(--accent); height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-    .progress-fill::after { 
-        content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 30px; 
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2)); 
+    /* Modern Progress Bar */
+    .p-track { height: 8px; background: var(--d-border); border-radius: 10px; overflow: hidden; margin: 8px 0; }
+    .p-fill { height: 100%; background: var(--d-accent); border-radius: 10px; transition: width 1s ease; }
+    .child-track { height: 4px; background: rgba(0,0,0,0.05); }
+    .dark-theme .child-track { background: rgba(255,255,255,0.05); }
+
+    /* Remove that dotted line and make it a badge */
+    .xirr-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--d-accent);
+        background: var(--d-accent-soft);
+        padding: 2px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+        border: none; /* Fixes the dotted line issue */
+    }
+    .xirr-badge:hover { background: var(--d-accent); color: white; }
+
+    /* Three Dots Button Modernization */
+    .menu-btn {
+        background: var(--d-border);
+        border: none;
+        color: var(--d-text-muted);
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    /* Drawer & Tree UI */
-    .drawer-content { position: relative; padding-left: 15px; margin-top: 20px; border-top: 1px solid #1e293b; }
-    .child-item-row { position: relative; padding: 20px 0 20px 25px; border-bottom: 1px solid rgba(30, 41, 59, 0.5); }
-    .child-item-row::before { 
-        content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; 
-        background: linear-gradient(to bottom, var(--accent), transparent); opacity: 0.3;
+    /* Dropdown UI */
+    .drop-menu {
+        display: none; position: absolute; right: 0; top: 35px; 
+        background: var(--d-card-bg); border: 1px solid var(--d-border);
+        min-width: 160px; z-index: 2000; border-radius: 10px;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden;
     }
-
-    /* Actions Menu Styling */
-    .dots-btn { 
-        background: #1e293b; color: #94a3b8; border: 1px solid #334155; 
-        width: 32px; height: 32px; border-radius: 8px; cursor: pointer; 
-        display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    .drop-menu a { 
+        display: block; padding: 10px 15px; font-size: 0.8rem; 
+        color: var(--d-text-main); text-decoration: none !important;
     }
-    .dots-btn:hover { background: #334155; color: #fff; }
+    .drop-menu a:hover { background: var(--d-accent-soft); color: var(--d-accent); }
+    .show { display: block !important; }
 
-    .dropdown-content { 
-        display: none; position: absolute; right: 0; top: 40px; background: #1e293b; 
-        min-width: 180px; z-index: 2000; border-radius: 12px; border: 1px solid #334155; 
-        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); overflow: hidden;
+    /* Modal Styling */
+    .modal-overlay {
+        display:none; position:fixed; z-index:5000; left:0; top:0; width:100%; height:100%; 
+        background:rgba(0,0,0,0.5); backdrop-filter: blur(4px);
     }
-    .dropdown-content a { color: #f1f5f9; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.85rem; transition: 0.2s; }
-    .dropdown-content a:hover { background: var(--accent); color: white; }
-    .show { display: block !important; animation: fadeIn 0.2s ease; }
-
-    /* Values & Typography */
-    .mono-value { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
-    .gain-positive { color: #4ade80; }
-    .gain-negative { color: #f87171; }
-    .info-icon { display: inline-block; width: 14px; height: 14px; background: #334155; color: #38bdf8; border-radius: 50%; font-size: 10px; line-height: 14px; text-align: center; cursor: help; margin-left: 5px; }
-    .xirr-clickable { color: var(--accent); cursor: pointer; font-weight: 700; border-bottom: 1px dashed var(--accent); }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
+
+<div id="asset-modal" class="modal-overlay">
+    <div class="goal-card" style="max-width: 600px; margin: 50px auto; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Update Market Values</h3>
+            <button onclick="closeAssetModal()" style="background:none; border:none; color:var(--d-text-muted); font-size: 1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Broker</th><th>Instrument</th><th style="text-align: right;">Current Value</th></tr>
+                </thead>
+                <tbody id="asset-table-body"></tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="closeAssetModal()" class="filter-btn">Cancel</button>
+            <button id="save-assets-btn" onclick="saveMarketValues()" class="filter-btn active">Save All</button>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; margin-top: 20px;">
+        <h2 style="margin: 0; font-family: 'Lora', serif;">Financial Goals</h2>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="openAssetModal()" class="filter-btn" style="font-size: 0.75rem;">Update Values</button>
+            <a href="/add-goal/" class="auth-link" style="font-size: 0.75rem; padding: 6px 15px;">+ New Goal</a>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+        <div class="goal-card" style="text-align: center; padding: 15px;">
+            <div style="color: var(--d-text-muted); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Active Goals</div>
+            <div id="total-goals-count" style="font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: 800; color: var(--d-text-main);">0</div>
+        </div>
+        <div class="goal-card" style="text-align: center; padding: 15px;">
+            <div style="color: var(--d-text-muted); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Net Worth</div>
+            <div id="total-net-worth" style="font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: 800; color: var(--d-accent);">₹0</div>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-bottom: 25px; gap: 8px;">
+        <button id="btn-group-goal" onclick="setDisplayMode('goal')" class="filter-btn active">By Goal</button>
+        <button id="btn-group-asset" onclick="setDisplayMode('asset')" class="filter-btn">By Asset</button>
+    </div>
+
+    <div id="dashboard-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;"></div>
+</div>
 
 <script>
 let currentDisplayMode = 'goal';
 let rawGoalsData = [];
 
-// ... [Keep helper functions: openAssetModal, closeAssetModal, saveMarketValues, normalize, getStats exactly as they were] ...
+// ... [Existing helper functions: normalize, getStats, openAssetModal, closeAssetModal, saveMarketValues remain identical] ...
 
 function normalize(s) { return s ? s.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unk'; }
 function getStats(g) {
@@ -154,12 +177,12 @@ function openAssetModal() {
         });
     });
     document.getElementById('asset-table-body').innerHTML = Object.keys(assets).map(k => `
-        <tr style="border-bottom: 1px solid #1e293b;">
-            <td style="padding: 15px; font-weight: 600;">${assets[k].b}</td>
-            <td style="padding: 15px; color: #94a3b8;">${assets[k].i}</td>
-            <td style="padding: 15px; text-align: right;">
+        <tr>
+            <td style="font-weight: 600; color: var(--d-text-main);">${assets[k].b}</td>
+            <td style="color: var(--d-text-muted);">${assets[k].i}</td>
+            <td style="text-align: right;">
                 <input type="number" class="asset-input" data-key="${k}" value="${assets[k].v}" 
-                style="background:#020617; border:1px solid #334155; color:#38bdf8; padding:8px; border-radius:8px; font-family:'JetBrains Mono'; text-align:right; width:140px;">
+                style="background:var(--d-card-bg); border:1px solid var(--d-border); color:var(--d-accent); padding:5px; border-radius:6px; font-family:'JetBrains Mono'; text-align:right; width:100px;">
             </td>
         </tr>`).join('');
     document.getElementById('asset-modal').style.display = 'block';
@@ -198,7 +221,6 @@ function renderDashboard() {
     rawGoalsData.forEach(g => {
         const s = getStats(g);
         let curVal = 0, isEstimated = false;
-
         if (g.goal_allocations?.length) {
             g.goal_allocations.forEach(a => {
                 const b = buckets[normalize((a.broker_name || 'Direct') + (a.instrument_name || 'Other'))];
@@ -229,74 +251,61 @@ function renderDashboard() {
         const gainPerc = grp.inv > 0 ? (gainAmt / grp.inv) * 100 : 0;
         
         const card = document.createElement('div');
-        card.className = "post-card";
+        card.className = "goal-card";
         card.id = `card-${grp.id}`;
         
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: -0.01em;">${grp.name}</h3>
-                <span class="chevron" id="arrow-${grp.id}" onclick="toggleDrawer('${grp.id}')" style="cursor:pointer; background: #1e293b; padding: 6px; border-radius: 8px; color:#64748b; font-size: 0.8rem;">▼</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin: 0; font-family: 'Lora'; font-size: 1.1rem; color: var(--d-text-main);">${grp.name}</h4>
+                <span class="chevron" id="arrow-${grp.id}" onclick="toggleDrawer('${grp.id}')" style="cursor:pointer; color:var(--d-text-muted); font-size: 0.7rem;">▼ Details</span>
             </div>
 
-            <div style="margin-bottom: 30px;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 8px; letter-spacing: 0.05em; color: #94a3b8; font-weight: 700;">
-                    <span>PROGRESS</span>
-                    <span style="color: var(--accent);">${prog.toFixed(1)}%</span>
-                </div>
-                <div class="progress-track"><div class="progress-fill" style="width: ${prog}%"></div></div>
+            <div class="p-track"><div class="p-fill" style="width: ${prog}%"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; margin-top: 5px; color: var(--d-text-muted); font-weight: 700;">
+                <span>PROGRESS</span>
+                <span style="color: var(--d-accent);">${prog.toFixed(1)}%</span>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid var(--d-border); padding-top: 15px;">
                 <div>
-                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Invested</div>
-                    <div class="mono-value" style="font-size: 1.1rem; color: #cbd5e1;">₹${Math.round(grp.inv).toLocaleString('en-IN')}</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Current ${grp.est ? `<span class="info-icon" title="Estimated">i</span>` : ''}</div>
-                    <div class="mono-value" style="font-size: 1.1rem; color: #38bdf8;">₹${Math.round(grp.cur).toLocaleString('en-IN')}</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Gain</div>
-                    <div class="mono-value ${gainAmt >= 0 ? 'gain-positive' : 'gain-negative'}" style="font-size: 1rem;">₹${Math.round(gainAmt).toLocaleString('en-IN')} (${gainPerc.toFixed(1)}%)</div>
+                    <div style="font-size: 0.55rem; color: var(--d-text-muted); text-transform: uppercase;">Current Value</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 1rem; color: var(--d-text-main); font-weight: 800;">₹${Math.round(grp.cur).toLocaleString('en-IN')}</div>
                 </div>
                 <div style="text-align: right;">
-                    <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">XIRR</div>
-                    <div id="xirr-btn-${grp.id}" class="xirr-clickable mono-value" style="font-size: 1.1rem;">View</div>
+                    <div style="font-size: 0.55rem; color: var(--d-text-muted); text-transform: uppercase;">XIRR</div>
+                    <button id="xirr-btn-${grp.id}" class="xirr-badge">View</button>
+                </div>
+                <div>
+                    <div style="font-size: 0.55rem; color: var(--d-text-muted); text-transform: uppercase;">Total Gain</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: ${gainAmt >= 0 ? '#10b981' : '#ef4444'}; font-weight: 700;">
+                        ${gainPerc >= 0 ? '+' : ''}${gainPerc.toFixed(1)}%
+                    </div>
                 </div>
             </div>
 
-            <div id="drawer-${grp.id}" style="display: none;" class="drawer-content">
+            <div id="drawer-${grp.id}" style="display: none; margin-top: 15px; border-top: 1px dashed var(--d-border); padding-top: 15px;">
                 ${grp.items.map(item => {
                     const itemProg = item.target_price > 0 ? Math.min((item.curVal / item.target_price) * 100, 100) : 0;
-                    const iGainAmt = item.curVal - item.s.inv;
-                    const iGainPerc = item.s.inv > 0 ? (iGainAmt / item.s.inv) * 100 : 0;
-                    
                     return `
-                    <div class="child-item-row">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <div style="flex: 1;">
-                                <div style="font-size: 1rem; font-weight: 700; color: #f1f5f9;">${currentDisplayMode === 'goal' ? (item.goal_allocations?.[0]?.instrument_name || 'Asset') : item.goal_name}</div>
-                                <div style="font-size: 0.75rem; color: #64748b; font-weight: 500;">${item.goal_allocations?.[0]?.broker_name || 'Manual'}</div>
+                    <div style="padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.03); position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-size: 0.8rem; font-weight: 700; color: var(--d-text-main);">${currentDisplayMode === 'goal' ? (item.goal_allocations?.[0]?.instrument_name || 'Asset') : item.goal_name}</div>
+                                <div style="font-size: 0.65rem; color: var(--d-text-muted);">${item.goal_allocations?.[0]?.broker_name || 'Manual'}</div>
                             </div>
                             <div style="position: relative;">
-                                <button onclick="event.stopPropagation(); toggleMenu('${item.id}', '${grp.id}')" class="dots-btn">⋮</button>
-                                <div id="menu-${item.id}" class="dropdown-content">
+                                <button onclick="event.stopPropagation(); toggleMenu('${item.id}', '${grp.id}')" class="menu-btn">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                </button>
+                                <div id="menu-${item.id}" class="drop-menu">
                                     <a href="/log-transaction/?goal_id=${item.id}">Add Transaction</a>
-                                    <a href="/goal-history/?goal_id=${item.id}">View History</a>
-                                    <a href="/edit-goal/?id=${item.id}">Edit Goal</a>
-                                    <a href="#" onclick="deleteGoal('${item.id}')" style="color: #f87171; border-top: 1px solid rgba(255,255,255,0.05);">Delete</a>
+                                    <a href="/goal-history/?goal_id=${item.id}">History</a>
+                                    <a href="/edit-goal/?id=${item.id}">Edit</a>
+                                    <a href="#" onclick="deleteGoal('${item.id}')" style="color: #ef4444;">Delete</a>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
-                            <div><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">INV</div><div class="mono-value" style="font-size: 0.85rem;">₹${Math.round(item.s.inv).toLocaleString('en-IN')}</div></div>
-                            <div><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">CUR</div><div class="mono-value" style="font-size: 0.85rem;">₹${Math.round(item.curVal).toLocaleString('en-IN')}</div></div>
-                            <div><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">GAIN</div><div class="mono-value ${iGainAmt >= 0 ? 'gain-positive' : 'gain-negative'}" style="font-size: 0.85rem;">${iGainPerc.toFixed(1)}%</div></div>
-                            <div style="text-align: right;"><div style="font-size: 0.55rem; color: #64748b; font-weight: 700;">XIRR</div><div id="xirr-child-${item.id}" class="xirr-clickable mono-value" style="font-size: 0.85rem;">View</div></div>
-                        </div>
-
-                        <div class="progress-track" style="height: 6px; background: #020617;"><div class="progress-fill" style="width: ${itemProg}%; background: #475569;"></div></div>
+                        <div class="p-track child-track"><div class="p-fill" style="width: ${itemProg}%; background: var(--d-text-muted);"></div></div>
                     </div>`;
                 }).join('')}
             </div>`;
@@ -304,13 +313,10 @@ function renderDashboard() {
         container.appendChild(card);
         
         document.getElementById(`xirr-btn-${grp.id}`).onclick = function() { runXIRR(this, grp.txs, grp.cur); };
-        grp.items.forEach(item => {
-            document.getElementById(`xirr-child-${item.id}`).onclick = function() { runXIRR(this, item.transactions || [], item.curVal); };
-        });
     });
 }
 
-// ... [Keep calculateXIRR, runXIRR, toggleDrawer unchanged] ...
+// ... [XIRR logic and toggle helpers remain unchanged but reference new class names] ...
 
 function calculateXIRR(flows, dates) {
     let r = 0.1;
@@ -339,21 +345,16 @@ function toggleDrawer(id) {
     const d = document.getElementById(`drawer-${id}`), a = document.getElementById(`arrow-${id}`);
     const open = d.style.display === 'block';
     d.style.display = open ? 'none' : 'block';
-    a.innerText = open ? '▼' : '▲';
+    a.innerText = open ? '▼ Details' : '▲ Hide';
 }
 
 function toggleMenu(itemId, cardId) {
     const m = document.getElementById(`menu-${itemId}`);
     const card = document.getElementById(`card-${cardId}`);
     const isVisible = m.classList.contains("show");
-    
-    document.querySelectorAll('.dropdown-content').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.post-card').forEach(c => c.classList.remove('active-card'));
-    
-    if (!isVisible) {
-        m.classList.add("show");
-        card.classList.add("active-card");
-    }
+    document.querySelectorAll('.drop-menu').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.goal-card').forEach(c => c.classList.remove('active-card'));
+    if (!isVisible) { m.classList.add("show"); card.classList.add("active-card"); }
 }
 
 function setDisplayMode(m) { 
@@ -366,9 +367,9 @@ function setDisplayMode(m) {
 async function deleteGoal(id) { if (confirm("Delete this goal?")) { await supabase.from('goals').delete().eq('id', id); location.reload(); } }
 
 window.onclick = e => { 
-    if (!e.target.matches('.dots-btn')) {
-        document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
-        document.querySelectorAll('.post-card').forEach(c => c.classList.remove('active-card'));
+    if (!e.target.closest('.menu-btn')) {
+        document.querySelectorAll('.drop-menu').forEach(d => d.classList.remove('show'));
+        document.querySelectorAll('.goal-card').forEach(c => c.classList.remove('active-card'));
     } 
 }
 
