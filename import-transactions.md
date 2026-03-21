@@ -84,6 +84,7 @@ async function handleFile(file) {
 }
 
 function processRawArray(rows) {
+    console.log("DEBUG: Received rows from file:", rows); // Light 1
     parsedData = [];
     let colMap = { date: -1, share: -1, amount: -1, type: -1, qty: -1, price: -1 };
     let headerIdx = -1;
@@ -155,6 +156,7 @@ function removeRow(id) {
 }
 
 async function startImport() {
+    console.log("DEBUG: Attempting to save these entries:", entries); // Light 2
     if (!currentGoalId) { alert("Goal ID missing. Return to dashboard and try again."); return; }
     const btnId = lastAction === 'finish' ? 'btn-import-finish' : 'btn-import-more';
     const btn = document.getElementById(btnId);
