@@ -10,7 +10,7 @@ permalink: /import-transactions/
 <div class="dashboard-container" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="font-family: 'Lora'; margin: 0;">Smart Import</h2>
-        <a href="/dashboard/" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; border: 1px solid #334155; padding: 6px 12px; border-radius: 8px;">✕ Exit</a>
+        <a href="/dashboard/" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; border: 1px solid #334155; padding: 6px 12px; border-radius: 8px;">✕ Exit to dashboard</a>
     </div>
 
     <div id="goal-info-header" style="margin-bottom: 20px; padding: 10px; background: #0f172a; border-radius: 8px; border: 1px solid #334155; color: #38bdf8; font-size: 0.9rem; font-weight: bold;">
