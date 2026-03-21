@@ -239,6 +239,17 @@ function resetPage() {
     document.getElementById('mapping-section').style.display = 'none';
     document.getElementById('dropzone').style.display = 'block';
     document.getElementById('file-input').value = "";
+
+    // RESET BUTTONS
+    const btnFinish = document.getElementById('btn-import-finish');
+    const btnMore = document.getElementById('btn-import-more');
+    
+    [btnFinish, btnMore].forEach(btn => {
+        btn.innerText = btn.id === 'btn-import-finish' ? "Import & Finish" : "Import & Add More";
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+    });
 }
 
 function showToast(msg) {
