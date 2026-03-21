@@ -32,11 +32,11 @@ permalink: /import-transactions/
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: #cbd5e1;">
                     <thead style="position: sticky; top: 0; background: #1e293b; z-index: 10;">
                         <tr style="text-align: left; color: #64748b; border-bottom: 1px solid #334155;">
-                            <th style="padding: 12px 10px;">Date</th>
-                            <th style="padding: 12px 10px;">Item</th>
-                            <th style="padding: 12px 10px; text-align: right;">Amount</th>
-                            <th style="padding: 12px 10px;"></th>
-                        </tr>
+                        <th style="padding: 12px 10px;">Date</th>
+                        <th style="padding: 12px 10px;">Item</th>
+                        <th style="padding: 12px 10px; text-align: right;">Amount</th>
+                        <th style="padding: 12px 10px; text-align: center;">Action</th>
+                    </tr>
                     </thead>
                     <tbody id="preview-body"></tbody>
                 </table>
@@ -166,11 +166,11 @@ function displayPreview() {
         <tr id="row-${d.tempId}" style="border-bottom: 1px solid #334155;">
             <td style="padding: 12px 10px;">${d.date}</td>
             <td style="padding: 12px 10px;">${d.share}</td>
-            <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: ${d.amount > 0 ? '#10b981' : '#f87171'};">
-                ₹${Math.abs(d.amount).toFixed(2)}
+            <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: ${d.amount > 0 ? '#4ade80' : '#f87171'};">
+                ₹${Math.abs(d.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}
             </td>
-            <td style="padding: 12px 10px; text-align: right;">
-                <button onclick="removeRow(${d.tempId})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.2rem;">×</button>
+            <td style="padding: 12px 10px; text-align: center;">
+                <button onclick="removeRow(${d.tempId})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.8rem; font-weight:bold;">Delete</button>
             </td>
         </tr>
     `).join('');
@@ -194,6 +194,8 @@ async function startImport() {
 
     btn.innerText = "Processing...";
     btn.disabled = true;
+    btn.style.cursor = "not-allowed";
+    btn.style.opacity = "0.5";
 
     const { data: { session } } = await supabase.auth.getSession();
     
