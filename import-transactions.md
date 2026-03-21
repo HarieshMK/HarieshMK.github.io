@@ -62,6 +62,19 @@ document.getElementById('file-input').onchange = (e) => handleFile(e.target.file
 document.getElementById('btn-import-finish').onclick = () => { lastAction = 'finish'; startImport(); };
 document.getElementById('btn-import-more').onclick = () => { lastAction = 'more'; startImport(); };
 
+// Helper to handle various date formats (DD-MM-YYYY to YYYY-MM-DD)
+function formatDate(dateStr) {
+    if (!dateStr) return new Date().toISOString().split('T')[0];
+    const parts = String(dateStr).split(/[-/ ]/);
+    if (parts.length >= 3) {
+        // If it looks like DD-MM-YYYY
+        if (parts[0].length <= 2 && parts[2].length === 4) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+    }
+    return dateStr.split(' ')[0]; // Default fallback
+}
+
 function generateRowHash(row, userId) {
     const s = JSON.stringify(row) + userId;
     let h = 0;
@@ -84,50 +97,66 @@ async function handleFile(file) {
 }
 
 function processRawArray(rows) {
-    console.log("DEBUG: Received rows from file:", rows); // Light 1
+    console.log("DEBUG: Processing rows. Total count:", rows.length);
     parsedData = [];
     let colMap = { date: -1, share: -1, amount: -1, type: -1, qty: -1, price: -1 };
     let headerIdx = -1;
 
-    for (let i = 0; i < Math.min(rows.length, 20); i++) {
-        const row = rows[i].map(c => String(c || '').toLowerCase());
-        if (row.some(c => c.includes('symbol') || c.includes('scrip') || c.includes('description') || c.includes('scheme'))) {
+    for (let i = 0; i < rows.length; i++) {
+        if (!rows[i] || rows[i].length < 3) continue; 
+        const row = rows[i].map(c => String(c || '').toLowerCase().trim());
+        
+        const hasHeaderMatch = row.some(c => 
+            c.includes('symbol') || c.includes('scrip') || c.includes('scheme') || 
+            c.includes('description') || c.includes('particulars') || c.includes('isin')
+        );
+
+        if (hasHeaderMatch) {
+            console.log("DEBUG: Found Header at Row:", i, row);
             headerIdx = i;
             row.forEach((c, idx) => {
                 if (c.includes('date')) colMap.date = idx;
-                if (c.includes('symbol') || c.includes('scrip') || c.includes('scheme') || c.includes('description')) colMap.share = idx;
-                if (c.includes('amount') || c.includes('total') || c.includes('settlement')) colMap.amount = idx;
-                if (c.includes('type') || c.includes('side')) colMap.type = idx;
-                if (c.includes('qty') || c.includes('units')) colMap.qty = idx;
-                if (c.includes('price') || c.includes('rate')) colMap.price = idx;
+                if (c.includes('symbol') || c.includes('scrip') || c.includes('scheme') || c.includes('description') || c.includes('particulars')) colMap.share = idx;
+                if (c.includes('amount') || c.includes('total') || c.includes('net') || c.includes('settlement') || c.includes('value')) colMap.amount = idx;
+                if (c.includes('type') || c.includes('side') || c.includes('transaction')) colMap.type = idx;
+                if (c.includes('qty') || c.includes('units') || c.includes('quantity')) colMap.qty = idx;
+                if (c.includes('price') || c.includes('rate') || c.includes('nav')) colMap.price = idx;
             });
             break;
         }
     }
 
-    if (headerIdx === -1) { alert("Could not find headers. Please check your file."); return; }
+    if (headerIdx === -1) {
+        console.error("DEBUG FAIL: No headers found.");
+        alert("Could not detect the table headers. Ensure your file has columns like 'Date' and 'Scheme'.");
+        return;
+    }
 
     rows.slice(headerIdx + 1).forEach((row, idx) => {
         const share = row[colMap.share];
-        if (!share) return;
+        if (!share || String(share).trim() === "") return;
 
         const qty = parseFloat(String(row[colMap.qty] || 0).replace(/,/g, ''));
         const price = parseFloat(String(row[colMap.price] || 0).replace(/,/g, ''));
         let amt = parseFloat(String(row[colMap.amount] || 0).replace(/,/g, '')) || (qty * price);
         
         const type = String(row[colMap.type] || '').toLowerCase();
-        if (type.includes('sell') || type.includes('redemption') || type === 's') amt = -Math.abs(amt);
+        if (type.includes('sell') || type.includes('redemption') || type === 's' || type.includes('out')) {
+            amt = -Math.abs(amt);
+        }
 
-        if (amt !== 0) {
+        if (!isNaN(amt) && amt !== 0) {
             parsedData.push({
                 tempId: idx,
-                date: row[colMap.date] ? String(row[colMap.date]).split(' ')[0] : new Date().toISOString().split('T')[0],
-                share: String(share).toUpperCase(),
+                date: formatDate(row[colMap.date]),
+                share: String(share).toUpperCase().trim(),
                 amount: amt,
                 rawRow: row
             });
         }
     });
+
+    console.log("DEBUG SUCCESS: Parsed Items:", parsedData.length);
     displayPreview();
 }
 
@@ -151,13 +180,14 @@ function displayPreview() {
 
 function removeRow(id) {
     parsedData = parsedData.filter(d => d.tempId !== id);
-    document.getElementById('row-' + id).remove();
+    const el = document.getElementById('row-' + id);
+    if (el) el.remove();
     if (parsedData.length === 0) resetPage();
 }
 
 async function startImport() {
-    console.log("DEBUG: Attempting to save these entries:", entries); // Light 2
     if (!currentGoalId) { alert("Goal ID missing. Return to dashboard and try again."); return; }
+    
     const btnId = lastAction === 'finish' ? 'btn-import-finish' : 'btn-import-more';
     const btn = document.getElementById(btnId);
     const countReq = parsedData.length;
@@ -166,6 +196,8 @@ async function startImport() {
     btn.disabled = true;
 
     const { data: { session } } = await supabase.auth.getSession();
+    
+    // Corrected variable hoisting
     const entries = parsedData.map(d => ({
         user_id: session.user.id,
         goal_id: currentGoalId,
@@ -174,6 +206,8 @@ async function startImport() {
         share_name: d.share,
         source_hash: generateRowHash(d.rawRow, session.user.id)
     }));
+
+    console.log("DEBUG: Attempting to save these entries:", entries);
 
     const { error, count } = await supabase.from('transactions').upsert(entries, { 
         onConflict: 'user_id,source_hash', 
@@ -186,9 +220,10 @@ async function startImport() {
         btn.disabled = false;
         btn.innerText = "Try Again";
     } else {
-        const diff = countReq - count;
+        const actualCount = count || 0;
+        const diff = countReq - actualCount;
         if (lastAction === 'more') {
-            showToast(diff > 0 ? `✅ ${count} Saved. ⚠️ ${diff} Duplicates Ignored.` : "✅ Successfully Imported!");
+            showToast(diff > 0 ? `✅ ${actualCount} Saved. ⚠️ ${diff} Duplicates Ignored.` : "✅ Successfully Imported!");
             resetPage();
         } else {
             if (diff > 0) alert(`${diff} duplicate transactions were skipped.`);
@@ -212,9 +247,23 @@ function showToast(msg) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("DEBUG: Page Loaded. Goal ID from URL:", currentGoalId);
+    
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session || !currentGoalId) return;
-    const { data: goal } = await supabase.from('goals').select('goal_name').eq('id', currentGoalId).single();
-    if (goal) document.getElementById('goal-info-header').innerText = `🎯 Goal: ${goal.goal_name}`;
+    if (!session) return;
+
+    if (!currentGoalId) {
+        document.getElementById('goal-info-header').innerText = "⚠️ No Goal Selected!";
+        return;
+    }
+
+    const { data: goal, error } = await supabase.from('goals').select('goal_name').eq('id', currentGoalId).single();
+    
+    if (error) {
+        console.error("DEBUG: Supabase Error:", error);
+        document.getElementById('goal-info-header').innerText = "❌ Error loading goal context.";
+    } else if (goal) {
+        document.getElementById('goal-info-header').innerText = `🎯 Goal: ${goal.goal_name}`;
+    }
 });
 </script>
