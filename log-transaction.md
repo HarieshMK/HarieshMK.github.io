@@ -7,7 +7,7 @@ permalink: /log-transaction/
 <div class="log-container" style="max-width: 600px; margin: 20px auto; padding: 0 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="margin: 0; font-family: 'Lora';">💸 Log Investment</h2>
-        <a href="/import-transactions/" class="btn-modern primary" style="text-decoration: none; background: #000; color: #fff; padding: 8px 16px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">⚡ Bulk Import</a>
+        <a href="/import-transactions/" id="bulk-import-btn" class="btn-modern primary" style="text-decoration: none; background: #000; color: #fff; padding: 8px 16px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">⚡📥 Upload your statement</a>
     </div>
 
     <div class="post-card" id="form-top" style="margin-bottom: 30px; position: relative; background: var(--d-card-bg); border: 1px solid var(--d-border); padding: 25px; border-radius: 16px;">
@@ -73,8 +73,14 @@ permalink: /log-transaction/
         currentUserSessionId = session.user.id;
 
         const goalSelect = document.getElementById('goal_select');
+        // ADD THIS PART HERE:
         const urlParams = new URLSearchParams(window.location.search);
         const preSelectedGoal = urlParams.get('goal_id');
+        
+        if (preSelectedGoal) {
+            const importBtn = document.getElementById('bulk-import-btn');
+            importBtn.href = `/import-transactions/?goal_id=${preSelectedGoal}`;
+        }
 
         document.getElementById('btn-another').onclick = () => lastClicked = 'another';
         document.getElementById('btn-finish').onclick = () => lastClicked = 'finish';
@@ -82,14 +88,31 @@ permalink: /log-transaction/
 
         const { data: goals } = await supabase.from('goals').select('id, goal_name').eq('user_id', currentUserSessionId);
         if (goals) {
-            goalSelect.innerHTML = goals.map(g => `<option value="${g.id}" ${g.id === preSelectedGoal ? 'selected' : ''}>${g.goal_name}</option>`).join('');
+            // This keeps a "Please Select" option at the top
+        goalSelect.innerHTML = '<option value="">-- Select Goal --</option>' +     
+        goals.map(g => `<option value="${g.id}" ${g.id === preSelectedGoal ? 'selected' : ''}>${g.goal_name}</option>`).join('');
         }
+        // Force Uppercase for Share Name for consistency
+        const shareInput = document.getElementById('share_name');
+        shareInput.addEventListener('input', () => {
+            shareInput.value = shareInput.value.toUpperCase();
+        });
+        
+        // Allow 'Enter' key to save
+        shareInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('btn-another').click();
+            }
+        });
 
         document.getElementById('transaction-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('btn-another');
             submitBtn.innerText = "Saving...";
             submitBtn.disabled = true;
+            submitBtn.style.cursor = "not-allowed"; // Add this line
+            submitBtn.style.opacity = "0.7";       // Add this line
 
             const goalId = goalSelect.value;
             const goalName = goalSelect.options[goalSelect.selectedIndex].text;
@@ -161,7 +184,7 @@ permalink: /log-transaction/
                 <div style="font-size: 0.75rem; color: #64748b;">${formattedDate} • ${share}</div>
             </div>
             <div style="text-align: right; display: flex; align-items: center; gap: 15px;">
-                <div style="font-family: 'JetBrains Mono'; font-size: 0.9rem; color: ${color}; font-weight: bold;">₹${Math.abs(amount).toLocaleString('en-IN')}</div>
+                <div style="font-family: 'JetBrains Mono'; font-size: 0.9rem; color: ${color}; font-weight: bold;">₹${Math.abs(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 <div style="display: flex; gap: 8px;">
                     <button onclick="editRecent('${id}', '${elementId}', '${goalId}', ${amount}, '${date}', '${share}')" style="background: none; border: none; color: #0ea5e9; cursor: pointer; font-size: 0.8rem;">Edit</button>
                     <button onclick="confirmDelete('${id}', '${elementId}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem;">Del</button>
