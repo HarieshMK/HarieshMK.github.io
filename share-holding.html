@@ -1,0 +1,141 @@
+---
+layout: default
+title: Share Holdings
+---
+
+<div class="portfolio-container">
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <span class="metric-label">Invested Value</span>
+            <strong id="total-invested">₹0.00</strong>
+        </div>
+        <div class="metric-card highlight">
+            <span class="metric-label">Current Value</span>
+            <strong id="current-value">₹0.00</strong>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">Total P&L</span>
+            <strong id="total-pl">₹0.00 (0%)</strong>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <div class="import-zone" id="drop-zone">
+            <i class="fas fa-file-import"></i>
+            <p>Drop Zerodha Tradebook CSV here or <span>Browse</span></p>
+            <input type="file" id="csv-input" hidden accept=".csv">
+        </div>
+        <button id="sync-btn" class="primary-btn" disabled>
+            <i class="fas fa-sync-alt"></i> Run FIFO Sync
+        </button>
+    </div>
+
+    <div id="status-box" class="status-msg" style="display:none;">
+        <div class="spinner"></div>
+        <p id="status-text">Processing transactions...</p>
+    </div>
+
+    <div class="table-container card">
+        <div class="table-header">
+            <h3>Active Equity Holdings</h3>
+            <span class="sub-text">Calculated using FIFO logic</span>
+        </div>
+        <table id="holdings-table">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Qty</th>
+                    <th>Avg. Price</th>
+                    <th>Invested</th>
+                    <th>Market Price</th>
+                    <th>Current Value</th>
+                    <th>P&L</th>
+                </tr>
+            </thead>
+            <tbody id="holdings-body">
+                <tr>
+                    <td colspan="7" class="empty-state">No holdings found. Upload your tradebook to begin.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* Portfolio Specific Styles - Consistent with your Calculator System */
+    .portfolio-container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    
+    .metrics-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+        gap: 20px; 
+        margin-bottom: 30px; 
+    }
+    
+    .metric-card {
+        background: var(--d-card-bg, #ffffff);
+        padding: 25px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .metric-card strong { 
+        font-family: 'JetBrains Mono', monospace; 
+        font-size: 1.8rem; 
+        color: #1e293b;
+    }
+
+    .metric-card.highlight { border-left: 5px solid #0ea5e9; }
+    
+    .actions-bar { 
+        display: flex; 
+        gap: 20px; 
+        margin-bottom: 30px; 
+        align-items: center; 
+    }
+
+    .import-zone {
+        flex: 1;
+        border: 2px dashed #cbd5e1;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    .import-zone:hover { border-color: #0ea5e9; background: #f0f9ff; }
+
+    .primary-btn {
+        padding: 15px 30px;
+        border-radius: 12px;
+        background: #0ea5e9;
+        color: white;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .primary-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    .table-container { 
+        background: white; 
+        border-radius: 20px; 
+        overflow: hidden; 
+        border: 1px solid #e2e8f0; 
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: #f1f5f9; padding: 15px; text-align: left; color: #64748b; font-weight: 700; }
+    td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+
+    .dark-theme .metric-card { background: #1e293b; border-color: #334155; }
+    .dark-theme .metric-card strong { color: #f1f5f9; }
+    .dark-theme .table-container { background: #0f172a; border-color: #1e293b; }
+    .dark-theme th { background: #1e293b; color: #94a3b8; }
+    .dark-theme td { border-color: #1e293b; color: #e2e8f0; }
+</style>
