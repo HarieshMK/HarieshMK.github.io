@@ -145,12 +145,14 @@ function processRawArray(rows) {
             amt = -Math.abs(amt);
         }
 
-        if (!isNaN(amt) && amt !== 0) {
+       
+        if (!isNaN(amt) && (amt !== 0 || qty !== 0)) {
             parsedData.push({
                 tempId: idx,
                 date: formatDate(row[colMap.date]),
                 share: String(share).toUpperCase().trim(),
                 amount: amt,
+                quantity: (qty !== undefined && !isNaN(qty)) ? qty : 1,
                 rawRow: row
             });
         }
@@ -165,8 +167,18 @@ function displayPreview() {
     body.innerHTML = parsedData.map(d => `
         <tr id="row-${d.tempId}" style="border-bottom: 1px solid #334155;">
             <td style="padding: 12px 10px; text-align: center;">${d.date}</td>
-            <td style="padding: 12px 10px; text-align: center;">${d.share}</td>
-            <td style="padding: 12px 10px; text-align: center; font-weight: bold; color: ${d.amount > 0 ? '#4ade80' : '#f87171'};">
+            <td style="padding: 12px 10px; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    ${d.share}
+                    <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; 
+                          background: ${d.amount > 0 ? '#064e3b' : '#450a0a'}; 
+                          color: ${d.amount > 0 ? '#4ade80' : '#f87171'}; border: 1px solid currentColor;">
+                        ${d.amount > 0 ? 'BUY' : 'SELL'}
+                    </span>
+                </div>
+                <small style="color: #64748b;">Qty: ${d.quantity}</small> 
+            </td>
+            <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: ${d.amount > 0 ? '#4ade80' : '#f87171'};">
                 ₹${Math.abs(d.amount).toLocaleString('en-IN', {minimumFractionDigits: 2})}
             </td>
             <td style="padding: 12px 10px; text-align: center;">
@@ -196,16 +208,17 @@ async function startImport() {
     btn.disabled = true;
     btn.style.cursor = "not-allowed";
     btn.style.opacity = "0.5";
+    btn.innerText = `Saving ${parsedData.length} records...`;
 
     const { data: { session } } = await supabase.auth.getSession();
     
-    // Corrected variable hoisting
     const entries = parsedData.map(d => ({
         user_id: session.user.id,
         goal_id: currentGoalId,
         transaction_date: d.date,
         amount: d.amount,
         share_name: d.share,
+        quantity: d.quantity, // <--- ADD THIS LINE
         source_hash: generateRowHash(d.rawRow, session.user.id)
     }));
 
@@ -222,12 +235,15 @@ async function startImport() {
         btn.disabled = false;
         btn.innerText = "Try Again";
     } else {
-        const actualCount = count || 0;
-        const diff = countReq - actualCount;
+        const actualCount = count || 0; // Number of rows actually inserted
+        const diff = countReq - actualCount; // Total rows minus inserted = duplicates skipped
+        
         if (lastAction === 'more') {
+            // This displays the exact message you wanted in the green toast popup
             showToast(diff > 0 ? `✅ ${actualCount} Saved. ⚠️ ${diff} Duplicates Ignored.` : "✅ Successfully Imported!");
             resetPage();
         } else {
+            // If finishing, it uses a standard alert before redirecting
             if (diff > 0) alert(`${diff} duplicate transactions were skipped.`);
             window.location.href = "/dashboard/";
         }
