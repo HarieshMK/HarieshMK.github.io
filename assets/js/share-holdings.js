@@ -1,7 +1,26 @@
 /**
- * Share Holdings Engine v2.3 - FULL STACK
- * Supports CSV/XLSX + Auto-Add Tickers + Flexible Headers
+ * Share Holdings Engine v2.4
+ * FULLY SELF-CONTAINED
  */
+
+// --- 1. DEFINE UI HELPERS FIRST (To prevent ReferenceErrors) ---
+function showStatus(msg, isError = false) {
+    console.log("Status Update:", msg); // This will show in console even if UI fails
+    const box = document.getElementById('status-box');
+    const text = document.getElementById('status-text');
+    if (box && text) {
+        box.style.display = 'flex';
+        text.innerText = msg;
+        box.style.backgroundColor = isError ? '#fee2e2' : '#f0f9ff';
+        box.style.color = isError ? '#991b1b' : '#075985';
+        if (!isError) setTimeout(() => { box.style.display = 'none'; }, 8000);
+    } else {
+        // If the HTML elements aren't found, alert the user so we know
+        if (isError) alert("Error: " + msg);
+    }
+}
+
+console.log("Share Holdings Script Initializing...");
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; 
 
@@ -16,27 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.onclick = () => csvInput.click();
         csvInput.onchange = (e) => handleFile(e.target.files[0]);
         
-        dropZone.ondragover = (e) => { 
-            e.preventDefault(); 
-            dropZone.style.borderColor = "#0ea5e9";
-            dropZone.style.background = "#f0f9ff";
-        };
-        dropZone.ondragleave = () => {
-            dropZone.style.borderColor = "#cbd5e1";
-            dropZone.style.background = "#f8fafc";
-        };
-        dropZone.ondrop = (e) => {
-            e.preventDefault();
-            handleFile(e.dataTransfer.files[0]);
-        };
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#0ea5e9"; };
+        dropZone.ondragleave = () => { dropZone.style.borderColor = "#cbd5e1"; };
+        dropZone.ondrop = (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); };
+        console.log("Event listeners attached to Drop Zone.");
     }
-
     if (syncBtn) syncBtn.onclick = () => startSync();
 });
 
+// --- 2. THE REST OF THE ENGINE ---
+
 async function handleFile(file) {
     if (!file) return;
-    showStatus(`Processing ${file.name}...`);
+    showStatus(`Reading ${file.name}...`);
     
     const reader = new FileReader();
     const isExcel = file.name.match(/\.(xlsx|xls)$/i);
@@ -45,6 +56,10 @@ async function handleFile(file) {
         try {
             let rawRows = [];
             if (isExcel) {
+                if (typeof XLSX === 'undefined') {
+                    showStatus("Excel library not loaded! Check HTML script tag.", true);
+                    return;
+                }
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -60,14 +75,14 @@ async function handleFile(file) {
             
             if (cleanData.length > 0) {
                 calculateFIFO(cleanData);
-                document.getElementById('sync-btn').disabled = false;
-                showStatus(`Success! Found ${cleanData.length} trades.`);
+                if(document.getElementById('sync-btn')) document.getElementById('sync-btn').disabled = false;
+                showStatus(`Found ${cleanData.length} trades.`);
             } else {
-                showStatus("Could not find Symbol/Quantity/Price columns.", true);
+                showStatus("Required headers (Symbol, Quantity, Price) not found.", true);
             }
         } catch (err) {
-            console.error(err);
-            showStatus("Error reading file content.", true);
+            console.error("File Processing Error:", err);
+            showStatus("Error reading file.", true);
         }
     };
 
@@ -77,11 +92,10 @@ async function handleFile(file) {
 
 function findAndMapHeaders(rows) {
     let headerIndex = -1;
-    // Looking for key indicators in any row
     const req = ['symbol', 'quantity', 'price'];
 
     for (let i = 0; i < rows.length; i++) {
-        const rowValues = rows[i].map(v => String(v).toLowerCase());
+        const rowValues = rows[i].map(v => String(v || "").toLowerCase());
         if (req.every(term => rowValues.some(col => col.includes(term)))) {
             headerIndex = i;
             break;
@@ -90,7 +104,7 @@ function findAndMapHeaders(rows) {
 
     if (headerIndex === -1) return [];
 
-    const headers = rows[headerIndex].map(h => String(h).trim().toLowerCase());
+    const headers = rows[headerIndex].map(h => String(h || "").trim().toLowerCase());
     const sIdx = headers.findIndex(h => h.includes('symbol'));
     const qIdx = headers.findIndex(h => h.includes('quantity') || h.includes('qty'));
     const pIdx = headers.findIndex(h => h.includes('price'));
@@ -107,7 +121,6 @@ function findAndMapHeaders(rows) {
             date: row[dIdx] || ""
         }));
 }
-
 function calculateFIFO(trades) {
     const portfolio = {};
     trades.sort((a, b) => new Date(a.date) - new Date(b.date));
