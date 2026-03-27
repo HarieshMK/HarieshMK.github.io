@@ -166,30 +166,52 @@ async function startSync() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
-        const res = await fetch(GOOGLE_SCRIPT_URL);
+        // 1. Fetch Prices with Redirect Handling
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'GET',
+            mode: 'cors',
+            credentials: 'omit'
+        });
+        
         const sheetPrices = await res.json();
         const missing = [];
 
+        // 2. Map prices to your holdings
         processedHoldings.forEach(h => {
-            const match = sheetPrices.find(p => p.ticker && p.ticker.includes(h.symbol.toUpperCase()));
-            if (match) h.current_price = parseFloat(match.price);
-            else missing.push(`NSE:${h.symbol.toUpperCase()}`);
+            const match = sheetPrices.find(p => 
+                p.ticker && p.ticker.toUpperCase().includes(h.symbol.toUpperCase())
+            );
+            if (match) {
+                h.current_price = parseFloat(match.price);
+            } else {
+                missing.push(`NSE:${h.symbol.toUpperCase()}`);
+            }
         });
 
+        // 3. Handle Missing Tickers
         if (missing.length > 0) {
-            showStatus(`Adding ${missing.length} new tickers...`);
+            showStatus(`Adding ${missing.length} new tickers to Sheet...`);
+            
+            // We use no-cors here because Google Script won't return a proper CORS header on POST
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', 
                 body: JSON.stringify({ tickers: missing })
             });
-            showStatus("New stocks added! formulas take ~10s. Click sync again shortly.");
+
+            // Since 'no-cors' blocks the response, we assume success if no network error occurred
+            showStatus("Tickers sent! Google formulas take ~10s. Click Sync again shortly.");
         } else {
-            showStatus("All prices updated!");
+            showStatus("All prices updated successfully!");
         }
+        
         renderTable();
+
     } catch (e) {
-        showStatus("Sync failed. Check Web App permissions.", true);
+        console.error("Detailed Sync Error:", e);
+        // Fallback: Even if sync fails, show the table with the data we have
+        renderTable(); 
+        showStatus("Sync failed. Ensure Google Web App is deployed to 'Anyone'.", true);
     } finally {
         btn.innerHTML = originalHTML;
     }
