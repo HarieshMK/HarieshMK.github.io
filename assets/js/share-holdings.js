@@ -1,7 +1,10 @@
 /**
- * Share Holdings Engine v2.5
- * COMPLETE SINGLE-FILE SOLUTION
+ * Share Holdings Engine v2.6
+ * CLEANED & VERIFIED
  */
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; 
+let processedHoldings = [];
 
 // --- 1. UI HELPERS ---
 function showStatus(msg, isError = false) {
@@ -16,9 +19,6 @@ function showStatus(msg, isError = false) {
     }
 }
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; 
-let processedHoldings = [];
-
 console.log("Share Holdings Script Initializing...");
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,7 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
         csvInput.onchange = (e) => handleFile(e.target.files[0]);
         dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#0ea5e9"; };
         dropZone.ondragleave = () => { dropZone.style.borderColor = "#cbd5e1"; };
-        dropZone.ondrop = (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); };
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            handleFile(e.dataTransfer.files[0]);
+        };
     }
     if (syncBtn) syncBtn.onclick = () => startSync();
 });
@@ -39,8 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- 2. FILE PROCESSING ---
 async function handleFile(file) {
     if (!file) return;
-    showStatus(`Processing ${file.name}...`);
     
+    showStatus(`Reading ${file.name}...`);
+    console.log("File selected:", file.name);
+
     const reader = new FileReader();
     const isExcel = file.name.match(/\.(xlsx|xls)$/i);
 
@@ -49,7 +54,7 @@ async function handleFile(file) {
             let rawRows = [];
             if (isExcel) {
                 if (typeof XLSX === 'undefined') {
-                    showStatus("Security Block: Excel library (XLSX) failed to load from CDN.", true);
+                    showStatus("Library Error: XLSX engine not loaded. Check HTML script tag.", true);
                     return;
                 }
                 const data = new Uint8Array(e.target.result);
@@ -66,14 +71,15 @@ async function handleFile(file) {
             const cleanData = findAndMapHeaders(rawRows);
             if (cleanData.length > 0) {
                 calculateFIFO(cleanData);
-                document.getElementById('sync-btn').disabled = false;
-                showStatus(`Successfully parsed ${cleanData.length} trades.`);
+                const btn = document.getElementById('sync-btn');
+                if(btn) btn.disabled = false;
+                showStatus(`Success: Loaded ${cleanData.length} trades.`);
             } else {
-                showStatus("Error: Required headers (Symbol, Quantity, Price) not found.", true);
+                showStatus("Format Error: Missing 'Symbol', 'Quantity', or 'Price' columns.", true);
             }
         } catch (err) {
-            console.error("Reader Error:", err);
-            showStatus("Failed to read file content.", true);
+            console.error("Processing error:", err);
+            showStatus("System Error: Failed to process file content.", true);
         }
     };
 
@@ -116,7 +122,6 @@ function findAndMapHeaders(rows) {
 // --- 3. THE FIFO & SYNC ENGINE ---
 function calculateFIFO(trades) {
     const portfolio = {};
-    // Ensure chronological order
     trades.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     trades.forEach(trade => {
@@ -156,6 +161,8 @@ function calculateFIFO(trades) {
 async function startSync() {
     showStatus("Syncing with Google Market Engine...");
     const btn = document.getElementById('sync-btn');
+    if (!btn) return;
+    const originalHTML = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
@@ -170,13 +177,13 @@ async function startSync() {
         });
 
         if (missing.length > 0) {
-            showStatus(`Adding ${missing.length} new tickers to Sheet...`);
+            showStatus(`Adding ${missing.length} new tickers...`);
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ tickers: missing })
             });
-            showStatus("New stocks added! Wait 10s for formulas to load and click Sync again.");
+            showStatus("New stocks added! formulas take ~10s. Click sync again shortly.");
         } else {
             showStatus("All prices updated!");
         }
@@ -184,7 +191,7 @@ async function startSync() {
     } catch (e) {
         showStatus("Sync failed. Check Web App permissions.", true);
     } finally {
-        btn.innerHTML = '<i class="fas fa-sync-alt"></i> Run FIFO Sync';
+        btn.innerHTML = originalHTML;
     }
 }
 
@@ -208,10 +215,13 @@ function renderTable() {
         </tr>`;
     }).join('');
 
-    document.getElementById('total-invested').innerText = `₹${totalInv.toLocaleString('en-IN')}`;
-    document.getElementById('current-value').innerText = `₹${totalCur.toLocaleString('en-IN')}`;
+    if(document.getElementById('total-invested')) document.getElementById('total-invested').innerText = `₹${totalInv.toLocaleString('en-IN')}`;
+    if(document.getElementById('current-value')) document.getElementById('current-value').innerText = `₹${totalCur.toLocaleString('en-IN')}`;
+    
     const totalPL = totalCur - totalInv;
     const plEl = document.getElementById('total-pl');
-    plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv>0?((totalPL/totalInv)*100).toFixed(2):0}%)`;
-    plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+    if (plEl) {
+        plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv > 0 ? ((totalPL/totalInv)*100).toFixed(2) : 0}%)`;
+        plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+    }
 }
