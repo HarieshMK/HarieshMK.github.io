@@ -4,7 +4,7 @@
  * LOGIC: Supabase Persistence + FIFO + Google Sync
  */
 
-const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL"; // Replace with your actual URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; // Replace with your actual URL
 let processedHoldings = []; 
 
 // --- 1. INITIALIZATION ---
@@ -48,6 +48,9 @@ async function loadPortfolioFromDB(userId) {
             date: t.transaction_date
         }));
         calculateFIFO(mappedTrades);
+        // Inside loadPortfolioFromDB, after calculateFIFO(mappedTrades);
+        const syncBtn = document.getElementById('sync-btn');
+        if (syncBtn) syncBtn.disabled = false; // Enable the button once data is ready
     }
 }
 
@@ -201,8 +204,16 @@ function showStatus(msg, isError = false) {
     if (box && text) {
         box.style.display = 'flex';
         text.innerText = msg;
-        box.style.backgroundColor = isError ? '#fee2e2' : '#f8fafc';
-        if (!isError) setTimeout(() => { box.style.display = 'none'; }, 5000);
+        
+        // Red for error, Blue-ish for info
+        box.style.backgroundColor = isError ? '#fee2e2' : '#f0f9ff';
+        box.style.border = isError ? '1px solid #ef4444' : '1px solid #0ea5e9';
+        box.style.color = isError ? '#991b1b' : '#075985';
+
+        // ONLY hide if it's NOT an error. If it's an error, keep it there so you can read it!
+        if (!isError) {
+            setTimeout(() => { box.style.display = 'none'; }, 4000);
+        }
     }
 }
 
