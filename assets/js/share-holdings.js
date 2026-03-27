@@ -1,30 +1,25 @@
 /**
- * Share Holdings Engine v2.4
- * FULLY SELF-CONTAINED
+ * Share Holdings Engine v2.5
+ * COMPLETE SINGLE-FILE SOLUTION
  */
 
-// --- 1. DEFINE UI HELPERS FIRST (To prevent ReferenceErrors) ---
+// --- 1. UI HELPERS ---
 function showStatus(msg, isError = false) {
-    console.log("Status Update:", msg); // This will show in console even if UI fails
+    console.log("Status:", msg);
     const box = document.getElementById('status-box');
     const text = document.getElementById('status-text');
     if (box && text) {
         box.style.display = 'flex';
         text.innerText = msg;
         box.style.backgroundColor = isError ? '#fee2e2' : '#f0f9ff';
-        box.style.color = isError ? '#991b1b' : '#075985';
         if (!isError) setTimeout(() => { box.style.display = 'none'; }, 8000);
-    } else {
-        // If the HTML elements aren't found, alert the user so we know
-        if (isError) alert("Error: " + msg);
     }
 }
 
-console.log("Share Holdings Script Initializing...");
-
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; 
-
 let processedHoldings = [];
+
+console.log("Share Holdings Script Initializing...");
 
 document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('drop-zone');
@@ -34,20 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dropZone && csvInput) {
         dropZone.onclick = () => csvInput.click();
         csvInput.onchange = (e) => handleFile(e.target.files[0]);
-        
         dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#0ea5e9"; };
         dropZone.ondragleave = () => { dropZone.style.borderColor = "#cbd5e1"; };
         dropZone.ondrop = (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); };
-        console.log("Event listeners attached to Drop Zone.");
     }
     if (syncBtn) syncBtn.onclick = () => startSync();
 });
 
-// --- 2. THE REST OF THE ENGINE ---
-
+// --- 2. FILE PROCESSING ---
 async function handleFile(file) {
     if (!file) return;
-    showStatus(`Reading ${file.name}...`);
+    showStatus(`Processing ${file.name}...`);
     
     const reader = new FileReader();
     const isExcel = file.name.match(/\.(xlsx|xls)$/i);
@@ -57,7 +49,7 @@ async function handleFile(file) {
             let rawRows = [];
             if (isExcel) {
                 if (typeof XLSX === 'undefined') {
-                    showStatus("Excel library not loaded! Check HTML script tag.", true);
+                    showStatus("Security Block: Excel library (XLSX) failed to load from CDN.", true);
                     return;
                 }
                 const data = new Uint8Array(e.target.result);
@@ -72,17 +64,16 @@ async function handleFile(file) {
             }
 
             const cleanData = findAndMapHeaders(rawRows);
-            
             if (cleanData.length > 0) {
                 calculateFIFO(cleanData);
-                if(document.getElementById('sync-btn')) document.getElementById('sync-btn').disabled = false;
-                showStatus(`Found ${cleanData.length} trades.`);
+                document.getElementById('sync-btn').disabled = false;
+                showStatus(`Successfully parsed ${cleanData.length} trades.`);
             } else {
-                showStatus("Required headers (Symbol, Quantity, Price) not found.", true);
+                showStatus("Error: Required headers (Symbol, Quantity, Price) not found.", true);
             }
         } catch (err) {
-            console.error("File Processing Error:", err);
-            showStatus("Error reading file.", true);
+            console.error("Reader Error:", err);
+            showStatus("Failed to read file content.", true);
         }
     };
 
@@ -121,8 +112,11 @@ function findAndMapHeaders(rows) {
             date: row[dIdx] || ""
         }));
 }
+
+// --- 3. THE FIFO & SYNC ENGINE ---
 function calculateFIFO(trades) {
     const portfolio = {};
+    // Ensure chronological order
     trades.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     trades.forEach(trade => {
@@ -160,9 +154,9 @@ function calculateFIFO(trades) {
 }
 
 async function startSync() {
-    showStatus("Syncing with Google Sheet...");
+    showStatus("Syncing with Google Market Engine...");
     const btn = document.getElementById('sync-btn');
-    btn.innerHTML = 'Syncing...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL);
@@ -176,21 +170,21 @@ async function startSync() {
         });
 
         if (missing.length > 0) {
-            showStatus(`Adding ${missing.length} new stocks...`);
+            showStatus(`Adding ${missing.length} new tickers to Sheet...`);
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ tickers: missing })
             });
-            showStatus("New stocks added! Wait 10s and Sync again.");
+            showStatus("New stocks added! Wait 10s for formulas to load and click Sync again.");
         } else {
-            showStatus("Update Complete!");
+            showStatus("All prices updated!");
         }
         renderTable();
     } catch (e) {
-        showStatus("Sync Error. Check Web App permissions.", true);
+        showStatus("Sync failed. Check Web App permissions.", true);
     } finally {
-        btn.innerHTML = 'Run FIFO Sync';
+        btn.innerHTML = '<i class="fas fa-sync-alt"></i> Run FIFO Sync';
     }
 }
 
@@ -203,7 +197,15 @@ function renderTable() {
         const curVal = h.qty * h.current_price;
         totalInv += h.invested; totalCur += curVal;
         const plPct = h.invested > 0 ? (((curVal - h.invested) / h.invested) * 100).toFixed(2) : 0;
-        return `<tr><td><b>${h.symbol}</b></td><td>${h.qty}</td><td>₹${h.avg_price.toFixed(2)}</td><td>₹${h.invested.toFixed(0)}</td><td>₹${h.current_price.toFixed(2)}</td><td>₹${curVal.toFixed(0)}</td><td style="color:${plPct>=0?'#10b981':'#ef4444'}">${plPct}%</td></tr>`;
+        return `<tr>
+            <td><b>${h.symbol}</b></td>
+            <td>${h.qty}</td>
+            <td>₹${h.avg_price.toFixed(2)}</td>
+            <td>₹${h.invested.toLocaleString('en-IN')}</td>
+            <td>₹${h.current_price.toFixed(2)}</td>
+            <td>₹${curVal.toLocaleString('en-IN')}</td>
+            <td style="color:${plPct>=0?'#10b981':'#ef4444'}">${plPct}%</td>
+        </tr>`;
     }).join('');
 
     document.getElementById('total-invested').innerText = `₹${totalInv.toLocaleString('en-IN')}`;
@@ -212,15 +214,4 @@ function renderTable() {
     const plEl = document.getElementById('total-pl');
     plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv>0?((totalPL/totalInv)*100).toFixed(2):0}%)`;
     plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
-}
-
-function showStatus(msg, isError = false) {
-    const box = document.getElementById('status-box');
-    const text = document.getElementById('status-text');
-    if (box && text) {
-        box.style.display = 'flex';
-        text.innerText = msg;
-        box.style.background = isError ? '#fee2e2' : '#f0f9ff';
-        if (!isError) setTimeout(() => box.style.display = 'none', 8000);
-    }
 }
