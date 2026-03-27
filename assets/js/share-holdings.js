@@ -225,31 +225,45 @@ async function startSync() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
-        const res = await fetch(GOOGLE_SCRIPT_URL);
+        // 1. Fetch Prices with 'follow' redirect logic
+        const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
         const sheetPrices = await res.json();
         const missing = [];
 
+        // 2. Map prices to holdings
         processedHoldings.forEach(h => {
+            const symbolOnly = h.symbol.replace('NSE:', '').trim().toUpperCase();
             const match = sheetPrices.find(p => 
-                p.ticker && p.ticker.toUpperCase().includes(h.symbol.toUpperCase())
+                p.ticker && p.ticker.toUpperCase().includes(symbolOnly)
             );
-            if (match) h.current_price = parseFloat(match.price);
-            else missing.push(`NSE:${h.symbol.toUpperCase()}`);
+            
+            if (match && match.price && !isNaN(match.price)) {
+                h.current_price = parseFloat(match.price);
+            } else {
+                missing.push(`NSE:${symbolOnly}`);
+            }
         });
 
+        // 3. Handle Missing Tickers (POST them to Google)
         if (missing.length > 0) {
+            showStatus(`Adding ${missing.length} new tickers to Sheet...`);
+            
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', 
-                body: JSON.stringify({ tickers: missing })
+                mode: 'no-cors', // Mandatory for Google Apps Script POST
+                body: JSON.stringify({ tickers: [...new Set(missing)] }) // Unique tickers only
             });
-            showStatus("Tickers added. Wait 10s and sync again.");
+
+            showStatus("Tickers added! Google is calculating... Wait 10s and Sync again.");
         } else {
-            showStatus("Prices updated!");
+            showStatus("Portfolio prices updated successfully!");
         }
+        
         renderTable();
+
     } catch (e) {
-        showStatus("Sync failed.", true);
+        console.error("Sync Error:", e);
+        showStatus("Sync failed. Check if Script is deployed to 'Anyone'.", true);
     } finally {
         btn.innerHTML = originalHTML;
     }
