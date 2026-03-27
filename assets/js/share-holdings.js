@@ -1,9 +1,11 @@
 /**
- * Share Holdings Engine
- * Handles Zerodha CSV parsing, FIFO logic, and Supabase Sync
+ * Share Holdings Engine v2.0
+ * Logic: Zerodha CSV Parser + FIFO Engine + Google Sheet Price Proxy
  */
 
-const SYMBOLS_TO_PROCESS = [];
+// 1. PLACEHOLDER: Paste your Google Web App URL here
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; 
+
 let processedHoldings = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,22 +13,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvInput = document.getElementById('csv-input');
     const syncBtn = document.getElementById('sync-btn');
 
-    // 1. File Upload Handlers
-    dropZone.onclick = () => csvInput.click();
-    
-    csvInput.onchange = (e) => handleFile(e.target.files[0]);
+    // File Upload Handlers
+    if (dropZone) {
+        dropZone.onclick = () => csvInput.click();
+        csvInput.onchange = (e) => handleFile(e.target.files[0]);
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            handleFile(e.dataTransfer.files[0]);
+        };
+    }
 
-    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
-    dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-    dropZone.ondrop = (e) => {
-        e.preventDefault();
-        handleFile(e.dataTransfer.files[0]);
-    };
-
-    syncBtn.onclick = () => startSync();
+    if (syncBtn) {
+        syncBtn.onclick = () => startSync();
+    }
 });
 
-// --- CORE LOGIC ---
+// --- FILE HANDLING & PARSING ---
 
 async function handleFile(file) {
     if (!file) return;
@@ -41,7 +45,7 @@ async function handleFile(file) {
         if (cleanData.length > 0) {
             calculateFIFO(cleanData);
             document.getElementById('sync-btn').disabled = false;
-            showStatus(`Found ${cleanData.length} trades. Ready to sync.`);
+            showStatus(`Found ${cleanData.length} trades. Click 'Run FIFO Sync' to fetch prices.`);
         } else {
             showStatus("Error: Could not find valid headers in CSV.", true);
         }
@@ -49,9 +53,10 @@ async function handleFile(file) {
     reader.readAsText(file);
 }
 
-/**
- * Scans rows to find where the Zerodha headers actually start
- */
+function parseCSV(text) {
+    return text.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+}
+
 function findAndMapHeaders(rows) {
     let headerIndex = -1;
     const targetHeaders = ['symbol', 'trade type', 'quantity', 'price'];
@@ -82,13 +87,10 @@ function findAndMapHeaders(rows) {
         });
 }
 
-/**
- * The FIFO Calculation Engine
- */
+// --- CORE FIFO ENGINE ---
+
 function calculateFIFO(trades) {
     const portfolio = {};
-
-    // Group by Symbol and sort by Date (ascending)
     trades.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     trades.forEach(trade => {
@@ -102,16 +104,15 @@ function calculateFIFO(trades) {
                 let oldestBuy = portfolio[trade.symbol][0];
                 if (oldestBuy.qty <= sellQty) {
                     sellQty -= oldestBuy.qty;
-                    portfolio[trade.symbol].shift(); // Remove fully sold buy lot
+                    portfolio[trade.symbol].shift();
                 } else {
                     oldestBuy.qty -= sellQty;
-                    sellQty = 0; // Partially sold buy lot
+                    sellQty = 0;
                 }
             }
         }
     });
 
-    // Flatten back to a "Holdings" list
     processedHoldings = Object.keys(portfolio).map(symbol => {
         const lots = portfolio[symbol];
         const totalQty = lots.reduce((sum, lot) => sum + lot.qty, 0);
@@ -124,23 +125,61 @@ function calculateFIFO(trades) {
             qty: totalQty,
             avg_price: avgPrice,
             invested: totalQty * avgPrice,
-            current_price: avgPrice, // Placeholder until API sync
-            lots: lots // Keeping individual lots for "Audit" view later
+            current_price: avgPrice // Default to buy price until sync
         };
     }).filter(h => h.qty > 0);
 
     renderTable();
 }
 
-// --- UI RENDERERS ---
+// --- SYNC WITH GOOGLE SHEETS ---
+
+async function startSync() {
+    showStatus("Fetching live prices from Google Price Engine...");
+    
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        if (!response.ok) throw new Error("Could not connect to Google Script");
+        const sheetPrices = await response.json();
+        
+        processedHoldings.forEach(holding => {
+            // Match 'RELIANCE' from CSV with 'NSE:RELIANCE' from Sheet
+            const match = sheetPrices.find(p => 
+                p.ticker && p.ticker.toUpperCase().includes(holding.symbol.toUpperCase())
+            );
+
+            if (match && match.price > 0) {
+                holding.current_price = parseFloat(match.price);
+            }
+        });
+
+        renderTable();
+        showStatus("Sync Successful! Prices updated.", false);
+
+    } catch (error) {
+        console.error("Sync Error:", error);
+        showStatus("Sync failed: Check if your Web App is deployed as 'Anyone'", true);
+    }
+}
+
+// --- UI RENDERER ---
 
 function renderTable() {
     const body = document.getElementById('holdings-body');
     let totalInvested = 0;
+    let totalCurrentValue = 0;
+
+    if (!body) return;
 
     body.innerHTML = processedHoldings.map(h => {
+        const currentValue = h.qty * h.current_price;
         totalInvested += h.invested;
-        const pl = 0; // Placeholder
+        totalCurrentValue += currentValue;
+
+        const plAmt = currentValue - h.invested;
+        const plPct = h.invested > 0 ? ((plAmt / h.invested) * 100).toFixed(2) : 0;
+        const statusClass = plAmt >= 0 ? 'text-success' : 'text-danger';
+
         return `
             <tr>
                 <td><strong>${h.symbol}</strong></td>
@@ -148,36 +187,36 @@ function renderTable() {
                 <td>₹${h.avg_price.toFixed(2)}</td>
                 <td>₹${h.invested.toLocaleString('en-IN')}</td>
                 <td>₹${h.current_price.toFixed(2)}</td>
-                <td>₹${h.invested.toLocaleString('en-IN')}</td>
-                <td class="${pl >= 0 ? 'text-success' : 'text-danger'}">0%</td>
+                <td>₹${currentValue.toLocaleString('en-IN')}</td>
+                <td class="${statusClass}">${plAmt >= 0 ? '+' : ''}${plPct}%</td>
             </tr>
         `;
     }).join('');
 
-    document.getElementById('total-invested').innerText = `₹${totalInvested.toLocaleString('en-IN')}`;
+    // Update the Summary Metric Cards
+    updateMetric('total-invested', totalInvested);
+    updateMetric('current-value', totalCurrentValue);
+    
+    const totalPlEl = document.getElementById('total-pl');
+    if (totalPlEl) {
+        const totalPlAmt = totalCurrentValue - totalInvested;
+        const totalPlPct = totalInvested > 0 ? ((totalPlAmt / totalInvested) * 100).toFixed(2) : 0;
+        totalPlEl.innerText = `₹${totalPlAmt.toLocaleString('en-IN', {maximumFractionDigits: 0})} (${totalPlPct}%)`;
+        totalPlEl.style.color = totalPlAmt >= 0 ? '#10b981' : '#ef4444';
+    }
 }
 
-async function startSync() {
-    showStatus("Connecting to Supabase & Fetching Market Prices...");
-    
-    // TODO: 1. Fetch Corporate Actions (Splits/Bonuses) for these symbols
-    // TODO: 2. Fetch Current Market Price
-    // TODO: 3. Upsert to Supabase 'processed_holdings' table
-
-    // Placeholder for next step
-    setTimeout(() => {
-        showStatus("Sync Successful! Holdings updated.", false);
-    }, 1500);
+function updateMetric(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = `₹${value.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
 }
 
 function showStatus(msg, isError = false) {
     const box = document.getElementById('status-box');
     const text = document.getElementById('status-text');
-    box.style.display = 'flex';
-    text.innerText = msg;
-    box.style.color = isError ? '#ef4444' : 'inherit';
-}
-
-function parseCSV(text) {
-    return text.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+    if (box && text) {
+        box.style.display = 'flex';
+        text.innerText = msg;
+        box.style.color = isError ? '#ef4444' : '#0ea5e9';
+    }
 }
