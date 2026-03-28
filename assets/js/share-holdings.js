@@ -225,52 +225,52 @@ async function startSync() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
-        // 1. Fetch Prices with 'follow' redirect logic
         const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
         const sheetPrices = await res.json();
         const missing = [];
 
-        // 2. Map prices to holdings
-            processedHoldings.forEach(h => {
-            // Clean the symbol from your table (e.g., "ITC")
+        processedHoldings.forEach(h => {
             const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
             
+            // Find match in sheet
             const match = sheetPrices.find(p => {
                 if (!p.ticker) return false;
-                // Clean the ticker from the Google Sheet (e.g., "NSE:ITC" -> "ITC")
                 const cleanSheetTicker = String(p.ticker).replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
-                
-                // Exact match OR the sheet ticker contains the symbol (e.g. "500875" manually added)
                 return cleanSheetTicker === cleanHoldingsSymbol || cleanSheetTicker.includes(cleanHoldingsSymbol);
             });
-            
-            if (match && match.price && !isNaN(match.price) && parseFloat(match.price) > 0) {
-                h.current_price = parseFloat(match.price);
+
+            if (match) {
+                // IMPORTANT: Even if price is 0, we found the ticker, so don't mark as missing!
+                const val = parseFloat(match.price);
+                h.current_price = (!isNaN(val) && val > 0) ? val : 0;
+                
+                // If it's 0 in the sheet, it's not "missing", it's just "loading"
+                if (h.current_price === 0) {
+                    console.log(`Price for ${h.symbol} is 0 in Google Sheet. Check formula.`);
+                }
             } else {
+                // Only add to missing if the ticker is NOT in the sheet at all
                 missing.push(`NSE:${cleanHoldingsSymbol}`);
             }
         });
 
-        // 3. Handle Missing Tickers (POST them to Google)
         if (missing.length > 0) {
             showStatus(`Adding ${missing.length} new tickers to Sheet...`);
-            
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Mandatory for Google Apps Script POST
-                body: JSON.stringify({ tickers: [...new Set(missing)] }) // Unique tickers only
+                mode: 'no-cors',
+                body: JSON.stringify({ tickers: [...new Set(missing)] })
             });
-
-            showStatus("Tickers added! Google is calculating... Wait 10s and Sync again.");
+            showStatus("New tickers added! Wait 10s and Sync again.");
         } else {
-            showStatus("Portfolio prices updated successfully!");
+            showStatus("Portfolio prices updated!");
         }
         
         renderTable();
 
     } catch (e) {
         console.error("Sync Error:", e);
-        showStatus("Sync failed. Check if Script is deployed to 'Anyone'.", true);
+        showStatus("Sync failed. Check connection.", true);
     } finally {
         btn.innerHTML = originalHTML;
     }
