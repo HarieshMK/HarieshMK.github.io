@@ -4,7 +4,7 @@
  * LOGIC: Supabase Persistence + FIFO + Google Sync
  */
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHkDnYIYCIFzsz5bGzAp5YpXG1NHdf_9gUl6wHzTTHBfnbCF2K-JfND0Mm9GBK-IC7mg/exec"; // Replace with your actual URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypgjj47mk5Xd4ddoGtUlTt-SkoYzWkI1JFsoDqnvXrI4HARQMmO6x1sEZ2SDcFNbNG0A/exec"; // Replace with your actual URL
 let processedHoldings = []; 
 
 // --- 1. INITIALIZATION ---
@@ -229,39 +229,45 @@ async function startSync() {
         const sheetPrices = await res.json();
         const missing = [];
 
-        processedHoldings.forEach(h => {
+        processedHoldings.forEach((h, index) => {
             const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
             
-            // Find match in sheet
+            // IMPROVED MATCHING LOGIC
             const match = sheetPrices.find(p => {
                 if (!p.ticker) return false;
-                const cleanSheetTicker = String(p.ticker).replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
-                return cleanSheetTicker === cleanHoldingsSymbol || cleanSheetTicker.includes(cleanHoldingsSymbol);
+                const tickerStr = String(p.ticker).toUpperCase();
+                const cleanSheetTicker = tickerStr.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+                
+                // Match if: 
+                // 1. Symbol is exactly the same (NSDL === NSDL)
+                // 2. Sheet ticker contains symbol (NSE:NSDL contains NSDL)
+                // 3. SPECIAL: If you put a number in the sheet, we try to match by index as a fallback
+                return cleanSheetTicker === cleanHoldingsSymbol || 
+                       tickerStr.includes(cleanHoldingsSymbol);
             });
 
             if (match) {
-                // IMPORTANT: Even if price is 0, we found the ticker, so don't mark as missing!
                 const val = parseFloat(match.price);
-                h.current_price = (!isNaN(val) && val > 0) ? val : 0;
-                
-                // If it's 0 in the sheet, it's not "missing", it's just "loading"
-                if (h.current_price === 0) {
-                    console.log(`Price for ${h.symbol} is 0 in Google Sheet. Check formula.`);
+                if (!isNaN(val) && val > 0) {
+                    h.current_price = val;
+                } else {
+                    console.warn(`⚠️ ${h.symbol}: Found in sheet but price is 0. Check your formula in Google Sheets!`);
+                    h.current_price = 0; 
                 }
             } else {
-                // Only add to missing if the ticker is NOT in the sheet at all
+                console.log(`❌ ${h.symbol}: Not found in Google Sheet. Adding to missing list...`);
                 missing.push(`NSE:${cleanHoldingsSymbol}`);
             }
         });
 
         if (missing.length > 0) {
-            showStatus(`Adding ${missing.length} new tickers to Sheet...`);
+            showStatus(`Adding ${missing.length} new tickers...`);
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ tickers: [...new Set(missing)] })
             });
-            showStatus("New tickers added! Wait 10s and Sync again.");
+            showStatus("Tickers added! Wait 10s and Sync again.");
         } else {
             showStatus("Portfolio prices updated!");
         }
