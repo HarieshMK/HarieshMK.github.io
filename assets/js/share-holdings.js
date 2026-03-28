@@ -231,20 +231,23 @@ async function startSync() {
         const missing = [];
 
         // 2. Map prices to holdings
-        processedHoldings.forEach(h => {
-            // Remove any prefixes for a clean comparison
+            processedHoldings.forEach(h => {
+            // Clean the symbol from your table (e.g., "ITC")
             const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
             
             const match = sheetPrices.find(p => {
                 if (!p.ticker) return false;
-                const cleanSheetTicker = p.ticker.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
-                return cleanSheetTicker === cleanHoldingsSymbol;
+                // Clean the ticker from the Google Sheet (e.g., "NSE:ITC" -> "ITC")
+                const cleanSheetTicker = String(p.ticker).replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
+                
+                // Exact match OR the sheet ticker contains the symbol (e.g. "500875" manually added)
+                return cleanSheetTicker === cleanHoldingsSymbol || cleanSheetTicker.includes(cleanHoldingsSymbol);
             });
             
-            if (match && match.price && !isNaN(match.price) && match.price > 0) {
+            if (match && match.price && !isNaN(match.price) && parseFloat(match.price) > 0) {
                 h.current_price = parseFloat(match.price);
             } else {
-                missing.push(`NSE:${cleanHoldingsSymbol}`); // Default request as NSE
+                missing.push(`NSE:${cleanHoldingsSymbol}`);
             }
         });
 
