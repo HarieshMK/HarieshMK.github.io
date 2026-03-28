@@ -4,7 +4,7 @@
  * LOGIC: Supabase Persistence + FIFO + Google Sync
  */
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; // Replace with your actual URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkSFTyJzrmoV67msqbKwbFc5qcZ7T5Ul84WuBOGaCshYx8H-Agm0n2GXHw-UEaysGnZA/exec"; // Replace with your actual URL
 let processedHoldings = []; 
 
 // --- 1. INITIALIZATION ---
