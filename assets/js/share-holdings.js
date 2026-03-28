@@ -151,7 +151,7 @@ function calculateFIFO(trades) {
             qty: totalQty,
             avg_price: totalQty > 0 ? totalCost / totalQty : 0,
             invested: totalCost,
-            current_price: totalQty > 0 ? totalCost / totalQty : 0 // Placeholder
+            current_price: 0
         };
     }).filter(h => h.qty > 0);
 
@@ -232,15 +232,19 @@ async function startSync() {
 
         // 2. Map prices to holdings
         processedHoldings.forEach(h => {
-            const symbolOnly = h.symbol.replace('NSE:', '').trim().toUpperCase();
-            const match = sheetPrices.find(p => 
-                p.ticker && p.ticker.toUpperCase().includes(symbolOnly)
-            );
+            // Remove any prefixes for a clean comparison
+            const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
             
-            if (match && match.price && !isNaN(match.price)) {
+            const match = sheetPrices.find(p => {
+                if (!p.ticker) return false;
+                const cleanSheetTicker = p.ticker.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
+                return cleanSheetTicker === cleanHoldingsSymbol;
+            });
+            
+            if (match && match.price && !isNaN(match.price) && match.price > 0) {
                 h.current_price = parseFloat(match.price);
             } else {
-                missing.push(`NSE:${symbolOnly}`);
+                missing.push(`NSE:${cleanHoldingsSymbol}`); // Default request as NSE
             }
         });
 
