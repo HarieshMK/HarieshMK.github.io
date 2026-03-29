@@ -232,18 +232,17 @@ async function startSync() {
         processedHoldings.forEach((h, index) => {
             const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
             
-            // IMPROVED MATCHING LOGIC
             const match = sheetPrices.find(p => {
                 if (!p.ticker) return false;
-                const tickerStr = String(p.ticker).toUpperCase();
+                const tickerStr = String(p.ticker).toUpperCase().trim();
                 const cleanSheetTicker = tickerStr.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
                 
-                // Match if: 
-                // 1. Symbol is exactly the same (NSDL === NSDL)
-                // 2. Sheet ticker contains symbol (NSE:NSDL contains NSDL)
-                // 3. SPECIAL: If you put a number in the sheet, we try to match by index as a fallback
-                return cleanSheetTicker === cleanHoldingsSymbol || 
-                       tickerStr.includes(cleanHoldingsSymbol);
+                // 1. Exact match (ITC === ITC)
+                // 2. Full ticker match (NSE:ITC === NSE:ITC)
+                // 3. Clean match (NSE:ITC -> ITC === ITC)
+                return tickerStr === h.symbol || 
+                       tickerStr === `NSE:${cleanHoldingsSymbol}` || 
+                       cleanSheetTicker === cleanHoldingsSymbol;
             });
 
             if (match) {
