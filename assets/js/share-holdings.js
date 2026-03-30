@@ -100,6 +100,7 @@ function calculateFIFO(trades) {
 }
 
 // --- 4. THE SCANNER & ALERTS ---
+const scannedTickers = new Set(); // Add this at the top of your script
 async function checkAndAlert(symbol, purchaseDate) {
     const cleanSymbol = symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
     
@@ -113,19 +114,22 @@ async function checkAndAlert(symbol, purchaseDate) {
     if (!data || data.length === 0) {
         // Run Google scanner if no verified record exists
         const url = `${GOOGLE_SCRIPT_URL}?action=scan&ticker=${symbol}&date=${purchaseDate}`;
-        try {
-            const res = await fetch(url);
-            const result = await res.json();
+       try {
+        const res = await fetch(url);
+        const result = await res.json();
+        
+        if (result.isDropDetected) {
+            // FIX: Try both the prefixed ID and the clean ID
+            const idWithPrefix = `name-${symbol.replace(':', '-')}`;
+            const idClean = `name-${cleanSymbol}`;
+            const cell = document.getElementById(idWithPrefix) || document.getElementById(idClean);
             
-            if (result.isDropDetected) {
-                const cellId = `name-${symbol.replace(':', '-')}`;
-                const cell = document.getElementById(cellId);
-                if (cell && !cell.innerHTML.includes('⚠️')) {
-                    cell.innerHTML += ` <span title="Potential Split/Bonus detected" style="cursor:pointer; color:#f59e0b; margin-left:5px;" onclick="openCorpModal('${symbol}')">⚠️</span>`;
-                }
+            if (cell && !cell.innerHTML.includes('⚠️')) {
+                cell.innerHTML += ` <span title="Potential Split/Bonus detected" style="cursor:pointer; color:#f59e0b; margin-left:5px;" onclick="openCorpModal('${symbol}')">⚠️</span>`;
             }
-        } catch (e) { console.error("Scan error:", e); }
-    }
+        }
+    } catch (e) { console.error("Scan error:", e); }
+}
 }
 
 // --- 5. MODAL & SUBMISSION ---
