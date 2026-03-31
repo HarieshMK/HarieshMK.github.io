@@ -1,11 +1,12 @@
 /**
- * Share Holdings Engine v3.0
+ * Share Holdings Engine v4.0
  * STYLE: Share Holding Dashboard
- * LOGIC: Supabase Persistence + FIFO + Google Sync
+ * LOGIC: Supabase Persistence + FIFO + Google Sync + Corp Action Scanner
  */
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; // Replace with your actual URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypgjj47mk5Xd4ddoGtUlTt-SkoYzWkI1JFsoDqnvXrI4HARQMmO6x1sEZ2SDcFNbNG0A/exec"; 
 let processedHoldings = []; 
+let currentScanningSymbol = "";
 
 // --- 1. INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -39,7 +40,6 @@ async function loadPortfolioFromDB(userId) {
         .order('transaction_date', { ascending: true });
 
     if (!error && data) {
-        // Map database columns to match the FIFO engine expectations
         const mappedTrades = data.map(t => ({
             symbol: t.symbol,
             type: t.transaction_type,
@@ -48,75 +48,14 @@ async function loadPortfolioFromDB(userId) {
             date: t.transaction_date
         }));
         calculateFIFO(mappedTrades);
-        // Inside loadPortfolioFromDB, after calculateFIFO(mappedTrades);
         const syncBtn = document.getElementById('sync-btn');
-        if (syncBtn) syncBtn.disabled = false; // Enable the button once data is ready
+        if (syncBtn) syncBtn.disabled = false;
     }
-}
-
-async function handleFileUpload(file, userId) {
-    if (!file) return;
-    showStatus(`Reading ${file.name}...`);
-
-    const reader = new FileReader();
-    const isExcel = file.name.match(/\.(xlsx|xls)$/i);
-
-    reader.onload = async (e) => {
-        try {
-            let rawRows = [];
-            if (isExcel) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                rawRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
-            } else {
-                const text = e.target.result;
-                rawRows = text.split('\n').map(row => 
-                    row.split(',').map(cell => cell.replace(/"/g, '').trim())
-                );
-            }
-
-            const cleanData = findAndMapHeaders(rawRows);
-            
-            if (cleanData.length === 0) {
-                showStatus("Format Error: Headers not found.", true);
-                return;
-            }
-
-            const entries = cleanData.map(d => ({
-                user_id: userId,
-                symbol: d.symbol.toUpperCase(),
-                transaction_type: d.type,
-                quantity: d.qty,
-                price: d.price,
-                transaction_date: d.date,
-                source_hash: generateRowHash(d)
-            }));
-
-            const { error } = await supabase
-                .from('equity_transactions')
-                .upsert(entries, { onConflict: 'source_hash', ignoreDuplicates: true });
-
-            if (error) {
-                showStatus("Error saving: " + error.message, true);
-            } else {
-                showStatus("Trades synchronized! Updating portfolio...");
-                await loadPortfolioFromDB(userId);
-            }
-        } catch (err) {
-            console.error(err);
-            showStatus("System Error: Failed to process file.", true);
-        }
-    };
-
-    if (isExcel) reader.readAsArrayBuffer(file);
-    else reader.readAsText(file);
 }
 
 // --- 3. THE FIFO ENGINE ---
 function calculateFIFO(trades) {
     const portfolio = {};
-    // Sort to ensure FIFO is accurate
     trades.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     trades.forEach(trade => {
@@ -124,9 +63,8 @@ function calculateFIFO(trades) {
         if (!portfolio[symbol]) portfolio[symbol] = [];
         
         if (trade.type.includes('BUY') || trade.type.includes('BONUS')) {
-            // Bonus issues are essentially a BUY with price 0
             const price = trade.type.includes('BONUS') ? 0 : trade.price;
-            portfolio[symbol].push({ qty: trade.qty, price: price });
+            portfolio[symbol].push({ qty: trade.qty, price: price, date: trade.date });
         } else if (trade.type.includes('SELL')) {
             let sellQty = trade.qty;
             while (sellQty > 0 && portfolio[symbol].length > 0) {
@@ -146,33 +84,218 @@ function calculateFIFO(trades) {
         const lots = portfolio[symbol];
         const totalQty = lots.reduce((s, l) => s + l.qty, 0);
         const totalCost = lots.reduce((s, l) => s + (l.qty * l.price), 0);
+        const earliestDate = lots.length > 0 ? lots[0].date : '2000-01-01';
+        
         return {
             symbol,
             qty: totalQty,
             avg_price: totalQty > 0 ? totalCost / totalQty : 0,
             invested: totalCost,
-            current_price: 0
+            current_price: 0,
+            first_purchase: earliestDate
         };
     }).filter(h => h.qty > 0);
 
     renderTable();
 }
 
-// --- 4. HELPERS & SYNC ---
+// --- 4. THE SCANNER & ALERTS ---
+const scannedTickers = new Set(); // Add this at the top of your script
+async function checkAndAlert(symbol, purchaseDate) {
+    const cleanSymbol = symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+    
+    // Check Supabase for verified records first
+    const { data } = await supabase
+        .from('corporate_actions')
+        .select('*')
+        .eq('ticker_symbol', cleanSymbol)
+        .eq('status', 'verified');
+
+    if (!data || data.length === 0) {
+        // Run Google scanner if no verified record exists
+        const url = `${GOOGLE_SCRIPT_URL}?action=scan&ticker=${symbol}&date=${purchaseDate}`;
+       try {
+        const res = await fetch(url);
+        const result = await res.json();
+        
+        if (result.isDropDetected) {
+            // FIX: Try both the prefixed ID and the clean ID
+            const idWithPrefix = `name-${symbol.replace(':', '-')}`;
+            const idClean = `name-${cleanSymbol}`;
+            const cell = document.getElementById(idWithPrefix) || document.getElementById(idClean);
+            
+            if (cell && !cell.innerHTML.includes('⚠️')) {
+                cell.innerHTML += ` <span title="Potential Split/Bonus detected" style="cursor:pointer; color:#f59e0b; margin-left:5px;" onclick="openCorpModal('${symbol}')">⚠️</span>`;
+            }
+        }
+    } catch (e) { console.error("Scan error:", e); }
+}
+}
+
+// --- 5. MODAL & SUBMISSION ---
+function openCorpModal(symbol) {
+    currentScanningSymbol = symbol;
+    document.getElementById('modal-ticker').innerText = symbol;
+    document.getElementById('corp-modal').style.display = 'flex';
+}
+
+function closeCorpModal() {
+    document.getElementById('corp-modal').style.display = 'none';
+}
+
+async function submitForApproval() {
+    const type = document.getElementById('action-type').value;
+    const ratio = document.getElementById('action-ratio').value;
+    const date = document.getElementById('action-date').value;
+
+    if (!ratio || !date) { alert("Please fill all details"); return; }
+    const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+
+    const { error } = await supabase.from('corporate_actions').insert([{
+        ticker_symbol: cleanSymbol,
+        action_type: type,
+        ratio_factor: ratio,
+        record_date: date,
+        status: 'pending'
+    }]);
+
+    if (!error) {
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                ticker: cleanSymbol, type, ratio, date, isSubmission: true
+            })
+        });
+        alert("Submitted for approval! 🚀");
+        closeCorpModal();
+    } else {
+        alert("Error: " + error.message);
+    }
+}
+
+// --- 6. SYNC & RENDERING ---
+async function startSync() {
+    showStatus("Syncing prices...");
+    const btn = document.getElementById('sync-btn');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = 'Syncing...';
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
+        const sheetPrices = await res.json();
+        const missing = [];
+
+        processedHoldings.forEach(h => {
+            const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
+            const match = sheetPrices.find(p => {
+                const tickerStr = String(p.ticker || "").toUpperCase().trim();
+                const cleanSheetTicker = tickerStr.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+                return tickerStr === h.symbol || cleanSheetTicker === cleanHoldingsSymbol;
+            });
+
+            if (match && match.price > 0) h.current_price = parseFloat(match.price);
+            else missing.push(`NSE:${cleanHoldingsSymbol}`);
+        });
+
+        if (missing.length > 0) {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ tickers: [...new Set(missing)] })
+            });
+            showStatus("New tickers added. Wait 10s and Sync again.");
+        }
+        renderTable();
+    } catch (e) { showStatus("Sync failed.", true); }
+    finally { btn.innerHTML = originalHTML; }
+}
+
+function renderTable() {
+    const body = document.getElementById('holdings-body');
+    let totalInv = 0, totalCur = 0;
+    if (!body) return;
+
+    body.innerHTML = processedHoldings.map(h => {
+        const curVal = h.qty * h.current_price;
+        totalInv += h.invested; totalCur += curVal;
+        const plPct = h.invested > 0 ? (((curVal - h.invested) / h.invested) * 100).toFixed(2) : 0;
+        
+        // Trigger Scanner
+        checkAndAlert(h.symbol, h.first_purchase);
+
+        return `<tr>
+            <td id="name-${h.symbol.replace(':', '-')}"><b>${h.symbol}</b></td>
+            <td>${h.qty}</td>
+            <td>₹${h.avg_price.toFixed(2)}</td>
+            <td>₹${h.invested.toLocaleString('en-IN')}</td>
+            <td>₹${h.current_price.toFixed(2)}</td>
+            <td>₹${curVal.toLocaleString('en-IN')}</td>
+            <td style="color:${plPct>=0?'#10b981':'#ef4444'}">${plPct}%</td>
+        </tr>`;
+    }).join('');
+
+    updateTotals(totalInv, totalCur);
+}
+
+function updateTotals(totalInv, totalCur) {
+    if(document.getElementById('total-invested')) document.getElementById('total-invested').innerText = `₹${totalInv.toLocaleString('en-IN')}`;
+    if(document.getElementById('current-value')) document.getElementById('current-value').innerText = `₹${totalCur.toLocaleString('en-IN')}`;
+    const totalPL = totalCur - totalInv;
+    const plEl = document.getElementById('total-pl');
+    if (plEl) {
+        plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv > 0 ? ((totalPL/totalInv)*100).toFixed(2) : 0}%)`;
+        plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+    }
+}
+
+// --- 7. FILE HELPERS ---
+async function handleFileUpload(file, userId) {
+    if (!file) return;
+    showStatus(`Reading ${file.name}...`);
+    const reader = new FileReader();
+    const isExcel = file.name.match(/\.(xlsx|xls)$/i);
+
+    reader.onload = async (e) => {
+        try {
+            let rawRows = [];
+            if (isExcel) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: "" });
+            } else {
+                rawRows = e.target.result.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+            }
+
+            const cleanData = findAndMapHeaders(rawRows);
+            if (cleanData.length === 0) { showStatus("Headers not found.", true); return; }
+
+            const entries = cleanData.map(d => ({
+                user_id: userId,
+                symbol: d.symbol.toUpperCase(),
+                transaction_type: d.type,
+                quantity: d.qty,
+                price: d.price,
+                transaction_date: d.date,
+                source_hash: generateRowHash(d)
+            }));
+
+            const { error } = await supabase.from('equity_transactions').upsert(entries, { onConflict: 'source_hash', ignoreDuplicates: true });
+            if (error) showStatus("Save Error: " + error.message, true);
+            else await loadPortfolioFromDB(userId);
+        } catch (err) { showStatus("System Error", true); }
+    };
+    if (isExcel) reader.readAsArrayBuffer(file); else reader.readAsText(file);
+}
+
 function findAndMapHeaders(rows) {
     let headerIndex = -1;
     const req = ['symbol', 'quantity', 'price'];
-
     for (let i = 0; i < rows.length; i++) {
         const rowValues = rows[i].map(v => String(v || "").toLowerCase());
-        if (req.every(term => rowValues.some(col => col.includes(term)))) {
-            headerIndex = i;
-            break;
-        }
+        if (req.every(term => rowValues.some(col => col.includes(term)))) { headerIndex = i; break; }
     }
-
     if (headerIndex === -1) return [];
-
     const headers = rows[headerIndex].map(h => String(h || "").trim().toLowerCase());
     const sIdx = headers.findIndex(h => h.includes('symbol'));
     const qIdx = headers.findIndex(h => h.includes('quantity') || h.includes('qty'));
@@ -180,15 +303,13 @@ function findAndMapHeaders(rows) {
     const tIdx = headers.findIndex(h => h.includes('type'));
     const dIdx = headers.findIndex(h => h.includes('date') || h.includes('time'));
 
-    return rows.slice(headerIndex + 1)
-        .filter(row => row[sIdx])
-        .map(row => ({
-            symbol: row[sIdx],
-            type: (String(row[tIdx] || "BUY")).toUpperCase(),
-            qty: Math.abs(parseFloat(row[qIdx])),
-            price: parseFloat(row[pIdx]) || 0,
-            date: row[dIdx] || new Date().toISOString().split('T')[0]
-        }));
+    return rows.slice(headerIndex + 1).filter(row => row[sIdx]).map(row => ({
+        symbol: row[sIdx],
+        type: (String(row[tIdx] || "BUY")).toUpperCase(),
+        qty: Math.abs(parseFloat(row[qIdx])),
+        price: parseFloat(row[pIdx]) || 0,
+        date: row[dIdx] || new Date().toISOString().split('T')[0]
+    }));
 }
 
 function generateRowHash(row) {
@@ -204,111 +325,8 @@ function showStatus(msg, isError = false) {
     if (box && text) {
         box.style.display = 'flex';
         text.innerText = msg;
-        
-        // Red for error, Blue-ish for info
         box.style.backgroundColor = isError ? '#fee2e2' : '#f0f9ff';
-        box.style.border = isError ? '1px solid #ef4444' : '1px solid #0ea5e9';
         box.style.color = isError ? '#991b1b' : '#075985';
-
-        // ONLY hide if it's NOT an error. If it's an error, keep it there so you can read it!
-        if (!isError) {
-            setTimeout(() => { box.style.display = 'none'; }, 4000);
-        }
-    }
-}
-
-async function startSync() {
-    showStatus("Syncing with Google Market Engine...");
-    const btn = document.getElementById('sync-btn');
-    if (!btn) return;
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
-
-    try {
-        const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
-        const sheetPrices = await res.json();
-        const missing = [];
-
-        processedHoldings.forEach((h, index) => {
-            const cleanHoldingsSymbol = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
-            
-            // IMPROVED MATCHING LOGIC
-            const match = sheetPrices.find(p => {
-                if (!p.ticker) return false;
-                const tickerStr = String(p.ticker).toUpperCase();
-                const cleanSheetTicker = tickerStr.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
-                
-                // Match if: 
-                // 1. Symbol is exactly the same (NSDL === NSDL)
-                // 2. Sheet ticker contains symbol (NSE:NSDL contains NSDL)
-                // 3. SPECIAL: If you put a number in the sheet, we try to match by index as a fallback
-                return cleanSheetTicker === cleanHoldingsSymbol || 
-                       tickerStr.includes(cleanHoldingsSymbol);
-            });
-
-            if (match) {
-                const val = parseFloat(match.price);
-                if (!isNaN(val) && val > 0) {
-                    h.current_price = val;
-                } else {
-                    console.warn(`⚠️ ${h.symbol}: Found in sheet but price is 0. Check your formula in Google Sheets!`);
-                    h.current_price = 0; 
-                }
-            } else {
-                console.log(`❌ ${h.symbol}: Not found in Google Sheet. Adding to missing list...`);
-                missing.push(`NSE:${cleanHoldingsSymbol}`);
-            }
-        });
-
-        if (missing.length > 0) {
-            showStatus(`Adding ${missing.length} new tickers...`);
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ tickers: [...new Set(missing)] })
-            });
-            showStatus("Tickers added! Wait 10s and Sync again.");
-        } else {
-            showStatus("Portfolio prices updated!");
-        }
-        
-        renderTable();
-
-    } catch (e) {
-        console.error("Sync Error:", e);
-        showStatus("Sync failed. Check connection.", true);
-    } finally {
-        btn.innerHTML = originalHTML;
-    }
-}
-
-function renderTable() {
-    const body = document.getElementById('holdings-body');
-    let totalInv = 0, totalCur = 0;
-    if (!body) return;
-
-    body.innerHTML = processedHoldings.map(h => {
-        const curVal = h.qty * h.current_price;
-        totalInv += h.invested; totalCur += curVal;
-        const plPct = h.invested > 0 ? (((curVal - h.invested) / h.invested) * 100).toFixed(2) : 0;
-        return `<tr>
-            <td><b>${h.symbol}</b></td>
-            <td>${h.qty}</td>
-            <td>₹${h.avg_price.toFixed(2)}</td>
-            <td>₹${h.invested.toLocaleString('en-IN')}</td>
-            <td>₹${h.current_price.toFixed(2)}</td>
-            <td>₹${curVal.toLocaleString('en-IN')}</td>
-            <td style="color:${plPct>=0?'#10b981':'#ef4444'}">${plPct}%</td>
-        </tr>`;
-    }).join('');
-
-    if(document.getElementById('total-invested')) document.getElementById('total-invested').innerText = `₹${totalInv.toLocaleString('en-IN')}`;
-    if(document.getElementById('current-value')) document.getElementById('current-value').innerText = `₹${totalCur.toLocaleString('en-IN')}`;
-    
-    const totalPL = totalCur - totalInv;
-    const plEl = document.getElementById('total-pl');
-    if (plEl) {
-        plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv > 0 ? ((totalPL/totalInv)*100).toFixed(2) : 0}%)`;
-        plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+        if (!isError) setTimeout(() => { box.style.display = 'none'; }, 4000);
     }
 }
