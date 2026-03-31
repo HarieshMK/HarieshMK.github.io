@@ -71,7 +71,7 @@ async function loadPortfolioFromDB(userId) {
     }
 }
 
-// --- 3. THE FIFO ENGINE ---
+// --- 3. THE FIFO ENGINE (Corrected) ---
 function calculateFIFO(trades, corporateActions = []) {
     const portfolio = {};
 
@@ -89,9 +89,9 @@ function calculateFIFO(trades, corporateActions = []) {
 
         if (event.eventType === 'TRADE') {
             const type = (event.type || "").toUpperCase();
-            if (type.includes('BUY') || type.includes('BONUS')) {
-                const price = type.includes('BONUS') ? 0 : event.price;
-                portfolio[symbol].push({ qty: event.qty, price: price, date: event.date });
+            // We only process BUYs here. Bonus/Splits come from the CORP_ACTION logic below.
+            if (type.includes('BUY')) {
+                portfolio[symbol].push({ qty: event.qty, price: event.price, date: event.date });
             } 
             else if (type.includes('SELL')) {
                 let sellQty = event.qty;
@@ -108,8 +108,19 @@ function calculateFIFO(trades, corporateActions = []) {
             }
         } 
         else if (event.eventType === 'CORP_ACTION') {
-            if (event.action_type === 'MERGER' && portfolio[symbol].length > 0) {
-                const ratio = parseRatio(event.ratio_factor); 
+            const actionType = (event.action_type || "").toUpperCase();
+            const multiplier = parseFloat(event.ratio_factor) || 1;
+            
+            if (multiplier <= 0) return; // Safety check
+
+            if ((actionType === 'BONUS' || actionType === 'SPLIT') && portfolio[symbol].length > 0) {
+                portfolio[symbol].forEach(lot => {
+                    lot.qty = lot.qty * multiplier;
+                    lot.price = lot.price / multiplier; 
+                });
+                console.log(`${actionType} applied to ${symbol}: Multiplied by ${multiplier}`);
+            }
+            else if (actionType === 'MERGER' && portfolio[symbol].length > 0) {
                 const targetSymbol = (event.new_ticker || "").toUpperCase();
                 if (!targetSymbol) return;
 
@@ -122,7 +133,7 @@ function calculateFIFO(trades, corporateActions = []) {
                 });
                 
                 portfolio[symbol] = []; 
-                const newQty = totalOldQty * ratio;
+                const newQty = totalOldQty * multiplier;
                 if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
                 portfolio[targetSymbol].push({
                     qty: newQty,
@@ -147,14 +158,7 @@ function calculateFIFO(trades, corporateActions = []) {
         };
     }).filter(h => h.qty > 0);
 
-    console.log("Holdings processed:", processedHoldings.length);
     renderTable();
-}
-
-function parseRatio(ratioStr) {
-    if (!ratioStr || !ratioStr.includes(':')) return parseFloat(ratioStr) || 1;
-    const [newR, oldR] = ratioStr.split(':').map(Number);
-    return newR / oldR || 1;
 }
 
 // --- 4. MODAL LOGIC ---
@@ -175,23 +179,39 @@ function closeCorpModal() {
 }
 
 async function submitForApproval() {
-    const fields = {
-        type: document.getElementById('action-type').value,
-        ratio: document.getElementById('action-ratio').value,
-        date: document.getElementById('action-date').value,
-        newTicker: document.getElementById('new-ticker-input')?.value || ""
-    };
+    const type = document.getElementById('action-type').value;
+    const ratioStr = document.getElementById('action-ratio').value; // e.g., "1:1"
+    const date = document.getElementById('action-date').value;
+    const newTicker = document.getElementById('new-ticker-input')?.value || "";
 
-    if (!fields.ratio || !fields.date) { alert("Please fill all details"); return; }
-    
+    if (!ratioStr || !date) { alert("Please fill all details"); return; }
+
+    // --- ACCURATE RATIO CALCULATION ---
+    let numericRatio = 1;
+    if (ratioStr.includes(':')) {
+        const [partsA, partsB] = ratioStr.split(':').map(Number); // A:B
+        
+        if (type === 'BONUS') {
+            // Your logic was right: You get A additional for every B held.
+            // Total multiplier = (A + B) / B
+            numericRatio = (partsA + partsB) / partsB;
+        } 
+        else {
+            // Splits & Mergers: Usually a direct swap ratio (New / Old)
+            numericRatio = partsA / partsB;
+        }
+    } else {
+        numericRatio = parseFloat(ratioStr);
+    }
+
     const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
 
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
-        action_type: fields.type,
-        ratio_factor: fields.ratio,
-        record_date: fields.date,
-        new_ticker: fields.newTicker,
+        action_type: type,
+        ratio_factor: numericRatio, // Now a clean number (e.g., 2.0)
+        record_date: date,
+        new_ticker: newTicker,
         status: 'pending'
     }]);
 
@@ -199,16 +219,15 @@ async function submitForApproval() {
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({ ticker: cleanSymbol, ...fields, isSubmission: true })
+            body: JSON.stringify({ ticker: cleanSymbol, type, ratio: numericRatio, originalRatio: ratioStr, date, isSubmission: true })
         });
-        alert("Action submitted! 🚀");
+        alert(`Action submitted! Multiplier: ${numericRatio}x`);
         closeCorpModal();
     } else {
         alert("Submission failed: " + error.message);
     }
 }
-
-// --- 5. SYNC & RENDERING ---
+// --- 5. SYNC (Efficiency Improvement) ---
 async function startSync() {
     const btn = document.getElementById('sync-btn');
     const originalHTML = btn.innerHTML;
@@ -217,17 +236,24 @@ async function startSync() {
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
         const sheetPrices = await res.json();
-        const missing = [];
+        
+        // Efficiency: Create a Map for O(1) lookup instead of .find() inside a loop
+        const priceMap = new Map();
+        sheetPrices.forEach(p => {
+            const cleanSheetTicker = String(p.ticker || "").toUpperCase().trim().replace(/^(NSE:|BOM:|BSE:)/i, '');
+            priceMap.set(cleanSheetTicker, parseFloat(p.price));
+        });
 
+        const missing = [];
         processedHoldings.forEach(h => {
             const cleanSym = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
-            const match = sheetPrices.find(p => {
-                const sheetTicker = String(p.ticker || "").toUpperCase().trim().replace(/^(NSE:|BOM:|BSE:)/i, '');
-                return sheetTicker === cleanSym;
-            });
+            const price = priceMap.get(cleanSym);
 
-            if (match && match.price > 0) h.current_price = parseFloat(match.price);
-            else missing.push(`NSE:${cleanSym}`);
+            if (price && price > 0) {
+                h.current_price = price;
+            } else {
+                missing.push(`NSE:${cleanSym}`);
+            }
         });
 
         if (missing.length > 0) {
@@ -239,7 +265,10 @@ async function startSync() {
             showStatus("New stocks added to tracker. Refresh in 10s.");
         }
         renderTable();
-    } catch (e) { showStatus("Price sync failed.", true); }
+    } catch (e) { 
+        console.error(e);
+        showStatus("Price sync failed.", true); 
+    }
     finally { btn.innerHTML = originalHTML; }
 }
 
@@ -258,7 +287,13 @@ function renderTable() {
         const curVal = h.qty * h.current_price;
         totals.inv += h.invested; 
         totals.cur += curVal;
-        const plPct = h.invested > 0 ? (((curVal - h.invested) / h.invested) * 100).toFixed(2) : 0;
+     // If invested is 0 but we have current value, it's a 100% "Free" gain.
+        let plPct = 0;
+        if (h.invested > 0) {
+            plPct = (((curVal - h.invested) / h.invested) * 100).toFixed(2);
+        } else if (curVal > 0) {
+            plPct = "100.00"; // Represents a pure profit holding
+        }
         
         return `<tr>
             <td><b>${h.symbol}</b></td>
