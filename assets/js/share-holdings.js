@@ -2,7 +2,7 @@
  * Share Holdings Engine v5.2 - "The Diagnostic Fix"
  */
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypgjj47mk5Xd4ddoGtUlTt-SkoYzWkI1JFsoDqnvXrI4HARQMmO6x1sEZ2SDcFNbNG0A/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; 
 let processedHoldings = []; 
 let currentScanningSymbol = "";
 
