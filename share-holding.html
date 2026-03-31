@@ -1,133 +1,365 @@
----
-layout: default
-title: Share Holdings
----
+/**
+ * Share Holdings Engine v5.5
+ * LOGIC: Timeline-Aware FIFO + Global Corporate Actions + Non-Blocking UI
+ * PERSISTENCE: Supabase + Google Price Sync
+ */
 
-<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; 
+let processedHoldings = []; 
+let currentScanningSymbol = "";
 
-<div class="portfolio-container">
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <span class="metric-label">Invested Value</span>
-            <strong id="total-invested">₹0.00</strong>
-        </div>
-        <div class="metric-card highlight">
-            <span class="metric-label">Current Value</span>
-            <strong id="current-value">₹0.00</strong>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">Total P&L</span>
-            <strong id="total-pl">₹0.00 (0%)</strong>
-        </div>
-    </div>
-
-    <div class="actions-bar">
-        <div class="import-zone" id="drop-zone">
-            <i class="fas fa-file-import"></i>
-            <p>Drop your trade book here or <span>Browse</span></p>
-            <input type="file" id="csv-input" hidden accept=".csv, .xlsx, .xls, .xlsm">
-        </div>
-        <button id="sync-btn" class="primary-btn" disabled>
-            <i class="fas fa-sync-alt"></i> Run FIFO Sync
-        </button>
-    </div>
-
-    <div id="status-box" class="status-msg" style="display:none; align-items: center; gap: 10px; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-        <div class="spinner"></div>
-        <p id="status-text" style="margin: 0;">Processing transactions...</p>
-    </div>
-
-    <div class="table-container card">
-        <div class="table-header" style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h3 style="margin: 0;">Active Equity Holdings</h3>
-                <span class="sub-text" style="font-size: 0.8rem; color: #64748b;">Calculated using Timeline-Aware FIFO logic</span>
-            </div>
-        </div>
-        <div style="overflow-x: auto;">
-            <table id="holdings-table">
-                <thead>
-                    <tr>
-                        <th>Symbol</th>
-                        <th>Qty</th>
-                        <th>Avg. Price</th>
-                        <th>Invested</th>
-                        <th>Market Price</th>
-                        <th>Current Value</th>
-                        <th>P&L</th>
-                        <th style="text-align: center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="holdings-body">
-                    <tr>
-                        <td colspan="8" class="empty-state" style="text-align: center; padding: 40px; color: #94a3b8;">
-                            No holdings found. Upload your tradebook to begin.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div id="corp-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(4px);">
-    <div style="background:white; padding:30px; border-radius:20px; width:90%; max-width:420px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
-        <h3 style="margin-top:0; color:#1e293b; display: flex; justify-content: space-between;">
-            Log Action: <span id="modal-ticker" style="color: #0ea5e9;">---</span>
-        </h3>
-        
-        <div style="margin-bottom:15px;">
-            <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">Action Type</label>
-            <select id="action-type" onchange="toggleModalFields()" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; background: #f8fafc;">
-                <option value="SPLIT">Stock Split</option>
-                <option value="BONUS">Bonus Issue</option>
-                <option value="DEMERGER">Demerger</option>
-            </select>
-        </div>
-
-        <div id="ratio-fields-container">
-            <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">Ratio (e.g., 1:10 or 2:1)</label>
-            <input type="text" id="action-ratio" placeholder="1:10" 
-                   onblur="validateRatio(this)" 
-                   style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom: 5px;">
-            <small id="ratio-error" style="color: #ef4444; display: none;">Please use the format 'New:Old' (e.g., 1:10)</small>
-        </div>
-
-        <div id="demerger-fields-container" style="display:none;">
-            <div style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">New Company Ticker</label>
-                <input type="text" id="new-ticker" placeholder="e.g. JIOFIN" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
-            </div>
-            <div style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">Cost Allocation %</label>
-                <input type="number" id="cost-allocation" placeholder="e.g. 5" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
-            </div>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <label style="display:block; font-size:0.8rem; font-weight:bold; margin-bottom:5px;">Record Date (Ex-Date)</label>
-            <input type="date" id="action-date" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1;">
-        </div>
-
-        <div style="display:flex; gap:10px;">
-            <button onclick="submitForApproval()" style="flex:1; padding:12px; background:#0ea5e9; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Submit</button>
-            <button onclick="closeCorpModal()" style="flex:1; padding:12px; background:#f1f5f9; color:#64748b; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Cancel</button>
-        </div>
-    </div>
-</div>
-<style>
-    /* Action Menu Styles */
-    .action-btn {
-        background: none;
-        border: none;
-        color: #94a3b8;
-        cursor: pointer;
-        font-size: 1.2rem;
-        padding: 5px 10px;
-        border-radius: 6px;
+// --- 1. INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        showStatus("Please login to view your holdings.", true);
+        return;
     }
-    .action-btn:hover { background: #f1f5f9; color: #1e293b; }
+
+    await loadPortfolioFromDB(session.user.id);
+
+    const elements = {
+        dropZone: document.getElementById('drop-zone'),
+        csvInput: document.getElementById('csv-input'),
+        syncBtn: document.getElementById('sync-btn')
+    };
+
+    if (elements.dropZone && elements.csvInput) {
+        elements.dropZone.onclick = () => elements.csvInput.click();
+        elements.csvInput.onchange = (e) => handleFileUpload(e.target.files[0], session.user.id);
+    }
     
-    /* Ensure table rows handle alignment */
-    #holdings-table td { vertical-align: middle; }
-</style>
+    if (elements.syncBtn) elements.syncBtn.onclick = () => startSync();
+});
+
+// --- 2. DATA PERSISTENCE ---
+async function loadPortfolioFromDB(userId) {
+    showStatus("Loading portfolio...");
+    
+    // Fetch user trades
+    const { data: trades, error: tError } = await supabase
+        .from('equity_transactions')
+        .select('*')
+        .eq('user_id', userId);
+
+    // Fetch verified global corporate actions
+    const { data: actions, error: aError } = await supabase
+        .from('corporate_actions')
+        .select('*')
+        .eq('status', 'verified');
+
+    if (!tError && trades) {
+        calculateFIFO(trades, actions || [], userId);
+        const syncBtn = document.getElementById('sync-btn');
+        if (syncBtn) syncBtn.disabled = false;
+    }
+}
+
+// --- 3. THE FIFO ENGINE (Timeline-Aware) ---
+async function calculateFIFO(trades, globalActions, userId) {
+    const portfolio = {};
+    const demergerUpdates = [];
+
+    // 1. Create a Master Timeline with standardized dates
+    let timeline = [
+        ...trades.map(t => ({ ...t, eventType: 'TRADE', date: standardizeDate(t.transaction_date) })),
+        ...globalActions.map(a => ({ ...a, eventType: 'CORP_ACTION', date: standardizeDate(a.record_date) }))
+    ];
+
+    // 2. Sort strictly by date (oldest first)
+    timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 3. Process the Timeline
+    for (let event of timeline) {
+        const symbol = (event.symbol || event.ticker_symbol).toUpperCase();
+        if (!portfolio[symbol]) portfolio[symbol] = [];
+
+        if (event.eventType === 'TRADE') {
+            const type = (event.transaction_type || event.type).toUpperCase();
+            
+            if (type.includes('BUY') || type === 'DEMERGED' || type === 'BONUS') {
+                portfolio[symbol].push({ 
+                    qty: event.quantity || event.qty, 
+                    price: type === 'BONUS' ? 0 : event.price, 
+                    date: event.date 
+                });
+            } else if (type.includes('SELL')) {
+                let sellQty = event.quantity || event.qty;
+                while (sellQty > 0 && portfolio[symbol].length > 0) {
+                    let oldest = portfolio[symbol][0];
+                    if (oldest.qty <= sellQty) {
+                        sellQty -= oldest.qty;
+                        portfolio[symbol].shift();
+                    } else {
+                        oldest.qty -= sellQty;
+                        sellQty = 0;
+                    }
+                }
+            }
+        } 
+        else if (event.eventType === 'CORP_ACTION' && portfolio[symbol].length > 0) {
+            if (event.action_type === 'SPLIT' || event.action_type === 'BONUS') {
+                const ratio = parseRatio(event.ratio_factor);
+                portfolio[symbol].forEach(lot => {
+                    lot.qty *= ratio;
+                    lot.price /= ratio;
+                });
+            } 
+            else if (event.action_type === 'DEMERGER') {
+                const allocationPct = parseFloat(event.ratio_factor) / 100;
+                let totalQtyForNew = 0;
+                let totalCostForNew = 0;
+
+                portfolio[symbol].forEach(lot => {
+                    const costShift = lot.price * allocationPct;
+                    totalCostForNew += (costShift * lot.qty);
+                    totalQtyForNew += lot.qty;
+                    lot.price -= costShift; // Reduce parent cost basis
+                });
+
+                if (totalQtyForNew > 0 && event.new_ticker) {
+                    demergerUpdates.push({ userId, ticker: event.new_ticker, qty: totalQtyForNew, cost: totalCostForNew, date: event.date, parent: symbol });
+                }
+            }
+        }
+    }
+
+    // 4. Map to UI display format
+    processedHoldings = Object.keys(portfolio).map(symbol => {
+        const lots = portfolio[symbol];
+        const totalQty = lots.reduce((s, l) => s + l.qty, 0);
+        const totalCost = lots.reduce((s, l) => s + (l.qty * l.price), 0);
+        return {
+            symbol,
+            qty: totalQty,
+            avg_price: totalQty > 0 ? totalCost / totalQty : 0,
+            invested: totalCost,
+            current_price: 0
+        };
+    }).filter(h => h.qty > 0);
+
+    renderTable();
+
+    // Background: Process Demerged stocks into database
+    demergerUpdates.forEach(d => autoInsertDemergedStock(d.userId, d.ticker, d.qty, d.cost, d.date, d.parent));
+}
+
+// --- 4. CORPORATE ACTION HELPERS ---
+function standardizeDate(dateStr) {
+    if (!dateStr) return new Date().toISOString().split('T')[0];
+    if (dateStr.includes('-')) {
+        const parts = dateStr.split('-');
+        if (parts[0].length === 4) return dateStr; // YYYY-MM-DD
+        return `${parts[2]}-${parts[1]}-${parts[0]}`; // Convert DD-MM-YYYY
+    }
+    return dateStr;
+}
+
+function parseRatio(ratioStr) {
+    if (typeof ratioStr === 'number') return ratioStr;
+    if (!ratioStr.includes(':')) return parseFloat(ratioStr) || 1;
+    const [newR, oldR] = ratioStr.split(':').map(Number);
+    return newR / oldR;
+}
+
+async function autoInsertDemergedStock(userId, newSymbol, qty, totalCost, date, parentSymbol) {
+    const avgPrice = qty > 0 ? totalCost / qty : 0;
+    const hash = `demerge-${parentSymbol}-${newSymbol}-${userId}-${date}`;
+    await supabase.from('equity_transactions').upsert([{
+        user_id: userId,
+        symbol: newSymbol.toUpperCase(),
+        transaction_type: 'DEMERGED',
+        quantity: qty,
+        price: avgPrice,
+        transaction_date: date,
+        source_hash: hash
+    }], { onConflict: 'source_hash' });
+}
+
+// --- 5. MODAL UI HANDLERS ---
+function openCorpModal(symbol) {
+    currentScanningSymbol = symbol;
+    document.getElementById('modal-ticker').innerText = symbol;
+    document.getElementById('corp-modal').style.display = 'flex';
+    toggleModalFields(); // Reset field visibility
+}
+
+function closeCorpModal() {
+    document.getElementById('corp-modal').style.display = 'none';
+}
+
+function toggleModalFields() {
+    const type = document.getElementById('action-type').value;
+    document.getElementById('ratio-fields-container').style.display = (type === 'DEMERGER') ? 'none' : 'block';
+    document.getElementById('demerger-fields-container').style.display = (type === 'DEMERGER') ? 'block' : 'none';
+}
+
+function validateRatio(input) {
+    const errorMsg = document.getElementById('ratio-error');
+    const ratioPattern = /^\d+:\d+$/;
+    if (input.value && !ratioPattern.test(input.value)) {
+        errorMsg.style.display = 'block';
+        input.style.borderColor = '#ef4444';
+    } else {
+        errorMsg.style.display = 'none';
+        input.style.borderColor = '#cbd5e1';
+    }
+}
+
+async function submitForApproval() {
+    const type = document.getElementById('action-type').value;
+    const date = document.getElementById('action-date').value;
+    const ratioStr = document.getElementById('action-ratio').value;
+    const ticker = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+
+    if (!date) { alert("Please select a date"); return; }
+    if (type !== 'DEMERGER' && !/^\d+:\d+$/.test(ratioStr)) { alert("Format: New:Old (e.g. 1:10)"); return; }
+
+    let payload = {
+        ticker_symbol: ticker,
+        action_type: type,
+        record_date: date,
+        status: 'pending'
+    };
+
+    if (type === 'DEMERGER') {
+        payload.ratio_factor = document.getElementById('cost-allocation').value;
+        payload.new_ticker = document.getElementById('new-ticker').value;
+        if (!payload.ratio_factor || !payload.new_ticker) { alert("Fill demerger details"); return; }
+    } else {
+        payload.ratio_factor = ratioStr;
+    }
+
+    const { error } = await supabase.from('corporate_actions').insert([payload]);
+    if (!error) {
+        fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ ticker, ...payload, isSubmission: true }) });
+        alert("Action submitted for verification! 🚀");
+        closeCorpModal();
+    }
+}
+
+// --- 6. SYNC & RENDERING ---
+async function startSync() {
+    const btn = document.getElementById('sync-btn');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
+        const sheetPrices = await res.json();
+        const missing = [];
+
+        processedHoldings.forEach(h => {
+            const cleanSym = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
+            const match = sheetPrices.find(p => String(p.ticker || "").toUpperCase().includes(cleanSym));
+            if (match && match.price > 0) h.current_price = parseFloat(match.price);
+            else missing.push(`NSE:${cleanSym}`);
+        });
+
+        if (missing.length > 0) {
+            await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ tickers: [...new Set(missing)] }) });
+            showStatus("New stocks added to tracker. Refresh in 10s.");
+        }
+        renderTable();
+    } catch (e) { showStatus("Price sync failed.", true); }
+    finally { btn.innerHTML = originalHTML; }
+}
+
+function renderTable() {
+    const body = document.getElementById('holdings-body');
+    if (!body) return;
+    let totals = { inv: 0, cur: 0 };
+
+    body.innerHTML = processedHoldings.map(h => {
+        const curVal = h.qty * h.current_price;
+        totals.inv += h.invested; totals.cur += curVal;
+        const plPct = h.invested > 0 ? (((curVal - h.invested) / h.invested) * 100).toFixed(2) : 0;
+        return `<tr>
+            <td><b>${h.symbol}</b></td>
+            <td>${h.qty.toFixed(2)}</td>
+            <td>₹${h.avg_price.toFixed(2)}</td>
+            <td>₹${h.invested.toLocaleString('en-IN')}</td>
+            <td>₹${h.current_price.toFixed(2)}</td>
+            <td>₹${curVal.toLocaleString('en-IN')}</td>
+            <td style="color:${plPct >= 0 ? '#10b981' : '#ef4444'}">${plPct}%</td>
+            <td style="text-align:center;"><button class="action-btn" onclick="openCorpModal('${h.symbol}')">⋮</button></td>
+        </tr>`;
+    }).join('');
+    updateTotals(totals.inv, totals.cur);
+}
+
+function updateTotals(totalInv, totalCur) {
+    const invEl = document.getElementById('total-invested');
+    const curEl = document.getElementById('current-value');
+    const plEl = document.getElementById('total-pl');
+
+    if (invEl) invEl.innerText = `₹${totalInv.toLocaleString('en-IN')}`;
+    if (curEl) curEl.innerText = `₹${totalCur.toLocaleString('en-IN')}`;
+    
+    if (plEl) {
+        const totalPL = totalCur - totalInv;
+        plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv > 0 ? ((totalPL/totalInv)*100).toFixed(2) : 0}%)`;
+        plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+    }
+}
+
+// --- 7. FILE IMPORT ---
+async function handleFileUpload(file, userId) {
+    if (!file) return;
+    showStatus(`Reading ${file.name}...`);
+    const reader = new FileReader();
+    const isExcel = file.name.match(/\.(xlsx|xls)$/i);
+
+    reader.onload = async (e) => {
+        try {
+            let rawRows = [];
+            if (isExcel) {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: "" });
+            } else {
+                rawRows = e.target.result.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+            }
+
+            const cleanData = findAndMapHeaders(rawRows);
+            if (cleanData.length === 0) return showStatus("Headers not found.", true);
+
+            const entries = cleanData.map(d => ({
+                user_id: userId,
+                symbol: d.symbol.toUpperCase(),
+                transaction_type: d.type,
+                quantity: d.qty,
+                price: d.price,
+                transaction_date: d.date,
+                source_hash: 'h' + Math.abs(JSON.stringify(d).split("").reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0))
+            }));
+
+            const { error } = await supabase.from('equity_transactions').upsert(entries, { onConflict: 'source_hash' });
+            if (error) showStatus(error.message, true);
+            else await loadPortfolioFromDB(userId);
+        } catch (err) { showStatus("System Error", true); }
+    };
+    if (isExcel) reader.readAsArrayBuffer(file); else reader.readAsText(file);
+}
+
+function findAndMapHeaders(rows) {
+    let hIdx = rows.findIndex(r => ['symbol', 'quantity', 'price'].every(t => r.map(v=>String(v).toLowerCase()).some(c=>c.includes(t))));
+    if (hIdx === -1) return [];
+    const h = rows[hIdx].map(v => String(v).toLowerCase());
+    return rows.slice(hIdx + 1).filter(r => r[h.findIndex(c=>c.includes('symbol'))]).map(r => ({
+        symbol: r[h.findIndex(c=>c.includes('symbol'))],
+        type: (String(r[h.findIndex(c=>c.includes('type'))] || "BUY")).toUpperCase(),
+        qty: Math.abs(parseFloat(r[h.findIndex(c=>c.includes('quantity') || c.includes('qty'))])),
+        price: parseFloat(r[h.findIndex(c=>c.includes('price'))]) || 0,
+        date: r[h.findIndex(c=>c.includes('date') || c.includes('time'))] || new Date().toISOString().split('T')[0]
+    }));
+}
+
+function showStatus(msg, isError = false) {
+    const box = document.getElementById('status-box');
+    const text = document.getElementById('status-text');
+    if (box && text) {
+        box.style.display = 'flex'; text.innerText = msg;
+        box.style.backgroundColor = isError ? '#fee2e2' : '#f0f9ff';
+        if (!isError) setTimeout(() => box.style.display = 'none', 4000);
+    }
+}
