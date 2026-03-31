@@ -166,7 +166,8 @@ async function submitForApproval() {
     const fields = {
         type: document.getElementById('action-type').value,
         ratio: document.getElementById('action-ratio').value,
-        date: document.getElementById('action-date').value
+        date: document.getElementById('action-date').value,
+        newTicker: document.getElementById('new-ticker-input')?.value || ""
     };
 
     if (!fields.ratio || !fields.date) { alert("Please fill all details"); return; }
