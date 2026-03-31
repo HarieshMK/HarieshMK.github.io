@@ -32,17 +32,14 @@ title: Share Holdings
         </button>
     </div>
 
-    <div id="status-box" class="status-msg" style="display:none;">
-        <div class="spinner"></div>
+    <div id="status-box" class="status-msg" style="display:none; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
         <p id="status-text">Processing transactions...</p>
     </div>
 
     <div class="table-container card">
-        <div class="table-header">
-            <div>
-                <h3>Active Equity Holdings</h3>
-                <span class="sub-text">Calculated using Timeline-Aware FIFO logic</span>
-            </div>
+        <div class="table-header" style="padding: 20px;">
+            <h3>Active Equity Holdings</h3>
+            <span class="sub-text">Calculated using Timeline-Aware FIFO logic</span>
         </div>
         <div style="overflow-x: auto;">
             <table id="holdings-table">
@@ -60,7 +57,7 @@ title: Share Holdings
                 </thead>
                 <tbody id="holdings-body">
                     <tr>
-                        <td colspan="8" class="empty-state">
+                        <td colspan="8" class="empty-state" style="text-align: center; padding: 40px;">
                             No holdings found. Upload your tradebook to begin.
                         </td>
                     </tr>
@@ -109,31 +106,25 @@ title: Share Holdings
 <style>
     :root { --primary: #0ea5e9; --success: #10b981; --danger: #ef4444; --bg: #f8fafc; }
     .portfolio-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; font-family: 'Inter', sans-serif; }
-    
     .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
     .metric-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
     .metric-card.highlight { border-left: 5px solid var(--primary); }
     .metric-label { display: block; color: #64748b; font-size: 0.85rem; margin-bottom: 8px; font-weight: 500; }
     .metric-card strong { font-size: 1.5rem; color: #1e293b; }
-
     .actions-bar { display: flex; gap: 20px; margin-bottom: 25px; align-items: center; }
     .import-zone { flex: 1; background: white; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
     .import-zone:hover { border-color: var(--primary); background: #f0f9ff; }
-    
     .primary-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     .primary-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
-
     .card { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; overflow: hidden; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th { background: #f8fafc; padding: 15px 20px; font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; }
     td { padding: 18px 20px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 0.95rem; }
-    
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: white; padding: 30px; border-radius: 20px; width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
     .field-group { margin-bottom: 15px; }
     .field-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
     .field-group input, .field-group select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; }
-    
     .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
     .btn-confirm { flex: 1; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn-cancel { flex: 1; background: #f1f5f9; color: #64748b; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
