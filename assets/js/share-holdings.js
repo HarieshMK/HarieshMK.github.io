@@ -1,7 +1,5 @@
 /**
- * Share Holdings Engine v5.0
- * STYLE: Community-Driven Dashboard
- * LOGIC: Supabase Persistence + FIFO + Google Price Sync
+ * Share Holdings Engine v5.1 (Fixed Alignment & IDs)
  */
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; 
@@ -18,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadPortfolioFromDB(session.user.id);
 
-    // Setup UI Listeners
     const elements = {
         dropZone: document.getElementById('drop-zone'),
         csvInput: document.getElementById('csv-input'),
@@ -36,14 +33,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- 2. DATA PERSISTENCE ---
 async function loadPortfolioFromDB(userId) {
     showStatus("Loading portfolio...");
-    
-    // Fetch both tables
-    const [tradesRes, corpRes] = await Promise.all([
-        supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
-        supabase.from('corporate_actions').select('*').eq('status', 'verified') // Only verified ones
-    ]);
+    try {
+        const [tradesRes, corpRes] = await Promise.all([
+            supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
+            supabase.from('corporate_actions').select('*').eq('status', 'verified')
+        ]);
 
-    if (!tradesRes.error && tradesRes.data) {
+        if (tradesRes.error) throw tradesRes.error;
+
         const mappedTrades = tradesRes.data.map(t => ({
             symbol: t.symbol,
             type: t.transaction_type,
@@ -52,35 +49,31 @@ async function loadPortfolioFromDB(userId) {
             date: t.transaction_date
         }));
         
-        // Pass both to the engine
         calculateFIFO(mappedTrades, corpRes.data || []);
         
         const syncBtn = document.getElementById('sync-btn');
         if (syncBtn) syncBtn.disabled = false;
+    } catch (err) {
+        showStatus("Error loading data: " + err.message, true);
     }
 }
 
-// --- 3. THE FIFO ENGINE (Timeline-Aware) ---
+// --- 3. THE FIFO ENGINE ---
 function calculateFIFO(trades, corporateActions = []) {
     const portfolio = {};
-
-    // 1. Create a Master Timeline (Combined Trades + Corporate Actions)
     let timeline = [
         ...trades.map(t => ({ ...t, eventType: 'TRADE', date: new Date(t.date || t.transaction_date) })),
         ...corporateActions.map(a => ({ ...a, eventType: 'CORP_ACTION', date: new Date(a.record_date) }))
     ];
 
-    // 2. Sort strictly by date (Oldest to Newest)
     timeline.sort((a, b) => a.date - b.date);
 
-    // 3. Process the Timeline
     timeline.forEach(event => {
         const symbol = (event.symbol || event.ticker_symbol).toUpperCase();
         if (!portfolio[symbol]) portfolio[symbol] = [];
 
         if (event.eventType === 'TRADE') {
             const type = event.type.toUpperCase();
-            
             if (type.includes('BUY') || type.includes('BONUS')) {
                 const price = type.includes('BONUS') ? 0 : event.price;
                 portfolio[symbol].push({ qty: event.qty, price: price, date: event.date });
@@ -100,11 +93,9 @@ function calculateFIFO(trades, corporateActions = []) {
             }
         } 
         else if (event.eventType === 'CORP_ACTION') {
-            // --- NEW: LOGIC FOR MERGERS & SPLITS ---
             if (event.action_type === 'MERGER' && portfolio[symbol].length > 0) {
                 const ratio = parseRatio(event.ratio_factor); 
                 const targetSymbol = event.new_ticker.toUpperCase();
-                
                 let totalOldCost = 0;
                 let totalOldQty = 0;
 
@@ -113,8 +104,7 @@ function calculateFIFO(trades, corporateActions = []) {
                     totalOldQty += lot.qty;
                 });
                 
-                portfolio[symbol] = []; // Company A is now gone
-
+                portfolio[symbol] = []; 
                 const newQty = totalOldQty * ratio;
                 if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
                 portfolio[targetSymbol].push({
@@ -124,11 +114,9 @@ function calculateFIFO(trades, corporateActions = []) {
                     type: 'MERGER_IN'
                 });
             }
-            // Add Split/Bonus logic here later
         }
     });
 
-    // 4. Map to Display
     processedHoldings = Object.keys(portfolio).map(symbol => {
         const lots = portfolio[symbol];
         const totalQty = lots.reduce((s, l) => s + l.qty, 0);
@@ -145,13 +133,19 @@ function calculateFIFO(trades, corporateActions = []) {
     renderTable();
 }
 
-// Helper to handle "42:25" or "1:10"
 function parseRatio(ratioStr) {
     if (!ratioStr.includes(':')) return parseFloat(ratioStr);
     const [newR, oldR] = ratioStr.split(':').map(Number);
     return newR / oldR;
 }
-// --- 4. MANUAL CORPORATE ACTION MODAL ---
+
+// --- 4. MODAL LOGIC ---
+function toggleModalFields() {
+    const type = document.getElementById('action-type').value;
+    const container = document.getElementById('new-ticker-container');
+    if(container) container.style.display = (type === 'MERGER' || type === 'DEMERGER') ? 'block' : 'none';
+}
+
 function openCorpModal(symbol) {
     currentScanningSymbol = symbol;
     document.getElementById('modal-ticker').innerText = symbol;
@@ -174,25 +168,22 @@ async function submitForApproval() {
     
     const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
 
-    // 1. Save to Supabase (Status: Pending)
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
         action_type: fields.type,
         ratio_factor: fields.ratio,
         record_date: fields.date,
+        new_ticker: fields.newTicker, // Fixed column name mapping
         status: 'pending'
     }]);
 
     if (!error) {
-        // 2. Log to Google Sheet for Admin tracking
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({
-                ticker: cleanSymbol, ...fields, isSubmission: true
-            })
+            body: JSON.stringify({ ticker: cleanSymbol, ...fields, isSubmission: true })
         });
-        alert("Action submitted! Once verified by UMC, it will reflect in your holdings. 🚀");
+        alert("Action submitted! Once verified by UMC, it will reflect. 🚀");
         closeCorpModal();
     } else {
         alert("Submission failed: " + error.message);
@@ -203,7 +194,7 @@ async function submitForApproval() {
 async function startSync() {
     const btn = document.getElementById('sync-btn');
     const originalHTML = btn.innerHTML;
-    btn.innerHTML = 'Updating Prices...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
@@ -221,14 +212,13 @@ async function startSync() {
             else missing.push(`NSE:${cleanSym}`);
         });
 
-        // Add missing tickers to Google Sheet automatically
         if (missing.length > 0) {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ tickers: [...new Set(missing)] })
             });
-            showStatus("New stocks added to tracker. Refresh in 10s.");
+            showStatus("New stocks added to tracker. Wait 10s and Sync again.");
         }
         renderTable();
     } catch (e) { showStatus("Price sync failed.", true); }
@@ -255,6 +245,11 @@ function renderTable() {
             <td>₹${h.current_price.toFixed(2)}</td>
             <td>₹${curVal.toLocaleString('en-IN')}</td>
             <td style="color:${plPct >= 0 ? '#10b981' : '#ef4444'}">${plPct}%</td>
+            <td style="text-align:center;">
+                <button onclick="openCorpModal('${h.symbol}')" class="action-btn" title="Log Corporate Action">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+            </td>
         </tr>`;
     }).join('');
 
@@ -272,69 +267,7 @@ function updateTotals(totalInv, totalCur) {
     }
 }
 
-// --- 7. FILE HELPERS ---
-async function handleFileUpload(file, userId) {
-    if (!file) return;
-    showStatus(`Reading ${file.name}...`);
-    const reader = new FileReader();
-    const isExcel = file.name.match(/\.(xlsx|xls)$/i);
-
-    reader.onload = async (e) => {
-        try {
-            let rawRows = [];
-            if (isExcel) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: "" });
-            } else {
-                rawRows = e.target.result.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
-            }
-
-            const cleanData = findAndMapHeaders(rawRows);
-            if (cleanData.length === 0) { showStatus("Headers not found.", true); return; }
-
-            const entries = cleanData.map(d => ({
-                user_id: userId,
-                symbol: d.symbol.toUpperCase(),
-                transaction_type: d.type,
-                quantity: d.qty,
-                price: d.price,
-                transaction_date: d.date,
-                source_hash: generateRowHash(d)
-            }));
-
-            const { error } = await supabase.from('equity_transactions').upsert(entries, { onConflict: 'source_hash', ignoreDuplicates: true });
-            if (error) showStatus("Save Error: " + error.message, true);
-            else await loadPortfolioFromDB(userId);
-        } catch (err) { showStatus("System Error", true); }
-    };
-    if (isExcel) reader.readAsArrayBuffer(file); else reader.readAsText(file);
-}
-
-function findAndMapHeaders(rows) {
-    let headerIndex = -1;
-    const req = ['symbol', 'quantity', 'price'];
-    for (let i = 0; i < rows.length; i++) {
-        const rowValues = rows[i].map(v => String(v || "").toLowerCase());
-        if (req.every(term => rowValues.some(col => col.includes(term)))) { headerIndex = i; break; }
-    }
-    if (headerIndex === -1) return [];
-    const headers = rows[headerIndex].map(h => String(h || "").trim().toLowerCase());
-    const sIdx = headers.findIndex(h => h.includes('symbol'));
-    const qIdx = headers.findIndex(h => h.includes('quantity') || h.includes('qty'));
-    const pIdx = headers.findIndex(h => h.includes('price'));
-    const tIdx = headers.findIndex(h => h.includes('type'));
-    const dIdx = headers.findIndex(h => h.includes('date') || h.includes('time'));
-
-    return rows.slice(headerIndex + 1).filter(row => row[sIdx]).map(row => ({
-        symbol: row[sIdx],
-        type: (String(row[tIdx] || "BUY")).toUpperCase(),
-        qty: Math.abs(parseFloat(row[qIdx])),
-        price: parseFloat(row[pIdx]) || 0,
-        date: row[dIdx] || new Date().toISOString().split('T')[0]
-    }));
-}
-
+// --- 7. HELPERS ---
 function generateRowHash(row) {
     const s = JSON.stringify(row);
     let h = 0;
