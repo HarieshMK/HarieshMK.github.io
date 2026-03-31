@@ -1,7 +1,5 @@
 /**
- * Share Holdings Engine v5.1
- * STYLE: Community-Driven Dashboard
- * LOGIC: Supabase Persistence + FIFO + Google Price Sync
+ * Share Holdings Engine v5.2 - "The Diagnostic Fix"
  */
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypgjj47mk5Xd4ddoGtUlTt-SkoYzWkI1JFsoDqnvXrI4HARQMmO6x1sEZ2SDcFNbNG0A/exec"; 
@@ -9,13 +7,20 @@ let processedHoldings = [];
 let currentScanningSymbol = "";
 
 // --- 1. INITIALIZATION ---
+// We use a small delay or explicit check to ensure session is caught
 document.addEventListener('DOMContentLoaded', async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    console.log("Initializing Portfolio Engine...");
+    
+    // Explicitly wait for the session
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session) {
+        console.error("Auth Session missing:", error);
         showStatus("Please login to view your holdings.", true);
         return;
     }
 
+    console.log("User authenticated:", session.user.id);
     await loadPortfolioFromDB(session.user.id);
 
     // Setup UI Listeners
@@ -24,16 +29,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const syncBtn = document.getElementById('sync-btn');
 
     if (dropZone && csvInput) {
-        dropZone.onclick = () => csvInput.click();
+        dropZone.onclick = () => {
+            console.log("Browse clicked");
+            csvInput.click();
+        };
         csvInput.onchange = (e) => handleFileUpload(e.target.files[0], session.user.id);
     }
     
-    if (syncBtn) syncBtn.onclick = () => startSync();
+    if (syncBtn) {
+        syncBtn.onclick = () => startSync();
+        syncBtn.disabled = false; // Enable it once we know we're logged in
+    }
 });
 
 // --- 2. DATA PERSISTENCE ---
 async function loadPortfolioFromDB(userId) {
-    showStatus("Loading portfolio...");
+    showStatus("Fetching data...");
     try {
         const [tradesRes, corpRes] = await Promise.all([
             supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
@@ -41,20 +52,21 @@ async function loadPortfolioFromDB(userId) {
         ]);
 
         if (tradesRes.error) throw tradesRes.error;
+        
+        console.log("Raw Trades fetched:", tradesRes.data.length);
 
         const mappedTrades = tradesRes.data.map(t => ({
             symbol: t.symbol,
-            type: t.transaction_type,
-            qty: t.quantity,
-            price: t.price,
+            type: t.transaction_type || 'BUY',
+            qty: parseFloat(t.quantity),
+            price: parseFloat(t.price),
             date: t.transaction_date
         }));
         
         calculateFIFO(mappedTrades, corpRes.data || []);
         
-        const syncBtn = document.getElementById('sync-btn');
-        if (syncBtn) syncBtn.disabled = false;
     } catch (err) {
+        console.error("Load Error:", err);
         showStatus("Error loading data: " + err.message, true);
     }
 }
@@ -64,18 +76,19 @@ function calculateFIFO(trades, corporateActions = []) {
     const portfolio = {};
 
     let timeline = [
-        ...trades.map(t => ({ ...t, eventType: 'TRADE', date: new Date(t.date || t.transaction_date) })),
+        ...trades.map(t => ({ ...t, eventType: 'TRADE', date: new Date(t.date) })),
         ...corporateActions.map(a => ({ ...a, eventType: 'CORP_ACTION', date: new Date(a.record_date) }))
     ];
 
     timeline.sort((a, b) => a.date - b.date);
 
     timeline.forEach(event => {
-        const symbol = (event.symbol || event.ticker_symbol).toUpperCase();
+        const symbol = (event.symbol || event.ticker_symbol || "").toUpperCase();
+        if (!symbol) return;
         if (!portfolio[symbol]) portfolio[symbol] = [];
 
         if (event.eventType === 'TRADE') {
-            const type = event.type.toUpperCase();
+            const type = (event.type || "").toUpperCase();
             if (type.includes('BUY') || type.includes('BONUS')) {
                 const price = type.includes('BONUS') ? 0 : event.price;
                 portfolio[symbol].push({ qty: event.qty, price: price, date: event.date });
@@ -97,7 +110,9 @@ function calculateFIFO(trades, corporateActions = []) {
         else if (event.eventType === 'CORP_ACTION') {
             if (event.action_type === 'MERGER' && portfolio[symbol].length > 0) {
                 const ratio = parseRatio(event.ratio_factor); 
-                const targetSymbol = event.new_ticker.toUpperCase();
+                const targetSymbol = (event.new_ticker || "").toUpperCase();
+                if (!targetSymbol) return;
+
                 let totalOldCost = 0;
                 let totalOldQty = 0;
 
@@ -132,13 +147,14 @@ function calculateFIFO(trades, corporateActions = []) {
         };
     }).filter(h => h.qty > 0);
 
+    console.log("Holdings processed:", processedHoldings.length);
     renderTable();
 }
 
 function parseRatio(ratioStr) {
-    if (!ratioStr.includes(':')) return parseFloat(ratioStr);
+    if (!ratioStr || !ratioStr.includes(':')) return parseFloat(ratioStr) || 1;
     const [newR, oldR] = ratioStr.split(':').map(Number);
-    return newR / oldR;
+    return newR / oldR || 1;
 }
 
 // --- 4. MODAL LOGIC ---
@@ -185,7 +201,7 @@ async function submitForApproval() {
             mode: 'no-cors',
             body: JSON.stringify({ ticker: cleanSymbol, ...fields, isSubmission: true })
         });
-        alert("Action submitted! Once verified, it will reflect. 🚀");
+        alert("Action submitted! 🚀");
         closeCorpModal();
     } else {
         alert("Submission failed: " + error.message);
@@ -215,7 +231,7 @@ async function startSync() {
         });
 
         if (missing.length > 0) {
-            await fetch(GOOGLE_SCRIPT_URL, {
+            fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({ tickers: [...new Set(missing)] })
@@ -231,6 +247,11 @@ function renderTable() {
     const body = document.getElementById('holdings-body');
     if (!body) return;
     
+    if (processedHoldings.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">No active holdings found.</td></tr>';
+        return;
+    }
+
     let totals = { inv: 0, cur: 0 };
 
     body.innerHTML = processedHoldings.map(h => {
@@ -259,11 +280,15 @@ function renderTable() {
 }
 
 function updateTotals(totalInv, totalCur) {
-    if(document.getElementById('total-invested')) document.getElementById('total-invested').innerText = `₹${totalInv.toLocaleString('en-IN')}`;
-    if(document.getElementById('current-value')) document.getElementById('current-value').innerText = `₹${totalCur.toLocaleString('en-IN')}`;
-    const totalPL = totalCur - totalInv;
+    const invEl = document.getElementById('total-invested');
+    const curEl = document.getElementById('current-value');
     const plEl = document.getElementById('total-pl');
+
+    if(invEl) invEl.innerText = `₹${totalInv.toLocaleString('en-IN')}`;
+    if(curEl) curEl.innerText = `₹${totalCur.toLocaleString('en-IN')}`;
+    
     if (plEl) {
+        const totalPL = totalCur - totalInv;
         plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv > 0 ? ((totalPL/totalInv)*100).toFixed(2) : 0}%)`;
         plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
     }
