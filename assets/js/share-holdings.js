@@ -36,59 +36,103 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- 2. DATA PERSISTENCE ---
 async function loadPortfolioFromDB(userId) {
     showStatus("Loading portfolio...");
-    const { data, error } = await supabase
-        .from('equity_transactions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('transaction_date', { ascending: true });
+    
+    // Fetch both tables
+    const [tradesRes, corpRes] = await Promise.all([
+        supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
+        supabase.from('corporate_actions').select('*').eq('status', 'verified') // Only verified ones
+    ]);
 
-    if (!error && data) {
-        const mappedTrades = data.map(t => ({
+    if (!tradesRes.error && tradesRes.data) {
+        const mappedTrades = tradesRes.data.map(t => ({
             symbol: t.symbol,
             type: t.transaction_type,
             qty: t.quantity,
             price: t.price,
             date: t.transaction_date
         }));
-        calculateFIFO(mappedTrades);
+        
+        // Pass both to the engine
+        calculateFIFO(mappedTrades, corpRes.data || []);
+        
         const syncBtn = document.getElementById('sync-btn');
         if (syncBtn) syncBtn.disabled = false;
     }
 }
 
-// --- 3. THE FIFO ENGINE ---
-function calculateFIFO(trades) {
+// --- 3. THE FIFO ENGINE (Timeline-Aware) ---
+function calculateFIFO(trades, corporateActions = []) {
     const portfolio = {};
-    // Sort chronological order
-    trades.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    trades.forEach(trade => {
-        const symbol = trade.symbol.toUpperCase();
+    // 1. Create a Master Timeline (Combined Trades + Corporate Actions)
+    let timeline = [
+        ...trades.map(t => ({ ...t, eventType: 'TRADE', date: new Date(t.date || t.transaction_date) })),
+        ...corporateActions.map(a => ({ ...a, eventType: 'CORP_ACTION', date: new Date(a.record_date) }))
+    ];
+
+    // 2. Sort strictly by date (Oldest to Newest)
+    timeline.sort((a, b) => a.date - b.date);
+
+    // 3. Process the Timeline
+    timeline.forEach(event => {
+        const symbol = (event.symbol || event.ticker_symbol).toUpperCase();
         if (!portfolio[symbol]) portfolio[symbol] = [];
-        
-        if (trade.type.includes('BUY') || trade.type.includes('BONUS')) {
-            const price = trade.type.includes('BONUS') ? 0 : trade.price;
-            portfolio[symbol].push({ qty: trade.qty, price: price, date: trade.date });
-        } else if (trade.type.includes('SELL')) {
-            let sellQty = trade.qty;
-            while (sellQty > 0 && portfolio[symbol].length > 0) {
-                let oldest = portfolio[symbol][0];
-                if (oldest.qty <= sellQty) {
-                    sellQty -= oldest.qty;
-                    portfolio[symbol].shift();
-                } else {
-                    oldest.qty -= sellQty;
-                    sellQty = 0;
+
+        if (event.eventType === 'TRADE') {
+            const type = event.type.toUpperCase();
+            
+            if (type.includes('BUY') || type.includes('BONUS')) {
+                const price = type.includes('BONUS') ? 0 : event.price;
+                portfolio[symbol].push({ qty: event.qty, price: price, date: event.date });
+            } 
+            else if (type.includes('SELL')) {
+                let sellQty = event.qty;
+                while (sellQty > 0 && portfolio[symbol].length > 0) {
+                    let oldest = portfolio[symbol][0];
+                    if (oldest.qty <= sellQty) {
+                        sellQty -= oldest.qty;
+                        portfolio[symbol].shift();
+                    } else {
+                        oldest.qty -= sellQty;
+                        sellQty = 0;
+                    }
                 }
             }
+        } 
+        else if (event.eventType === 'CORP_ACTION') {
+            // --- NEW: LOGIC FOR MERGERS & SPLITS ---
+            if (event.action_type === 'MERGER' && portfolio[symbol].length > 0) {
+                const ratio = parseRatio(event.ratio_factor); 
+                const targetSymbol = event.new_ticker.toUpperCase();
+                
+                let totalOldCost = 0;
+                let totalOldQty = 0;
+
+                portfolio[symbol].forEach(lot => {
+                    totalOldCost += (lot.qty * lot.price);
+                    totalOldQty += lot.qty;
+                });
+                
+                portfolio[symbol] = []; // Company A is now gone
+
+                const newQty = totalOldQty * ratio;
+                if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
+                portfolio[targetSymbol].push({
+                    qty: newQty,
+                    price: totalOldCost / newQty,
+                    date: event.date,
+                    type: 'MERGER_IN'
+                });
+            }
+            // Add Split/Bonus logic here later
         }
     });
 
+    // 4. Map to Display
     processedHoldings = Object.keys(portfolio).map(symbol => {
         const lots = portfolio[symbol];
         const totalQty = lots.reduce((s, l) => s + l.qty, 0);
         const totalCost = lots.reduce((s, l) => s + (l.qty * l.price), 0);
-        
         return {
             symbol,
             qty: totalQty,
@@ -101,6 +145,12 @@ function calculateFIFO(trades) {
     renderTable();
 }
 
+// Helper to handle "42:25" or "1:10"
+function parseRatio(ratioStr) {
+    if (!ratioStr.includes(':')) return parseFloat(ratioStr);
+    const [newR, oldR] = ratioStr.split(':').map(Number);
+    return newR / oldR;
+}
 // --- 4. MANUAL CORPORATE ACTION MODAL ---
 function openCorpModal(symbol) {
     currentScanningSymbol = symbol;
