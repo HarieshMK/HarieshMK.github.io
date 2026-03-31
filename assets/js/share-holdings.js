@@ -1,5 +1,5 @@
 /**
- * Share Holdings Engine v5.0
+ * Share Holdings Engine v5.1
  * STYLE: Community-Driven Dashboard
  * LOGIC: Supabase Persistence + FIFO + Google Price Sync
  */
@@ -19,31 +19,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadPortfolioFromDB(session.user.id);
 
     // Setup UI Listeners
-    const elements = {
-        dropZone: document.getElementById('drop-zone'),
-        csvInput: document.getElementById('csv-input'),
-        syncBtn: document.getElementById('sync-btn')
-    };
+    const dropZone = document.getElementById('drop-zone');
+    const csvInput = document.getElementById('csv-input');
+    const syncBtn = document.getElementById('sync-btn');
 
-    if (elements.dropZone && elements.csvInput) {
-        elements.dropZone.onclick = () => elements.csvInput.click();
-        elements.csvInput.onchange = (e) => handleFileUpload(e.target.files[0], session.user.id);
+    if (dropZone && csvInput) {
+        dropZone.onclick = () => csvInput.click();
+        csvInput.onchange = (e) => handleFileUpload(e.target.files[0], session.user.id);
     }
     
-    if (elements.syncBtn) elements.syncBtn.onclick = () => startSync();
+    if (syncBtn) syncBtn.onclick = () => startSync();
 });
 
 // --- 2. DATA PERSISTENCE ---
 async function loadPortfolioFromDB(userId) {
     showStatus("Loading portfolio...");
-    
-    // Fetch both tables
-    const [tradesRes, corpRes] = await Promise.all([
-        supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
-        supabase.from('corporate_actions').select('*').eq('status', 'verified') // Only verified ones
-    ]);
+    try {
+        const [tradesRes, corpRes] = await Promise.all([
+            supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
+            supabase.from('corporate_actions').select('*').eq('status', 'verified')
+        ]);
 
-    if (!tradesRes.error && tradesRes.data) {
+        if (tradesRes.error) throw tradesRes.error;
+
         const mappedTrades = tradesRes.data.map(t => ({
             symbol: t.symbol,
             type: t.transaction_type,
@@ -52,35 +50,32 @@ async function loadPortfolioFromDB(userId) {
             date: t.transaction_date
         }));
         
-        // Pass both to the engine
         calculateFIFO(mappedTrades, corpRes.data || []);
         
         const syncBtn = document.getElementById('sync-btn');
         if (syncBtn) syncBtn.disabled = false;
+    } catch (err) {
+        showStatus("Error loading data: " + err.message, true);
     }
 }
 
-// --- 3. THE FIFO ENGINE (Timeline-Aware) ---
+// --- 3. THE FIFO ENGINE ---
 function calculateFIFO(trades, corporateActions = []) {
     const portfolio = {};
 
-    // 1. Create a Master Timeline (Combined Trades + Corporate Actions)
     let timeline = [
         ...trades.map(t => ({ ...t, eventType: 'TRADE', date: new Date(t.date || t.transaction_date) })),
         ...corporateActions.map(a => ({ ...a, eventType: 'CORP_ACTION', date: new Date(a.record_date) }))
     ];
 
-    // 2. Sort strictly by date (Oldest to Newest)
     timeline.sort((a, b) => a.date - b.date);
 
-    // 3. Process the Timeline
     timeline.forEach(event => {
         const symbol = (event.symbol || event.ticker_symbol).toUpperCase();
         if (!portfolio[symbol]) portfolio[symbol] = [];
 
         if (event.eventType === 'TRADE') {
             const type = event.type.toUpperCase();
-            
             if (type.includes('BUY') || type.includes('BONUS')) {
                 const price = type.includes('BONUS') ? 0 : event.price;
                 portfolio[symbol].push({ qty: event.qty, price: price, date: event.date });
@@ -100,11 +95,9 @@ function calculateFIFO(trades, corporateActions = []) {
             }
         } 
         else if (event.eventType === 'CORP_ACTION') {
-            // --- NEW: LOGIC FOR MERGERS & SPLITS ---
             if (event.action_type === 'MERGER' && portfolio[symbol].length > 0) {
                 const ratio = parseRatio(event.ratio_factor); 
                 const targetSymbol = event.new_ticker.toUpperCase();
-                
                 let totalOldCost = 0;
                 let totalOldQty = 0;
 
@@ -113,8 +106,7 @@ function calculateFIFO(trades, corporateActions = []) {
                     totalOldQty += lot.qty;
                 });
                 
-                portfolio[symbol] = []; // Company A is now gone
-
+                portfolio[symbol] = []; 
                 const newQty = totalOldQty * ratio;
                 if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
                 portfolio[targetSymbol].push({
@@ -124,11 +116,9 @@ function calculateFIFO(trades, corporateActions = []) {
                     type: 'MERGER_IN'
                 });
             }
-            // Add Split/Bonus logic here later
         }
     });
 
-    // 4. Map to Display
     processedHoldings = Object.keys(portfolio).map(symbol => {
         const lots = portfolio[symbol];
         const totalQty = lots.reduce((s, l) => s + l.qty, 0);
@@ -145,13 +135,19 @@ function calculateFIFO(trades, corporateActions = []) {
     renderTable();
 }
 
-// Helper to handle "42:25" or "1:10"
 function parseRatio(ratioStr) {
     if (!ratioStr.includes(':')) return parseFloat(ratioStr);
     const [newR, oldR] = ratioStr.split(':').map(Number);
     return newR / oldR;
 }
-// --- 4. MANUAL CORPORATE ACTION MODAL ---
+
+// --- 4. MODAL LOGIC ---
+function toggleModalFields() {
+    const type = document.getElementById('action-type').value;
+    const container = document.getElementById('new-ticker-container');
+    if(container) container.style.display = (type === 'MERGER' || type === 'DEMERGER') ? 'block' : 'none';
+}
+
 function openCorpModal(symbol) {
     currentScanningSymbol = symbol;
     document.getElementById('modal-ticker').innerText = symbol;
@@ -174,25 +170,22 @@ async function submitForApproval() {
     
     const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
 
-    // 1. Save to Supabase (Status: Pending)
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
         action_type: fields.type,
         ratio_factor: fields.ratio,
         record_date: fields.date,
+        new_ticker: fields.newTicker,
         status: 'pending'
     }]);
 
     if (!error) {
-        // 2. Log to Google Sheet for Admin tracking
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({
-                ticker: cleanSymbol, ...fields, isSubmission: true
-            })
+            body: JSON.stringify({ ticker: cleanSymbol, ...fields, isSubmission: true })
         });
-        alert("Action submitted! Once verified by UMC, it will reflect in your holdings. 🚀");
+        alert("Action submitted! Once verified, it will reflect. 🚀");
         closeCorpModal();
     } else {
         alert("Submission failed: " + error.message);
@@ -203,7 +196,7 @@ async function submitForApproval() {
 async function startSync() {
     const btn = document.getElementById('sync-btn');
     const originalHTML = btn.innerHTML;
-    btn.innerHTML = 'Updating Prices...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
 
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
@@ -221,7 +214,6 @@ async function startSync() {
             else missing.push(`NSE:${cleanSym}`);
         });
 
-        // Add missing tickers to Google Sheet automatically
         if (missing.length > 0) {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -255,6 +247,11 @@ function renderTable() {
             <td>₹${h.current_price.toFixed(2)}</td>
             <td>₹${curVal.toLocaleString('en-IN')}</td>
             <td style="color:${plPct >= 0 ? '#10b981' : '#ef4444'}">${plPct}%</td>
+            <td style="text-align:center;">
+                <button onclick="openCorpModal('${h.symbol}')" style="background:none; border:none; color:#0ea5e9; cursor:pointer; font-size:1.2rem;">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+            </td>
         </tr>`;
     }).join('');
 
