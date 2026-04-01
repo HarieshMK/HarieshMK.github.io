@@ -108,42 +108,68 @@ function calculateFIFO(trades, corporateActions = []) {
             }
         } 
         else if (event.eventType === 'CORP_ACTION') {
-            const actionType = (event.action_type || "").toUpperCase();
-            const multiplier = parseFloat(event.ratio_factor) || 1;
-            
-            if (multiplier <= 0) return; // Safety check
+    const actionType = (event.action_type || "").toUpperCase();
+    const multiplier = parseFloat(event.ratio_factor) || 1;
+    const targetSymbol = (event.new_ticker || "").toUpperCase();
+    
+    if (multiplier <= 0) return;
 
-            if ((actionType === 'BONUS' || actionType === 'SPLIT') && portfolio[symbol].length > 0) {
-                portfolio[symbol].forEach(lot => {
-                    lot.qty = lot.qty * multiplier;
-                    lot.price = lot.price / multiplier; 
-                });
-                console.log(`${actionType} applied to ${symbol}: Multiplied by ${multiplier}`);
-            }
-            else if (actionType === 'MERGER' && portfolio[symbol].length > 0) {
-                const targetSymbol = (event.new_ticker || "").toUpperCase();
-                if (!targetSymbol) return;
-
-                let totalOldCost = 0;
-                let totalOldQty = 0;
-
-                portfolio[symbol].forEach(lot => {
-                    totalOldCost += (lot.qty * lot.price);
-                    totalOldQty += lot.qty;
-                });
-                
-                portfolio[symbol] = []; 
-                const newQty = totalOldQty * multiplier;
-                if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
-                portfolio[targetSymbol].push({
-                    qty: newQty,
-                    price: totalOldCost / newQty,
-                    date: event.date,
-                    type: 'MERGER_IN'
-                });
-            }
+    // --- CASE A: BONUS & SPLIT ---
+    if ((actionType === 'BONUS' || actionType === 'SPLIT') && portfolio[symbol].length > 0) {
+        portfolio[symbol].forEach(lot => {
+            lot.qty = lot.qty * multiplier;
+            lot.price = lot.price / multiplier; 
+        });
+    }
+    
+    // --- CASE B: DEMERGER ---
+    else if (actionType === 'DEMERGER' && portfolio[symbol].length > 0) {
+        if (!targetSymbol) return;
+        
+        // Use the actual value from your new Supabase column
+        const costToParentPct = parseFloat(event.cost_proportion_pct);
+        
+        if (isNaN(costToParentPct)) {
+            console.warn(`Missing cost proportion for demerger of ${symbol}`);
+            return; 
         }
-    });
+
+        const parentFactor = costToParentPct / 100;
+        const childFactor = 1 - parentFactor;
+
+        if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
+
+        portfolio[symbol].forEach(lot => {
+            const originalTotalCost = lot.qty * lot.price;
+
+            // 1. Create Child (e.g., KWIL) - Keep original buy date
+            portfolio[targetSymbol].push({
+                qty: lot.qty * multiplier,
+                price: (originalTotalCost * childFactor) / (lot.qty * multiplier),
+                date: lot.date 
+            });
+
+            // 2. Update Parent (e.g., HUL) - Keep original buy date
+            lot.price = (originalTotalCost * parentFactor) / lot.qty;
+        });
+    }
+
+    // --- CASE C: MERGER ---
+    else if (actionType === 'MERGER' && portfolio[symbol].length > 0) {
+        if (!targetSymbol) return;
+        if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
+
+        portfolio[symbol].forEach(lot => {
+            portfolio[targetSymbol].push({
+                qty: lot.qty * multiplier,
+                price: (lot.qty * lot.price) / (lot.qty * multiplier),
+                date: lot.date 
+            });
+        });
+        portfolio[symbol] = []; // Parent ticker is removed
+    }
+    }
+ });
 
     processedHoldings = Object.keys(portfolio).map(symbol => {
         const lots = portfolio[symbol];
@@ -164,8 +190,16 @@ function calculateFIFO(trades, corporateActions = []) {
 // --- 4. MODAL LOGIC ---
 function toggleModalFields() {
     const type = document.getElementById('action-type').value;
-    const container = document.getElementById('new-ticker-container');
-    if(container) container.style.display = (type === 'MERGER' || type === 'DEMERGER') ? 'block' : 'none';
+    const tickerContainer = document.getElementById('new-ticker-container');
+    const costContainer = document.getElementById('cost-proportion-container');
+
+    if (tickerContainer) {
+        tickerContainer.style.display = (type === 'MERGER' || type === 'DEMERGER') ? 'block' : 'none';
+    }
+    
+    if (costContainer) {
+        costContainer.style.display = (type === 'DEMERGER') ? 'block' : 'none';
+    }
 }
 
 function openCorpModal(symbol) {
@@ -179,54 +213,64 @@ function closeCorpModal() {
 }
 
 async function submitForApproval() {
+    // 1. Get Raw Values
     const type = document.getElementById('action-type').value;
-    const ratioStr = document.getElementById('action-ratio').value; // e.g., "1:1"
+    const ratioStr = document.getElementById('action-ratio').value;
     const date = document.getElementById('action-date').value;
-    const newTicker = document.getElementById('new-ticker-input')?.value || "";
+    const newTicker = (document.getElementById('new-ticker-input')?.value || "").toUpperCase().trim();
+    const costPct = document.getElementById('cost-proportion-input')?.value;
 
-    if (!ratioStr || !date) { alert("Please fill all details"); return; }
-
-    // --- ACCURATE RATIO CALCULATION ---
+    // 2. Define calculated variables FIRST
+    const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+    
     let numericRatio = 1;
     if (ratioStr.includes(':')) {
-        const [partsA, partsB] = ratioStr.split(':').map(Number); // A:B
-        
-        if (type === 'BONUS') {
-            // Your logic was right: You get A additional for every B held.
-            // Total multiplier = (A + B) / B
-            numericRatio = (partsA + partsB) / partsB;
-        } 
-        else {
-            // Splits & Mergers: Usually a direct swap ratio (New / Old)
-            numericRatio = partsA / partsB;
-        }
+        const [partsA, partsB] = ratioStr.split(':').map(Number);
+        numericRatio = (type === 'BONUS') ? (partsA + partsB) / partsB : partsA / partsB;
     } else {
         numericRatio = parseFloat(ratioStr);
     }
 
-    const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
+    // 3. Validation
+    if (!ratioStr || !date) { alert("Please fill all details"); return; }
+    if (type === 'DEMERGER' && !costPct) {
+        alert("Please enter the Cost Proportion percentage for the Demerger.");
+        return;
+    }
 
+    // 4. Single Supabase Insert (Now cleanSymbol is defined!)
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
         action_type: type,
-        ratio_factor: numericRatio, // Now a clean number (e.g., 2.0)
+        ratio_factor: numericRatio,
         record_date: date,
         new_ticker: newTicker,
+        cost_proportion_pct: costPct ? parseFloat(costPct) : 100,
         status: 'pending'
     }]);
 
+    // 5. Handle Result
     if (!error) {
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({ ticker: cleanSymbol, type, ratio: numericRatio, originalRatio: ratioStr, date, isSubmission: true })
+            body: JSON.stringify({ 
+                ticker: cleanSymbol, 
+                type, 
+                ratio: numericRatio, 
+                originalRatio: ratioStr, 
+                date, 
+                isSubmission: true 
+            })
         });
-        alert(`Action submitted! Multiplier: ${numericRatio}x`);
+        alert(`Action submitted for ${cleanSymbol}!`);
         closeCorpModal();
     } else {
         alert("Submission failed: " + error.message);
     }
 }
+
+
 // --- 5. SYNC (Efficiency Improvement) ---
 async function startSync() {
     const btn = document.getElementById('sync-btn');
