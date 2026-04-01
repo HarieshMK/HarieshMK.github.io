@@ -5,6 +5,8 @@
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; 
 let processedHoldings = []; 
 let currentScanningSymbol = "";
+let sortColumn = 'symbol';
+let sortDirection = 'asc';
 
 // --- 1. INITIALIZATION ---
 // We use a small delay or explicit check to ensure session is caught
@@ -150,13 +152,13 @@ function calculateFIFO(trades, corporateActions = []) {
         });
     }
 
-    // --- CASE C: MERGER ---
+ // --- CASE C: MERGER ---
     else if (actionType === 'MERGER' && portfolio[symbol].length > 0) {
         if (!targetSymbol) return;
         if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
 
         portfolio[symbol].forEach(lot => {
-            const newQty = Math.floor(lot.qty * multiplier); // Round down to whole shares
+            const newQty = Math.floor(lot.qty * multiplier);
             if (newQty > 0) {
                 portfolio[targetSymbol].push({
                     qty: newQty,
@@ -167,9 +169,10 @@ function calculateFIFO(trades, corporateActions = []) {
         });
         portfolio[symbol] = []; 
     }
-    }
- });
+    // CLOSING BRACE FOR THE TIMELINE LOOP WAS HERE - FIXED
+    }); 
 
+    // Now map the results to the global variable
     processedHoldings = Object.keys(portfolio).map(symbol => {
         const lots = portfolio[symbol];
         const totalQty = lots.reduce((s, l) => s + l.qty, 0);
@@ -179,7 +182,7 @@ function calculateFIFO(trades, corporateActions = []) {
             qty: totalQty,
             avg_price: totalQty > 0 ? totalCost / totalQty : 0,
             invested: totalCost,
-            current_price: 0
+            current_price: 0 // Will be updated by startSync()
         };
     }).filter(h => h.qty > 0);
 
@@ -320,23 +323,36 @@ function renderTable() {
     if (!body) return;
     
     if (processedHoldings.length === 0) {
-        body.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">No active holdings found.</td></tr>';
+        body.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px;">No active holdings found.</td></tr>';
         return;
     }
 
+    // 1. Prepare data with P&L values for sorting
+    processedHoldings.forEach(h => {
+        h.current_value = h.qty * h.current_price;
+        h.pl_value = h.current_value - h.invested;
+        h.pl_pct = h.invested > 0 ? (h.pl_value / h.invested) * 100 : (h.current_value > 0 ? 100 : 0);
+    });
+
+    // 2. Sort the data
+    processedHoldings.sort((a, b) => {
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
+        
+        // Handle strings (Symbols) vs Numbers
+        if (typeof valA === 'string') {
+            return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        } else {
+            return sortDirection === 'asc' ? valA - valB : valB - valA;
+        }
+    });
+
     let totals = { inv: 0, cur: 0 };
 
+    // 3. Render rows
     body.innerHTML = processedHoldings.map(h => {
-        const curVal = h.qty * h.current_price;
         totals.inv += h.invested; 
-        totals.cur += curVal;
-     // If invested is 0 but we have current value, it's a 100% "Free" gain.
-        let plPct = 0;
-        if (h.invested > 0) {
-            plPct = (((curVal - h.invested) / h.invested) * 100).toFixed(2);
-        } else if (curVal > 0) {
-            plPct = "100.00"; // Represents a pure profit holding
-        }
+        totals.cur += h.current_value;
         
         return `<tr>
             <td><b>${h.symbol}</b></td>
@@ -344,8 +360,9 @@ function renderTable() {
             <td>₹${h.avg_price.toFixed(2)}</td>
             <td>₹${h.invested.toLocaleString('en-IN')}</td>
             <td>₹${h.current_price.toFixed(2)}</td>
-            <td>₹${curVal.toLocaleString('en-IN')}</td>
-            <td style="color:${plPct >= 0 ? '#10b981' : '#ef4444'}">${plPct}%</td>
+            <td>₹${h.current_value.toLocaleString('en-IN')}</td>
+            <td style="color:${h.pl_value >= 0 ? '#10b981' : '#ef4444'}">₹${h.pl_value.toLocaleString('en-IN')}</td>
+            <td style="color:${h.pl_pct >= 0 ? '#10b981' : '#ef4444'}">${h.pl_pct.toFixed(2)}%</td>
             <td style="text-align:center;">
                 <button onclick="openCorpModal('${h.symbol}')" style="background:none; border:none; color:#0ea5e9; cursor:pointer; font-size:1.2rem;">
                     <i class="fas fa-plus-circle"></i>
@@ -354,9 +371,56 @@ function renderTable() {
         </tr>`;
     }).join('');
 
+    updateSortIcons();
     updateTotals(totals.inv, totals.cur);
 }
 
+// 4. The Sorting Controller
+function sortHoldings(column) {
+    if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+    }
+    renderTable();
+}
+
+// 5. Update UI Icons
+function updateSortIcons() {
+    const columns = ['symbol', 'qty', 'avg_price', 'invested', 'current_price', 'current_value', 'pl_value', 'pl_pct'];
+    columns.forEach(col => {
+        const el = document.getElementById(`sort-${col}`);
+        if (el) {
+            if (sortColumn === col) {
+                el.innerHTML = sortDirection === 'asc' ? ' ↑' : ' ↓';
+                el.style.color = '#0ea5e9';
+            } else {
+                el.innerHTML = '';
+            }
+        }
+    });
+}
+function filterTable() {
+    const input = document.getElementById('stock-search');
+    const filter = input.value.toUpperCase();
+    const table = document.getElementById('holdings-table');
+    const tr = table.getElementsByTagName('tr');
+
+    // Loop through all table rows (excluding the header)
+    for (let i = 1; i < tr.length; i++) {
+        // We look at the first column (the Symbol column)
+        const td = tr[i].getElementsByTagName('td')[0];
+        if (td) {
+            const txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = ""; // Show
+            } else {
+                tr[i].style.display = "none"; // Hide
+            }
+        }
+    }
+}
 function updateTotals(totalInv, totalCur) {
     const invEl = document.getElementById('total-invested');
     const curEl = document.getElementById('current-value');
