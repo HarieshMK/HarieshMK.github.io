@@ -168,8 +168,8 @@ function calculateFIFO(trades, corporateActions = []) {
             }
         });
         portfolio[symbol] = []; 
+        }
     }
-    // CLOSING BRACE FOR THE TIMELINE LOOP WAS HERE - FIXED
     }); 
 
     // Now map the results to the global variable
