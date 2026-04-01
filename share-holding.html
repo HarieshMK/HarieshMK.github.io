@@ -36,7 +36,15 @@ title: Share Holdings
         <p id="status-text">Processing transactions...</p>
     </div>
 
-    <div class="table-container card">
+        <div class="table-container card">
+        <div class="search-bar-container" style="padding: 15px 20px; border-bottom: 1px solid #f1f5f9; background: #fff;">
+            <div style="position: relative; max-width: 300px;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" id="stock-search" placeholder="Search by symbol (e.g. IDFC)..." 
+                       onkeyup="filterTable()" 
+                       style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.2s;">
+            </div>
+        </div>
         <div class="table-header" style="padding: 20px;">
             <h3>Active Equity Holdings</h3>
             <span class="sub-text">Calculated using Timeline-Aware FIFO logic</span>
@@ -45,14 +53,15 @@ title: Share Holdings
             <table id="holdings-table">
                 <thead>
                     <tr>
-                        <th>Symbol</th>
-                        <th>Qty</th>
-                        <th>Avg. Price</th>
-                        <th>Invested</th>
-                        <th>Market Price</th>
-                        <th>Current Value</th>
-                        <th>P&L</th>
-                        <th style="text-align: center;">Actions</th>
+                        <th onclick="sortHoldings('symbol')" style="cursor:pointer">Symbol <span id="sort-symbol"></span></th>
+                        <th onclick="sortHoldings('qty')" style="cursor:pointer">Qty <span id="sort-qty"></span></th>
+                        <th onclick="sortHoldings('avg_price')" style="cursor:pointer">Avg. Price <span id="sort-avg_price"></span></th>
+                        <th onclick="sortHoldings('invested')" style="cursor:pointer">Invested <span id="sort-invested"></span></th>
+                        <th onclick="sortHoldings('current_price')" style="cursor:pointer">Market Price <span id="sort-current_price"></span></th>
+                        <th onclick="sortHoldings('current_value')" style="cursor:pointer">Current Value <span id="sort-current_value"></span></th>
+                        <th onclick="sortHoldings('pl_value')" style="cursor:pointer">P&L (₹) <span id="sort-pl_value"></span></th>
+                        <th onclick="sortHoldings('pl_pct')" style="cursor:pointer">P&L (%) <span id="sort-pl_pct"></span></th>
+                        <th style="text-align: center; width: 80px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="holdings-body">
@@ -111,7 +120,13 @@ title: Share Holdings
 
 <style>
     :root { --primary: #0ea5e9; --success: #10b981; --danger: #ef4444; --bg: #f8fafc; }
-    .portfolio-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; font-family: 'Inter', sans-serif; }
+    .portfolio-container {max-width: 1400px;width: 95%; margin: 40px auto; padding: 0 20px; font-family: 'Inter', sans-serif;}
+     th, td {white-space: nowrap;}
+    .table-container {overflow-x: auto;-webkit-overflow-scrolling: touch; border-radius: 16px;}
+    .table-container::-webkit-scrollbar {height: 8px;}
+    .table-container::-webkit-scrollbar-track {background: #f1f5f9;}
+    .table-container::-webkit-scrollbar-thumb {background: #cbd5e1;border-radius: 10px;}
+    .table-container::-webkit-scrollbar-thumb:hover {background: #94a3b8;}
     .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
     .metric-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
     .metric-card.highlight { border-left: 5px solid var(--primary); }
