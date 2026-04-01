@@ -117,7 +117,7 @@ function calculateFIFO(trades, corporateActions = []) {
     // --- CASE A: BONUS & SPLIT ---
     if ((actionType === 'BONUS' || actionType === 'SPLIT') && portfolio[symbol].length > 0) {
         portfolio[symbol].forEach(lot => {
-            lot.qty = lot.qty * multiplier;
+            lot.qty = Math.floor(lot.qty * multiplier); // Round down to whole shares
             lot.price = lot.price / multiplier; 
         });
     }
@@ -126,13 +126,8 @@ function calculateFIFO(trades, corporateActions = []) {
     else if (actionType === 'DEMERGER' && portfolio[symbol].length > 0) {
         if (!targetSymbol) return;
         
-        // Use the actual value from your new Supabase column
         const costToParentPct = parseFloat(event.cost_proportion_pct);
-        
-        if (isNaN(costToParentPct)) {
-            console.warn(`Missing cost proportion for demerger of ${symbol}`);
-            return; 
-        }
+        if (isNaN(costToParentPct)) return; 
 
         const parentFactor = costToParentPct / 100;
         const childFactor = 1 - parentFactor;
@@ -141,15 +136,16 @@ function calculateFIFO(trades, corporateActions = []) {
 
         portfolio[symbol].forEach(lot => {
             const originalTotalCost = lot.qty * lot.price;
+            const newChildQty = Math.floor(lot.qty * multiplier); // Round down to whole shares
 
-            // 1. Create Child (e.g., KWIL) - Keep original buy date
-            portfolio[targetSymbol].push({
-                qty: lot.qty * multiplier,
-                price: (originalTotalCost * childFactor) / (lot.qty * multiplier),
-                date: lot.date 
-            });
+            if (newChildQty > 0) {
+                portfolio[targetSymbol].push({
+                    qty: newChildQty,
+                    price: (originalTotalCost * childFactor) / (lot.qty * multiplier), // Price based on theoretical full entitlement
+                    date: lot.date 
+                });
+            }
 
-            // 2. Update Parent (e.g., HUL) - Keep original buy date
             lot.price = (originalTotalCost * parentFactor) / lot.qty;
         });
     }
@@ -160,13 +156,16 @@ function calculateFIFO(trades, corporateActions = []) {
         if (!portfolio[targetSymbol]) portfolio[targetSymbol] = [];
 
         portfolio[symbol].forEach(lot => {
-            portfolio[targetSymbol].push({
-                qty: lot.qty * multiplier,
-                price: (lot.qty * lot.price) / (lot.qty * multiplier),
-                date: lot.date 
-            });
+            const newQty = Math.floor(lot.qty * multiplier); // Round down to whole shares
+            if (newQty > 0) {
+                portfolio[targetSymbol].push({
+                    qty: newQty,
+                    price: (lot.qty * lot.price) / (lot.qty * multiplier),
+                    date: lot.date 
+                });
+            }
         });
-        portfolio[symbol] = []; // Parent ticker is removed
+        portfolio[symbol] = []; 
     }
     }
  });
