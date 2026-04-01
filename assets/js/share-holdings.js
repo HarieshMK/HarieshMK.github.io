@@ -403,24 +403,31 @@ function updateSortIcons() {
 }
 function filterTable() {
     const input = document.getElementById('stock-search');
+    const clearBtn = document.getElementById('clear-search');
     const filter = input.value.toUpperCase();
     const table = document.getElementById('holdings-table');
     const tr = table.getElementsByTagName('tr');
 
-    // Loop through all table rows (excluding the header)
+    // Show "X" only if there is text
+    clearBtn.style.display = input.value.length > 0 ? "block" : "none";
+
     for (let i = 1; i < tr.length; i++) {
-        // We look at the first column (the Symbol column)
         const td = tr[i].getElementsByTagName('td')[0];
         if (td) {
             const txtValue = td.textContent || td.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = ""; // Show
-            } else {
-                tr[i].style.display = "none"; // Hide
-            }
+            tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
         }
     }
 }
+
+function clearSearch() {
+    const input = document.getElementById('stock-search');
+    input.value = "";
+    filterTable(); // This will hide the X and show all rows automatically
+    input.focus(); // Keeps the cursor in the box in case they want to type something else
+}
+
+
 function updateTotals(totalInv, totalCur) {
     const invEl = document.getElementById('total-invested');
     const curEl = document.getElementById('current-value');
