@@ -368,6 +368,7 @@ function renderTable() {
     body.innerHTML = processedHoldings.map(h => {
         totals.inv += h.invested; 
         totals.cur += h.current_value;
+        const plClass = h.pl_value >= 0 ? 'text-success' : 'text-danger';
         
         return `<tr>
             <td><b>${h.symbol}</b></td>
@@ -376,8 +377,8 @@ function renderTable() {
             <td>₹${h.invested.toLocaleString('en-IN')}</td>
             <td>₹${h.current_price.toFixed(2)}</td>
             <td>₹${h.current_value.toLocaleString('en-IN')}</td>
-            <td style="color:${h.pl_value >= 0 ? '#10b981' : '#ef4444'}">₹${h.pl_value.toLocaleString('en-IN')}</td>
-            <td style="color:${h.pl_pct >= 0 ? '#10b981' : '#ef4444'}">${h.pl_pct.toFixed(2)}%</td>
+            <td class="${plClass}">₹${h.pl_value.toLocaleString('en-IN')}</td>
+            <td class="${plClass}">${h.pl_pct.toFixed(2)}%</td>
             <td style="text-align:center;">
                 <button onclick="openCorpModal('${h.symbol}')" style="background:none; border:none; color:#0ea5e9; cursor:pointer; font-size:1.2rem;">
                     <i class="fas fa-plus-circle"></i>
@@ -467,7 +468,10 @@ function updateTotals(totalInv, totalCur) {
     if (plEl) {
         const totalPL = totalCur - totalInv;
         plEl.innerText = `₹${totalPL.toLocaleString('en-IN')} (${totalInv > 0 ? ((totalPL/totalInv)*100).toFixed(2) : 0}%)`;
-        plEl.style.color = totalPL >= 0 ? '#10b981' : '#ef4444';
+        
+        // Toggle classes instead of hardcoding colors
+        plEl.classList.remove('text-success', 'text-danger');
+        plEl.classList.add(totalPL >= 0 ? 'text-success' : 'text-danger');
     }
 }
 
