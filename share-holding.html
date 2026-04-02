@@ -8,19 +8,16 @@ permalink: /share-holding/
 
 <div class="portfolio-container">
     <div class="metrics-grid">
-        <div class="metric-card">
-            <span class="metric-label">Invested Value</span>
-            <strong id="total-invested">₹0.00</strong>
-        </div>
-        <div class="metric-card highlight">
-            <span class="metric-label">Current Value</span>
-            <strong id="current-value">₹0.00</strong>
-        </div>
-        <div class="metric-card">
-            <span class="metric-label">Total P&L</span>
-            <strong id="total-pl">₹0.00 (0%)</strong>
-        </div>
+    <div class="metric-card">
+        <span class="metric-label">Invested Value</span> <strong id="total-invested">₹0.00</strong>
     </div>
+    <div class="metric-card highlight">
+        <span class="metric-label">Current Value</span> <strong id="current-value">₹0.00</strong>
+    </div>
+    <div class="metric-card">
+        <span class="metric-label">Total P&L</span> <strong id="total-pl">₹0.00 (0%)</strong>
+    </div>
+</div>
 
     <div id="status-box" class="status-msg" style="display:none; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
         <p id="status-text" style="margin: 0; font-size: 0.85rem;"></p>
@@ -220,20 +217,44 @@ permalink: /share-holding/
     }
 
     /* 4. METRICS & TABLES */
-    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+    .metrics-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 20px; 
+        margin-bottom: 30px; 
+    }
     
     .metric-card { 
-        background: var(--bg-color); 
-        padding: 20px; 
-        border-radius: 15px; 
+        /* Using a specific surface color rather than pure background */
+        background: var(--card-bg); 
+        padding: 24px 20px; 
+        border-radius: 18px; 
         border: 1px solid var(--border-color);
         text-align: center;
+        /* Adding a subtle shadow to create separation from the main page */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+    /* Optional: Slight lift on hover to make it feel interactive */
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }    
 
+    .metric-card .metric-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+        display: block;
+    }
+    
     .metric-card strong { 
         display: block;
         font-family: 'JetBrains Mono', monospace; 
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         color: var(--text-color);
     }
 
@@ -343,6 +364,18 @@ permalink: /share-holding/
     /* Ensure readability in Dark Mode */
     .dark-theme .text-success { color: #34d399 !important; }
     .dark-theme .text-danger { color: #f87171 !important; }
+
+    .dark-theme .metric-card {
+    /* This color (#1e293b) is the standard "Slate 800" which usually 
+       sits perfectly on top of a darker (#0f172a) background */
+    background: #1e293b !important; 
+    border-color: #334155 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+    
+    .dark-theme .metric-card strong {
+        color: #f8fafc; /* Brighter white for the numbers */
+    }
 </style>
 
 <script src="{{ '/assets/js/share-holdings.js' | relative_url }}"></script>
