@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/global-styles.css' | relative_url }}">
+  <style>
+    /* 1. Reset the narrow site container for this layout only */
+    .container { 
+      max-width: 100% !important; 
+      width: 100% !important; 
+      box-shadow: none !important; 
+      padding: 0 !important; 
+      background: transparent !important;
+    }
+
+    /* 2. Create the wide centered lane for the dashboard */
+    .dashboard-wrapper {
+      max-width: 1350px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      box-sizing: border-box;
+    }
+
+    main { width: 100% !important; }
+
+    /* Fix for background color consistency in dark mode */
+    .dark-theme .dashboard-wrapper {
+      background-color: #0b1120; /* Matches your site's dark body color */
+    }
+  </style>
+</head>
+<body class="{% if site.dark_theme %}dark-theme{% endif %}">
+  
+  {% include header.html %}
+
+  <div class="dashboard-wrapper">
+    <main>
+      {{ content }}
+    </main>
+  </div>
+
+  {% include footer.html %}
+
+  </body>
+</html>
