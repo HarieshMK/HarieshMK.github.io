@@ -204,25 +204,31 @@ function toggleModalFields() {
     }
 }
 
+// --- Updated open/close to handle background blur ---
 function openCorpModal(symbol) {
     currentScanningSymbol = symbol;
     document.getElementById('modal-ticker').innerText = symbol;
     document.getElementById('corp-modal').style.display = 'flex';
+    
+    // This blurs the specific portfolio container behind the modal
+    document.querySelector('.portfolio-container').style.filter = 'blur(5px)';
 }
 
 function closeCorpModal() {
     document.getElementById('corp-modal').style.display = 'none';
+    
+    // This removes the blur
+    document.querySelector('.portfolio-container').style.filter = 'none';
 }
 
+// --- Updated submitForApproval (Replaced alerts) ---
 async function submitForApproval() {
-    // 1. Get Raw Values
     const type = document.getElementById('action-type').value;
     const ratioStr = document.getElementById('action-ratio').value;
     const date = document.getElementById('action-date').value;
     const newTicker = (document.getElementById('new-ticker-input')?.value || "").toUpperCase().trim();
     const costPct = document.getElementById('cost-proportion-input')?.value;
 
-    // 2. Define calculated variables FIRST
     const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
     
     let numericRatio = 1;
@@ -233,14 +239,16 @@ async function submitForApproval() {
         numericRatio = parseFloat(ratioStr);
     }
 
-    // 3. Validation
-    if (!ratioStr || !date) { alert("Please fill all details"); return; }
+    // REPLACED ALERTS HERE
+    if (!ratioStr || !date) { 
+        showStatus("Please fill all details", true); 
+        return; 
+    }
     if (type === 'DEMERGER' && !costPct) {
-        alert("Please enter the Cost Proportion percentage for the Demerger.");
+        showStatus("Please enter the Cost Proportion percentage.", true);
         return;
     }
 
-    // 4. Single Supabase Insert (Now cleanSymbol is defined!)
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
         action_type: type,
@@ -251,7 +259,6 @@ async function submitForApproval() {
         status: 'pending'
     }]);
 
-    // 5. Handle Result
     if (!error) {
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
@@ -265,10 +272,13 @@ async function submitForApproval() {
                 isSubmission: true 
             })
         });
-        alert(`Action submitted for ${cleanSymbol}!`);
+        
+        // REPLACED ALERT HERE
+        showStatus(`Action submitted for ${cleanSymbol}!`);
         closeCorpModal();
     } else {
-        alert("Submission failed: " + error.message);
+        // REPLACED ALERT HERE
+        showStatus("Submission failed: " + error.message, true);
     }
 }
 
