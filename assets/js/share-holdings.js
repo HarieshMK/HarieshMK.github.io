@@ -9,38 +9,39 @@ let sortColumn = 'symbol';
 let sortDirection = 'asc';
 
 // --- 1. INITIALIZATION ---
-// We use a small delay or explicit check to ensure session is caught
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Initializing Portfolio Engine...");
     
-    // Explicitly wait for the session
     const { data: { session }, error } = await supabase.auth.getSession();
-    
     if (error || !session) {
-        console.error("Auth Session missing:", error);
         showStatus("Please login to view your holdings.", true);
         return;
     }
 
-    console.log("User authenticated:", session.user.id);
+    // 1. Load data from DB (Awaiting this ensures processedHoldings is populated)
     await loadPortfolioFromDB(session.user.id);
 
-    // Setup UI Listeners
+    // 2. Load cached prices
+    const cachedPrices = localStorage.getItem('portfolio_prices');
+    if (cachedPrices) {
+        applyPrices(JSON.parse(cachedPrices));
+    }
+
+    // 3. Background Sync
+    startSync(); 
+
+    // --- SETUP LISTENERS ---
     const dropZone = document.getElementById('drop-zone');
     const csvInput = document.getElementById('csv-input');
-    const syncBtn = document.getElementById('sync-btn');
+    const syncBtn = document.getElementById('manual-sync-trigger'); // Updated ID to match your trigger
 
     if (dropZone && csvInput) {
-        dropZone.onclick = () => {
-            console.log("Browse clicked");
-            csvInput.click();
-        };
+        dropZone.onclick = () => csvInput.click();
         csvInput.onchange = (e) => handleFileUpload(e.target.files[0], session.user.id);
     }
     
     if (syncBtn) {
         syncBtn.onclick = () => startSync();
-        syncBtn.disabled = false; // Enable it once we know we're logged in
     }
 });
 
@@ -285,47 +286,51 @@ async function submitForApproval() {
 
 // --- 5. SYNC (Efficiency Improvement) ---
 async function startSync() {
-    const btn = document.getElementById('sync-btn');
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+    const refreshIcon = document.getElementById('manual-sync-trigger');
+    const liveLabel = document.getElementById('sync-status-label');
+    
+    // Start Animation
+    if (refreshIcon) refreshIcon.classList.add('spinning');
 
     try {
         const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
         const sheetPrices = await res.json();
         
-        // Efficiency: Create a Map for O(1) lookup instead of .find() inside a loop
-        const priceMap = new Map();
-        sheetPrices.forEach(p => {
-            const cleanSheetTicker = String(p.ticker || "").toUpperCase().trim().replace(/^(NSE:|BOM:|BSE:)/i, '');
-            priceMap.set(cleanSheetTicker, parseFloat(p.price));
-        });
+        // Save to local storage for next visit
+        localStorage.setItem('portfolio_prices', JSON.stringify(sheetPrices));
+        
+        // Apply prices to the global processedHoldings array
+        applyPrices(sheetPrices);
 
-        const missing = [];
-        processedHoldings.forEach(h => {
-            const cleanSym = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
-            const price = priceMap.get(cleanSym);
-
-            if (price && price > 0) {
-                h.current_price = price;
-            } else {
-                missing.push(`NSE:${cleanSym}`);
-            }
-        });
-
-        if (missing.length > 0) {
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ tickers: [...new Set(missing)] })
-            });
-            showStatus("New stocks added to tracker. Refresh in 10s.");
-        }
-        renderTable();
+        if (liveLabel) liveLabel.style.display = 'inline';
     } catch (e) { 
-        console.error(e);
-        showStatus("Price sync failed.", true); 
+        console.error("Price sync failed:", e);
+    } finally {
+        // Stop Animation
+        if (refreshIcon) refreshIcon.classList.remove('spinning');
     }
-    finally { btn.innerHTML = originalHTML; }
+}
+
+// Helper to map prices to holdings
+function applyPrices(priceData) {
+    const priceMap = new Map();
+    priceData.forEach(p => {
+        const cleanTicker = String(p.ticker || "").toUpperCase().trim().replace(/^(NSE:|BOM:|BSE:)/i, '');
+        priceMap.set(cleanTicker, parseFloat(p.price));
+    });
+
+    processedHoldings.forEach(h => {
+        const cleanSym = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
+        const price = priceMap.get(cleanSym);
+        if (price) h.current_price = price;
+    });
+
+    renderTable();
+}
+
+// Bridge function for the onclick="triggerSync()" in your HTML
+function triggerSync() {
+    startSync();
 }
 
 function renderTable() {
@@ -415,18 +420,31 @@ function filterTable() {
     const input = document.getElementById('stock-search');
     const clearBtn = document.getElementById('clear-search');
     const filter = input.value.toUpperCase();
-    const table = document.getElementById('holdings-table');
-    const tr = table.getElementsByTagName('tr');
+    const tr = document.querySelectorAll('#holdings-body tr');
 
-    // Show "X" only if there is text
-    clearBtn.style.display = input.value.length > 0 ? "block" : "none";
+    // Only update clearBtn if it actually exists in the HTML
+    if (clearBtn) {
+        clearBtn.style.display = input.value.length > 0 ? "block" : "none";
+    }
 
-    for (let i = 1; i < tr.length; i++) {
-        const td = tr[i].getElementsByTagName('td')[0];
+    tr.forEach(row => {
+        const td = row.getElementsByTagName('td')[0];
         if (td) {
             const txtValue = td.textContent || td.innerText;
-            tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            row.style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
         }
+    });
+}
+
+// Add this for the expanding search bar
+function toggleSearch() {
+    const input = document.getElementById('stock-search');
+    input.classList.toggle('active');
+    if (input.classList.contains('active')) {
+        input.focus();
+    } else {
+        input.value = "";
+        filterTable(); // Reset table when closing
     }
 }
 
