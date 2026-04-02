@@ -1,6 +1,7 @@
+
 ---
-layout: dashboard
-title: Equity portfolio
+layout: default
+title: Share Holdings
 ---
 
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
@@ -123,60 +124,135 @@ title: Equity portfolio
 </div>
 
 <style>
-  /* Fix the Browse / Import Area */
-  .import-zone {
-    background: #f8fafc;
-    border: 2px dashed #cbd5e1;
-    color: #64748b;
-    padding: 20px;
-    border-radius: 16px;
-    text-align: center;
-    margin-bottom: 25px;
-    font-family: 'Inter', sans-serif;
-  }
+    /* 1. UNIFIED PAGE BREAKOUT 
+       Ensures metrics, search, and table all share the same width */
+    .portfolio-container {
+        width: 94vw;
+        max-width: 1300px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 40px auto;
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
 
-  .dark-theme .import-zone {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    color: #94a3b8 !important;
-  }
+    /* 2. DARK MODE FIXES FOR INPUTS & BUTTONS */
+    .dark-theme .portfolio-container {
+        background: #0f172a; /* Matches your site's dark-theme container */
+        border-color: #1e293b;
+    }
 
-  /* Fix Search Input visibility */
-  #stock-search {
-    background-color: #ffffff;
-    color: #0f172a;
-    border: 2px solid #f1f5f9;
-    border-radius: 12px;
-    padding: 12px 18px;
-    width: 100%;
-    font-weight: 600;
-  }
+    /* Fixing the Search Box White Background */
+    #stock-search {
+        width: 100%;
+        padding: 12px 18px;
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+        background: #ffffff; /* Light mode default */
+        color: #0f172a;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+    }
 
-  .dark-theme #stock-search {
-    background-color: #020617 !important; /* Deep dark blue */
-    color: #ffffff !important;
-    border-color: #334155 !important;
-  }
+    .dark-theme #stock-search {
+        background: #1e293b; /* Darker blue to match metrics */
+        border-color: #334155;
+        color: #ffffff;
+    }
 
-  /* Dashboard Card Layout */
-  .portfolio-container {
-    width: 100%;
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 24px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-  }
+    /* Fixing the Browse / Run Sync Button UI */
+    .import-zone {
+        flex: 1;
+        background: #f8fafc; /* Matches calc-results */
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
 
-  .dark-theme .portfolio-container {
-    background: #0f172a !important; /* Matches your site container color */
-    border-color: #1e293b !important;
-  }
+    .dark-theme .import-zone {
+        background: rgba(30, 41, 59, 0.5);
+        border-color: #334155;
+        color: #94a3b8;
+    }
 
-  /* Table Number Formatting */
-  table td {
-    font-family: 'JetBrains Mono', monospace; /* Consistent with your calculators */
-    font-size: 0.9rem;
-  }
+    .primary-btn {
+        background: #0ea5e9;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    /* 3. METRICS GRID (Synced with your site's Result Item styling) */
+    .metrics-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 20px; 
+        margin-bottom: 30px; 
+    }
+
+    .metric-card { 
+        background: #f8fafc; 
+        padding: 25px; 
+        border-radius: 20px; 
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .dark-theme .metric-card { 
+        background: #1e293b; 
+        border-color: #334155; 
+    }
+
+    .metric-card strong { 
+        font-family: 'JetBrains Mono', monospace; 
+        font-size: 1.6rem;
+        color: #0f172a;
+    }
+
+    .dark-theme .metric-card strong { color: #ffffff !important; }
+
+    /* 4. TABLE POLISH */
+    .table-container { width: 100%; overflow-x: auto; margin-top: 25px; }
+    
+    table { width: 100%; border-collapse: collapse; table-layout: auto; }
+    
+    th { 
+        background: #f8fafc; 
+        color: #64748b; 
+        font-size: 0.7rem; 
+        text-transform: uppercase; 
+        padding: 15px; 
+        letter-spacing: 0.1em;
+    }
+
+    .dark-theme th { background: #0b1120; color: #94a3b8; }
+    
+    td { 
+        padding: 15px; 
+        border-bottom: 1px solid #f1f5f9; 
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+    }
+
+    .dark-theme td { border-bottom-color: #1e293b; color: #cbd5e1; }
+    
+    /* Make the stock symbols use the site's normal font for readability */
+    td:first-child { font-family: 'Inter', sans-serif; font-weight: 700; }
+
+    @media (max-width: 768px) {
+        .metrics-grid { grid-template-columns: 1fr; }
+        .portfolio-container { width: 96vw; padding: 20px; }
+    }
 </style>
 <script src="{{ '/assets/js/share-holdings.js' | relative_url }}"></script>
