@@ -22,35 +22,36 @@ permalink: /share-holding/
         </div>
     </div>
 
-    <div class="actions-bar">
-        <div class="import-zone" id="drop-zone">
-            <i class="fas fa-file-import"></i>
-            <p>Drop your trade book here or <span>Browse</span></p>
+    <div class="actions-bar" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+        <div class="import-zone" id="drop-zone" style="flex: 1; padding: 10px; border: 1px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer;">
+            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">
+                <i class="fas fa-file-import"></i> Drop trade book or <span style="color: #0ea5e9; font-weight: 600;">Browse</span>
+            </p>
             <input type="file" id="csv-input" hidden accept=".csv, .xlsx, .xls, .xlsm">
         </div>
-        <button id="sync-btn" class="primary-btn" disabled>
-            <i class="fas fa-sync-alt"></i> Run FIFO Sync
-        </button>
+        <button id="sync-btn" style="display: none;"></button>
     </div>
 
-    <div id="status-box" class="status-msg" style="display:none; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-        <p id="status-text">Processing transactions...</p>
+    <div id="status-box" class="status-msg" style="display:none; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+        <p id="status-text" style="margin: 0; font-size: 0.85rem;"></p>
     </div>
 
     <div class="table-container card">
-        <div class="search-bar-container" style="padding: 15px 20px; border-bottom: 1px solid var(--border-color);">
-            <div style="position: relative; max-width: 300px;">
-                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                <input type="text" id="stock-search" placeholder="Search by symbol (e.g. IDFC)..." 
-                       onkeyup="filterTable()">
-                <i class="fas fa-times-circle" id="clear-search" onclick="clearSearch()" 
-                   style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none;"></i>
+        <div class="table-header-group" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <h3 style="margin: 0;">Equity Portfolio</h3>
+                
+                <i class="fas fa-sync-alt refresh-icon" id="manual-sync-trigger" 
+                   onclick="triggerSync()" 
+                   style="cursor: pointer; color: var(--text-muted); transition: transform 0.5s ease;"></i>
+                
+                <span id="sync-status-label" style="font-size: 0.7rem; color: #10b981; font-weight: 600; display: none;">LIVE PRICES</span>
             </div>
-        </div>
-        
-        <div class="table-header" style="padding: 20px;">
-            <h3>Active Equity Holdings</h3>
-            <span class="sub-text">Calculated using Timeline-Aware FIFO logic</span>
+
+            <div class="search-wrapper">
+                <input type="text" id="stock-search" placeholder="Search symbol..." onkeyup="filterTable()">
+                <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
+            </div>
         </div>
         <div style="overflow-x: auto;">
             <table id="holdings-table">
@@ -128,22 +129,8 @@ permalink: /share-holding/
         color: var(--text-color);
     }
 
-    /* 2. SEARCH & INPUTS */
-    #stock-search {
-        width: 100%;
-        padding: 10px 35px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background: var(--input-bg, #ffffff);
-        color: var(--text-color);
-        outline: none;
-    }
 
-    .dark-theme #stock-search {
-        background: var(--bg-color); 
-    }
-
-    /* 3. MODAL & STATUS MESSAGES */
+    /* 2. MODAL & STATUS MESSAGES */
     .modal-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -201,7 +188,7 @@ permalink: /share-holding/
         transition: all 0.2s ease;
     }
 
-    /* 4. BUTTONS & ACTIONS */
+    /* 3. BUTTONS & ACTIONS */
     .modal-actions {
         display: flex;
         gap: 12px;
@@ -233,7 +220,7 @@ permalink: /share-holding/
         cursor: pointer;
     }
 
-    /* 5. METRICS & TABLES */
+    /* 4. METRICS & TABLES */
     .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
     
     .metric-card { 
@@ -255,6 +242,63 @@ permalink: /share-holding/
     th { background: var(--bg-color); color: var(--text-muted); padding: 12px; text-align: left; font-size: 0.8rem; }
     td { padding: 12px; border-bottom: 1px solid var(--border-color); font-family: 'JetBrains Mono', monospace; }
     td:first-child { font-family: 'Inter', sans-serif; font-weight: 700; }
+
+    /* 5. Expanding Search Logic */
+    .search-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        min-height: 40px;
+    }
+
+    #stock-search {
+        width: 0;
+        opacity: 0;
+        padding: 8px 0;
+        border: none;
+        border-bottom: 2px solid #0ea5e9;
+        background: transparent;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+    }
+
+    #stock-search.active {
+        width: 200px;
+        opacity: 1;
+        padding: 8px 35px 8px 10px;
+        pointer-events: auto;
+    }
+
+    .search-icon {
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        transition: color 0.3s;
+        padding: 5px;
+    }
+
+    .search-icon:hover { color: #0ea5e9; }
+
+    /* Spinning animation for the Refresh Icon */
+    .spinning {
+        animation: fa-spin 1s infinite linear;
+        color: #0ea5e9 !important;
+    }
+
+    @keyframes fa-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(359deg); }
+    }
+
+    /* Adjust table header padding to accommodate the new layout */
+    .table-header-group h3 {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        white-space: nowrap;
+    }
 
     /* 6. DARK THEME OVERRIDES */
     .dark-theme .modal-content {
