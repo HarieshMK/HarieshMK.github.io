@@ -330,6 +330,19 @@ permalink: /share-holding/
     @media (max-width: 768px) {
         .metrics-grid { grid-template-columns: 1fr; }
     }
+    /* 7. UTILITY COLORS */
+    .text-success { 
+        color: #10b981 !important; /* Emerald Green */
+        font-weight: 700;
+    }
+    .text-danger { 
+        color: #ef4444 !important; /* Rose Red */
+        font-weight: 700;
+    }
+
+    /* Ensure readability in Dark Mode */
+    .dark-theme .text-success { color: #34d399 !important; }
+    .dark-theme .text-danger { color: #f87171 !important; }
 </style>
 
 <script src="{{ '/assets/js/share-holdings.js' | relative_url }}"></script>
