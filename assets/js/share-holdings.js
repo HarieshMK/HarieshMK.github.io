@@ -1,5 +1,5 @@
 /**
- * Share Holdings Engine v5.2 - "The Diagnostic Fix"
+ * Share Holdings Engine v6 - "The Diagnostic Fix"
  */
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM1ra94SDop0TSB9xgmH-Cy-_Ha-nCJE8IlcDEgWzyGG-jdMVZ_C8SqullEoYebqg6/exec"; 
@@ -7,6 +7,8 @@ let processedHoldings = [];
 let currentScanningSymbol = "";
 let sortColumn = 'symbol';
 let sortDirection = 'asc';
+let dataState = {portfolioReady: false,pricesReady: false, rawPrices: []
+                };
 
 // --- 1. INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -18,17 +20,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 1. Load data from DB (Awaiting this ensures processedHoldings is populated)
+    // 1. Load data from DB
     await loadPortfolioFromDB(session.user.id);
 
-    // 2. Load cached prices
+    // 2. Load cached prices (Updated to use dataState)
     const cachedPrices = localStorage.getItem('portfolio_prices');
     if (cachedPrices) {
-        applyPrices(JSON.parse(cachedPrices));
+        dataState.rawPrices = JSON.parse(cachedPrices);
+        dataState.pricesReady = true;
+        reconcileAndRender(); // Try to render immediately if DB is also ready
     }
 
     // 3. Background Sync
-    startSync(); 
+    startSync();
 
     // --- SETUP LISTENERS ---
     const dropZone = document.getElementById('drop-zone');
@@ -47,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- 2. DATA PERSISTENCE ---
 async function loadPortfolioFromDB(userId) {
-    showStatus("Fetching data...");
+    showStatus("Fetching Portfolio...");
     try {
         const [tradesRes, corpRes] = await Promise.all([
             supabase.from('equity_transactions').select('*').eq('user_id', userId).order('transaction_date', { ascending: true }),
@@ -55,8 +59,6 @@ async function loadPortfolioFromDB(userId) {
         ]);
 
         if (tradesRes.error) throw tradesRes.error;
-        
-        console.log("Raw Trades fetched:", tradesRes.data.length);
 
         const mappedTrades = tradesRes.data.map(t => ({
             symbol: t.symbol,
@@ -68,9 +70,12 @@ async function loadPortfolioFromDB(userId) {
         
         calculateFIFO(mappedTrades, corpRes.data || []);
         
+        // MARK PORTFOLIO AS READY
+        dataState.portfolioReady = true;
+        reconcileAndRender(); 
+        
     } catch (err) {
-        console.error("Load Error:", err);
-        showStatus("Error loading data: " + err.message, true);
+        showStatus("Load Error: " + err.message, true);
     }
 }
 
@@ -187,7 +192,7 @@ function calculateFIFO(trades, corporateActions = []) {
         };
     }).filter(h => h.qty > 0);
 
-    renderTable();
+    reconcileAndRender();
 }
 
 // --- 4. MODAL LOGIC ---
@@ -240,7 +245,6 @@ async function submitForApproval() {
         numericRatio = parseFloat(ratioStr);
     }
 
-    // REPLACED ALERTS HERE
     if (!ratioStr || !date) { 
         showStatus("Please fill all details", true); 
         return; 
@@ -249,6 +253,8 @@ async function submitForApproval() {
         showStatus("Please enter the Cost Proportion percentage.", true);
         return;
     }
+
+    showStatus("Saving to database...");
 
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
@@ -261,24 +267,41 @@ async function submitForApproval() {
     }]);
 
     if (!error) {
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ 
-                ticker: cleanSymbol, 
-                type, 
-                ratio: numericRatio, 
-                originalRatio: ratioStr, 
-                date, 
-                isSubmission: true 
-            })
-        });
+        showStatus("Syncing with Google Sheets...");
         
-        // REPLACED ALERT HERE
-        showStatus(`Action submitted for ${cleanSymbol}!`);
-        closeCorpModal();
+        // We wrap this in a try/catch and use a controller for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Kept for Google compatibility, but handled via logic
+                signal: controller.signal,
+                body: JSON.stringify({ 
+                    ticker: cleanSymbol, 
+                    newTicker: newTicker,
+                    type: type,
+                    ratio: numericRatio, 
+                    originalRatio: ratioStr, 
+                    date, 
+                    isSubmission: true 
+                })
+            });
+            
+            clearTimeout(timeoutId);
+            showStatus(`Action submitted! Ticker ${newTicker || cleanSymbol} added to sync.`);
+            closeCorpModal();
+            
+            // Refresh prices after a short delay to allow Google to process
+            setTimeout(() => startSync(), 2000);
+
+        } catch (err) {
+            console.error("Google Sync Timeout/Error:", err);
+            showStatus("Action saved to DB, but Google Sheet sync timed out. Ticker may take longer to appear.", true);
+            closeCorpModal();
+        }
     } else {
-        // REPLACED ALERT HERE
         showStatus("Submission failed: " + error.message, true);
     }
 }
@@ -287,34 +310,35 @@ async function submitForApproval() {
 // --- 5. SYNC (Efficiency Improvement) ---
 async function startSync() {
     const refreshIcon = document.getElementById('manual-sync-trigger');
-    const liveLabel = document.getElementById('sync-status-label');
-    
-    // Start Animation
     if (refreshIcon) refreshIcon.classList.add('spinning');
 
     try {
-        const res = await fetch(GOOGLE_SCRIPT_URL, { redirect: 'follow' });
+        const res = await fetch(GOOGLE_SCRIPT_URL);
         const sheetPrices = await res.json();
         
-        // Save to local storage for next visit
         localStorage.setItem('portfolio_prices', JSON.stringify(sheetPrices));
         
-        // Apply prices to the global processedHoldings array
-        applyPrices(sheetPrices);
+        // MARK PRICES AS READY
+        dataState.rawPrices = sheetPrices;
+        dataState.pricesReady = true;
+        reconcileAndRender();
 
-        if (liveLabel) liveLabel.style.display = 'inline';
     } catch (e) { 
         console.error("Price sync failed:", e);
+        showStatus("Price sync failed. Showing cached/zero prices.", true);
     } finally {
-        // Stop Animation
         if (refreshIcon) refreshIcon.classList.remove('spinning');
     }
 }
 
-// Helper to map prices to holdings
-function applyPrices(priceData) {
+// THE GATE: Only joins data when both are present
+function reconcileAndRender() {
+    if (!dataState.portfolioReady || !dataState.pricesReady || processedHoldings.length === 0) return;
+
+    console.log("Gate Open: Reconciling Prices with Portfolio...");
+    
     const priceMap = new Map();
-    priceData.forEach(p => {
+    dataState.rawPrices.forEach(p => {
         const cleanTicker = String(p.ticker || "").toUpperCase().trim().replace(/^(NSE:|BOM:|BSE:)/i, '');
         priceMap.set(cleanTicker, parseFloat(p.price));
     });
@@ -322,7 +346,7 @@ function applyPrices(priceData) {
     processedHoldings.forEach(h => {
         const cleanSym = h.symbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim().toUpperCase();
         const price = priceMap.get(cleanSym);
-        if (price) h.current_price = price;
+        h.current_price = price || 0;
     });
 
     renderTable();
