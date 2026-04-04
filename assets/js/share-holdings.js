@@ -230,20 +230,31 @@ function closeCorpModal() {
 // --- Updated submitForApproval (Fixes CORB/CORS Block) ---
 async function submitForApproval() {
     const type = document.getElementById('action-type').value;
-    const ratioStr = document.getElementById('action-ratio').value;
+    const ratioStr = document.getElementById('action-ratio').value; // e.g., "1:10"
     const date = document.getElementById('action-date').value;
     const newTicker = (document.getElementById('new-ticker-input')?.value || "").toUpperCase().trim();
     const costPct = document.getElementById('cost-proportion-input')?.value;
 
     const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
     
-    // ... (Keep your numericRatio calculation logic here) ...
+    // --- FIX: CALCULATE NUMERIC RATIO ---
+    let numericRatio = 1;
+    if (ratioStr.includes(':')) {
+        const [num, den] = ratioStr.split(':').map(Number);
+        numericRatio = (num && den) ? num / den : 1;
+    } else {
+        numericRatio = parseFloat(ratioStr) || 1;
+    }
+    // ------------------------------------
 
-    if (!ratioStr || !date) { showStatus("Please fill all details", true); return; }
+    if (!ratioStr || !date) { 
+        showStatus("Please fill all details", true); 
+        return; 
+    }
 
     showStatus("Saving to database...");
 
-    // 1. SAVE TO SUPABASE (We know this works)
+    // 1. SAVE TO SUPABASE
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
         action_type: type,
@@ -258,17 +269,19 @@ async function submitForApproval() {
         showStatus("Syncing with Google Sheets...");
         
         try {
-            // 2. SYNC WITH GOOGLE (The Fix)
-            // Inside submitForApproval() ...
-            
+            // 2. SYNC WITH GOOGLE
+            const tickerWithPrefix = currentScanningSymbol.includes(':') ? 
+                                   currentScanningSymbol : `NSE:${currentScanningSymbol}`;
+            const newTickerWithPrefix = newTicker && !newTicker.includes(':') ? 
+                                      `NSE:${newTicker}` : newTicker;
+
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({ 
-                    // CHANGE THIS LINE:
-                    ticker: currentScanningSymbol.includes(':') ? currentScanningSymbol : `NSE:${currentScanningSymbol}`, 
-                    newTicker: newTicker && !newTicker.includes(':') ? `NSE:${newTicker}` : newTicker,
+                    ticker: tickerWithPrefix, 
+                    newTicker: newTickerWithPrefix,
                     type: type,
                     ratio: numericRatio, 
                     date: date, 
@@ -276,7 +289,7 @@ async function submitForApproval() {
                 })
             });
             
-            showStatus(`Action submitted! Ticker ${newTicker || cleanSymbol} added to sync.`);
+            showStatus(`Action submitted! Tickers added to sync.`);
             closeCorpModal();
             setTimeout(() => startSync(), 2000);
 
