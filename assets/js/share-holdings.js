@@ -227,7 +227,6 @@ function closeCorpModal() {
     document.querySelector('.portfolio-container').style.filter = 'none';
 }
 
-// --- Updated submitForApproval (Replaced alerts) ---
 // --- Updated submitForApproval (Fixes CORB/CORS Block) ---
 async function submitForApproval() {
     const type = document.getElementById('action-type').value;
@@ -260,15 +259,16 @@ async function submitForApproval() {
         
         try {
             // 2. SYNC WITH GOOGLE (The Fix)
+            // Inside submitForApproval() ...
+            
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Keeps it simple for Google
-                headers: {
-                    'Content-Type': 'text/plain' // This bypasses the CORB/CORS pre-flight check
-                },
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({ 
-                    ticker: cleanSymbol, 
-                    newTicker: newTicker,
+                    // CHANGE THIS LINE:
+                    ticker: currentScanningSymbol.includes(':') ? currentScanningSymbol : `NSE:${currentScanningSymbol}`, 
+                    newTicker: newTicker && !newTicker.includes(':') ? `NSE:${newTicker}` : newTicker,
                     type: type,
                     ratio: numericRatio, 
                     date: date, 
