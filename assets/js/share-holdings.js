@@ -228,6 +228,7 @@ function closeCorpModal() {
 }
 
 // --- Updated submitForApproval (Replaced alerts) ---
+// --- Updated submitForApproval (Fixes CORB/CORS Block) ---
 async function submitForApproval() {
     const type = document.getElementById('action-type').value;
     const ratioStr = document.getElementById('action-ratio').value;
@@ -237,25 +238,13 @@ async function submitForApproval() {
 
     const cleanSymbol = currentScanningSymbol.replace(/^(NSE:|BOM:|BSE:)/i, '').trim();
     
-    let numericRatio = 1;
-    if (ratioStr.includes(':')) {
-        const [partsA, partsB] = ratioStr.split(':').map(Number);
-        numericRatio = (type === 'BONUS') ? (partsA + partsB) / partsB : partsA / partsB;
-    } else {
-        numericRatio = parseFloat(ratioStr);
-    }
+    // ... (Keep your numericRatio calculation logic here) ...
 
-    if (!ratioStr || !date) { 
-        showStatus("Please fill all details", true); 
-        return; 
-    }
-    if (type === 'DEMERGER' && !costPct) {
-        showStatus("Please enter the Cost Proportion percentage.", true);
-        return;
-    }
+    if (!ratioStr || !date) { showStatus("Please fill all details", true); return; }
 
     showStatus("Saving to database...");
 
+    // 1. SAVE TO SUPABASE (We know this works)
     const { error } = await supabase.from('corporate_actions').insert([{
         ticker_symbol: cleanSymbol,
         action_type: type,
@@ -269,43 +258,36 @@ async function submitForApproval() {
     if (!error) {
         showStatus("Syncing with Google Sheets...");
         
-        // We wrap this in a try/catch and use a controller for timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-
         try {
+            // 2. SYNC WITH GOOGLE (The Fix)
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Kept for Google compatibility, but handled via logic
-                signal: controller.signal,
+                mode: 'no-cors', // Keeps it simple for Google
+                headers: {
+                    'Content-Type': 'text/plain' // This bypasses the CORB/CORS pre-flight check
+                },
                 body: JSON.stringify({ 
                     ticker: cleanSymbol, 
                     newTicker: newTicker,
                     type: type,
                     ratio: numericRatio, 
-                    originalRatio: ratioStr, 
-                    date, 
+                    date: date, 
                     isSubmission: true 
                 })
             });
             
-            clearTimeout(timeoutId);
             showStatus(`Action submitted! Ticker ${newTicker || cleanSymbol} added to sync.`);
             closeCorpModal();
-            
-            // Refresh prices after a short delay to allow Google to process
             setTimeout(() => startSync(), 2000);
 
         } catch (err) {
-            console.error("Google Sync Timeout/Error:", err);
-            showStatus("Action saved to DB, but Google Sheet sync timed out. Ticker may take longer to appear.", true);
-            closeCorpModal();
+            console.error("Google Sync Error:", err);
+            showStatus("Saved to DB, but Google Sync failed.", true);
         }
     } else {
         showStatus("Submission failed: " + error.message, true);
     }
 }
-
 
 // --- 5. SYNC (Efficiency Improvement) ---
 async function startSync() {
