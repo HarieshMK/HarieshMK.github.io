@@ -3,7 +3,7 @@ layout: post
 title: "Do You Really Need an Emergency Fund?"
 date: 2026-03-13
 categories: [beginners]
-folder_name: "The Unexciting Money Club"
+folder_name: "Just beginning? Click here!"
 ---
 
 Who needs an emergency fund? What is it? Why does every finance YouTuber shout about having 3 to 6 months of expenses saved away?
