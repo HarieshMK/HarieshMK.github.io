@@ -130,6 +130,12 @@ footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
 .dark-theme .post-card-link:hover .post-card, .dark-theme .post-card:hover, .dark-theme .home-card:hover, .dark-theme .folder-card:hover {
   background: #232f46 !important; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important; border-color: #38bdf8 !important;
 }
+/* Fix for Blog Page Folders in Dark Mode */
+.dark-theme .folder-name, 
+.dark-theme .category-title {color: #ffffff !important; }
+.dark-theme .folder-count { color: #94a3b8 !important; }
+.dark-theme .category-header { border-bottom-color: rgba(255, 255, 255, 0.1) !important; }
+.dark-theme .folder-card {background: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.1) !important;}
  
 /* ===== 8. GLOBAL LINK RESET ===== */
 a:not(.nav-list li a):not(.post-card-link):not(.nav-link) { color: #0f172a; text-decoration: none; transition: color 0.3s ease; }
