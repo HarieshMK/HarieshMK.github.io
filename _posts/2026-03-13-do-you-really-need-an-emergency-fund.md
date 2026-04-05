@@ -2,7 +2,7 @@
 layout: post
 title: "Do You Really Need an Emergency Fund?"
 date: 2026-03-13
-categories: [finance]
+categories: [beginners]
 folder_name: "The Unexciting Money Club"
 ---
 
