@@ -43,11 +43,10 @@ title: Blogs
         </h3>
         
         {% if posts.size > 3 %}
-        <a href="{{ '/category/' | relative_url }}{{ category_name | slugify }}/" class="input-readable" style="text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-          View All {{ posts.size }} →
-        </a>
+          <a href="{{ site.baseurl }}/category/{{ category_name | slugify }}/" class="input-readable" style="text-decoration: none; font-weight: 700; text-transform: uppercase;">
+            View All {{ posts.size }} →
+          </a>
         {% endif %}
-      </div>
       
       <div class="posts-stack">
         {% for post in posts limit:3 %}
