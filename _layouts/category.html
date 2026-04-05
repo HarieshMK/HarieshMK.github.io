@@ -1,0 +1,21 @@
+---
+layout: default
+---
+
+<header style="text-align: left; margin-bottom: 40px;">
+  <a href="{{ '/blogs/' | relative_url }}" class="input-readable" style="text-decoration: none;">&larr; Back to Knowledge Base</a>
+  <h1 style="font-size: 2.5rem; margin-top: 10px;">{{ page.title }}</h1>
+  <p style="color: #64748b;">All articles filed under this category.</p>
+</header>
+
+<div class="posts-stack">
+  {% for post in site.categories[page.category_slug] %}
+    <a href="{{ post.url | relative_url }}" class="post-card-link">
+      <div class="post-card">
+        <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+        <h2 class="post-title">{{ post.title }}</h2>
+        <p class="post-summary">{{ post.excerpt | strip_html | truncate: 160 }}</p>
+      </div>
+    </a>
+  {% endfor %}
+</div>
