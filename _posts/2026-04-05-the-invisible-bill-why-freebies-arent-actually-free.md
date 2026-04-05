@@ -3,7 +3,7 @@ layout: post
 title: "The Invisible Bill: Why Freebies Aren't Actually Free"
 date: 2026-04-05
 categories: [macroeconomics]
-folder_name: "The Unexciting Money Club"
+folder_name: "Wanna know how world works? Click here"
 ---
 
 The bicycle, the mixer, the television, the fridge, or that ₹2,000 hitting your bank account—it’s all free, right? 
