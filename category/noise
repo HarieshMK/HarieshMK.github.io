@@ -1,0 +1,5 @@
+---
+layout: category
+title: Finance & Investment  # This is the display name
+category_slug: noise       # This MUST match the category name in your posts
+---
