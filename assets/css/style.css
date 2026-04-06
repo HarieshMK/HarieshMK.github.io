@@ -149,7 +149,7 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover { color: #38bdf8
   flex: 1 1 300px; background: #ffffff; border: 1px solid #eef2f6 !important; border-radius: 15px; 
   padding: 24px; display: flex; align-items: center; gap: 15px; margin-bottom: 20px !important; box-sizing: border-box;
 }
-.post-card { margin-bottom: 25px !important; }
+.post-card { margin-bottom: 15px !important; }
 .folder-icon { font-size: 2rem; }
 .folder-name { display: block; font-weight: 700; color: #0f172a; font-size: 0.95rem; }
 .folder-count { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -305,7 +305,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .posts-stack-vertical {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
     width: 100%;
 }
 
@@ -313,7 +313,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .view-all-row {
     display: flex;
     justify-content: flex-end; /* Pushes link to the right */
-    margin-top: 15px;
+    margin-top: 8px;
 }
 
 .view-all-link {
