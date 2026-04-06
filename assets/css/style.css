@@ -50,9 +50,9 @@ header .tagline { color: #64748b; font-size: 1.1rem; font-style: italic; margin:
 #theme-toggle:hover #theme-icon { transform: scale(1.2) rotate(15deg); }
 
 .nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
-.nav-list li a { text-decoration: none; color: #64748b; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; padding: 10px 22px; border-radius: 10px; transition: all 0.3s ease; display: inline-block; }
+.nav-list li a { text-decoration: none; color: var(--text-color); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; padding: 10px 22px; border-radius: 10px; transition: all 0.3s ease; display: inline-block; }
 .nav-list li a:hover { color: #38bdf8 !important; background-color: rgba(56, 189, 248, 0.08) !important; transform: translateY(-1px); }
-.nav-list li a.active { color: #0f172a !important; background: rgba(255, 255, 255, 0.5) !important; backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important; border: 1px solid rgba(226, 232, 240, 0.8) !important; }
+.nav-list li a.active { color: #0f172a ; background: rgba(255, 255, 255, 0.5) !important; backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important; border: 1px solid rgba(226, 232, 240, 0.8) !important; }
 
 /* REVISED MOBILE OVERRIDES */
 @media (max-width: 480px) {
@@ -72,7 +72,7 @@ header .tagline { color: #64748b; font-size: 1.1rem; font-style: italic; margin:
 }
 .post-date, span.post-date { font-size: 0.82rem !important; font-style: italic !important; color: #64748b !important; display: block !important; margin-bottom: 8px !important; }
 .post-title, .post-card h2, .home-card h2, .post-card-link h2, .post-card h2 a {
-  font-style: normal !important; font-size: 1.85rem !important; font-weight: 800 !important; line-height: 1.2 !important; 
+  font-style: normal !important; font-size: 1.85rem !important; font-weight: 700 !important; line-height: 1.2 !important; 
   font-family: 'Lora', serif !important; color: #0f172a !important; text-decoration: none !important; 
   display: block !important; margin-top: 0 !important; margin-bottom: 10px !important;
 }
@@ -149,7 +149,7 @@ a:not(.nav-list li a):not(.post-card-link):not(.nav-link):hover { color: #38bdf8
   flex: 1 1 300px; background: #ffffff; border: 1px solid #eef2f6 !important; border-radius: 15px; 
   padding: 24px; display: flex; align-items: center; gap: 15px; margin-bottom: 20px !important; box-sizing: border-box;
 }
-.post-card { margin-bottom: 15px !important; }
+.posts-stack-vertical .post-card { margin-bottom: 0 !important;}
 .folder-icon { font-size: 2rem; }
 .folder-name { display: block; font-weight: 700; color: #0f172a; font-size: 0.95rem; }
 .folder-count { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
