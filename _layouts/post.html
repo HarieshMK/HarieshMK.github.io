@@ -37,15 +37,23 @@ layout: default
   </p>
   
   <div id="cusdis_thread"
-    data-host="https://cusdis.com"
-    data-app-id="078e37ac-a7c4-4015-a9ec-e3e1aa8ca3f0"
-    data-page-id="{{ page.url }}"
-    data-page-url="{{ site.url }}{{ page.url }}"
-    data-page-title="{{ page.title }}">
-  </div>
-  
-  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-</section>
+  data-host="https://cusdis.com"
+  data-app-id="078e37ac-a7c4-4015-a9ec-e3e1aa8ca3f0"
+  data-page-id="{{ page.url }}"
+  data-page-url="{{ site.url }}{{ page.url }}"
+  data-page-title="{{ page.title }}"
+  data-theme="auto"> </div>
+
+<script>
+  // This small script tells Cusdis exactly what colors to use based on your CSS
+  window.CUSDIS_CONFIG = {
+    target: '#cusdis_thread',
+    dataset: document.querySelector('#cusdis_thread').dataset,
+    // This part dynamically checks if your body has the "dark-theme" class
+    theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
+  }
+</script>
+<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 
 <div class="post-footer">
   <div class="post-nav">
