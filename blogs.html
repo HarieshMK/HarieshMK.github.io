@@ -36,19 +36,15 @@ title: Blogs
     {% assign posts = category[1] %}
     {% assign first_post = posts | first %}
 
-    <div id="{{ category_name | slugify }}" class="playlist-group" style="margin-bottom: 60px; scroll-margin-top: 100px;">
-      <div class="category-header" style="border-bottom: 1px solid #e2e8f0; margin-bottom: 25px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: baseline;">
-        <h3 class="category-title" style="margin: 0; font-family: 'Lora', serif; font-size: 1.8rem;">
+    <div id="{{ category_name | slugify }}" class="playlist-group" style="margin-bottom: 80px; scroll-margin-top: 100px;">
+      
+      <div class="category-header-row">
+        <h3 class="category-title">
             {% if first_post.folder_name %}{{ first_post.folder_name }}{% else %}{{ category_name }}{% endif %}
         </h3>
-        
-        {% if posts.size > 3 %}
-          <a href="{{ site.baseurl }}/category/{{ category_name | slugify }}/" class="input-readable" style="text-decoration: none; font-weight: 700; text-transform: uppercase;">
-            View All {{ posts.size }} →
-          </a>
-        {% endif %}
+      </div>
       
-      <div class="posts-stack">
+      <div class="posts-stack-vertical">
         {% for post in posts limit:3 %}
           <a href="{{ post.url | relative_url }}" class="post-card-link">
             <div class="post-card">
@@ -59,6 +55,15 @@ title: Blogs
           </a>
         {% endfor %}
       </div>
+
+      {% if posts.size > 3 %}
+      <div class="view-all-row">
+        <a href="{{ site.baseurl }}/category/{{ category_name | slugify }}/" class="view-all-link">
+          view all {{ posts.size }} posts
+        </a>
+      </div>
+      {% endif %}
+
     </div> 
   {% endfor %} 
 </div>
