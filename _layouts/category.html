@@ -2,12 +2,19 @@
 layout: default
 ---
 
-<header style="text-align: left; margin-bottom: 40px;">
-  <a href="{{ '/blogs/' | relative_url }}" class="input-readable" style="text-decoration: none;">&larr; Back to Knowledge Base</a>
-  <h1 style="font-size: 2.5rem; margin-top: 10px;">{{ page.title }}</h1>
+<header style="text-align: left; margin-bottom: 40px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px;">
+  <a href="{{ '/blogs/' | relative_url }}" class="back-link" style="text-decoration: none; font-size: 0.9rem;">&larr; Back to Knowledge Base</a>
+  
+  <h1 style="font-size: 2.5rem; margin-top: 20px; margin-bottom: 10px;">{{ page.title }}</h1>
+
+  {% if page.description %}
+    <p class="category-description" style="font-style: italic; color: #64748b;">{{ page.description }}</p>
+  {% else %}
+    <p style="font-style: italic; color: #64748b;">All articles filed under this category.</p>
+  {% endif %}
 </header>
 
-<div class="posts-stack">
+<div class="posts-stack-vertical">
   {% for post in site.categories[page.category_slug] %}
     <a href="{{ post.url | relative_url }}" class="post-card-link">
       <div class="post-card">
