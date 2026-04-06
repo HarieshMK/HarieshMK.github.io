@@ -290,3 +290,50 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 
 .dark-theme .user-greeting { color: #ffffff; }
 .dark-theme .auth-link { color: #ffffff; border-color: #ffffff; }
+
+/* --- BLOGS LIST ROW LAYOUT --- */
+
+/* Ensures the header takes its own full row */
+.category-header-row {
+    width: 100%;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+/* Forces the posts to stack vertically, one per row */
+.posts-stack-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* ROW 5: The View All container */
+.view-all-row {
+    display: flex;
+    justify-content: flex-end; /* Pushes link to the right */
+    margin-top: 15px;
+}
+
+.view-all-link {
+    font-size: 0.85rem !important;
+    font-style: italic !important;
+    text-decoration: underline !important;
+    color: #0ea5e9 !important; /* Blue color from your theme */
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.view-all-link:hover {
+    opacity: 0.7;
+    color: #0369a1 !important;
+}
+
+/* Dark Mode Adjustments for Blog Row Layout */
+.dark-theme .category-header-row {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+.dark-theme .view-all-link {
+    color: #38bdf8 !important;
+}
