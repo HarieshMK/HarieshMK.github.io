@@ -136,6 +136,17 @@ footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
 .dark-theme .folder-count { color: #94a3b8 !important; }
 .dark-theme .category-header { border-bottom-color: rgba(255, 255, 255, 0.1) !important; }
 .dark-theme .folder-card {background: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.1) !important;}
+.dark-theme #cusdis_thread iframe {
+  color-scheme: dark;
+  background: transparent !important; /* Forces your site bg to show through */
+  filter: invert(0); /* Ensures text stays readable */
+}
+
+/* Ensure the title and helper text in the comment section also match */
+.dark-theme .comments h3, 
+.dark-theme .comments p {
+  color: #ffffff !important;
+}
  
 /* ===== 8. GLOBAL LINK RESET ===== */
 a:not(.nav-list li a):not(.post-card-link):not(.nav-link) { color: #0f172a; text-decoration: none; transition: color 0.3s ease; }
