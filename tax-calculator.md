@@ -105,7 +105,40 @@ permalink: /tax-calculator/
 
 <script src="{{ '/assets/js/investment-options.js' | relative_url }}"></script>
 <script>
-    // Logic for UI interactions
+    // --- 1. UI GENERATION (Run on Page Load) ---
+    const deductionsContainer = document.getElementById('deductions-list');
+
+    // Generate fields from the Registry
+    Object.keys(InvestmentRegistry).forEach(key => {
+        const item = InvestmentRegistry[key];
+        
+        // Filter: Show everything that has a Tax Category except basic savings or NONE
+        if (item.taxCategory && !["NONE", "80TTA", "STD"].includes(item.taxCategory)) {
+            const row = document.createElement('div');
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.justifyContent = "space-between";
+            row.style.padding = "12px 10px";
+            row.style.borderBottom = "1px solid #1e293b";
+
+            row.innerHTML = `
+                <div style="flex: 1;">
+                    <div style="font-size: 0.9rem; color: #fff; font-weight: 500;">${key}</div>
+                    <div style="font-size: 0.75rem; color: #38bdf8;">Section ${item.taxCategory}</div>
+                </div>
+                <div style="flex: 0 0 140px;">
+                    <input type="number" class="deduction-input" 
+                           data-category="${item.taxCategory}" 
+                           data-name="${key}" 
+                           placeholder="₹ 0" 
+                           style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
+                </div>
+            `;
+            deductionsContainer.appendChild(row);
+        }
+    });
+
+    // --- 2. UI INTERACTION LOGIC ---
     const homeLoanCheck = document.getElementById('has-home-loan');
     const clpCheck = document.getElementById('is-under-construction');
     const homeLoanSection = document.getElementById('home-loan-section');
@@ -119,9 +152,10 @@ permalink: /tax-calculator/
         clpNote.style.display = e.target.checked ? 'block' : 'none';
     });
 
+    // --- 3. THE CALCULATION ENGINE LINK ---
     function runCalculator() {
-        // Collect all data
-        const data = {
+        // A. Collect standard inputs
+        const salaryData = {
             basic: parseFloat(document.getElementById('basic-salary').value) || 0,
             hraRec: parseFloat(document.getElementById('hra-received').value) || 0,
             other: parseFloat(document.getElementById('other-income').value) || 0,
@@ -132,9 +166,25 @@ permalink: /tax-calculator/
             interest: parseFloat(document.getElementById('home-interest').value) || 0
         };
 
-        // This is where we call FinanceEngine.TaxEngine.calculate(data)
-        // For now, let's just log it to ensure it's working
-        console.log("Input Data for Engine:", data);
-        alert("Inputs collected! Next: Linking the Math Engine.");
+        // B. Collect dynamic deductions (80C, 80D, etc.)
+        const dynamicDeductions = [];
+        document.querySelectorAll('.deduction-input').forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if (val > 0) {
+                dynamicDeductions.push({
+                    name: input.dataset.name,
+                    category: input.dataset.category,
+                    amount: val
+                });
+            }
+        });
+
+        // Combined data object
+        const finalInputs = { ...salaryData, deductions: dynamicDeductions };
+
+        console.log("🚀 Data ready for FinanceEngine:", finalInputs);
+        
+        // This is where we will call FinanceEngine next
+        alert("Calculation Data ready! Total deductions found: " + dynamicDeductions.length);
     }
 </script>
