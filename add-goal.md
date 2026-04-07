@@ -93,13 +93,18 @@ permalink: /add-goal/
     const targetDateInput = document.getElementById('target_date');
     const durationDisplay = document.getElementById('goal-duration-text');
 
-    // 1. Setup Instrument Dropdown
-    Object.keys(InvestmentRegistry).forEach(option => {
-        let el = document.createElement('option');
-        el.textContent = option;
-        el.value = option;
-        select.appendChild(el);
-    });
+   // 1. Setup Instrument Dropdown
+        Object.keys(InvestmentRegistry).forEach(option => {
+            const asset = InvestmentRegistry[option];
+            
+            // Only show if it's explicitly marked as an investment
+            if (asset.isInvestment === true) {
+                let el = document.createElement('option');
+                el.textContent = option;
+                el.value = option;
+                select.appendChild(el);
+            }
+        });
 
     // 2. Duration Logic
     function updateDuration() {
