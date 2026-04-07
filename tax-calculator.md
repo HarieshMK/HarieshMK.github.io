@@ -35,6 +35,13 @@ permalink: /tax-calculator/
             <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Housing & Exemptions</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                 <div>
+                <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
+                    <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-shield-alt" style="margin-right: 10px; color: #fbbf24;"></i>Tax Savings (Deductions)</h3>
+                    <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 15px;">Select your investments and expenses to save tax under the Old Regime.</p>
+                    
+                    <div id="deductions-list" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                        </div>
+                </div>
                     <label style="font-size: 0.8rem; color: #64748b;">Monthly Rent Paid</label>
                     <input type="number" id="rent-paid" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
                 </div>
