@@ -133,10 +133,12 @@ permalink: /tax-calculator/
     });
 
     // --- 3. DYNAMIC 80C ROWS ---
-    const options80C = Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C");
+    // Added a check to make sure InvestmentRegistry exists before filtering
+    const options80C = typeof InvestmentRegistry !== 'undefined' ? 
+                       Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
     function add80CRow() {
-        emptyMsg.style.display = 'none';
+        if(emptyMsg) emptyMsg.style.display = 'none';
         const rowId = Date.now();
         const row = document.createElement('div');
         row.id = `row-${rowId}`;
@@ -162,33 +164,18 @@ permalink: /tax-calculator/
     function update80CTotal() {
         let total = 0;
         document.querySelectorAll('.row-amount-80c').forEach(input => total += parseFloat(input.value) || 0);
-        document.getElementById('display-80c-total').innerText = `₹ ${total.toLocaleString('en-IN')}`;
+        const displayTotal = document.getElementById('display-80c-total');
+        if(displayTotal) displayTotal.innerText = `₹ ${total.toLocaleString('en-IN')}`;
     }
 
-    // --- 4. ENGINE INTEGRATION ---
+    // --- 4. BRIDGE TO THE JS CONTROLLER ---
     function runCalculator() {
-        const data = {
-            salary: {
-                basic: parseFloat(document.getElementById('basic-salary').value) || 0,
-                hra: parseFloat(document.getElementById('hra-received').value) || 0,
-                other: parseFloat(document.getElementById('other-income').value) || 0
-            },
-            housing: {
-                rent: parseFloat(document.getElementById('rent-paid').value) || 0,
-                isMetro: document.getElementById('is-metro').value === 'true',
-                loanInterest: homeLoanCheck.checked ? (parseFloat(document.getElementById('home-interest').value) || 0) : 0,
-                isCLP: clpCheck.checked
-            },
-            deductions: []
-        };
-
-        document.querySelectorAll('.dynamic-80c-row').forEach(row => {
-            const name = row.querySelector('.row-select-80c').value;
-            const amt = parseFloat(row.querySelector('.row-amount-80c').value) || 0;
-            if (name && amt > 0) data.deductions.push({ name, category: "80C", amount: amt });
-        });
-
-        console.log("Calculated Inputs:", data);
-        alert("Inputs Captured! Ready to trigger Math Engine.");
+        console.log("Button clicked, calling controller...");
+        if (typeof TaxController !== 'undefined') {
+            TaxController.calculateAll(); 
+        } else {
+            console.error("TaxController is missing!");
+            alert("Error: tax-calculator.js not loaded.");
+        }
     }
 </script>
