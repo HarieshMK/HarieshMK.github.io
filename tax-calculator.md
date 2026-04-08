@@ -12,7 +12,7 @@ permalink: /tax-calculator/
 <div style="display: flex; flex-wrap: wrap; gap: 25px;">
     
     <div style="flex: 1 1 550px;">
-        
+
         <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
             <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -35,13 +35,6 @@ permalink: /tax-calculator/
             <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Housing & Exemptions</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                 <div>
-                <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-shield-alt" style="margin-right: 10px; color: #fbbf24;"></i>Tax Savings (Deductions)</h3>
-                    <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 15px;">Select your investments and expenses to save tax under the Old Regime.</p>
-                    
-                    <div id="deductions-list" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
-                        </div>
-                </div>
                     <label style="font-size: 0.8rem; color: #64748b;">Monthly Rent Paid</label>
                     <input type="number" id="rent-paid" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
                 </div>
@@ -54,23 +47,41 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;">
-
-            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #38bdf8; font-weight: 600;">
-                <input type="checkbox" id="has-home-loan" style="width: 18px; height: 18px;"> I have an active Home Loan (Section 24b)
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #38bdf8;">
+                <input type="checkbox" id="has-home-loan"> I have a Home Loan (Section 24b)
             </label>
 
-            <div id="home-loan-section" style="display: none; margin-top: 20px; padding: 15px; background: rgba(56, 189, 248, 0.05); border-radius: 10px; border: 1px dashed #38bdf8;">
-                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 0.9rem;">
-                    <input type="checkbox" id="is-under-construction"> My property is Under Construction
+            <div id="home-loan-section" style="display: none; margin-top: 15px; padding: 15px; border-radius: 10px; border: 1px dashed #38bdf8; background: rgba(56, 189, 248, 0.05);">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; margin-bottom: 10px;">
+                    <input type="checkbox" id="is-under-construction"> Under Construction (CLP)
                 </label>
-                
                 <div id="interest-input-group">
-                    <label id="interest-label" style="font-size: 0.8rem; color: #64748b;">Annual Interest Paid this Year</label>
-                    <input type="number" id="home-interest" placeholder="₹" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #1e293b; background: #000; color: #fff;">
+                    <label style="font-size: 0.8rem; color: #64748b;">Annual Interest Paid</label>
+                    <input type="number" id="home-interest" placeholder="₹" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
                     <p id="clp-note" style="display: none; font-size: 0.7rem; color: #94a3b8; margin-top: 8px;">
-                        * Under Old Regime, interest paid during construction is deferred. You can claim it in 5 installments after possession.
+                        * Under Old Regime, construction interest is claimable in 5 installments after possession.
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
+            <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: #fff;"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
+                <i id="80c-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
+            </div>
+            
+            <div id="80c-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
+                <div id="80c-rows-container">
+                    <p id="empty-80c-msg" style="color: #64748b; font-size: 0.85rem; font-style: italic; text-align: center; margin: 20px 0;">No entries added yet.</p>
+                </div>
+                
+                <button type="button" onclick="add80CRow()" style="background: none; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                    <i class="fas fa-plus-circle"></i> Add entry
+                </button>
+                
+                <div style="margin-top: 15px; text-align: right; font-size: 0.8rem; color: #94a3b8;">
+                    Total 80C: <span id="display-80c-total" style="color: #4ade80; font-weight: bold;">₹ 0</span> / ₹ 1,50,000
                 </div>
             </div>
         </div>
@@ -78,113 +89,103 @@ permalink: /tax-calculator/
 
     <div style="flex: 1 1 300px;">
         <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px;">
-            <h3 style="margin-top: 0; text-align: center;">Tax Liability Comparison</h3>
-            
+            <h3 style="margin-top: 0; text-align: center;">Tax Liability</h3>
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
                 <div style="text-align: center; padding: 20px; background: #0f172a; border-radius: 12px; border: 1px solid #1e293b;">
-                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px;">OLD REGIME TAX</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px;">OLD REGIME</div>
                     <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: #fff; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
                 </div>
-                
                 <div style="text-align: center; padding: 20px; background: #0f172a; border-radius: 12px; border: 2px solid #4ade80;">
-                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px;">NEW REGIME TAX</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px;">NEW REGIME</div>
                     <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
                 </div>
             </div>
-
-            <div id="recommendation-box" style="margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; background: rgba(56, 189, 248, 0.1); color: #38bdf8; font-size: 0.9rem;">
-                Fill in your salary details to generate a report.
-            </div>
-
-            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;">
-                Calculate Tax
-            </button>
+            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;">Calculate Tax</button>
         </div>
     </div>
 </div>
 
 <script src="{{ '/assets/js/investment-options.js' | relative_url }}"></script>
 <script>
-    // --- 1. UI GENERATION (Run on Page Load) ---
-    const deductionsContainer = document.getElementById('deductions-list');
-
-    // Generate fields from the Registry
-    Object.keys(InvestmentRegistry).forEach(key => {
-        const item = InvestmentRegistry[key];
-        
-        // Filter: Show everything that has a Tax Category except basic savings or NONE
-        if (item.taxCategory && !["NONE", "80TTA", "STD"].includes(item.taxCategory)) {
-            const row = document.createElement('div');
-            row.style.display = "flex";
-            row.style.alignItems = "center";
-            row.style.justifyContent = "space-between";
-            row.style.padding = "12px 10px";
-            row.style.borderBottom = "1px solid #1e293b";
-
-            row.innerHTML = `
-                <div style="flex: 1;">
-                    <div style="font-size: 0.9rem; color: #fff; font-weight: 500;">${key}</div>
-                    <div style="font-size: 0.75rem; color: #38bdf8;">Section ${item.taxCategory}</div>
-                </div>
-                <div style="flex: 0 0 140px;">
-                    <input type="number" class="deduction-input" 
-                           data-category="${item.taxCategory}" 
-                           data-name="${key}" 
-                           placeholder="₹ 0" 
-                           style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
-                </div>
-            `;
-            deductionsContainer.appendChild(row);
-        }
-    });
-
-    // --- 2. UI INTERACTION LOGIC ---
+    // --- 1. UI ELEMENT REFS ---
     const homeLoanCheck = document.getElementById('has-home-loan');
     const clpCheck = document.getElementById('is-under-construction');
-    const homeLoanSection = document.getElementById('home-loan-section');
     const clpNote = document.getElementById('clp-note');
+    const homeLoanSection = document.getElementById('home-loan-section');
 
-    homeLoanCheck.addEventListener('change', (e) => {
-        homeLoanSection.style.display = e.target.checked ? 'block' : 'none';
+    const header80C = document.getElementById('80c-header');
+    const content80C = document.getElementById('80c-content');
+    const icon80C = document.getElementById('80c-icon');
+    const rowsContainer = document.getElementById('80c-rows-container');
+    const emptyMsg = document.getElementById('empty-80c-msg');
+
+    // --- 2. TOGGLE LOGIC ---
+    homeLoanCheck.addEventListener('change', (e) => homeLoanSection.style.display = e.target.checked ? 'block' : 'none');
+    clpCheck.addEventListener('change', (e) => clpNote.style.display = e.target.checked ? 'block' : 'none');
+    
+    header80C.addEventListener('click', () => {
+        const isHidden = content80C.style.display === 'none';
+        content80C.style.display = isHidden ? 'block' : 'none';
+        icon80C.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
     });
 
-    clpCheck.addEventListener('change', (e) => {
-        clpNote.style.display = e.target.checked ? 'block' : 'none';
-    });
+    // --- 3. DYNAMIC 80C ROWS ---
+    const options80C = Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C");
 
-    // --- 3. THE CALCULATION ENGINE LINK ---
+    function add80CRow() {
+        emptyMsg.style.display = 'none';
+        const rowId = Date.now();
+        const row = document.createElement('div');
+        row.id = `row-${rowId}`;
+        row.className = "dynamic-80c-row";
+        row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+
+        let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        
+        row.innerHTML = `
+            <select class="row-select-80c" style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                <option value="" disabled selected>Select Investment</option>
+                ${selectOptions}
+            </select>
+            <input type="number" class="row-amount-80c" placeholder="Amount" oninput="update80CTotal()"
+                   style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
+            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" style="background:none; border:none; color:#ef4444; cursor:pointer;">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        rowsContainer.appendChild(row);
+    }
+
+    function update80CTotal() {
+        let total = 0;
+        document.querySelectorAll('.row-amount-80c').forEach(input => total += parseFloat(input.value) || 0);
+        document.getElementById('display-80c-total').innerText = `₹ ${total.toLocaleString('en-IN')}`;
+    }
+
+    // --- 4. ENGINE INTEGRATION ---
     function runCalculator() {
-        // A. Collect standard inputs
-        const salaryData = {
-            basic: parseFloat(document.getElementById('basic-salary').value) || 0,
-            hraRec: parseFloat(document.getElementById('hra-received').value) || 0,
-            other: parseFloat(document.getElementById('other-income').value) || 0,
-            rent: parseFloat(document.getElementById('rent-paid').value) || 0,
-            isMetro: document.getElementById('is-metro').value === 'true',
-            loanActive: homeLoanCheck.checked,
-            isCLP: clpCheck.checked,
-            interest: parseFloat(document.getElementById('home-interest').value) || 0
+        const data = {
+            salary: {
+                basic: parseFloat(document.getElementById('basic-salary').value) || 0,
+                hra: parseFloat(document.getElementById('hra-received').value) || 0,
+                other: parseFloat(document.getElementById('other-income').value) || 0
+            },
+            housing: {
+                rent: parseFloat(document.getElementById('rent-paid').value) || 0,
+                isMetro: document.getElementById('is-metro').value === 'true',
+                loanInterest: homeLoanCheck.checked ? (parseFloat(document.getElementById('home-interest').value) || 0) : 0,
+                isCLP: clpCheck.checked
+            },
+            deductions: []
         };
 
-        // B. Collect dynamic deductions (80C, 80D, etc.)
-        const dynamicDeductions = [];
-        document.querySelectorAll('.deduction-input').forEach(input => {
-            const val = parseFloat(input.value) || 0;
-            if (val > 0) {
-                dynamicDeductions.push({
-                    name: input.dataset.name,
-                    category: input.dataset.category,
-                    amount: val
-                });
-            }
+        document.querySelectorAll('.dynamic-80c-row').forEach(row => {
+            const name = row.querySelector('.row-select-80c').value;
+            const amt = parseFloat(row.querySelector('.row-amount-80c').value) || 0;
+            if (name && amt > 0) data.deductions.push({ name, category: "80C", amount: amt });
         });
 
-        // Combined data object
-        const finalInputs = { ...salaryData, deductions: dynamicDeductions };
-
-        console.log("🚀 Data ready for FinanceEngine:", finalInputs);
-        
-        // This is where we will call FinanceEngine next
-        alert("Calculation Data ready! Total deductions found: " + dynamicDeductions.length);
+        console.log("Calculated Inputs:", data);
+        alert("Inputs Captured! Ready to trigger Math Engine.");
     }
 </script>
