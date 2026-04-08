@@ -100,14 +100,14 @@ permalink: /tax-calculator/
                     <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
                 </div>
             </div>
-           <button onclick="TaxController.calculateAll()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;">Calculate Tax</button>
+           <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;"> Calculate Tax </button>
         </div>
     </div>
 </div>
 
-<script src="{{ '/assets/js/investment-options.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/finance-engine.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/tax-calculator.js' | relative_url }}"></script>
+<script src="/assets/js/investment-options.js"></script>
+<script src="/assets/js/finance-engine.js"></script>
+<script src="/assets/js/tax-calculator.js"></script>
 
 <script>
     // --- 1. UI ELEMENT REFS ---
