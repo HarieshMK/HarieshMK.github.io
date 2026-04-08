@@ -5,69 +5,68 @@
 const TaxController = {
     init: () => {
         // Any setup logic can go here
-        TaxController.updateMode(); 
+        console.log("Tax Controller Initialized");
     },
 
-    // 1. Handle the Planning vs Actuals Toggle
-    updateMode: () => {
-        const isActualMode = document.getElementById('calc-mode').checked;
-        const label = document.getElementById('mode-label');
-        
-        if (isActualMode) {
-            label.innerHTML = "Mode: <strong>Actuals (Filing)</strong>";
-            // Logic to show/hide extra fields if needed
-        } else {
-            label.innerHTML = "Mode: <strong>Planning (Projections)</strong>";
-        }
-        TaxController.calculateAll();
-    },
-
-    // 2. The Master Calculation Function
+    // 1. The Master Calculation Function
     calculateAll: () => {
-        // A. Grab Income Inputs
-        const basic = parseFloat(document.getElementById('basic-pay').value) || 0;
-        const hraRec = parseFloat(document.getElementById('hra-received').value) || 0;
-        const special = parseFloat(document.getElementById('special-allowance').value) || 0;
-        const bonus = parseFloat(document.getElementById('bonus').value) || 0;
+        // A. Collect Core Salary Inputs
+        const inputs = {
+            basic: parseFloat(document.getElementById('basic-salary').value) || 0,
+            hraReceived: parseFloat(document.getElementById('hra-received').value) || 0,
+            otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
+            rentPaid: parseFloat(document.getElementById('rent-paid').value) || 0,
+            isMetro: document.getElementById('is-metro').value === 'true',
+            homeLoanInterest: document.getElementById('has-home-loan').checked ? 
+                             (parseFloat(document.getElementById('home-interest').value) || 0) : 0
+        };
 
-        const grossSalary = basic + hraRec + special + bonus;
+        const grossSalary = inputs.basic + inputs.hraReceived + inputs.otherIncome;
 
-        // B. Update Income Card UI
-        document.getElementById('display-gross').innerText = `₹ ${FinanceEngine.formatIndian(grossSalary)}`;
+        // B. Collect Dynamic 80C Deductions
+        let total80C = 0;
+        document.querySelectorAll('.row-amount-80c').forEach(input => {
+            total80C += parseFloat(input.value) || 0;
+        });
 
-        // C. Calculate Tax (Using our FinanceEngine)
+        // C. Calculate Tax (Using FinanceEngine)
+        // 1. New Regime (Simple)
         const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary);
         
-        // Note: For now, we are passing 0 deductions for Old Regime until we build the next cards
+        // 2. Old Regime (Complex - needs deductions)
+        // Note: We cap 80C at 1.5L inside the Engine, but we pass the total here.
         const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
-            section80C: 0,
-            section80D: 0,
-            homeLoanInterest: 0,
-            npsIndividual: 0,
-            exemptHRA: 0,
+            section80C: total80C,
+            section80D: 0, // We will build this card next
+            homeLoanInterest: inputs.homeLoanInterest,
+            exemptHRA: 0, // We need to add HRA calculation logic in the engine
             otherExemptions: 0
         });
 
-        // D. Update Summary Sidebar
+        // D. Update UI Summary Sidebar
         TaxController.updateSummary(newRegimeTax, oldRegimeTax);
     },
 
     updateSummary: (newTax, oldTax) => {
-        // We'll map these to the HTML elements in your Summary Sidebar
-        const newElem = document.getElementById('summary-new-tax');
-        const oldElem = document.getElementById('summary-old-tax');
+        const newElem = document.getElementById('new-regime-tax');
+        const oldElem = document.getElementById('old-regime-tax');
+        const recommendationBox = document.getElementById('recommendation-box');
         
-        if(newElem) newElem.innerText = `₹ ${FinanceEngine.formatIndian(newTax)}`;
-        if(oldElem) oldElem.innerText = `₹ ${FinanceEngine.formatIndian(oldTax)}`;
+        if(newElem) newElem.innerText = `₹ ${newTax.toLocaleString('en-IN')}`;
+        if(oldElem) oldElem.innerText = `₹ ${oldTax.toLocaleString('en-IN')}`;
 
-        // Highlight the winner
-        const winnerText = document.getElementById('tax-winner');
-        if(winnerText) {
+        if(recommendationBox) {
             const diff = Math.abs(newTax - oldTax);
             if (newTax < oldTax) {
-                winnerText.innerHTML = `New Regime saves you <strong>₹${FinanceEngine.formatIndian(diff)}</strong>`;
+                recommendationBox.style.background = "rgba(74, 222, 128, 0.1)";
+                recommendationBox.style.color = "#4ade80";
+                recommendationBox.innerHTML = `<strong>New Regime</strong> is better. You save <strong>₹${diff.toLocaleString('en-IN')}</strong>`;
+            } else if (oldTax < newTax) {
+                recommendationBox.style.background = "rgba(56, 189, 248, 0.1)";
+                recommendationBox.style.color = "#38bdf8";
+                recommendationBox.innerHTML = `<strong>Old Regime</strong> is better. You save <strong>₹${diff.toLocaleString('en-IN')}</strong>`;
             } else {
-                winnerText.innerHTML = `Old Regime saves you <strong>₹${FinanceEngine.formatIndian(diff)}</strong>`;
+                recommendationBox.innerHTML = `Both regimes result in the same tax.`;
             }
         }
     }
