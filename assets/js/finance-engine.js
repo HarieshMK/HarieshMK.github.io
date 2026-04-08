@@ -2,7 +2,7 @@
  * FinanceEngine: The core logic for all financial calculations.
  * This file is UI-agnostic (no DOM references).
  */
-const FinanceEngine = {
+var FinanceEngine = window.FinanceEngine || {
     
     // 1. Core Future Value Math (SIP + Lumpsum)
     calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
