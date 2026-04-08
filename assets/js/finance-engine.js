@@ -66,71 +66,58 @@ const FinanceEngine = {
 
 /* 6. Tax Calculation Module */
 const TaxEngine = {
-
-    // A. The "Best of 3" HRA Logic from your Excel
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
         const limit1 = hraReceived;
         const limit2 = basic * metroFactor;
-        const limit3 = Math.max(0, rentPaid - (basic * 0.1));
-        
+        const limit3 = Math.max(0, (rentPaid * 12) - (basic * 0.1)); // Monthly rent to Annual
         return Math.min(limit1, limit2, limit3);
     },
 
-    // B. Base Slab Calculator (G3 in your Excel)
     calculateBaseSlabTax: (income, slabs) => {
         let tax = 0;
+        let previousLimit = 0;
         slabs.forEach(slab => {
-            if (income > slab.start) {
-                let amountInSlab = Math.min(income, slab.end) - slab.start;
-                tax += amountInSlab * slab.rate;
+            if (income > previousLimit) {
+                let currentLimit = slab.limit === Infinity ? income : slab.limit;
+                let taxableInSlab = Math.min(income, currentLimit) - previousLimit;
+                if (taxableInSlab > 0) tax += taxableInSlab * slab.rate;
             }
+            previousLimit = slab.limit;
         });
         return tax;
     },
 
-    // C. The Main New Regime Function (With your Marginal Relief Logic)
     calculateNewRegime: (grossIncome) => {
         const config = TAX_CONFIG.newRegime;
         const netTaxable = Math.max(0, grossIncome - config.stdDeduction);
         
         if (netTaxable <= config.rebateLimit) return 0;
 
-        // Slab Tax (G3)
         const slabTax = TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-        
-        // Marginal Relief (G5): Tax cannot exceed income above 12L
         const extraIncome = netTaxable - config.rebateLimit;
-        const taxAfterRelief = Math.min(slabTax, extraIncome);
+        const taxAfterRelief = Math.min(slabTax, extraIncome); // Marginal Relief
         
-        const cess = taxAfterRelief * TAX_CONFIG.cessRate;
-        return taxAfterRelief + cess;
+        return taxAfterRelief + (taxAfterRelief * TAX_CONFIG.cessRate);
     },
 
-    // D. The Old Regime Function (Handles your 80C, 80D, etc.)
     calculateOldRegime: (grossIncome, deductions) => {
         const config = TAX_CONFIG.oldRegime;
         const d = deductions;
 
-        // Apply Limits to Deductions
-        const capped80C = Math.min(d.section80C, config.limits.section80C);
-        const capped80D = Math.min(d.section80D, d.isParentSenior ? config.limits.section80D_SeniorParents : config.limits.section80D_Parents) + Math.min(d.section80D_Self, config.limits.section80D_Self);
-        const capped24b = Math.min(d.homeLoanInterest, config.limits.section24b);
-        const cappedNPS = Math.min(d.npsIndividual, config.limits.section80CCD_1B);
+        // Apply Hard Limits
+        const capped80C = Math.min(d.section80C || 0, config.limits.section80C);
+        const capped24b = Math.min(d.homeLoanInterest || 0, config.limits.section24b);
+        const capped80D = Math.min(d.section80D || 0, config.limits.section80D_Self + config.limits.section80D_Parents);
 
-        const totalDeductions = config.stdDeduction + capped80C + capped80D + capped24b + cappedNPS + d.exemptHRA + d.otherExemptions;
-        
+        const totalDeductions = config.stdDeduction + capped80C + capped24b + capped80D + (d.exemptHRA || 0) + (d.otherExemptions || 0);
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
 
-        // Rebate check for Old Regime (Usually up to 5L)
         if (netTaxable <= config.rebateLimit) return 0;
 
         const slabTax = TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-        const cess = slabTax * TAX_CONFIG.cessRate;
-        
-        return slabTax + cess;
+        return slabTax + (slabTax * TAX_CONFIG.cessRate);
     }
 };
 
-// Update the main object to include TaxEngine
 FinanceEngine.TaxEngine = TaxEngine;
