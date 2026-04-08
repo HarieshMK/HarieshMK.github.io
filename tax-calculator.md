@@ -32,56 +32,75 @@ permalink: /tax-calculator/
         </div>
 
         <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
-    <div id="24b-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-        <h3 style="margin: 0; color: #fff;"><i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Section 24b: Home Loan Interest</h3>
-        <i id="24b-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
-    </div>
-    <div id="24b-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
-        <div style="margin-bottom: 15px;">
-            <label style="font-size: 0.8rem; color: #64748b;">Annual Interest Paid</label>
-            <input type="number" id="home-interest" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+            <div id="24b-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: #fff;"><i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Section 24b: Home Loan Interest</h3>
+                <i id="24b-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
+            </div>
+            <div id="24b-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.8rem; color: #64748b;">Annual Interest Paid</label>
+                    <input type="number" id="home-interest" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                </div>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #38bdf8; font-size: 0.9rem;">
+                    <input type="checkbox" id="is-under-construction"> My property is Under Construction (CLP)
+                </label>
+                <p id="clp-note" style="display: none; font-size: 0.75rem; color: #94a3b8; margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 5px;">
+                    <i class="fas fa-info-circle"></i> Interest for under-construction property can only be claimed in 5 equal installments starting from the year possession is taken.
+                </p>
+            </div>
         </div>
-        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #38bdf8; font-size: 0.9rem;">
-            <input type="checkbox" id="is-under-construction"> My property is Under Construction (CLP)
-        </label>
-        <p id="clp-note" style="display: none; font-size: 0.75rem; color: #94a3b8; margin-top: 10px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 5px;">
-            <i class="fas fa-info-circle"></i> Interest for under-construction property can only be claimed in 5 equal installments starting from the year possession is taken.
-        </p>
-    </div>
-</div>
 
-<div class="post-card" style="margin-bottom: 20px; padding: 25px;">
-    <div id="80d-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-        <h3 style="margin: 0; color: #fff;"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: #f87171;"></i>Section 80D: Health Insurance</h3>
-        <i id="80d-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
-    </div>
-    <div id="80d-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
-        <div style="margin-bottom: 15px;">
-            <label style="font-size: 0.8rem; color: #64748b;">Self, Spouse & Children</label>
-            <input type="number" id="80d-self" placeholder="Max ₹25,000" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
+            <div id="80d-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: #fff;"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: #f87171;"></i>Section 80D: Health Insurance</h3>
+                <i id="80d-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
+            </div>
+            <div id="80d-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.8rem; color: #64748b;">Self, Spouse & Children</label>
+                    <input type="number" id="80d-self" placeholder="Max ₹25,000" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: #64748b;">Parents Premium</label>
+                    <input type="number" id="80d-parents" placeholder="Max ₹25,000 / ₹50,000" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #94a3b8; font-size: 0.8rem; margin-top: 8px;">
+                        <input type="checkbox" id="parents-senior"> Parents are Senior Citizens (60+)
+                    </label>
+                </div>
+            </div>
         </div>
-        <div>
-            <label style="font-size: 0.8rem; color: #64748b;">Parents Premium</label>
-            <input type="number" id="80d-parents" placeholder="Max ₹25,000 / ₹50,000" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #94a3b8; font-size: 0.8rem; margin-top: 8px;">
-                <input type="checkbox" id="parents-senior"> Parents are Senior Citizens (60+)
-            </label>
-        </div>
-    </div>
-</div>
 
-<div class="post-card" style="margin-bottom: 20px; padding: 25px;">
-    <div id="nps-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-        <h3 style="margin: 0; color: #fff;"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>80CCD (1B): Extra NPS</h3>
-        <i id="nps-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
-    </div>
-    <div id="nps-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
-        <label style="font-size: 0.8rem; color: #64748b;">Voluntary NPS Contribution</label>
-        <input type="number" id="nps-extra" placeholder="Max ₹50,000" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-        <p style="font-size: 0.7rem; color: #64748b; margin-top: 8px;">* This is over and above the ₹1.5L limit of 80C.</p>
-    </div>
-</div>
-    <div style="flex: 1 1 300px;">
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
+            <div id="nps-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: #fff;"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>80CCD (1B): Extra NPS</h3>
+                <i id="nps-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
+            </div>
+            <div id="nps-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
+                <label style="font-size: 0.8rem; color: #64748b;">Voluntary NPS Contribution</label>
+                <input type="number" id="nps-extra" placeholder="Max ₹50,000" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                <p style="font-size: 0.7rem; color: #64748b; margin-top: 8px;">* This is over and above the ₹1.5L limit of 80C.</p>
+            </div>
+        </div>
+
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
+            <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: #fff;"><i class="fas fa-coins" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
+                <i id="80c-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
+            </div>
+            <div id="80c-content" style="display: none; margin-top: 20px; border-top: 1px solid #1e293b; padding-top: 15px;">
+                <div id="80c-rows-container">
+                    <p id="empty-80c-msg" style="color: #64748b; font-size: 0.85rem; font-style: italic; text-align: center; margin: 20px 0;">No entries added yet.</p>
+                </div>
+                <button type="button" onclick="add80CRow()" style="background: none; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                    <i class="fas fa-plus-circle"></i> Add entry
+                </button>
+                <div style="margin-top: 15px; text-align: right; font-size: 0.8rem; color: #94a3b8;">
+                    Total 80C: <span id="display-80c-total" style="color: #4ade80; font-weight: bold;">₹ 0</span> / ₹ 1,50,000
+                </div>
+            </div>
+        </div>
+
+    </div> <div style="flex: 1 1 300px;">
         <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px;">
             <h3 style="margin-top: 0; text-align: center;">Tax Liability</h3>
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
@@ -97,29 +116,26 @@ permalink: /tax-calculator/
                     </div>
                 </div>
             </div>
-           <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;"> Calculate Tax </button>
+            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;"> Calculate Tax </button>
         </div>
     </div>
-</div>
 
-<script src="/assets/js/tax-config.js"></script>
+</div> <script src="/assets/js/tax-config.js"></script>
 <script src="/assets/js/investment-options.js"></script>
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-    // --- 1. UI ELEMENT REFS ---
+    // JS Logic stays the same as the previous correct version...
     const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
     const rowsContainer = document.getElementById('80c-rows-container');
     const emptyMsg = document.getElementById('empty-80c-msg');
 
-    // --- 2. COLLAPSIBLE LOGIC (Helper Function) ---
     function setupToggle(headerId, contentId, iconId) {
         const header = document.getElementById(headerId);
         const content = document.getElementById(contentId);
         const icon = document.getElementById(iconId);
-        
         if (header && content && icon) {
             header.addEventListener('click', () => {
                 const isHidden = content.style.display === 'none';
@@ -129,16 +145,13 @@ permalink: /tax-calculator/
         }
     }
 
-    // Initialize all collapsible sections
     setupToggle('80c-header', '80c-content', '80c-icon');
     setupToggle('80d-header', '80d-content', '80d-icon');
     setupToggle('24b-header', '24b-content', '24b-icon');
     setupToggle('nps-header', 'nps-content', 'nps-icon');
 
-    // CLP Note Toggle
     clpCheck.addEventListener('change', (e) => clpNote.style.display = e.target.checked ? 'block' : 'none');
 
-    // --- 3. DYNAMIC 80C ROWS ---
     const options80C = typeof InvestmentRegistry !== 'undefined' ? 
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
@@ -148,9 +161,7 @@ permalink: /tax-calculator/
         const row = document.createElement('div');
         row.id = `row-${rowId}`;
         row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
-
         let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-        
         row.innerHTML = `
             <select class="row-select-80c" style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
                 <option value="" disabled selected>Select Investment</option>
@@ -172,13 +183,10 @@ permalink: /tax-calculator/
         if(displayTotal) displayTotal.innerText = `₹ ${total.toLocaleString('en-IN')}`;
     }
 
-    // --- 4. BRIDGE TO THE JS CONTROLLER ---
     function runCalculator() {
-        console.log("Button clicked, calling controller...");
         if (typeof TaxController !== 'undefined') {
             TaxController.calculateAll(); 
         } else {
-            console.error("TaxController is missing!");
             alert("Error: tax-calculator.js not loaded.");
         }
     }
