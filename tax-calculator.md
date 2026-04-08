@@ -106,6 +106,9 @@ permalink: /tax-calculator/
 </div>
 
 <script src="{{ '/assets/js/investment-options.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/finance-engine.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/tax-calculator.js' | relative_url }}"></script>
+
 <script>
     // --- 1. UI ELEMENT REFS ---
     const homeLoanCheck = document.getElementById('has-home-loan');
