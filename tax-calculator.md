@@ -100,7 +100,7 @@ permalink: /tax-calculator/
                     <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
                 </div>
             </div>
-            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;">Calculate Tax</button>
+           <button onclick="TaxController.calculateAll()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;">Calculate Tax</button>
         </div>
     </div>
 </div>
