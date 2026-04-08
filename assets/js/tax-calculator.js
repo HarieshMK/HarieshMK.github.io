@@ -96,23 +96,32 @@ const TaxController = {
         }
 
         // 3. Deduction Calculations
-        const exemptHRA = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
-        
-        let total80C = 0;
-        document.querySelectorAll('.row-amount-80c').forEach(input => {
-            total80C += parseFloat(input.value) || 0;
-        });
+const exemptHRA = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
 
-        // 4. Run Engine with Perks Data
-        const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
-        const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
-            section80C: total80C,
-            homeLoanInterest: homeLoanInterest,
-            exemptHRA: exemptHRA
-        }, perksData, basic);
+let total80C = 0;
+let npsSelf = 0; // Added this to catch self-contribution NPS separately
 
-        TaxController.updateSummary(newRegimeTax, oldRegimeTax);
-    },
+// Note: Ensure your 80C rows have a way to identify 'NPS' 
+// Usually, you might have a dropdown in each 80C row
+document.querySelectorAll('.row-80c').forEach(row => {
+    const amount = parseFloat(row.querySelector('.row-amount-80c').value) || 0;
+    const type = row.querySelector('.row-type-80c')?.value; // Check if you have a type selector
+
+    if (type === "NPS (Self)") {
+        npsSelf += amount;
+    } else {
+        total80C += amount;
+    }
+});
+
+// 4. Run Engine with Perks Data
+const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
+const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
+    section80C: total80C,
+    npsSelf: npsSelf, // PASS THIS TO THE ENGINE
+    homeLoanInterest: homeLoanInterest,
+    exemptHRA: exemptHRA
+}, perksData, basic);
 
     updateSummary: (newTax, oldTax) => {
         document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
