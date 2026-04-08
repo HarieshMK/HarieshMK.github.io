@@ -31,6 +31,18 @@ permalink: /tax-calculator/
             </div>
         </div>
 
+        <div>
+            <label style="font-size: 0.8rem; color: #64748b;">Annual Rent Paid</label>
+            <input type="number" id="rent-paid" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: #64748b;">Living in Metro?</label>
+            <select id="is-metro" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                <option value="false">Non-Metro</option>
+                <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
+            </select>
+        </div>
+
         <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
             <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
             <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 15px;">Add employer benefits applied to your CTC.</p>
