@@ -1,7 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
  */
-
 const TaxController = {
     init: () => { 
         console.log("Tax Controller Initialized"); 
@@ -40,15 +39,11 @@ const TaxController = {
         const declValue = row.querySelector('.perk-declaration').value;
         const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
         
-        // Safety check for TAX_CONFIG
         const rules = (typeof TAX_CONFIG !== 'undefined' && TAX_CONFIG.perkRules) ? TAX_CONFIG.perkRules[type] : { maxExempt: Infinity };
         
-        let amount = 0;
-        if (declValue.includes('%')) {
-            amount = (parseFloat(declValue.replace('%', '')) / 100) * basic;
-        } else {
-            amount = parseFloat(declValue) || 0;
-        }
+        let amount = declValue.includes('%') 
+            ? (parseFloat(declValue.replace('%', '')) / 100) * basic 
+            : parseFloat(declValue) || 0;
 
         let eligible = amount;
         if (type === "Corporate NPS") {
@@ -70,58 +65,54 @@ const TaxController = {
         const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
         const hraReceived = parseFloat(document.getElementById('hra-received').value) || 0;
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
-        const rentPaid = parseFloat(document.getElementById('rent-paid').value) || 0;
+        const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0; 
         const isMetro = document.getElementById('is-metro')?.value === 'true';
-        const homeLoanInterest = document.getElementById('is-under-construction')?.checked ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0);
 
+        // 2. Home Loan & Health Insurance (Syncing with your .md IDs)
+        const isUnderConstruction = document.getElementById('is-under-construction')?.checked;
+        const homeLoanInterest = isUnderConstruction ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0);
+        
+        const premSelf = parseFloat(document.getElementById('80d-self')?.value) || 0;
+        const premParents = parseFloat(document.getElementById('80d-parents')?.value) || 0;
+        const isSr = document.getElementById('parents-senior')?.checked;
+        const total80D = Math.min(premSelf, 25000) + Math.min(premParents, isSr ? 50000 : 25000);
+
+        // 3. Deduction Data Collection
         const grossSalary = basic + hraReceived + otherIncome;
+        const npsExtra = parseFloat(document.getElementById('nps-extra')?.value) || 0;
 
-        // 2. Collect Perks Data (THE NEW PART)
+        let total80C = 0;
+        document.querySelectorAll('.row-amount-80c').forEach(input => {
+            total80C += parseFloat(input.value) || 0;
+        });
+
+        // 4. Perks Collection
         let perksData = [];
         document.querySelectorAll('.perk-row').forEach(row => {
             const type = row.querySelector('.perk-type').value;
             const declValue = row.querySelector('.perk-declaration').value;
-            let amt = 0;
-            if (declValue.includes('%')) {
-                amt = (parseFloat(declValue.replace('%', '')) / 100) * basic;
-            } else {
-                amt = parseFloat(declValue) || 0;
-            }
+            let amt = declValue.includes('%') 
+                ? (parseFloat(declValue.replace('%', '')) / 100) * basic 
+                : parseFloat(declValue) || 0;
             perksData.push({ type: type, amount: amt });
         });
 
-        if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) {
-            console.error("Engine Missing!");
-            return;
-        }
+        if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
 
-        // 3. Deduction Calculations
-const exemptHRA = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
+        // 5. Engine Execution
+        const exemptHRA = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
+        
+        const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
+        const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
+            section80C: total80C,
+            npsSelf: npsExtra, // This handles the Waterfall logic
+            section80D: total80D,
+            homeLoanInterest: homeLoanInterest,
+            exemptHRA: exemptHRA
+        }, perksData, basic);
 
-let total80C = 0;
-let npsSelf = 0; // Added this to catch self-contribution NPS separately
-
-// Note: Ensure your 80C rows have a way to identify 'NPS' 
-// Usually, you might have a dropdown in each 80C row
-document.querySelectorAll('.row-80c').forEach(row => {
-    const amount = parseFloat(row.querySelector('.row-amount-80c').value) || 0;
-    const type = row.querySelector('.row-type-80c')?.value; // Check if you have a type selector
-
-    if (type === "NPS (Self)") {
-        npsSelf += amount;
-    } else {
-        total80C += amount;
-    }
-});
-
-// 4. Run Engine with Perks Data
-const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
-const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
-    section80C: total80C,
-    npsSelf: npsSelf, // PASS THIS TO THE ENGINE
-    homeLoanInterest: homeLoanInterest,
-    exemptHRA: exemptHRA
-}, perksData, basic);
+        TaxController.updateSummary(newRegimeTax, oldRegimeTax);
+    },
 
     updateSummary: (newTax, oldTax) => {
         document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
@@ -141,7 +132,7 @@ const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
     }
 };
 
-// Global Bridge for HTML buttons
+// Global Bridge
 function addPerkRow() { TaxController.addPerkRow(); }
 function runCalculator() { TaxController.calculateAll(); }
 
