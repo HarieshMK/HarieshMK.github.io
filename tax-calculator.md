@@ -98,6 +98,9 @@ permalink: /tax-calculator/
                 <div style="text-align: center; padding: 20px; background: #0f172a; border-radius: 12px; border: 2px solid #4ade80;">
                     <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px;">NEW REGIME</div>
                     <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+                    <div id="recommendation-box" style="margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 0.9rem; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                        Enter your details to see the recommendation.
+                    </div>
                 </div>
             </div>
            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;"> Calculate Tax </button>
