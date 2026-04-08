@@ -32,6 +32,18 @@ permalink: /tax-calculator/
         </div>
 
         <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
+            <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
+            <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 15px;">Add employer benefits applied to your CTC.</p>
+            
+            <div id="perks-rows-container">
+                </div>
+        
+            <button type="button" onclick="addPerkRow()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                <i class="fas fa-plus-circle"></i> Add Benefit/Perk
+            </button>
+        </div>
+
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
             <div id="24b-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <h3 style="margin: 0; color: #fff;"><i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Section 24b: Home Loan Interest</h3>
                 <i id="24b-icon" class="fas fa-chevron-down" style="transition: transform 0.3s;"></i>
