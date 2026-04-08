@@ -24,6 +24,17 @@ permalink: /tax-calculator/
                     <label style="font-size: 0.8rem; color: #64748b;">Annual HRA Received</label>
                     <input type="number" id="hra-received" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
                 </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: #64748b;">Annual Rent Paid</label>
+                    <input type="number" id="rent-paid" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: #64748b;">Living in Metro?</label>
+                    <select id="is-metro" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+                        <option value="false">Non-Metro</option>
+                        <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
+                    </select>
+                </div>
             </div>
             <div style="margin-top: 15px;">
                 <label style="font-size: 0.8rem; color: #64748b;">Other Taxable Allowances / Bonus</label>
@@ -31,25 +42,10 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <div>
-            <label style="font-size: 0.8rem; color: #64748b;">Annual Rent Paid</label>
-            <input type="number" id="rent-paid" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-        </div>
-        <div>
-            <label style="font-size: 0.8rem; color: #64748b;">Living in Metro?</label>
-            <select id="is-metro" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-                <option value="false">Non-Metro</option>
-                <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
-            </select>
-        </div>
-
         <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
             <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
             <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 15px;">Add employer benefits applied to your CTC.</p>
-            
-            <div id="perks-rows-container">
-                </div>
-        
+            <div id="perks-rows-container"></div>
             <button type="button" onclick="addPerkRow()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
                 <i class="fas fa-plus-circle"></i> Add Benefit/Perk
             </button>
@@ -124,7 +120,9 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-    </div> <div style="flex: 1 1 300px;">
+    </div> 
+
+    <div style="flex: 1 1 300px;">
         <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px;">
             <h3 style="margin-top: 0; text-align: center;">Tax Liability</h3>
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
@@ -143,14 +141,15 @@ permalink: /tax-calculator/
             <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer;"> Calculate Tax </button>
         </div>
     </div>
+</div>
 
-</div> <script src="/assets/js/tax-config.js"></script>
+<script src="/assets/js/tax-config.js"></script>
 <script src="/assets/js/investment-options.js"></script>
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-    // JS Logic stays the same as the previous correct version...
+    // Toggle Logic
     const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
     const rowsContainer = document.getElementById('80c-rows-container');
