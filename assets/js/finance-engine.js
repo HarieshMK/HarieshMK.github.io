@@ -24,7 +24,7 @@ var FinanceEngine = window.FinanceEngine || {
         };
     },
 
-    // 2. Goal Gap Math (From goal-planner.js)
+    // 2. Goal Gap Math
     calculateGoalGap: (currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) => {
         const i = inflationRate / 100;
         const r = annualCorpReturn / 100;
@@ -64,8 +64,8 @@ var FinanceEngine = window.FinanceEngine || {
     }
 };
 
-/* 6. Tax Calculation Module */
-const TaxEngine = {
+/* 6. Tax Calculation Module attached to FinanceEngine */
+FinanceEngine.TaxEngine = {
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
         const limit1 = hraReceived;
@@ -77,6 +77,8 @@ const TaxEngine = {
     calculateBaseSlabTax: (income, slabs) => {
         let tax = 0;
         let previousLimit = 0;
+        if (!slabs) return 0;
+        
         slabs.forEach(slab => {
             if (income > previousLimit) {
                 let currentLimit = slab.limit === Infinity ? income : slab.limit;
@@ -89,12 +91,13 @@ const TaxEngine = {
     },
 
     calculateNewRegime: (grossIncome) => {
+        if (typeof TAX_CONFIG === 'undefined') return 0;
         const config = TAX_CONFIG.newRegime;
         const netTaxable = Math.max(0, grossIncome - config.stdDeduction);
         
         if (netTaxable <= config.rebateLimit) return 0;
 
-        const slabTax = TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+        const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
         const extraIncome = netTaxable - config.rebateLimit;
         const taxAfterRelief = Math.min(slabTax, extraIncome); // Marginal Relief
         
@@ -102,6 +105,7 @@ const TaxEngine = {
     },
 
     calculateOldRegime: (grossIncome, deductions) => {
+        if (typeof TAX_CONFIG === 'undefined') return 0;
         const config = TAX_CONFIG.oldRegime;
         const d = deductions;
 
@@ -115,9 +119,7 @@ const TaxEngine = {
 
         if (netTaxable <= config.rebateLimit) return 0;
 
-        const slabTax = TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+        const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
         return slabTax + (slabTax * TAX_CONFIG.cessRate);
     }
 };
-
-FinanceEngine.TaxEngine = TaxEngine;
