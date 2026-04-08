@@ -122,38 +122,63 @@ FinanceEngine.TaxEngine = {
     },
 
     // ADDED basicSalary as a parameter here
-    calculateOldRegime: (grossIncome, deductions, perks, basicSalary = 0) => {
-        const config = TAX_CONFIG.oldRegime;
-        
-        let perkExemptions = 0;
-        let local80C = deductions.section80C || 0;
+ calculateOldRegime: (grossIncome, deductions, perks, basicSalary = 0) => {
+    const config = TAX_CONFIG.oldRegime;
+    
+    let perkExemptions = 0;
+    let npsSelf = deductions.npsSelf || 0; // Ensure your controller passes this
+    let other80C = deductions.section80C || 0; // Non-NPS 80C like LIC, PPF, VPF
 
-        perks.forEach(p => {
-            if (p.type === "Corporate NPS") {
-                // 10% limit for Old Regime
-                const limit = basicSalary * 0.10;
-                perkExemptions += Math.min(p.amount, limit);
-            } else if (p.type === "Meal Coupons") {
-                perkExemptions += Math.min(p.amount, 105600);
-            } else if (p.type === "VPF") {
-                local80C += p.amount;
-            } else {
-                perkExemptions += p.amount;
-            }
-        });
+    // 1. Process Perks (Corporate NPS, VPF, etc.)
+    perks.forEach(p => {
+        if (p.type === "Corporate NPS") {
+            const limit = basicSalary * 0.10;
+            perkExemptions += Math.min(p.amount, limit);
+        } else if (p.type === "Meal Coupons") {
+            perkExemptions += Math.min(p.amount, 105600);
+        } else if (p.type === "VPF") {
+            other80C += p.amount; // VPF goes into the general 80C bucket
+        } else if (p.type === "NPS (Self)") {
+            npsSelf += p.amount; // If added via perks instead of 80C section
+        } else {
+            perkExemptions += p.amount;
+        }
+    });
 
-        const capped80C = Math.min(local80C, config.limits.section80C);
-        const capped24b = Math.min(deductions.homeLoanInterest || 0, config.limits.section24b);
-        const capped80D = Math.min(deductions.section80D || 0, 75000); 
+    /* --- THE NPS WATERFALL LOGIC --- */
+    
+    // Step A: Calculate how much space is left in the ₹1.5L 80C bucket
+    const cappedOther80C = Math.min(other80C, config.limits.section80C);
+    const spaceLeftIn80C = config.limits.section80C - cappedOther80C;
 
-        const totalDeductions = config.stdDeduction + capped80C + capped24b + capped80D + 
-                                (deductions.exemptHRA || 0) + perkExemptions;
+    // Step B: Use NPS to fill that remaining 80C space
+    const npsUsedToFill80C = Math.min(npsSelf, spaceLeftIn80C);
+    const npsRemainingAfter80C = npsSelf - npsUsedToFill80C;
 
-        const netTaxable = Math.max(0, grossIncome - totalDeductions);
-        
-        if (netTaxable <= config.rebateLimit) return 0;
+    // Step C: Put the leftover NPS into the dedicated ₹50k 80CCD(1B) bucket
+    const capped80CCD1B = Math.min(npsRemainingAfter80C, config.limits.section80CCD_1B);
 
-        const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-        return slabTax + (slabTax * TAX_CONFIG.cessRate);
-    }
-};
+    // Step D: Final 80C combined amount
+    const final80CTotal = cappedOther80C + npsUsedToFill80C;
+    
+    /* ------------------------------ */
+
+    // 2. Aggregate all other deductions
+    const capped24b = Math.min(deductions.homeLoanInterest || 0, config.limits.section24b);
+    const capped80D = Math.min(deductions.section80D || 0, 75000); 
+
+    const totalDeductions = config.stdDeduction + 
+                            final80CTotal + 
+                            capped80CCD1B + 
+                            capped24b + 
+                            capped80D + 
+                            (deductions.exemptHRA || 0) + 
+                            perkExemptions;
+
+    const netTaxable = Math.max(0, grossIncome - totalDeductions);
+    
+    if (netTaxable <= config.rebateLimit) return 0;
+
+    const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+    return slabTax + (slabTax * TAX_CONFIG.cessRate);
+}
