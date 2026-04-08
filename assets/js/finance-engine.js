@@ -182,3 +182,4 @@ FinanceEngine.TaxEngine = {
     const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
     return slabTax + (slabTax * TAX_CONFIG.cessRate);
 }
+};
