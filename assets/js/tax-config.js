@@ -51,7 +51,7 @@ const TAX_CONFIG = {
             "LTA": { regime: "old", label: "Leave Travel Allowance" },
             "Books & Periodicals": { maxExempt: Infinity, label: "Actual Bill Reimbursement" },
             "Professional Tax": { maxExempt: 2500, label: "Standard State PT" }
-        }
+        },
 
     cessRate: 0.04 // 4% Health & Education Cess
 };
