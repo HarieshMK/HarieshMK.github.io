@@ -105,6 +105,7 @@ permalink: /tax-calculator/
     </div>
 </div>
 
+<script src="/assets/js/tax-config.js"></script>
 <script src="/assets/js/investment-options.js"></script>
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/tax-calculator.js"></script>
