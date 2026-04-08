@@ -104,12 +104,12 @@ const TaxController = {
         });
 
         // 4. Run Engine with Perks Data
-        const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData);
+        const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
         const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
             section80C: total80C,
             homeLoanInterest: homeLoanInterest,
             exemptHRA: exemptHRA
-        }, perksData);
+        }, perksData, basic);
 
         TaxController.updateSummary(newRegimeTax, oldRegimeTax);
     },
