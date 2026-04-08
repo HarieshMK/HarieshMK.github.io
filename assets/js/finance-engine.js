@@ -70,7 +70,7 @@ FinanceEngine.TaxEngine = {
         const metroFactor = isMetro ? 0.5 : 0.4;
         const limit1 = hraReceived;
         const limit2 = basic * metroFactor;
-        const limit3 = Math.max(0, (rentPaid * 12) - (basic * 0.1)); // Monthly rent to Annual
+        const limit3 = Math.max(0, (rentPaid * 12) - (basic * 0.1)); 
         return Math.min(limit1, limit2, limit3);
     },
 
@@ -90,33 +90,67 @@ FinanceEngine.TaxEngine = {
         return tax;
     },
 
-    calculateNewRegime: (grossIncome) => {
-        if (typeof TAX_CONFIG === 'undefined') return 0;
+    // ADDED basicSalary as a parameter here
+    calculateNewRegime: (grossIncome, perks, basicSalary = 0) => {
         const config = TAX_CONFIG.newRegime;
-        const netTaxable = Math.max(0, grossIncome - config.stdDeduction);
         
+        let exemptions = config.stdDeduction;
+        perks.forEach(p => {
+            if (p.type === "Meal Coupons") {
+                exemptions += Math.min(p.amount, 105600);
+            } else if (p.type === "Corporate NPS") {
+                // 14% limit for New Regime
+                const limit = basicSalary * 0.14;
+                exemptions += Math.min(p.amount, limit);
+            } else if (p.type === "Mobile & Internet" || p.type === "Books & Periodicals") {
+                exemptions += p.amount;
+            }
+        });
+
+        const netTaxable = Math.max(0, grossIncome - exemptions);
+        
+        // Income up to rebateLimit (12L in 2026) is tax-free
         if (netTaxable <= config.rebateLimit) return 0;
 
         const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+        
+        // Marginal Relief logic for 2026
         const extraIncome = netTaxable - config.rebateLimit;
-        const taxAfterRelief = Math.min(slabTax, extraIncome); // Marginal Relief
+        const taxAfterRelief = Math.min(slabTax, extraIncome);
         
         return taxAfterRelief + (taxAfterRelief * TAX_CONFIG.cessRate);
     },
 
-    calculateOldRegime: (grossIncome, deductions) => {
-        if (typeof TAX_CONFIG === 'undefined') return 0;
+    // ADDED basicSalary as a parameter here
+    calculateOldRegime: (grossIncome, deductions, perks, basicSalary = 0) => {
         const config = TAX_CONFIG.oldRegime;
-        const d = deductions;
+        
+        let perkExemptions = 0;
+        let local80C = deductions.section80C || 0;
 
-        // Apply Hard Limits
-        const capped80C = Math.min(d.section80C || 0, config.limits.section80C);
-        const capped24b = Math.min(d.homeLoanInterest || 0, config.limits.section24b);
-        const capped80D = Math.min(d.section80D || 0, config.limits.section80D_Self + config.limits.section80D_Parents);
+        perks.forEach(p => {
+            if (p.type === "Corporate NPS") {
+                // 10% limit for Old Regime
+                const limit = basicSalary * 0.10;
+                perkExemptions += Math.min(p.amount, limit);
+            } else if (p.type === "Meal Coupons") {
+                perkExemptions += Math.min(p.amount, 105600);
+            } else if (p.type === "VPF") {
+                local80C += p.amount;
+            } else {
+                perkExemptions += p.amount;
+            }
+        });
 
-        const totalDeductions = config.stdDeduction + capped80C + capped24b + capped80D + (d.exemptHRA || 0) + (d.otherExemptions || 0);
+        const capped80C = Math.min(local80C, config.limits.section80C);
+        const capped24b = Math.min(deductions.homeLoanInterest || 0, config.limits.section24b);
+        const capped80D = Math.min(deductions.section80D || 0, 75000); 
+
+        const totalDeductions = config.stdDeduction + capped80C + capped24b + capped80D + 
+                                (deductions.exemptHRA || 0) + perkExemptions;
+
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
-
+        
         if (netTaxable <= config.rebateLimit) return 0;
 
         const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
