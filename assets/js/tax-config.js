@@ -38,6 +38,20 @@ const TAX_CONFIG = {
             section80D_SeniorParents: 50000
         }
     },
+    // Add this inside TAX_CONFIG
+        perkRules: {
+            "Meal Coupons": { maxExempt: 105600, label: "Max ₹200/meal per day" },
+            "Corporate NPS": { 
+                oldLimit: 0.10, // 10% of Basic
+                newLimit: 0.14, // 14% of Basic
+                label: "Employer NPS (80CCD 2)" 
+            },
+            "VPF": { regime: "old", label: "Voluntary PF (part of 80C)" },
+            "Mobile & Internet": { maxExempt: Infinity, label: "Actual Bill Reimbursement" },
+            "LTA": { regime: "old", label: "Leave Travel Allowance" },
+            "Books & Periodicals": { maxExempt: Infinity, label: "Actual Bill Reimbursement" },
+            "Professional Tax": { maxExempt: 2500, label: "Standard State PT" }
+        }
 
     cessRate: 0.04 // 4% Health & Education Cess
 };
