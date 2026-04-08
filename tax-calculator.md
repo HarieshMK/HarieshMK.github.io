@@ -213,4 +213,28 @@ permalink: /tax-calculator/
             alert("Error: tax-calculator.js not loaded.");
         }
     }
+    function addPerkRow() {
+    const container = document.getElementById('perks-rows-container');
+    const rowId = Date.now();
+    const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : [];
+    
+    const row = document.createElement('div');
+    row.id = `perk-${rowId}`;
+    row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+    
+    let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+    
+    row.innerHTML = `
+        <select class="perk-type" style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+            <option value="" disabled selected>Select Perk</option>
+            ${optionsHTML}
+        </select>
+        <input type="number" class="perk-amount" placeholder="Annual Amount" 
+               style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+        <button onclick="document.getElementById('perk-${rowId}').remove()" style="background:none; border:none; color:#ef4444; cursor:pointer;">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    container.appendChild(row);
+}
 </script>
