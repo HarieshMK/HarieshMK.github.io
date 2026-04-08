@@ -6,6 +6,7 @@ const TaxController = {
     init: () => { console.log("Tax Controller Initialized"); },
 
     calculateAll: () => {
+        console.log("--- Calculation Started ---");
         // A. Inputs
         const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
         const hraReceived = parseFloat(document.getElementById('hra-received').value) || 0;
@@ -14,8 +15,15 @@ const TaxController = {
         const isMetro = document.getElementById('is-metro').value === 'true';
         const homeLoanInterest = document.getElementById('has-home-loan').checked ? 
                                  (parseFloat(document.getElementById('home-interest').value) || 0) : 0;
+        console.log("Inputs Collected:", { basic, hraReceived, otherIncome });
 
         const grossSalary = basic + hraReceived + otherIncome;
+        console.log("Gross Salary:", grossSalary);
+        // 2. Check if Engine exists
+        if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) {
+            console.error("Engine Missing!", window.FinanceEngine);
+            return;
+        }
 
         // B. HRA Calculation (Only for Old Regime)
         const exemptHRA = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
@@ -33,6 +41,7 @@ const TaxController = {
             homeLoanInterest: homeLoanInterest,
             exemptHRA: exemptHRA
         });
+        console.log("Results:", { newRegimeTax, oldRegimeTax });
 
         TaxController.updateSummary(newRegimeTax, oldRegimeTax);
     },
