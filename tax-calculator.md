@@ -170,19 +170,44 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
+    // --- INITIALIZATION ---
     document.addEventListener("DOMContentLoaded", function() {
-        const numInputs = document.querySelectorAll('input[type="number"]');
-        numInputs.forEach(input => {
-            if (!input.hasAttribute('inputmode')) {
-                input.setAttribute('inputmode', 'decimal');
-            }
+        // Ensure all number inputs have correct mobile keyboards
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
         });
+
+        // Initialize Toggles
+        setupToggle('80c-header', '80c-content', '80c-icon');
+        setupToggle('80d-header', '80d-content', '80d-icon');
+        setupToggle('24b-header', '24b-content', '24b-icon');
+        setupToggle('nps-header', 'nps-content', 'nps-icon');
+
+        // Initial Rows
+        addPerkRow();
+        add80CRow();
     });
 
+    // --- AUTOMATIC CALCULATION TRIGGER ---
+    // This listens to ANY change in the main input fields
+    document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('dynamic-input') || e.target.type === 'checkbox') {
+            if (typeof runCalculator === 'function') {
+                runCalculator();
+            }
+        }
+    });
+
+    // --- UI HELPERS ---
     const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
     const rowsContainer = document.getElementById('80c-rows-container');
     const emptyMsg = document.getElementById('empty-80c-msg');
+
+    clpCheck.addEventListener('change', (e) => {
+        clpNote.style.display = e.target.checked ? 'block' : 'none';
+        runCalculator(); // Trigger calc on checkbox change
+    });
 
     function setupToggle(headerId, contentId, iconId) {
         const header = document.getElementById(headerId);
@@ -197,13 +222,7 @@ permalink: /tax-calculator/
         }
     }
 
-    setupToggle('80c-header', '80c-content', '80c-icon');
-    setupToggle('80d-header', '80d-content', '80d-icon');
-    setupToggle('24b-header', '24b-content', '24b-icon');
-    setupToggle('nps-header', 'nps-content', 'nps-icon');
-
-    clpCheck.addEventListener('change', (e) => clpNote.style.display = e.target.checked ? 'block' : 'none');
-
+    // --- DYNAMIC ROW LOGIC (Updated for Auto-Calc) ---
     const options80C = typeof InvestmentRegistry !== 'undefined' ? 
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
@@ -217,14 +236,14 @@ permalink: /tax-calculator/
         let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
         
         row.innerHTML = `
-            <select class="row-select-80c dynamic-input" style="flex: 2;">
+            <select class="row-select-80c dynamic-input" style="flex: 2;" onchange="runCalculator()">
                 <option value="" disabled selected>Select Investment</option>
                 ${selectOptions}
             </select>
             <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
-                   oninput="update80CTotal()" inputmode="decimal" 
+                   oninput="update80CTotal(); runCalculator();" inputmode="decimal" 
                    style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
-            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
+            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal(); runCalculator();" 
                     style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
                 <i class="fas fa-trash"></i>
             </button>
@@ -244,14 +263,14 @@ permalink: /tax-calculator/
         let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
         
         row.innerHTML = `
-            <select class="perk-type dynamic-input" style="flex: 2;">
+            <select class="perk-type dynamic-input" style="flex: 2;" onchange="runCalculator()">
                 <option value="" disabled selected>Select Perk</option>
                 ${optionsHTML}
             </select>
             <input type="number" class="perk-amount dynamic-input" placeholder="Annual Amount" 
-                   inputmode="decimal" 
+                   oninput="runCalculator()" inputmode="decimal" 
                    style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
-            <button onclick="document.getElementById('perk-${rowId}').remove()" 
+            <button onclick="document.getElementById('perk-${rowId}').remove(); runCalculator();" 
                     style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
                 <i class="fas fa-trash"></i>
             </button>
@@ -259,20 +278,7 @@ permalink: /tax-calculator/
         container.appendChild(row);
     }
     
-    function syncFloatingBar(oldTax, newTax) {
-        const floatOld = document.getElementById('float-old-tax');
-        const floatNew = document.getElementById('float-new-tax');
-        floatOld.innerText = `₹ ${oldTax.toLocaleString('en-IN')}`;
-        floatNew.innerText = `₹ ${newTax.toLocaleString('en-IN')}`;
-        if (oldTax < newTax) {
-            floatOld.className = 'tax-val tax-lower';
-            floatNew.className = 'tax-val tax-higher';
-        } else {
-            floatOld.className = 'tax-val tax-higher';
-            floatNew.className = 'tax-val tax-lower';
-        }
-    }
-
+    // --- EXTERNAL BRIDGES ---
     async function handleSave() {
         const btn = document.getElementById('save-btn');
         const status = document.getElementById('save-status');
@@ -296,20 +302,6 @@ permalink: /tax-calculator/
             btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Try Again';
         }
     }
-
-    const observer = new IntersectionObserver((entries) => {
-        const bar = document.getElementById('mobile-tax-bar');
-        entries.forEach(entry => {
-            if (entry.isIntersecting) bar.classList.remove('is-visible');
-            else bar.classList.add('is-visible');
-        });
-    }, { threshold: 0.1 });
-
-    observer.observe(document.getElementById('recommendation-box'));
-    window.addEventListener('load', () => {
-        addPerkRow();
-        add80CRow();
-    });
 </script>
 
 <style>
