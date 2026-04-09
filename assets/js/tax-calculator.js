@@ -111,7 +111,7 @@ const TaxController = {
             exemptHRA: exemptHRA
         }, perksData, basic);
 
-        // 6. ADMIN DEBUG AUDIT (The "Rough Work")
+        // 6. ADMIN DEBUG AUDIT
         console.group("🔍 ADMIN TAX AUDIT");
         console.log("1. Total Gross Input:", grossSalary);
         console.log("2. HRA Exemption Calculated:", exemptHRA);
@@ -122,3 +122,27 @@ const TaxController = {
 
         TaxController.updateSummary(newRegimeTax, oldRegimeTax);
     },
+
+    updateSummary: (newTax, oldTax) => {
+        document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
+        document.getElementById('old-regime-tax').innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
+        
+        const recBox = document.getElementById('recommendation-box');
+        if (recBox) {
+            const diff = Math.abs(newTax - oldTax);
+            if (newTax < oldTax) {
+                recBox.innerHTML = `<strong>New Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
+                recBox.style.borderColor = "#4ade80";
+            } else {
+                recBox.innerHTML = `<strong>Old Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
+                recBox.style.borderColor = "#38bdf8";
+            }
+        }
+    }
+};
+
+// --- GLOBAL BRIDGE (Ensure these are outside the object) ---
+function addPerkRow() { TaxController.addPerkRow(); }
+function runCalculator() { TaxController.calculateAll(); }
+
+window.onload = TaxController.init;
