@@ -14,36 +14,36 @@ permalink: /tax-calculator/
     <div style="flex: 1 1 550px;">
 
         <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
-            <h3 style="margin-top: 0; color: var(--calc-text-main);">
-                <i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details
-            </h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Basic Salary</label>
-                    <input type="number" id="basic-salary" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual HRA Received</label>
-                    <input type="number" id="hra-received" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Rent Paid</label>
-                    <input type="number" id="rent-paid" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Living in Metro?</label>
-                    <select id="is-metro" class="dynamic-input" style="width: 100%;">
-                        <option value="false">Non-Metro</option>
-                        <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
-                    </select>
-                </div>
-            </div>
-            <div style="margin-top: 15px;">
-                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Other Taxable Allowances / Bonus</label>
-                <input type="number" id="other-income" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
-            </div>
+    <h3 style="margin-top: 0; color: var(--calc-text-main);">
+        <i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Basic Salary</label>
+            <input type="number" id="basic-salary" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
         </div>
-
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual HRA Received</label>
+            <input type="number" id="hra-received" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Rent Paid</label>
+            <input type="number" id="rent-paid" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
+            <div id="hra-eligible-display" style="font-size: 0.7rem; color: #4ade80; margin-top: 4px; font-weight: bold;"></div>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Living in Metro?</label>
+            <select id="is-metro" class="dynamic-input" style="width: 100%;" onchange="runCalculator()">
+                <option value="false">Non-Metro</option>
+                <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 15px;">
+        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Other Taxable Allowances / Bonus</label>
+        <input type="number" id="other-income" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
+    </div>
+</div>
         <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
             <h3 style="margin-top: 0; color: var(--calc-text-main);"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
             <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Add employer benefits applied to your CTC.</p>
@@ -226,7 +226,7 @@ permalink: /tax-calculator/
     const options80C = typeof InvestmentRegistry !== 'undefined' ? 
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
-    function add80CRow() {
+       function add80CRow() {
         if(emptyMsg) emptyMsg.style.display = 'none';
         const rowId = Date.now();
         const row = document.createElement('div');
@@ -241,9 +241,9 @@ permalink: /tax-calculator/
                 ${selectOptions}
             </select>
             <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
-                   oninput="update80CTotal(); runCalculator();" inputmode="decimal" 
+                   oninput="update80CTotal();" inputmode="decimal" 
                    style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
-            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal(); runCalculator();" 
+            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
                     style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
                 <i class="fas fa-trash"></i>
             </button>
@@ -251,25 +251,27 @@ permalink: /tax-calculator/
         rowsContainer.appendChild(row);
     }
 
-    function addPerkRow() {
+        function addPerkRow() {
         const container = document.getElementById('perks-rows-container');
         const rowId = Date.now();
         const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : [];
         
         const row = document.createElement('div');
         row.id = `perk-${rowId}`;
-        row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+        // Updated style to include the 4th column for "Eligible" display
+        row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
         
         let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
         
         row.innerHTML = `
-            <select class="perk-type dynamic-input" style="flex: 2;" onchange="runCalculator()">
+            <select class="perk-type dynamic-input" onchange="runCalculator()">
                 <option value="" disabled selected>Select Perk</option>
                 ${optionsHTML}
             </select>
-            <input type="number" class="perk-amount dynamic-input" placeholder="Annual Amount" 
-                   oninput="runCalculator()" inputmode="decimal" 
-                   style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
+            <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" 
+                   oninput="runCalculator()"
+                   style="font-family: 'JetBrains Mono', monospace; text-align: right;">
+            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem; font-weight: bold;">₹ 0</div>
             <button onclick="document.getElementById('perk-${rowId}').remove(); runCalculator();" 
                     style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
                 <i class="fas fa-trash"></i>
