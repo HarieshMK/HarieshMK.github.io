@@ -142,6 +142,16 @@ permalink: /tax-calculator/
         </div>
     </div>
 </div>
+<div id="mobile-tax-bar">
+    <div style="text-align: center;">
+        <div style="font-size: 0.6rem; color: #94a3b8;">OLD</div>
+        <div id="float-old-tax" class="tax-val">₹ 0</div>
+    </div>
+    <div style="text-align: center;">
+        <div style="font-size: 0.6rem; color: #94a3b8;">NEW</div>
+        <div id="float-new-tax" class="tax-val">₹ 0</div>
+    </div>
+</div>
 
 <script src="/assets/js/tax-config.js"></script>
 <script src="/assets/js/investment-options.js"></script>
@@ -149,6 +159,15 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
+    // Global numeric keypad for all number inputs
+    document.addEventListener("DOMContentLoaded", function() {
+        const numInputs = document.querySelectorAll('input[type="number"]');
+        numInputs.forEach(input => {
+            if (!input.hasAttribute('inputmode')) {
+                input.setAttribute('inputmode', 'decimal');
+            }
+        });
+    });
     // Toggle Logic
     const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
@@ -208,7 +227,11 @@ permalink: /tax-calculator/
 
     function runCalculator() {
         if (typeof TaxController !== 'undefined') {
-            TaxController.calculateAll(); 
+            const results = TaxController.calculateAll(); 
+            // Sync the floating bar with the new results
+            if(results) {
+                syncFloatingBar(results.oldTax, results.newTax);
+            }
         } else {
             alert("Error: tax-calculator.js not loaded.");
         }
@@ -237,4 +260,65 @@ permalink: /tax-calculator/
     `;
     container.appendChild(row);
 }
+    // Function to sync floating bar colors and values
+function syncFloatingBar(oldTax, newTax) {
+    const floatOld = document.getElementById('float-old-tax');
+    const floatNew = document.getElementById('float-new-tax');
+    
+    floatOld.innerText = `₹ ${oldTax.toLocaleString('en-IN')}`;
+    floatNew.innerText = `₹ ${newTax.toLocaleString('en-IN')}`;
+
+    if (oldTax < newTax) {
+        floatOld.className = 'tax-val tax-lower';
+        floatNew.className = 'tax-val tax-higher';
+    } else {
+        floatOld.className = 'tax-val tax-higher';
+        floatNew.className = 'tax-val tax-lower';
+    }
+}
+
+// Intersection Observer to hide bar when real results are in view
+const observer = new IntersectionObserver((entries) => {
+    const bar = document.getElementById('mobile-tax-bar');
+    entries.forEach(entry => {
+        // If the recommendation box is NOT visible, show the floating bar
+        if (entry.isIntersecting) {
+            bar.classList.remove('is-visible');
+        } else {
+            bar.classList.add('is-visible');
+        }
+    });
+}, { threshold: 0.1 });
+
+observer.observe(document.getElementById('recommendation-box'));
+    window.addEventListener('load', () => {
+    addPerkRow();
+    add80CRow();
+});
 </script>
+
+<style>
+    /* Floating Bar - Hidden by default, shown only on mobile */
+#mobile-tax-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f172a;
+    border-top: 2px solid #38bdf8;
+    padding: 12px;
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+}
+
+@media (max-width: 768px) {
+    #mobile-tax-bar.is-visible { display: flex; }
+}
+
+.tax-val { font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+.tax-lower { color: #4ade80; }
+.tax-higher { color: #ef4444; }
+</style>
