@@ -4,9 +4,20 @@ title: Income Tax Calculator (FY 2026-27)
 permalink: /tax-calculator/
 ---
 
-<div style="margin-bottom: 30px;">
-    <h1 style="margin: 0; color: #38bdf8; font-family: 'Lora', serif;">💰 Income Tax Calculator</h1>
-    <p style="color: var(--calc-text-muted);">Compare Old vs. New Tax Regime for Financial Year 2026-27</p>
+<div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h1 style="margin: 0; color: #38bdf8; font-family: 'Lora', serif;">💰 Income Tax Calculator</h1>
+        <p style="color: var(--calc-text-muted); margin: 5px 0 0 0;">Compare Old vs. New Tax Regime</p>
+    </div>
+    <div style="text-align: right;">
+        <label for="fy-selector" style="display: block; font-size: 0.7rem; color: var(--calc-text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Assessment Year</label>
+        <select id="fy-selector" class="dynamic-input" style="padding: 5px 12px; font-size: 0.9rem; min-width: 140px; cursor: pointer;">
+            <option value="2027-28">FY 2027-28</option>
+            <option value="2026-27" selected>FY 2026-27</option>
+            <option value="2025-26">FY 2025-26</option>
+            <option value="2024-25">FY 2024-25</option>
+        </select>
+    </div>
 </div>
 
 <div style="display: flex; flex-wrap: wrap; gap: 25px;">
@@ -187,6 +198,16 @@ permalink: /tax-calculator/
         addPerkRow();
         add80CRow();
     });
+    // --- YEAR SELECTOR LOGIC ---
+        const fySelector = document.getElementById('fy-selector');
+        fySelector.addEventListener('change', () => {
+            // Update the subtitle text so the user knows which year is active
+            const subTitle = document.querySelector('p[style*="var(--calc-text-muted)"]');
+            if(subTitle) subTitle.innerText = `Compare Old vs. New Tax Regime for Financial Year ${fySelector.value}`;
+            
+            // Refresh the math
+            runCalculator();
+        });
 
     // --- AUTOMATIC CALCULATION TRIGGER ---
     // This listens to ANY change in the main input fields
@@ -281,22 +302,31 @@ permalink: /tax-calculator/
     }
     
     // --- EXTERNAL BRIDGES ---
-    async function handleSave() {
-        const btn = document.getElementById('save-btn');
-        const status = document.getElementById('save-status');
-        try {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            status.innerText = "Connecting to database...";
-            await saveTaxData(); 
-            btn.innerHTML = '<i class="fas fa-check-circle"></i> Saved!';
-            status.style.color = "#4ade80";
-            status.innerText = "Data synced successfully.";
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
-            }, 3000);
-        } catch (error) {
+   async function handleSave() {
+    const btn = document.getElementById('save-btn');
+    const status = document.getElementById('save-status');
+    
+    // 1. GET THE YEAR FROM THE DROPDOWN HERE
+    const selectedYear = document.getElementById('fy-selector').value; 
+
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        status.innerText = "Connecting to database...";
+
+        // 2. PASS THE YEAR TO THE SAVE FUNCTION
+        // (Make sure your saveTaxData function in tax-calculator.js is updated to accept this)
+        await saveTaxData(selectedYear); 
+
+        btn.innerHTML = `<i class="fas fa-check-circle"></i> Saved for ${selectedYear}!`;
+        status.style.color = "#4ade80";
+        status.innerText = `Data for ${selectedYear} synced successfully.`;
+        
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
+        }, 3000);
+    } catch (error) {
             console.error(error);
             status.style.color = "#ef4444";
             status.innerText = "Error saving data.";
