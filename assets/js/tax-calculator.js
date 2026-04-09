@@ -68,7 +68,7 @@ const TaxController = {
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0; 
         const isMetro = document.getElementById('is-metro')?.value === 'true';
 
-        // 2. Home Loan & Health Insurance (Syncing with your .md IDs)
+        // 2. Home Loan & Health Insurance
         const isUnderConstruction = document.getElementById('is-under-construction')?.checked;
         const homeLoanInterest = isUnderConstruction ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0);
         
@@ -105,35 +105,20 @@ const TaxController = {
         const newRegimeTax = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
         const oldRegimeTax = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
             section80C: total80C,
-            npsSelf: npsExtra, // This handles the Waterfall logic
+            npsSelf: npsExtra, 
             section80D: total80D,
             homeLoanInterest: homeLoanInterest,
             exemptHRA: exemptHRA
         }, perksData, basic);
 
+        // 6. ADMIN DEBUG AUDIT (The "Rough Work")
+        console.group("🔍 ADMIN TAX AUDIT");
+        console.log("1. Total Gross Input:", grossSalary);
+        console.log("2. HRA Exemption Calculated:", exemptHRA);
+        console.log("3. Perks Detected:", perksData);
+        console.log("4. Final New Regime Tax:", newRegimeTax);
+        console.log("5. Final Old Regime Tax:", oldRegimeTax);
+        console.groupEnd();
+
         TaxController.updateSummary(newRegimeTax, oldRegimeTax);
     },
-
-    updateSummary: (newTax, oldTax) => {
-        document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
-        document.getElementById('old-regime-tax').innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
-        
-        const recBox = document.getElementById('recommendation-box');
-        if (recBox) {
-            const diff = Math.abs(newTax - oldTax);
-            if (newTax < oldTax) {
-                recBox.innerHTML = `<strong>New Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
-                recBox.style.borderColor = "#4ade80";
-            } else {
-                recBox.innerHTML = `<strong>Old Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
-                recBox.style.borderColor = "#38bdf8";
-            }
-        }
-    }
-};
-
-// Global Bridge
-function addPerkRow() { TaxController.addPerkRow(); }
-function runCalculator() { TaxController.calculateAll(); }
-
-window.onload = TaxController.init;
