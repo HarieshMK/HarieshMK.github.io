@@ -13,34 +13,36 @@ permalink: /tax-calculator/
     
     <div style="flex: 1 1 550px;">
 
-        <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
-            <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <label style="font-size: 0.8rem; color: #64748b;">Annual Basic Salary</label>
-                    <input type="number" id="basic-salary" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: #64748b;">Annual HRA Received</label>
-                    <input type="number" id="hra-received" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: #64748b;">Annual Rent Paid</label>
-                    <input type="number" id="rent-paid" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: #64748b;">Living in Metro?</label>
-                    <select id="is-metro" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-                        <option value="false">Non-Metro</option>
-                        <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
-                    </select>
-                </div>
-            </div>
-            <div style="margin-top: 15px;">
-                <label style="font-size: 0.8rem; color: #64748b;">Other Taxable Allowances / Bonus</label>
-                <input type="number" id="other-income" placeholder="₹" style="width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-            </div>
+               <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+    <h3 style="margin-top: 0; color: var(--calc-text-main);">
+        <i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Basic Salary</label>
+            <input type="number" id="basic-salary" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
         </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual HRA Received</label>
+            <input type="number" id="hra-received" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Rent Paid</label>
+            <input type="number" id="rent-paid" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Living in Metro?</label>
+            <select id="is-metro" class="dynamic-input" style="width: 100%;">
+                <option value="false">Non-Metro</option>
+                <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 15px;">
+        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Other Taxable Allowances / Bonus</label>
+        <input type="number" id="other-income" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal">
+    </div>
+</div>
 
         <div class="post-card" style="margin-bottom: 20px; padding: 25px;">
             <h3 style="margin-top: 0; color: #fff;"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
@@ -198,68 +200,57 @@ permalink: /tax-calculator/
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
     function add80CRow() {
-        if(emptyMsg) emptyMsg.style.display = 'none';
-        const rowId = Date.now();
-        const row = document.createElement('div');
-        row.id = `row-${rowId}`;
-        row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
-        let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-        row.innerHTML = `
-            <select class="row-select-80c" style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-                <option value="" disabled selected>Select Investment</option>
-                ${selectOptions}
-            </select>
-            <input type="number" class="row-amount-80c" placeholder="Amount" oninput="update80CTotal()"
-                   style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
-            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" style="background:none; border:none; color:#ef4444; cursor:pointer;">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-        rowsContainer.appendChild(row);
-    }
+    if(emptyMsg) emptyMsg.style.display = 'none';
+    const rowId = Date.now();
+    const row = document.createElement('div');
+    row.id = `row-${rowId}`;
+    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+    
+    let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+    
+    row.innerHTML = `
+        <select class="row-select-80c dynamic-input" style="flex: 2;">
+            <option value="" disabled selected>Select Investment</option>
+            ${selectOptions}
+        </select>
+        <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
+               oninput="update80CTotal()" inputmode="decimal" 
+               style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
+        <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
+                style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    rowsContainer.appendChild(row);
+}
 
-    function update80CTotal() {
-        let total = 0;
-        document.querySelectorAll('.row-amount-80c').forEach(input => total += parseFloat(input.value) || 0);
-        const displayTotal = document.getElementById('display-80c-total');
-        if(displayTotal) displayTotal.innerText = `₹ ${total.toLocaleString('en-IN')}`;
-    }
-
-    function runCalculator() {
-        if (typeof TaxController !== 'undefined') {
-            const results = TaxController.calculateAll(); 
-            // Sync the floating bar with the new results
-            if(results) {
-                syncFloatingBar(results.oldTax, results.newTax);
-            }
-        } else {
-            alert("Error: tax-calculator.js not loaded.");
-        }
-    }
-    function addPerkRow() {
+function addPerkRow() {
     const container = document.getElementById('perks-rows-container');
     const rowId = Date.now();
     const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : [];
     
     const row = document.createElement('div');
     row.id = `perk-${rowId}`;
-    row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
     
     let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
     
     row.innerHTML = `
-        <select class="perk-type" style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
+        <select class="perk-type dynamic-input" style="flex: 2;">
             <option value="" disabled selected>Select Perk</option>
             ${optionsHTML}
         </select>
-        <input type="number" class="perk-amount" placeholder="Annual Amount" 
-               style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; background: #0f172a; color: #fff;">
-        <button onclick="document.getElementById('perk-${rowId}').remove()" style="background:none; border:none; color:#ef4444; cursor:pointer;">
+        <input type="number" class="perk-amount dynamic-input" placeholder="Annual Amount" 
+               inputmode="decimal" 
+               style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
+        <button onclick="document.getElementById('perk-${rowId}').remove()" 
+                style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
             <i class="fas fa-trash"></i>
         </button>
     `;
     container.appendChild(row);
 }
+    
     // Function to sync floating bar colors and values
 function syncFloatingBar(oldTax, newTax) {
     const floatOld = document.getElementById('float-old-tax');
@@ -319,7 +310,12 @@ observer.observe(document.getElementById('recommendation-box'));
         --calc-text-muted: #94a3b8;
         --calc-accent: #38bdf8;
     }
-
+        .btn:hover {
+        background: #38bdf8;
+        color: #0f172a;
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+    }
     /* Apply variables to dynamic rows added via JS */
     .dynamic-input {
         background-color: var(--calc-input-bg) !important;
