@@ -298,27 +298,65 @@ observer.observe(document.getElementById('recommendation-box'));
 </script>
 
 <style>
-    /* Floating Bar - Hidden by default, shown only on mobile */
-#mobile-tax-bar {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #0f172a;
-    border-top: 2px solid #38bdf8;
-    padding: 12px;
-    z-index: 1000;
-    justify-content: space-around;
-    align-items: center;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
-}
+    /* CSS Variables for Theme Switching */
+    :root {
+        --calc-bg: #ffffff;
+        --calc-card: #f8fafc;
+        --calc-input-bg: #ffffff;
+        --calc-input-border: #e2e8f0;
+        --calc-text-main: #1e293b;
+        --calc-text-muted: #64748b;
+        --calc-accent: #0ea5e9;
+    }
 
-@media (max-width: 768px) {
-    #mobile-tax-bar.is-visible { display: flex; }
-}
+    /* Dark Mode Overrides (Matches your site's .dark-theme class) */
+    .dark-theme :root, .dark-theme {
+        --calc-bg: #0f172a;
+        --calc-card: #1e293b;
+        --calc-input-bg: #020617;
+        --calc-input-border: #334155;
+        --calc-text-main: #f1f5f9;
+        --calc-text-muted: #94a3b8;
+        --calc-accent: #38bdf8;
+    }
 
-.tax-val { font-weight: bold; font-family: 'JetBrains Mono', monospace; }
-.tax-lower { color: #4ade80; }
-.tax-higher { color: #ef4444; }
+    /* Apply variables to dynamic rows added via JS */
+    .dynamic-input {
+        background-color: var(--calc-input-bg) !important;
+        border: 2px solid var(--calc-input-border) !important;
+        color: var(--calc-text-main) !important;
+        border-radius: 10px;
+        padding: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .dynamic-input:focus {
+        outline: none;
+        border-color: var(--calc-accent) !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    }
+
+    /* Mobile Floating Bar */
+    #mobile-tax-bar {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--calc-bg);
+        border-top: 2px solid var(--calc-accent);
+        padding: 12px;
+        z-index: 1000;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+        #mobile-tax-bar.is-visible { display: flex; }
+    }
+
+    .tax-val { font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+    .tax-lower { color: #4ade80; }
+    .tax-higher { color: #ef4444; }
 </style>
