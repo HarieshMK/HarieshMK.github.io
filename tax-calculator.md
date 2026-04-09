@@ -121,7 +121,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
     </div> 
 
     <div style="flex: 1 1 300px;">
@@ -140,7 +139,16 @@ permalink: /tax-calculator/
                     </div>
                 </div>
             </div>
-            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;"> Calculate Tax </button>
+            
+            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;"> 
+                <i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculate Tax 
+            </button>
+
+            <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8; transition: all 0.3s ease;"> 
+                <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i>Save to Profile 
+            </button>
+            
+            <div id="save-status" style="margin-top: 10px; font-size: 0.75rem; text-align: center; color: var(--calc-text-muted); min-height: 1.2em;"></div>
         </div>
     </div>
 </div>
@@ -162,7 +170,6 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-    // Global numeric keypad for all number inputs
     document.addEventListener("DOMContentLoaded", function() {
         const numInputs = document.querySelectorAll('input[type="number"]');
         numInputs.forEach(input => {
@@ -171,7 +178,7 @@ permalink: /tax-calculator/
             }
         });
     });
-    // Toggle Logic
+
     const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
     const rowsContainer = document.getElementById('80c-rows-container');
@@ -201,96 +208,111 @@ permalink: /tax-calculator/
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
     function add80CRow() {
-    if(emptyMsg) emptyMsg.style.display = 'none';
-    const rowId = Date.now();
-    const row = document.createElement('div');
-    row.id = `row-${rowId}`;
-    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
-    
-    let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-    
-    row.innerHTML = `
-        <select class="row-select-80c dynamic-input" style="flex: 2;">
-            <option value="" disabled selected>Select Investment</option>
-            ${selectOptions}
-        </select>
-        <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
-               oninput="update80CTotal()" inputmode="decimal" 
-               style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
-        <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
-                style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
-            <i class="fas fa-trash"></i>
-        </button>
-    `;
-    rowsContainer.appendChild(row);
-}
-
-function addPerkRow() {
-    const container = document.getElementById('perks-rows-container');
-    const rowId = Date.now();
-    const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : [];
-    
-    const row = document.createElement('div');
-    row.id = `perk-${rowId}`;
-    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
-    
-    let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-    
-    row.innerHTML = `
-        <select class="perk-type dynamic-input" style="flex: 2;">
-            <option value="" disabled selected>Select Perk</option>
-            ${optionsHTML}
-        </select>
-        <input type="number" class="perk-amount dynamic-input" placeholder="Annual Amount" 
-               inputmode="decimal" 
-               style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
-        <button onclick="document.getElementById('perk-${rowId}').remove()" 
-                style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
-            <i class="fas fa-trash"></i>
-        </button>
-    `;
-    container.appendChild(row);
-}
-    
-    // Function to sync floating bar colors and values
-function syncFloatingBar(oldTax, newTax) {
-    const floatOld = document.getElementById('float-old-tax');
-    const floatNew = document.getElementById('float-new-tax');
-    
-    floatOld.innerText = `₹ ${oldTax.toLocaleString('en-IN')}`;
-    floatNew.innerText = `₹ ${newTax.toLocaleString('en-IN')}`;
-
-    if (oldTax < newTax) {
-        floatOld.className = 'tax-val tax-lower';
-        floatNew.className = 'tax-val tax-higher';
-    } else {
-        floatOld.className = 'tax-val tax-higher';
-        floatNew.className = 'tax-val tax-lower';
+        if(emptyMsg) emptyMsg.style.display = 'none';
+        const rowId = Date.now();
+        const row = document.createElement('div');
+        row.id = `row-${rowId}`;
+        row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+        
+        let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        
+        row.innerHTML = `
+            <select class="row-select-80c dynamic-input" style="flex: 2;">
+                <option value="" disabled selected>Select Investment</option>
+                ${selectOptions}
+            </select>
+            <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
+                   oninput="update80CTotal()" inputmode="decimal" 
+                   style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
+            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
+                    style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        rowsContainer.appendChild(row);
     }
-}
 
-// Intersection Observer to hide bar when real results are in view
-const observer = new IntersectionObserver((entries) => {
-    const bar = document.getElementById('mobile-tax-bar');
-    entries.forEach(entry => {
-        // If the recommendation box is NOT visible, show the floating bar
-        if (entry.isIntersecting) {
-            bar.classList.remove('is-visible');
+    function addPerkRow() {
+        const container = document.getElementById('perks-rows-container');
+        const rowId = Date.now();
+        const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : [];
+        
+        const row = document.createElement('div');
+        row.id = `perk-${rowId}`;
+        row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+        
+        let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        
+        row.innerHTML = `
+            <select class="perk-type dynamic-input" style="flex: 2;">
+                <option value="" disabled selected>Select Perk</option>
+                ${optionsHTML}
+            </select>
+            <input type="number" class="perk-amount dynamic-input" placeholder="Annual Amount" 
+                   inputmode="decimal" 
+                   style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
+            <button onclick="document.getElementById('perk-${rowId}').remove()" 
+                    style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(row);
+    }
+    
+    function syncFloatingBar(oldTax, newTax) {
+        const floatOld = document.getElementById('float-old-tax');
+        const floatNew = document.getElementById('float-new-tax');
+        floatOld.innerText = `₹ ${oldTax.toLocaleString('en-IN')}`;
+        floatNew.innerText = `₹ ${newTax.toLocaleString('en-IN')}`;
+        if (oldTax < newTax) {
+            floatOld.className = 'tax-val tax-lower';
+            floatNew.className = 'tax-val tax-higher';
         } else {
-            bar.classList.add('is-visible');
+            floatOld.className = 'tax-val tax-higher';
+            floatNew.className = 'tax-val tax-lower';
         }
-    });
-}, { threshold: 0.1 });
+    }
 
-observer.observe(document.getElementById('recommendation-box'));
+    async function handleSave() {
+        const btn = document.getElementById('save-btn');
+        const status = document.getElementById('save-status');
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            status.innerText = "Connecting to database...";
+            await saveTaxData(); 
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Saved!';
+            status.style.color = "#4ade80";
+            status.innerText = "Data synced successfully.";
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
+            }, 3000);
+        } catch (error) {
+            console.error(error);
+            status.style.color = "#ef4444";
+            status.innerText = "Error saving data.";
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Try Again';
+        }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        const bar = document.getElementById('mobile-tax-bar');
+        entries.forEach(entry => {
+            if (entry.isIntersecting) bar.classList.remove('is-visible');
+            else bar.classList.add('is-visible');
+        });
+    }, { threshold: 0.1 });
+
+    observer.observe(document.getElementById('recommendation-box'));
     window.addEventListener('load', () => {
-    addPerkRow();
-    add80CRow();
-});
+        addPerkRow();
+        add80CRow();
+    });
 </script>
 
 <style>
-    /* CSS Variables for Theme Switching */
     :root {
         --calc-bg: #ffffff;
         --calc-card: #f8fafc;
@@ -301,7 +323,6 @@ observer.observe(document.getElementById('recommendation-box'));
         --calc-accent: #0ea5e9;
     }
 
-    /* Dark Mode Overrides (Matches your site's .dark-theme class) */
     .dark-theme :root, .dark-theme {
         --calc-bg: #0f172a;
         --calc-card: #1e293b;
@@ -311,13 +332,14 @@ observer.observe(document.getElementById('recommendation-box'));
         --calc-text-muted: #94a3b8;
         --calc-accent: #38bdf8;
     }
-        .btn:hover {
+
+    .btn:hover {
         background: #38bdf8;
         color: #0f172a;
         transform: translateY(-2px);
         transition: all 0.2s ease;
     }
-    /* Apply variables to dynamic rows added via JS */
+
     .dynamic-input {
         background-color: var(--calc-input-bg) !important;
         border: 2px solid var(--calc-input-border) !important;
@@ -327,13 +349,6 @@ observer.observe(document.getElementById('recommendation-box'));
         transition: all 0.2s ease;
     }
 
-    .dynamic-input:focus {
-        outline: none;
-        border-color: var(--calc-accent) !important;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
-    }
-
-    /* Mobile Floating Bar */
     #mobile-tax-bar {
         display: none;
         position: fixed;
@@ -345,8 +360,11 @@ observer.observe(document.getElementById('recommendation-box'));
         padding: 12px;
         z-index: 1000;
         justify-content: space-around;
-        align-items: center;
         box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+    }
+
+    #save-btn:hover:not(:disabled) {
+        background: rgba(56, 189, 248, 0.1) !important;
     }
 
     @media (max-width: 768px) {
