@@ -15,11 +15,13 @@ const TaxController = {
             }
         });
 
-        // 2. Track changes on all inputs to set 'isDirty'
+        // 2. Real-time Calculation & Dirty State
+        // Listens to every input/select change on the page
         document.addEventListener('input', (e) => {
             const tag = e.target.tagName;
             if (tag === 'INPUT' || tag === 'SELECT') {
                 TaxController.isDirty = true;
+                TaxController.calculateAll();
             }
         });
 
@@ -29,65 +31,60 @@ const TaxController = {
 
     // --- PERSISTENCE METHODS ---
     saveUserData: async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-            throw new Error("AUTH_REQUIRED");
-        }
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("AUTH_REQUIRED");
 
-        // Gather All Data
-        const formData = {
-            basic: document.getElementById('basic-salary').value,
-            hra: document.getElementById('hra-received').value,
-            rent: document.getElementById('rent-paid').value,
-            isMetro: document.getElementById('is-metro').value,
-            otherIncome: document.getElementById('other-income').value,
-            homeInterest: document.getElementById('home-interest').value,
-            isUnderConstruction: document.getElementById('is-under-construction').checked,
-            healthSelf: document.getElementById('80d-self').value,
-            healthParents: document.getElementById('80d-parents').value,
-            parentsSenior: document.getElementById('parents-senior').checked,
-            npsExtra: document.getElementById('nps-extra').value,
-            perks: [],
-            deductions80C: []
-        };
+            const formData = {
+                basic: document.getElementById('basic-salary').value,
+                hra: document.getElementById('hra-received').value,
+                rent: document.getElementById('rent-paid').value,
+                isMetro: document.getElementById('is-metro').value,
+                otherIncome: document.getElementById('other-income').value,
+                homeInterest: document.getElementById('home-interest').value,
+                isUnderConstruction: document.getElementById('is-under-construction').checked,
+                healthSelf: document.getElementById('80d-self').value,
+                healthParents: document.getElementById('80d-parents').value,
+                parentsSenior: document.getElementById('parents-senior').checked,
+                npsExtra: document.getElementById('nps-extra').value,
+                perks: [],
+                deductions80C: []
+            };
 
-        // Collect Perks - Fixed selector to match the .md row IDs
-        document.querySelectorAll('[id^="perk-"]').forEach(row => {
-            const typeSelect = row.querySelector('.perk-type');
-            const amtInput = row.querySelector('.perk-amount'); // Matches .md class
-            if (typeSelect && typeSelect.value) {
-                formData.perks.push({
-                    type: typeSelect.value,
-                    value: amtInput.value
-                });
-            }
-        });
-
-        // Collect 80C - Fixed selection logic
-        document.querySelectorAll('[id^="row-"]').forEach(row => {
-            const select = row.querySelector('.row-select-80c');
-            const amtInput = row.querySelector('.row-amount-80c');
-            if (select && select.value && amtInput.value) {
-                formData.deductions80C.push({ 
-                    type: select.value, 
-                    amount: amtInput.value 
-                });
-            }
-        });
-
-        const { error } = await supabase
-            .from('tax_user_data')
-            .upsert({ 
-                id: user.id, 
-                calculator_inputs: formData, 
-                updated_at: new Date() 
+            // Gather Perks
+            document.querySelectorAll('[id^="perk-"]').forEach(row => {
+                const typeSelect = row.querySelector('.perk-type');
+                const amtInput = row.querySelector('.perk-amount'); 
+                if (typeSelect && typeSelect.value) {
+                    formData.perks.push({ type: typeSelect.value, value: amtInput.value });
+                }
             });
 
-        if (error) throw error;
-        
-        TaxController.isDirty = false;
-        return true;
+            // Gather 80C
+            document.querySelectorAll('[id^="row-"]').forEach(row => {
+                const select = row.querySelector('.row-select-80c');
+                const amtInput = row.querySelector('.row-amount-80c');
+                if (select && select.value && amtInput.value) {
+                    formData.deductions80C.push({ type: select.value, amount: amtInput.value });
+                }
+            });
+
+            const { error } = await supabase
+                .from('tax_user_data')
+                .upsert({ 
+                    id: user.id, 
+                    calculator_inputs: formData, 
+                    updated_at: new Date() 
+                });
+
+            if (error) throw error;
+            
+            TaxController.isDirty = false;
+            return true;
+        } catch (err) {
+            console.error("Save process failed:", err);
+            throw err;
+        }
     },
 
     loadUserData: async () => {
@@ -103,7 +100,7 @@ const TaxController = {
         if (data && data.calculator_inputs) {
             const inputs = data.calculator_inputs;
             
-            // Fill core fields
+            // Core fields
             document.getElementById('basic-salary').value = inputs.basic || "";
             document.getElementById('hra-received').value = inputs.hra || "";
             document.getElementById('rent-paid').value = inputs.rent || "";
@@ -116,50 +113,93 @@ const TaxController = {
             document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
             document.getElementById('nps-extra').value = inputs.npsExtra || "";
 
-            // Toggle visibility for CLP note if needed
-            if(inputs.isUnderConstruction) {
-                document.getElementById('clp-note').style.display = 'block';
+            // Visibility logic for Home Loan Note
+            if (document.getElementById('clp-note')) {
+                document.getElementById('clp-note').style.display = inputs.isUnderConstruction ? 'block' : 'none';
             }
 
-            // Clear and Rebuild Perks using the .md globally available function
+            // Perks Rebuild
             const perksContainer = document.getElementById('perks-rows-container');
             perksContainer.innerHTML = '';
-            if (inputs.perks && inputs.perks.length > 0) {
-                inputs.perks.forEach(p => {
-                    // Use the function defined in your HTML script
-                    if (typeof window.addPerkRow === 'function') {
-                        addPerkRow(); 
-                        const lastRow = perksContainer.lastElementChild;
-                        lastRow.querySelector('.perk-type').value = p.type;
-                        lastRow.querySelector('.perk-amount').value = p.value;
-                    }
-                });
-            } else {
-                addPerkRow(); // Add one empty row if none saved
+            if (inputs.perks?.length > 0) {
+                inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
             }
 
-            // Clear and Rebuild 80C
+            // 80C Rebuild
             const rows80c = document.getElementById('80c-rows-container');
             rows80c.innerHTML = '';
-            if (inputs.deductions80C && inputs.deductions80C.length > 0) {
+            if (inputs.deductions80C?.length > 0) {
                 inputs.deductions80C.forEach(item => {
                     if (typeof window.add80CRow === 'function') {
-                        add80CRow();
+                        add80CRow(); // Call the .md global function
                         const lastRow = rows80c.lastElementChild;
                         lastRow.querySelector('.row-select-80c').value = item.type;
                         lastRow.querySelector('.row-amount-80c').value = item.amount;
                     }
                 });
-            } else {
-                add80CRow(); // Add one empty row if none saved
             }
             
-            // Calculate everything after loading
+            // Post-load calculation
             setTimeout(() => {
                 TaxController.calculateAll();
                 if(typeof update80CTotal === 'function') update80CTotal();
             }, 100);
         }
+    },
+
+    // --- UI METHODS ---
+    addPerkRowWithData: (type = "", value = "") => {
+        const rowId = Date.now() + Math.random();
+        const container = document.getElementById('perks-rows-container');
+        if (!container) return;
+
+        const row = document.createElement('div');
+        row.id = `perk-${rowId}`;
+        row.className = "perk-row";
+        row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
+
+        const perkOptions = ["Meal Coupons", "Corporate NPS", "VPF", "Mobile & Internet", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
+        let selectOptions = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
+        
+        row.innerHTML = `
+            <select class="perk-type" onchange="TaxController.calculatePerkExemption('${rowId}'); TaxController.calculateAll();" style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
+                ${selectOptions}
+            </select>
+            <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" 
+                   oninput="TaxController.calculatePerkExemption('${rowId}'); TaxController.calculateAll();"
+                   style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
+            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.85rem; font-weight: bold;">₹ 0</div>
+            <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        container.appendChild(row);
+        TaxController.calculatePerkExemption(rowId);
+    },
+
+    calculatePerkExemption: (rowId) => {
+        const row = document.getElementById(`perk-${rowId}`);
+        if(!row) return;
+        const type = row.querySelector('.perk-type').value;
+        const declValue = row.querySelector('.perk-amount').value;
+        const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
+        
+        // Use global TAX_CONFIG if available, else default to no limit
+        const rules = (window.TAX_CONFIG && TAX_CONFIG.perkRules) ? TAX_CONFIG.perkRules[type] : { maxExempt: Infinity };
+        
+        let amount = declValue.includes('%') 
+            ? (parseFloat(declValue.replace('%', '')) / 100) * basic 
+            : parseFloat(declValue) || 0;
+
+        let eligible = amount;
+        if (type === "Corporate NPS") {
+            const maxPercent = rules.oldLimit || 0.14; 
+            eligible = Math.min(amount, basic * maxPercent);
+        } else if (rules && rules.maxExempt) {
+            eligible = Math.min(amount, rules.maxExempt);
+        }
+
+        row.querySelector('.perk-eligible').innerText = `₹ ${Math.round(eligible).toLocaleString('en-IN')}`;
     },
 
     calculateAll: () => {
@@ -210,8 +250,6 @@ const TaxController = {
         }, perksData, basic);
 
         TaxController.updateSummary(newRegimeTax, oldRegimeTax);
-        
-        // Update floating bar if function exists
         if(window.syncFloatingBar) syncFloatingBar(oldRegimeTax, newRegimeTax);
     },
 
@@ -235,15 +273,11 @@ const TaxController = {
     }
 };
 
-// --- GLOBAL BRIDGE FUNCTIONS ---
-// These are called by the inline 'onclick' handlers in your Markdown
+// --- GLOBAL BRIDGE ---
+function addPerkRow() { TaxController.addPerkRowWithData(); }
 function runCalculator() { TaxController.calculateAll(); }
+async function saveTaxData() { return await TaxController.saveUserData(); }
 
-async function saveTaxData() { 
-    return await TaxController.saveUserData(); 
-}
-
-// Ensure 80C total label updates
 function update80CTotal() {
     let total = 0;
     document.querySelectorAll('.row-amount-80c').forEach(input => {
