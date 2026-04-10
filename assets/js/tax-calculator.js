@@ -31,7 +31,7 @@ const TaxController = {
     },
 
     // --- PERSISTENCE METHODS ---
-    saveUserData: async () => {
+    saveUserData: async () => { (passedYear)
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("AUTH_REQUIRED");
