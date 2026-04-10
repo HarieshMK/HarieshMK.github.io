@@ -99,86 +99,92 @@ FinanceEngine.TaxEngine = {
     },
 
     // 2. NEW REGIME WITH OBJECT RETURN
-    calculateNewRegime: (grossIncome, perks, basicSalary = 0) => {
+   calculateNewRegime: (grossIncome, perks, basicSalary = 0) => {
         const config = TAX_CONFIG.newRegime;
         let totalExemptions = config.stdDeduction;
-        let corpNPSUsed = 0;
+        let perkBreakdown = [];
 
         perks.forEach(p => {
+            let eligible = 0;
             if (p.type === "Meal Coupons") {
-                totalExemptions += Math.min(p.amount, 105600);
+                eligible = Math.min(p.amount, 105600); // Standard approx for 2 meals/day
             } else if (p.type === "Corporate NPS") {
-                corpNPSUsed = Math.min(p.amount, basicSalary * 0.14);
-                totalExemptions += corpNPSUsed;
+                eligible = Math.min(p.amount, basicSalary * 0.14); // 14% for New Regime
             } else if (["Mobile & Internet", "Books & Periodicals"].includes(p.type)) {
-                totalExemptions += p.amount;
+                eligible = p.amount; // Usually fully exempt against bills
             }
+            totalExemptions += eligible;
+            perkBreakdown.push({ type: p.type, eligible });
         });
 
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
         
-        if (netTaxable <= config.rebateLimit) return { tax: 0, netTaxable, totalExemptions };
+        // New Regime Tax Calculation with Rebate
+        let tax = 0;
+        if (netTaxable > config.rebateLimit) {
+            const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+            // Marginal Relief logic
+            const extraIncome = netTaxable - config.rebateLimit;
+            tax = Math.min(slabTax, extraIncome);
+        }
 
-        const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-        const extraIncome = netTaxable - config.rebateLimit;
-        const taxAfterRelief = Math.min(slabTax, extraIncome);
-        
         return {
-            tax: taxAfterRelief + (taxAfterRelief * TAX_CONFIG.cessRate),
+            tax: tax + (tax * TAX_CONFIG.cessRate),
             netTaxable,
             totalExemptions,
-            corpNPSEligible: basicSalary * 0.14
+            perkBreakdown
         };
     },
 
-    // 3. OLD REGIME WITH WATERFALL & OBJECT RETURN
-    calculateOldRegime: (grossIncome, deductions, perks, basicSalary = 0) => {
+   calculateOldRegime: (grossIncome, deductions, perks, basicSalary = 0) => {
         const config = TAX_CONFIG.oldRegime;
-        let perkExemptions = 0;
-        let npsSelf = deductions.npsSelf || 0;
+        let totalExemptions = config.stdDeduction;
         let other80C = deductions.section80C || 0;
+        let profTax = 0;
 
         perks.forEach(p => {
             if (p.type === "Corporate NPS") {
-                perkExemptions += Math.min(p.amount, basicSalary * 0.10);
-            } else if (p.type === "Meal Coupons") {
-                perkExemptions += Math.min(p.amount, 105600);
+                totalExemptions += Math.min(p.amount, basicSalary * 0.10); 
+            } else if (p.type === "Professional Tax") {
+                profTax = p.amount;
+                totalExemptions += profTax;
             } else if (p.type === "VPF") {
-                other80C += p.amount;
+                other80C += p.amount; 
             } else {
-                perkExemptions += p.amount;
+                totalExemptions += p.amount;
             }
         });
 
-        // Waterfall Logic for 80C + 80CCD(1B)
+        // Waterfall: 80C + 80CCD(1B)
         const cappedOther80C = Math.min(other80C, config.limits.section80C);
         const spaceLeftIn80C = config.limits.section80C - cappedOther80C;
-        const npsUsedToFill80C = Math.min(npsSelf, spaceLeftIn80C);
-        const npsRemainingAfter80C = npsSelf - npsUsedToFill80C;
-        const capped80CCD1B = Math.min(npsRemainingAfter80C, config.limits.section80CCD_1B);
+        const npsUsedIn80C = Math.min(deductions.npsSelf || 0, spaceLeftIn80C);
+        const npsFor80CCD = Math.min((deductions.npsSelf || 0) - npsUsedIn80C, config.limits.section80CCD_1B);
 
-        const final80CTotal = cappedOther80C + npsUsedToFill80C;
         const capped24b = Math.min(deductions.homeLoanInterest || 0, config.limits.section24b);
         
         const limit80D = deductions.parentsSenior ? 
-                         (config.limits.section80D_Self + config.limits.section80D_SeniorParents) : 
-                         (config.limits.section80D_Self + config.limits.section80D_Parents);
+            (config.limits.section80D_Self + config.limits.section80D_SeniorParents) : 
+            (config.limits.section80D_Self + config.limits.section80D_Parents);
+        
         const capped80D = Math.min(deductions.section80D || 0, limit80D);
 
-        const totalDeductions = config.stdDeduction + final80CTotal + capped80CCD1B + capped24b + capped80D + (deductions.exemptHRA || 0) + perkExemptions;
+        // COMBINED DEDUCTION CALCULATION (Fixed variable names)
+        const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + capped24b + capped80D + (deductions.exemptHRA || 0);
+        
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
 
-        if (netTaxable <= config.rebateLimit) return { tax: 0, netTaxable, totalDeductions };
+        let tax = 0;
+        if (netTaxable > config.rebateLimit) {
+            const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+            // Section 87A Rebate for Old Regime (Income up to 5L)
+            tax = (netTaxable <= 500000) ? Math.max(0, slabTax - 12500) : slabTax;
+        }
 
-        const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-        
         return {
-            tax: slabTax + (slabTax * TAX_CONFIG.cessRate),
+            tax: tax + (tax * TAX_CONFIG.cessRate),
             netTaxable,
-            totalDeductions,
-            corpNPSEligible: basicSalary * 0.10,
-            nps80CCD: capped80CCD1B,
-            final80C: final80CTotal
+            totalDeductions
         };
     }
 };
