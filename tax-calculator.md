@@ -141,13 +141,15 @@ permalink: /tax-calculator/
         <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
             <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
-                <div style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
-                    <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">OLD REGIME</div>
-                    <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
-                </div>
-                <div style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 2px solid #4ade80;">
-                    <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">NEW REGIME</div>
-                    <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: #4ade80; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+                <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border); transition: all 0.3s ease;">
+                <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">OLD REGIME</div>
+                <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+            </div>
+            
+            <div id="new-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border); transition: all 0.3s ease;">
+                <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">NEW REGIME</div>
+                <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+            </div>
                     <div id="recommendation-box" style="margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 0.9rem; text-align: center; border: 1px solid var(--calc-input-border); color: var(--calc-text-main);">
                         Enter your details to see the recommendation.
                     </div>
@@ -393,8 +395,8 @@ permalink: /tax-calculator/
     }
 
     .btn:hover {
-        background: #38bdf8;
-        color: #0f172a;
+        background: #38bdf8 !important;
+        color: #0f172a !important;
         transform: translateY(-2px);
         transition: all 0.2s ease;
     }
