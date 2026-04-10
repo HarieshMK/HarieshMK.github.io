@@ -67,7 +67,15 @@ async function handleLogin(email, password) {
             showAuthMessage(error.message);
         } else {
             showAuthMessage("Login successful!", false);
-            setTimeout(() => { window.location.href = '/'; }, 1000);
+            
+            // --- THE FIX STARTS HERE ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const destination = urlParams.get('return_to') || '/'; // Go to return_to OR home
+            
+            setTimeout(() => { 
+                window.location.href = destination; 
+            }, 1000);
+            // --- THE FIX ENDS HERE ---
         }
     } catch (err) {
         console.error("Critical Auth Error:", err);
