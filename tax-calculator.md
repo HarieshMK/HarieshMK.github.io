@@ -58,6 +58,9 @@ permalink: /tax-calculator/
         <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
             <h3 style="margin-top: 0; color: var(--calc-text-main);"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
             <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Add employer benefits applied to your CTC.</p>
+            <div style="font-size: 0.75rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #fbbf24;">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Only add perks here if they are already included in your <strong>Other Taxable Allowances</strong> above.  
+            </div>
             <div id="perks-rows-container"></div>
             <button type="button" onclick="addPerkRow()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
                 <i class="fas fa-plus-circle"></i> Add Benefit/Perk
@@ -161,6 +164,22 @@ permalink: /tax-calculator/
             
             <div id="save-status" style="margin-top: 10px; font-size: 0.75rem; text-align: center; color: var(--calc-text-muted); min-height: 1.2em;"></div>
         </div>
+            <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
+            <h4 style="color: var(--calc-text-main); margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Detailed Breakdown</h4>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--calc-text-main);">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left;">
+                            <th style="padding: 8px 4px;">Component</th>
+                            <th style="padding: 8px 4px; color: #4ade80;">New</th>
+                            <th style="padding: 8px 4px; color: #38bdf8;">Old</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparison-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -193,24 +212,33 @@ permalink: /tax-calculator/
         setupToggle('80d-header', '80d-content', '80d-icon');
         setupToggle('24b-header', '24b-content', '24b-icon');
         setupToggle('nps-header', 'nps-content', 'nps-icon');
+    
+        // Load User Data
+        TaxController.init().then(() => {
+            const pContainer = document.getElementById('perks-rows-container');
+            const cContainer = document.getElementById('80c-rows-container');
 
-        // Initial Rows
-        addPerkRow();
-        add80CRow();
+            // Only add default rows if the database returned nothing
+            if (pContainer && pContainer.children.length === 0) {
+                TaxController.addPerkRowWithData("Professional Tax", 2500);
+            }
+            if (cContainer && (cContainer.children.length === 0 || cContainer.querySelector('#empty-80c-msg'))) {
+                add80CRow(); 
+            }
+        });
     });
+
     // --- YEAR SELECTOR LOGIC ---
-        const fySelector = document.getElementById('fy-selector');
+    const fySelector = document.getElementById('fy-selector');
+    if (fySelector) {
         fySelector.addEventListener('change', () => {
-            // Update the subtitle text so the user knows which year is active
             const subTitle = document.querySelector('p[style*="var(--calc-text-muted)"]');
             if(subTitle) subTitle.innerText = `Compare Old vs. New Tax Regime for Financial Year ${fySelector.value}`;
-            
-            // Refresh the math
             runCalculator();
         });
+    }
 
     // --- AUTOMATIC CALCULATION TRIGGER ---
-    // This listens to ANY change in the main input fields
     document.addEventListener('input', (e) => {
         if (e.target.classList.contains('dynamic-input') || e.target.type === 'checkbox') {
             if (typeof runCalculator === 'function') {
@@ -218,7 +246,7 @@ permalink: /tax-calculator/
             }
         }
     });
-
+    
     // --- UI HELPERS ---
     const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
@@ -247,30 +275,37 @@ permalink: /tax-calculator/
     const options80C = typeof InvestmentRegistry !== 'undefined' ? 
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
-       function add80CRow() {
-        if(emptyMsg) emptyMsg.style.display = 'none';
-        const rowId = Date.now();
-        const row = document.createElement('div');
-        row.id = `row-${rowId}`;
-        row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
-        
-        let selectOptions = options80C.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-        
-        row.innerHTML = `
-            <select class="row-select-80c dynamic-input" style="flex: 2;" onchange="runCalculator()">
-                <option value="" disabled selected>Select Investment</option>
-                ${selectOptions}
-            </select>
-            <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
-                   oninput="update80CTotal();" inputmode="decimal" 
-                   style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;">
-            <button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
-                    style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
+       function add80CRow(type = "", amount = "", isLocked = false) {
+    if(emptyMsg) emptyMsg.style.display = 'none';
+    const rowId = Date.now() + Math.random();
+    const row = document.createElement('div');
+    row.id = `row-${rowId}`;
+    row.className = isLocked ? "row-80c-statutory" : "row-80c-manual";
+    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+    
+    let selectOptions = options80C.map(opt => 
+        `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`
+    ).join('');
+    
+    row.innerHTML = `
+        <select class="row-select-80c dynamic-input" style="flex: 2;" onchange="runCalculator()" ${isLocked ? 'disabled' : ''}>
+            <option value="" disabled ${!type ? 'selected' : ''}>Select Investment</option>
+            ${selectOptions}
+        </select>
+        <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
+               oninput="update80CTotal();" value="${amount}" inputmode="decimal" 
+               style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;" 
+               ${isLocked ? 'readonly style="opacity: 0.7; background: var(--calc-card) !important;"' : ''}>
+        ${isLocked ? 
+            `<div style="width: 30px; text-align: center; color: var(--calc-text-muted); font-size: 0.7rem;"><i class="fas fa-lock"></i></div>` : 
+            `<button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
+                     style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px; width: 30px;">
                 <i class="fas fa-trash"></i>
-            </button>
-        `;
-        rowsContainer.appendChild(row);
-    }
+            </button>`
+        }
+    `;
+    rowsContainer.appendChild(row);
+}
 
         function addPerkRow() {
         const container = document.getElementById('perks-rows-container');
@@ -371,6 +406,15 @@ permalink: /tax-calculator/
         border-radius: 10px;
         padding: 10px;
         transition: all 0.2s ease;
+    }
+    /* Styling for auto-calculated rows like EPF */
+    .row-80c-statutory select, 
+    .row-80c-statutory input {
+        background-color: var(--calc-card) !important;
+        border-style: dashed !important;
+        pointer-events: none; /* Prevents clicking */
+        opacity: 0.7;
+        cursor: not-allowed;
     }
 
     #mobile-tax-bar {
