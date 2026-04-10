@@ -1,5 +1,6 @@
 /**
  * Controller for the Tax Calculator UI with Supabase Persistence
+ * VERSION: 2.0 - Fixed EPF Duplication & Row Deletion Logic
  */
 const TaxController = {
     isDirty: false,
@@ -7,6 +8,7 @@ const TaxController = {
     init: async () => { 
         console.log("Tax Controller Initialized"); 
         
+        // Prevents losing data on accidental refresh
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) {
                 e.preventDefault();
@@ -14,6 +16,7 @@ const TaxController = {
             }
         });
 
+        // Watches for any input change to trigger calculation
         document.addEventListener('input', (e) => {
             const tag = e.target.tagName;
             if (tag === 'INPUT' || tag === 'SELECT') {
@@ -31,19 +34,16 @@ const TaxController = {
             const inputs = JSON.parse(savedDraft);
             TaxController.fillForm(inputs); 
             localStorage.removeItem('tax_calc_draft');
-            
-            setTimeout(() => {
-                TaxController.calculateAll();
-            }, 200);
+            setTimeout(() => { TaxController.calculateAll(); }, 200);
         }
 
-        // 3. Pre-fill PT if empty
+        // 3. Pre-fill Professional Tax if empty
         const perksContainer = document.getElementById('perks-rows-container');
         if (perksContainer && perksContainer.children.length === 0) {
             TaxController.addPerkRowWithData("Professional Tax", 2500);
         }
         
-        // 4. Update Button Label based on Auth status
+        // 4. Update Button Label based on Login status
         const { data: { session } } = await window.supabase.auth.getSession();
         const saveBtn = document.getElementById('btn-save-tax');
         if (saveBtn) {
@@ -55,35 +55,28 @@ const TaxController = {
     saveUserData: async () => {
         try {
             const { data: { session } } = await window.supabase.auth.getSession();
-            
             if (!session) {
                 const formData = TaxController.captureInputs();
                 localStorage.setItem('tax_calc_draft', JSON.stringify(formData));
-                const currentPath = window.location.pathname;
-                window.location.href = `/login/?return_to=${currentPath}`;
+                window.location.href = `/login/?return_to=${window.location.pathname}`;
                 return false; 
             }
-
             const user = session.user;
             const selectedYear = document.getElementById('fy-selector').value;
             const formData = TaxController.captureInputs();
-
-            const { error } = await supabase
-                .from('tax_user_data')
-                .upsert({ 
-                    id: user.id, 
-                    financial_year: selectedYear, 
-                    calculator_inputs: formData, 
-                    updated_at: new Date() 
-                }, { onConflict: 'id, financial_year' }); 
-
+            const { error } = await supabase.from('tax_user_data').upsert({ 
+                id: user.id, 
+                financial_year: selectedYear, 
+                calculator_inputs: formData, 
+                updated_at: new Date() 
+            }, { onConflict: 'id, financial_year' }); 
             if (error) throw error;
             TaxController.isDirty = false;
-            alert("Data saved successfully to your profile!");
+            alert("Data saved successfully!");
             return true;
         } catch (err) {
-            console.error("Save process failed:", err);
-            alert("Save failed. Check console for details.");
+            console.error("Save failed:", err);
+            alert("Save failed.");
             throw err;
         }
     },
@@ -104,21 +97,15 @@ const TaxController = {
             perks: [],
             deductions80C: []
         };
-
         document.querySelectorAll('[id^="perk-"]').forEach(row => {
-            const typeSelect = row.querySelector('.perk-type');
-            const amtInput = row.querySelector('.perk-amount'); 
-            if (typeSelect && typeSelect.value) {
-                formData.perks.push({ type: typeSelect.value, value: amtInput.value });
-            }
+            const type = row.querySelector('.perk-type')?.value;
+            const val = row.querySelector('.perk-amount')?.value;
+            if (type) formData.perks.push({ type: type, value: val });
         });
-
         document.querySelectorAll('[id^="row-"]').forEach(row => {
-            const select = row.querySelector('.row-select-80c');
-            const amtInput = row.querySelector('.row-amount-80c');
-            if (select && select.value && amtInput.value) {
-                formData.deductions80C.push({ type: select.value, amount: amtInput.value });
-            }
+            const type = row.querySelector('.row-select-80c')?.value;
+            const amt = row.querySelector('.row-amount-80c')?.value;
+            if (type) formData.deductions80C.push({ type: type, amount: amt });
         });
         return formData;
     },
@@ -126,20 +113,9 @@ const TaxController = {
     loadUserData: async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-
         const selectedYear = document.getElementById('fy-selector').value;
-        const { data, error } = await supabase
-            .from('tax_user_data')
-            .select('calculator_inputs')
-            .eq('id', user.id)
-            .eq('financial_year', selectedYear)
-            .maybeSingle(); 
-
-        if (data && data.calculator_inputs) {
-            TaxController.fillForm(data.calculator_inputs);
-        } else {
-            TaxController.resetForm();
-        }
+        const { data } = await supabase.from('tax_user_data').select('calculator_inputs').eq('id', user.id).eq('financial_year', selectedYear).maybeSingle(); 
+        if (data?.calculator_inputs) TaxController.fillForm(data.calculator_inputs);
     },
 
     fillForm: (inputs) => {
@@ -155,19 +131,13 @@ const TaxController = {
         document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
         document.getElementById('nps-extra').value = inputs.npsExtra || "";
 
-        if (document.getElementById('clp-note')) {
-            document.getElementById('clp-note').style.display = inputs.isUnderConstruction ? 'block' : 'none';
-        }
-
         const perksContainer = document.getElementById('perks-rows-container');
         perksContainer.innerHTML = '';
-        if (inputs.perks?.length > 0) {
-            inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
-        }
+        if (inputs.perks) inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
 
         const rows80c = document.getElementById('80c-rows-container');
         rows80c.innerHTML = '';
-        if (inputs.deductions80C?.length > 0) {
+        if (inputs.deductions80C) {
             inputs.deductions80C.forEach(item => {
                 if (typeof window.add80CRow === 'function') {
                     window.add80CRow();
@@ -177,46 +147,24 @@ const TaxController = {
                 }
             });
         }
-        
-        setTimeout(() => {
-            TaxController.calculateAll();
-        }, 100);
-    },
-
-    resetForm: () => {
-        document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = "");
-        document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
-        document.getElementById('perks-rows-container').innerHTML = '';
-        document.getElementById('80c-rows-container').innerHTML = '';
-        if(document.getElementById('is-metro')) document.getElementById('is-metro').value = "false";
-        TaxController.calculateAll();
+        setTimeout(() => { TaxController.calculateAll(); }, 100);
     },
 
     addPerkRowWithData: (type = "", value = "") => {
         const rowId = Date.now() + Math.random();
         const container = document.getElementById('perks-rows-container');
         if (!container) return;
-
         const row = document.createElement('div');
         row.id = `perk-${rowId}`;
         row.className = "perk-row";
         row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
-
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Mobile Reimbursement", "Fuel Allowance", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
         let selectOptions = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
-        
         row.innerHTML = `
-            <select class="perk-type" onchange="TaxController.calculateAll();" style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">
-                ${selectOptions}
-            </select>
-            <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" 
-                   oninput="TaxController.calculateAll();"
-                   style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
+            <select class="perk-type" onchange="TaxController.calculateAll();" style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">${selectOptions}</select>
+            <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" oninput="TaxController.calculateAll();" style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.85rem; font-weight: bold;">₹ 0</div>
-            <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
+            <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>`;
         container.appendChild(row);
     },
 
@@ -224,44 +172,32 @@ const TaxController = {
         const selectedYear = document.getElementById('fy-selector').value;
         const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
         const hraReceived = parseFloat(document.getElementById('hra-received').value) || 0;
-        const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0; 
         const isMetro = document.getElementById('is-metro')?.value === 'true';
-        const epfAmount = Math.round(basic * 0.12);
+        const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rows80c = document.getElementById('80c-rows-container');
+        const epfAmount = Math.round(basic * 0.12);
 
-        const isUnderConstruction = document.getElementById('is-under-construction')?.checked;
-        const homeLoanInterest = isUnderConstruction ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0);
-        
-        const premSelf = parseFloat(document.getElementById('80d-self')?.value) || 0;
-        const premParents = parseFloat(document.getElementById('80d-parents')?.value) || 0;
-        const isSr = document.getElementById('parents-senior')?.checked;
-        const npsExtra = parseFloat(document.getElementById('nps-extra')?.value) || 0;
-
-        // --- EPF HANDLING ---
-        const all80cSelects = Array.from(rows80c.querySelectorAll('.row-select-80c'));
-        let epfRow = all80cSelects.find(sel => sel.value === "EPF")?.closest('.row-80c');
-
-        if (!epfRow && basic > 0) {
-            if (typeof window.add80CRow === 'function') {
-                window.add80CRow();
-                const newRow = rows80c.lastElementChild;
-                const select = newRow.querySelector('.row-select-80c');
-                if (select) {
-                    select.value = "EPF";
-                    select.disabled = true; 
+        // --- PREVENT DUPLICATE EPF ---
+        let epfRow = rows80c.querySelector('[data-is-epf="true"]');
+        if (basic > 0) {
+            if (!epfRow) {
+                if (typeof window.add80CRow === 'function') {
+                    window.add80CRow();
+                    epfRow = rows80c.lastElementChild;
+                    epfRow.setAttribute('data-is-epf', 'true');
+                    const select = epfRow.querySelector('.row-select-80c');
+                    if (select) { select.value = "EPF"; select.disabled = true; }
                 }
-                epfRow = newRow;
             }
-        }
-
-        if (epfRow) {
-            const amtInput = epfRow.querySelector('.row-amount-80c');
-            if (amtInput) {
+            if (epfRow) {
+                const amtInput = epfRow.querySelector('.row-amount-80c');
                 amtInput.value = epfAmount;
                 amtInput.readOnly = true;
                 amtInput.style.opacity = "0.7";
             }
+        } else if (epfRow) {
+            epfRow.remove();
         }
 
         let total80CInput = 0;
@@ -269,62 +205,51 @@ const TaxController = {
             total80CInput += parseFloat(input.value) || 0;
         });
 
-        // --- PERKS ---
         let perksData = []; 
-        document.querySelectorAll('[id^="perk-"]').forEach(row => {
-            const typeSelect = row.querySelector('.perk-type');
-            const amtInput = row.querySelector('.perk-amount');
+        document.querySelectorAll('.perk-row').forEach(row => {
+            const type = row.querySelector('.perk-type')?.value;
+            const amtVal = row.querySelector('.perk-amount')?.value || "0";
+            let amt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
+            perksData.push({ type: type, amount: amt });
+            // UI Update for Perk labels
             const label = row.querySelector('.perk-eligible');
-
-            if (typeSelect && amtInput && typeSelect.value) {
-                const type = typeSelect.value;
-                const amtVal = amtInput.value;
-                let amt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
-                perksData.push({ type: type, amount: amt });
-
-                const yearData = TAX_CONFIG[selectedYear];
-                const rule = yearData.perkRules ? yearData.perkRules[type] : null;
-                
-                if (type === "Corporate NPS") {
-                    const allowedAmt = basic * 0.14;
-                    label.innerText = amt > allowedAmt ? `Capped at ₹${Math.round(allowedAmt).toLocaleString('en-IN')} (14%)` : `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
-                    label.style.color = amt > allowedAmt ? "#fbbf24" : "#4ade80";
+            if (label) {
+                const isNPS = type === "Corporate NPS";
+                const cap = basic * 0.14;
+                if (isNPS && amt > cap) {
+                    label.innerText = `Capped ₹${Math.round(cap).toLocaleString('en-IN')}`;
+                    label.style.color = "#fbbf24";
                 } else {
-                    const isAllowedInNew = rule && (rule.regime === "both" || rule.regime === "new");
-                    label.innerText = isAllowedInNew ? `₹ ${Math.round(amt).toLocaleString('en-IN')}` : `Not in New Regime`;
-                    label.style.color = isAllowedInNew ? "#4ade80" : "#ef4444";
+                    label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
+                    label.style.color = "#4ade80";
                 }
             }
         });
 
         if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
 
-        // --- CALCULATIONS ---
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
-        const hraEligibleLabel = document.getElementById('hra-eligible-display');
-        if(hraEligibleLabel) hraEligibleLabel.innerText = `Eligible: ₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
+        const hraDisplay = document.getElementById('hra-eligible-display');
+        if(hraDisplay) hraDisplay.innerText = `Eligible: ₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
 
         const grossSalary = basic + hraReceived + otherIncome;
-        const newRegimeObj = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, basic);
-        const oldRegimeObj = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
+        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, basic);
+        const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
             section80C: total80CInput,
-            npsSelf: npsExtra, 
-            section80D: premSelf + premParents,
-            parentsSenior: isSr,
-            homeLoanInterest: homeLoanInterest,
+            npsSelf: parseFloat(document.getElementById('nps-extra')?.value) || 0, 
+            section80D: (parseFloat(document.getElementById('80d-self')?.value) || 0) + (parseFloat(document.getElementById('80d-parents')?.value) || 0),
+            parentsSenior: document.getElementById('parents-senior')?.checked,
+            homeLoanInterest: document.getElementById('is-under-construction')?.checked ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0),
             exemptHRA: hraResult.actualExemption
         }, perksData, basic);
 
-        TaxController.updateSummary(newRegimeObj.tax, oldRegimeObj.tax);
+        TaxController.updateSummary(newReg.tax, oldReg.tax);
         
-        const display80C = Math.min(total80CInput, 150000);
         const counterEl = document.getElementById('display-80c-total');
         if (counterEl) {
-            counterEl.textContent = `₹ ${display80C.toLocaleString('en-IN')} / 1,50,000`;
+            counterEl.innerText = `₹ ${Math.min(total80CInput, 150000).toLocaleString('en-IN')} / 1,50,000`;
             counterEl.style.color = total80CInput > 150000 ? "#fbbf24" : "#4ade80";
         }
-
-        if(window.syncFloatingBar) syncFloatingBar(oldRegimeObj.tax, newRegimeObj.tax);
     },
 
     updateSummary: (newTax, oldTax) => {
@@ -340,37 +265,42 @@ const TaxController = {
         [newBox, oldBox].forEach(box => {
             box.style.borderColor = "var(--calc-input-border)";
             box.style.borderWidth = "1px";
-            box.style.boxShadow = "none";
         });
-        newEl.style.color = "var(--calc-text-main)";
-        oldEl.style.color = "var(--calc-text-main)";
 
         if (newTax === oldTax) {
-            if (recBox) recBox.innerHTML = `Both regimes result in the same tax.`;
+            if (recBox) recBox.innerHTML = `Both regimes are equal.`;
             return;
         }
 
         const isNewBetter = newTax < oldTax;
         const winnerBox = isNewBetter ? newBox : oldBox;
         const winnerText = isNewBetter ? newEl : oldEl;
-        const diff = Math.abs(newTax - oldTax);
-
+        
         winnerBox.style.borderColor = "#4ade80";
         winnerBox.style.borderWidth = "2px";
-        winnerBox.style.boxShadow = "0 0 15px rgba(74, 222, 128, 0.1)";
         winnerText.style.color = "#4ade80";
 
         if (recBox) {
-            recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
-            recBox.style.borderColor = isNewBetter ? "#4ade80" : "#38bdf8"; 
+            recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. Save <strong>₹${Math.round(Math.abs(newTax - oldTax)).toLocaleString('en-IN')}</strong>`;
         }
     }
 };
 
-// --- GLOBAL BRIDGE ---
+// --- GLOBAL FIXES ---
+// This overrides the original add80CRow so that deletions trigger calculations
+const originalAdd80C = window.add80CRow;
+window.add80CRow = function() {
+    if (typeof originalAdd80C === 'function') originalAdd80C();
+    // Ensure the new row's delete button calls our refresh logic
+    const container = document.getElementById('80c-rows-container');
+    const lastRow = container.lastElementChild;
+    const delBtn = lastRow.querySelector('button');
+    if (delBtn) {
+        delBtn.setAttribute('onclick', 'this.parentElement.remove(); TaxController.calculateAll();');
+    }
+};
+
 function addPerkRow() { TaxController.addPerkRowWithData(); }
 function runCalculator() { TaxController.calculateAll(); }
 async function saveTaxData() { return await TaxController.saveUserData(); }
-function update80CTotal() { TaxController.calculateAll(); }
-
 window.onload = TaxController.init;
