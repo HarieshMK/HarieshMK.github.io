@@ -25,11 +25,14 @@ const TaxController = {
         await TaxController.loadUserData();
     },
 
-    // --- PERSISTENCE METHODS (Keeping your existing logic) ---
+    // --- PERSISTENCE METHODS ---
     saveUserData: async () => {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("AUTH_REQUIRED");
+
+            // 1. Get the year from the dropdown
+            const selectedYear = document.getElementById('fy-selector').value;
 
             const formData = {
                 basic: document.getElementById('basic-salary').value,
@@ -63,13 +66,15 @@ const TaxController = {
                 }
             });
 
+            // 2. Save with the Year column (onConflict updated)
             const { error } = await supabase
                 .from('tax_user_data')
                 .upsert({ 
                     id: user.id, 
+                    financial_year: selectedYear, 
                     calculator_inputs: formData, 
                     updated_at: new Date() 
-                });
+                }, { onConflict: 'id, financial_year' }); 
 
             if (error) throw error;
             TaxController.isDirty = false;
@@ -84,14 +89,20 @@ const TaxController = {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
+        const selectedYear = document.getElementById('fy-selector').value;
+
         const { data, error } = await supabase
             .from('tax_user_data')
             .select('calculator_inputs')
             .eq('id', user.id)
-            .single();
+            .eq('financial_year', selectedYear)
+            .maybeSingle(); 
 
+        // Check if we actually got data
         if (data && data.calculator_inputs) {
             const inputs = data.calculator_inputs;
+            
+            // Map inputs to DOM elements
             document.getElementById('basic-salary').value = inputs.basic || "";
             document.getElementById('hra-received').value = inputs.hra || "";
             document.getElementById('rent-paid').value = inputs.rent || "";
@@ -108,12 +119,14 @@ const TaxController = {
                 document.getElementById('clp-note').style.display = inputs.isUnderConstruction ? 'block' : 'none';
             }
 
+            // Restore Perks
             const perksContainer = document.getElementById('perks-rows-container');
             perksContainer.innerHTML = '';
             if (inputs.perks?.length > 0) {
                 inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
             }
 
+            // Restore 80C Rows
             const rows80c = document.getElementById('80c-rows-container');
             rows80c.innerHTML = '';
             if (inputs.deductions80C?.length > 0) {
@@ -131,7 +144,25 @@ const TaxController = {
                 TaxController.calculateAll();
                 if(typeof update80CTotal === 'function') update80CTotal();
             }, 100);
+
+        } else {
+            // No data for this year? Reset form to blank state
+            TaxController.resetForm();
         }
+    },
+
+    resetForm: () => {
+        // Clear all standard number inputs
+        document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = "");
+        // Clear checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+        // Empty the dynamic containers
+        document.getElementById('perks-rows-container').innerHTML = '';
+        document.getElementById('80c-rows-container').innerHTML = '';
+        // Set standard select values
+        if(document.getElementById('is-metro')) document.getElementById('is-metro').value = "false";
+        
+        TaxController.calculateAll();
     },
 
     // --- UI METHODS ---
