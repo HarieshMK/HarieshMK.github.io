@@ -23,6 +23,11 @@ const TaxController = {
         });
 
         await TaxController.loadUserData();
+        // If it's a fresh load (no data), pre-fill PT
+        const perksContainer = document.getElementById('perks-rows-container');
+        if (perksContainer && perksContainer.children.length === 0) {
+            TaxController.addPerkRowWithData("Professional Tax", 2500);
+        }
     },
 
     // --- PERSISTENCE METHODS ---
@@ -176,7 +181,7 @@ const TaxController = {
         row.className = "perk-row";
         row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
 
-        const perkOptions = ["Meal Coupons", "Corporate NPS", "VPF", "Mobile & Internet", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
+        const perkOptions = ["Meal Coupons", "Corporate NPS", "Mobile Reimbursement", "Fuel Allowance", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
         let selectOptions = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
         
         row.innerHTML = `
@@ -200,6 +205,8 @@ const TaxController = {
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0; 
         const isMetro = document.getElementById('is-metro')?.value === 'true';
+        const epfAmount = Math.round(basic * 0.12);
+        const rows80c = document.getElementById('80c-rows-container');
 
         const isUnderConstruction = document.getElementById('is-under-construction')?.checked;
         const homeLoanInterest = isUnderConstruction ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0);
@@ -214,8 +221,28 @@ const TaxController = {
         let total80CInput = 0;
         document.querySelectorAll('.row-amount-80c').forEach(input => {
             total80CInput += parseFloat(input.value) || 0;
+        let epfRow = Array.from(rows80c.querySelectorAll('.perk-row, .row-80c')) // adjust selector based on your HTML class
+                  .find(row => row.querySelector('.row-select-80c')?.value === "EPF");
         });
+            if (!epfRow && basic > 0) {
+            // If no EPF row exists and user has entered salary, create it
+            if (typeof window.add80CRow === 'function') {
+                add80CRow();
+                epfRow = rows80c.lastElementChild;
+                const select = epfRow.querySelector('.row-select-80c');
+                select.value = "EPF";
+                // Optional: Disable the select so they can't change it to "LIC"
+                select.disabled = true; 
+            }
+        }
 
+            if (epfRow) {
+                const amtInput = epfRow.querySelector('.row-amount-80c');
+                amtInput.value = epfAmount;
+                // Optional: Disable the input so they see it's automatic
+                amtInput.readOnly = true; 
+                amtInput.style.opacity = "0.7";
+            }
         // 2. Process Perks and update individual "Eligible" labels for Perks
         let perksData = [];
         document.querySelectorAll('[id^="perk-"]').forEach(row => {
