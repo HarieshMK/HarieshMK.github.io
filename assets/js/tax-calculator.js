@@ -246,33 +246,52 @@ const TaxController = {
         }
 
         // 2. Process Perks & Update UI Labels
-        let perksData = [];
-        document.querySelectorAll('[id^="perk-"]').forEach(row => {
-            const type = row.querySelector('.perk-type').value;
-            const amtVal = row.querySelector('.perk-amount').value;
+let perksData = []; // This MUST be populated to pass to the Engine
+document.querySelectorAll('[id^="perk-"]').forEach(row => {
+    const typeSelect = row.querySelector('.perk-type');
+    const amtInput = row.querySelector('.perk-amount');
+    const label = row.querySelector('.perk-eligible');
+
+    if (typeSelect && amtInput && typeSelect.value) {
+        const type = typeSelect.value;
+        const amtVal = amtInput.value;
+        
+        // Calculate numeric value (handle %)
+        let amt = amtVal.includes('%') 
+            ? (parseFloat(amtVal.replace('%', '')) / 100) * basic 
+            : parseFloat(amtVal) || 0;
+
+        // Push to perksData so calculations actually use these values
+        perksData.push({ type: type, amount: amt });
+
+        const yearData = TAX_CONFIG[selectedYear];
+        const rule = yearData.perkRules ? yearData.perkRules[type] : null;
+        
+        // NPS Specific UI Feedback
+        if (type === "Corporate NPS") {
+            const npsLimitPercent = 0.14; 
+            const allowedAmt = basic * npsLimitPercent;
             
-            if (type && amtVal) {
-                let amt = amtVal.includes('%') 
-                    ? (parseFloat(amtVal.replace('%', '')) / 100) * basic 
-                    : parseFloat(amtVal) || 0;
-                
-                perksData.push({ type: type, amount: amt });
-
-                // UI Feedback based on Year/Regime rules
-                const yearData = TAX_CONFIG[selectedYear];
-                const rule = yearData.perkRules[type];
-                const isAllowedInNew = rule && (rule.regime === "both" || rule.regime === "new");
-
-                const label = row.querySelector('.perk-eligible');
-                if (isAllowedInNew) {
-                    label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
-                    label.style.color = "#4ade80"; // Green
-                } else {
-                    label.innerText = `Not in New Regime`;
-                    label.style.color = "#ef4444"; // Red
-                }
+            if (amt > allowedAmt) {
+                label.innerText = `Capped at ₹${Math.round(allowedAmt).toLocaleString('en-IN')} (14%)`;
+                label.style.color = "#fbbf24"; 
+            } else {
+                label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
+                label.style.color = "#4ade80";
             }
-        });
+        } else {
+            // Check if allowed in New Regime for other perks
+            const isAllowedInNew = rule && (rule.regime === "both" || rule.regime === "new");
+            if (isAllowedInNew) {
+                label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
+                label.style.color = "#4ade80";
+            } else {
+                label.innerText = `Not in New Regime`;
+                label.style.color = "#ef4444";
+            }
+        }
+    }
+});
 
         if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
 
