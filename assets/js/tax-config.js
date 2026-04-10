@@ -17,27 +17,27 @@ const TAX_CONFIG = {
         ]
     },
 
-    // OLD REGIME (Optional)
-    oldRegime: {
-        stdDeduction: 50000,
-        rebateLimit: 500000,
-        maxRebate: 125000,
-        slabs: [
-            { limit: 250000, rate: 0.00 },
-            { limit: 500000, rate: 0.05 },
-            { limit: 1000000, rate: 0.20 },
-            { limit: Infinity, rate: 0.30 }
-        ],
-        // Limits for Deductions
-        limits: {
-            section80C: 150000,
-            section80CCD_1B: 50000, // Extra NPS
-            section24b: 200000,    // Home Loan Interest
-            section80D_Self: 25000,
-            section80D_Parents: 25000,
-            section80D_SeniorParents: 50000
-        }
-    },
+            // Updated section for tax-config.js
+        oldRegime: {
+            stdDeduction: 50000,
+            rebateLimit: 500000,
+            maxRebate: 12500, // Fixed: was 125000
+            slabs: [
+                { limit: 250000, rate: 0.00 },
+                { limit: 500000, rate: 0.05 },
+                { limit: 1000000, rate: 0.20 },
+                { limit: Infinity, rate: 0.30 }
+            ],
+            limits: {
+                section80C: 150000,
+                section80CCD_1B: 50000,
+                section24b: 200000,
+                section80D_Self: 25000,
+                section80D_Parents: 25000,
+                section80D_SeniorParents: 50000
+            }
+        },
+    
     // Add this inside TAX_CONFIG
         perkRules: {
             "Meal Coupons": { maxExempt: 105600, label: "Max ₹200/meal per day" },
