@@ -101,6 +101,7 @@ FinanceEngine.TaxEngine = {
     // 2. NEW REGIME WITH OBJECT RETURN
     calculateNewRegime: (selectedYear, grossIncome, perks, basicSalary = 0) => {
         // Fetch config for the specific year
+        perks = perks || [];
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.newRegime;
         const perksConfig = yearData.perkRules;
@@ -145,6 +146,7 @@ FinanceEngine.TaxEngine = {
     },
 
    calculateOldRegime: (selectedYear, grossIncome, deductions, perks, basicSalary = 0) => {
+       perks = perks || [];
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.oldRegime;
         const perksConfig = yearData.perkRules;
