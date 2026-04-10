@@ -377,6 +377,7 @@ document.querySelectorAll('[id^="perk-"]').forEach(row => {
                 recBox.style.borderColor = isNewBetter ? "#4ade80" : "#38bdf8"; 
             }
         }
+};
 
 // --- GLOBAL BRIDGE ---
 function addPerkRow() { TaxController.addPerkRowWithData(); }
