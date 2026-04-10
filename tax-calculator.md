@@ -137,11 +137,12 @@ permalink: /tax-calculator/
         </div>
     </div> 
 
-    <div style="flex: 1 1 300px;">
-        <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
-            <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
-            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
-                <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border); transition: all 0.3s ease;">
+   <div style="flex: 1 1 300px;">
+    <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
+        <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
+            <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border); transition: all 0.3s ease;">
                 <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">OLD REGIME</div>
                 <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
             </div>
@@ -150,24 +151,24 @@ permalink: /tax-calculator/
                 <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">NEW REGIME</div>
                 <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
             </div>
-                    <div id="recommendation-box" style="margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 0.9rem; text-align: center; border: 1px solid var(--calc-input-border); color: var(--calc-text-main);">
-                        Enter your details to see the recommendation.
-                    </div>
-                </div>
+            
+            <div id="recommendation-box" style="margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 0.9rem; text-align: center; border: 1px solid var(--calc-input-border); color: var(--calc-text-main);">
+                Enter your details to see the recommendation.
             </div>
-            
-            <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;"> 
-                <i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculate Tax 
-            </button>
-
-            <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8; transition: all 0.3s ease;"> 
-                <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i>Save to Profile 
-            </button>
-            
-            <div id="save-status" style="margin-top: 10px; font-size: 0.75rem; text-align: center; color: var(--calc-text-muted); min-height: 1.2em;"></div>
         </div>
-            <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
-            <h4 style="color: var(--calc-text-main); margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Detailed Breakdown</h4>
+
+        <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;"> 
+            <i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculate Tax 
+        </button>
+
+        <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8; transition: all 0.3s ease;"> 
+            <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i>Save to Profile 
+        </button>
+        
+        <div id="save-status" style="margin-top: 10px; font-size: 0.75rem; text-align: center; color: var(--calc-text-muted); min-height: 1.2em;"></div>
+    </div> 
+    <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
+    <h4 style="color: var(--calc-text-main); margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Detailed Breakdown</h4>
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--calc-text-main);">
                     <thead>
