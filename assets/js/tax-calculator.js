@@ -57,7 +57,6 @@ const TaxController = {
             const { data: { session } } = await window.supabase.auth.getSession();
             
             if (!session) {
-                // Save draft and redirect
                 const formData = TaxController.captureInputs();
                 localStorage.setItem('tax_calc_draft', JSON.stringify(formData));
                 const currentPath = window.location.pathname;
@@ -143,7 +142,6 @@ const TaxController = {
         }
     },
 
-    // ADDED THIS HELPER: Centralizing the "Fill UI" logic
     fillForm: (inputs) => {
         document.getElementById('basic-salary').value = inputs.basic || "";
         document.getElementById('hra-received').value = inputs.hra || "";
@@ -172,7 +170,7 @@ const TaxController = {
         if (inputs.deductions80C?.length > 0) {
             inputs.deductions80C.forEach(item => {
                 if (typeof window.add80CRow === 'function') {
-                    add80CRow();
+                    window.add80CRow();
                     const lastRow = rows80c.lastElementChild;
                     lastRow.querySelector('.row-select-80c').value = item.type;
                     lastRow.querySelector('.row-amount-80c').value = item.amount;
@@ -182,7 +180,6 @@ const TaxController = {
         
         setTimeout(() => {
             TaxController.calculateAll();
-            if(typeof update80CTotal === 'function') update80CTotal();
         }, 100);
     },
 
@@ -194,9 +191,7 @@ const TaxController = {
         if(document.getElementById('is-metro')) document.getElementById('is-metro').value = "false";
         TaxController.calculateAll();
     },
-    
 
-    // --- UI METHODS ---
     addPerkRowWithData: (type = "", value = "") => {
         const rowId = Date.now() + Math.random();
         const container = document.getElementById('perks-rows-container');
@@ -225,8 +220,7 @@ const TaxController = {
         container.appendChild(row);
     },
 
-  calculateAll: () => {
-        // 0. Get the selected Year
+    calculateAll: () => {
         const selectedYear = document.getElementById('fy-selector').value;
         const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
         const hraReceived = parseFloat(document.getElementById('hra-received').value) || 0;
@@ -244,93 +238,73 @@ const TaxController = {
         const isSr = document.getElementById('parents-senior')?.checked;
         const npsExtra = parseFloat(document.getElementById('nps-extra')?.value) || 0;
 
-        // 1. Gather 80C
-        let total80CInput = 0;
-        document.querySelectorAll('.row-amount-80c').forEach(input => {
-            total80CInput += parseFloat(input.value) || 0;
-        });
-
-        // Handle Automatic EPF Row
-        let epfRow = Array.from(rows80c.querySelectorAll('.row-80c, .perk-row'))
-                          .find(row => row.querySelector('.row-select-80c')?.value === "EPF");
+        // --- EPF HANDLING ---
+        const all80cSelects = Array.from(rows80c.querySelectorAll('.row-select-80c'));
+        let epfRow = all80cSelects.find(sel => sel.value === "EPF")?.closest('.row-80c');
 
         if (!epfRow && basic > 0) {
             if (typeof window.add80CRow === 'function') {
-                add80CRow();
-                epfRow = rows80c.lastElementChild;
-                const select = epfRow.querySelector('.row-select-80c');
-                select.value = "EPF";
-                select.disabled = true; 
+                window.add80CRow();
+                const newRow = rows80c.lastElementChild;
+                const select = newRow.querySelector('.row-select-80c');
+                if (select) {
+                    select.value = "EPF";
+                    select.disabled = true; 
+                }
+                epfRow = newRow;
             }
         }
 
         if (epfRow) {
             const amtInput = epfRow.querySelector('.row-amount-80c');
-            amtInput.value = epfAmount;
-            amtInput.readOnly = true; 
-            amtInput.style.opacity = "0.7";
-        }
-
-        // 2. Process Perks & Update UI Labels
-let perksData = []; // This MUST be populated to pass to the Engine
-document.querySelectorAll('[id^="perk-"]').forEach(row => {
-    const typeSelect = row.querySelector('.perk-type');
-    const amtInput = row.querySelector('.perk-amount');
-    const label = row.querySelector('.perk-eligible');
-
-    if (typeSelect && amtInput && typeSelect.value) {
-        const type = typeSelect.value;
-        const amtVal = amtInput.value;
-        
-        // Calculate numeric value (handle %)
-        let amt = amtVal.includes('%') 
-            ? (parseFloat(amtVal.replace('%', '')) / 100) * basic 
-            : parseFloat(amtVal) || 0;
-
-        // Push to perksData so calculations actually use these values
-        perksData.push({ type: type, amount: amt });
-
-        const yearData = TAX_CONFIG[selectedYear];
-        const rule = yearData.perkRules ? yearData.perkRules[type] : null;
-        
-        // NPS Specific UI Feedback
-        if (type === "Corporate NPS") {
-            const npsLimitPercent = 0.14; 
-            const allowedAmt = basic * npsLimitPercent;
-            
-            if (amt > allowedAmt) {
-                label.innerText = `Capped at ₹${Math.round(allowedAmt).toLocaleString('en-IN')} (14%)`;
-                label.style.color = "#fbbf24"; 
-            } else {
-                label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
-                label.style.color = "#4ade80";
-            }
-        } else {
-            // Check if allowed in New Regime for other perks
-            const isAllowedInNew = rule && (rule.regime === "both" || rule.regime === "new");
-            if (isAllowedInNew) {
-                label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
-                label.style.color = "#4ade80";
-            } else {
-                label.innerText = `Not in New Regime`;
-                label.style.color = "#ef4444";
+            if (amtInput) {
+                amtInput.value = epfAmount;
+                amtInput.readOnly = true;
+                amtInput.style.opacity = "0.7";
             }
         }
-    }
-});
+
+        let total80CInput = 0;
+        document.querySelectorAll('.row-amount-80c').forEach(input => {
+            total80CInput += parseFloat(input.value) || 0;
+        });
+
+        // --- PERKS ---
+        let perksData = []; 
+        document.querySelectorAll('[id^="perk-"]').forEach(row => {
+            const typeSelect = row.querySelector('.perk-type');
+            const amtInput = row.querySelector('.perk-amount');
+            const label = row.querySelector('.perk-eligible');
+
+            if (typeSelect && amtInput && typeSelect.value) {
+                const type = typeSelect.value;
+                const amtVal = amtInput.value;
+                let amt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
+                perksData.push({ type: type, amount: amt });
+
+                const yearData = TAX_CONFIG[selectedYear];
+                const rule = yearData.perkRules ? yearData.perkRules[type] : null;
+                
+                if (type === "Corporate NPS") {
+                    const allowedAmt = basic * 0.14;
+                    label.innerText = amt > allowedAmt ? `Capped at ₹${Math.round(allowedAmt).toLocaleString('en-IN')} (14%)` : `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
+                    label.style.color = amt > allowedAmt ? "#fbbf24" : "#4ade80";
+                } else {
+                    const isAllowedInNew = rule && (rule.regime === "both" || rule.regime === "new");
+                    label.innerText = isAllowedInNew ? `₹ ${Math.round(amt).toLocaleString('en-IN')}` : `Not in New Regime`;
+                    label.style.color = isAllowedInNew ? "#4ade80" : "#ef4444";
+                }
+            }
+        });
 
         if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
 
-        // 3. RUN CALCULATIONS
+        // --- CALCULATIONS ---
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
-        
         const hraEligibleLabel = document.getElementById('hra-eligible-display');
-        if(hraEligibleLabel) {
-            hraEligibleLabel.innerText = `Eligible: ₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
-        }
+        if(hraEligibleLabel) hraEligibleLabel.innerText = `Eligible: ₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
 
         const grossSalary = basic + hraReceived + otherIncome;
-
         const newRegimeObj = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, basic);
         const oldRegimeObj = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
             section80C: total80CInput,
@@ -341,68 +315,56 @@ document.querySelectorAll('[id^="perk-"]').forEach(row => {
             exemptHRA: hraResult.actualExemption
         }, perksData, basic);
 
-        // 4. UPDATE MAIN UI
         TaxController.updateSummary(newRegimeObj.tax, oldRegimeObj.tax);
         
-        // 5. UPDATE 80C COUNTER
-        const display80C = Math.min(total80CInput, 150000); // UI reflects current total vs cap
+        const display80C = Math.min(total80CInput, 150000);
         const counterEl = document.getElementById('display-80c-total');
         if (counterEl) {
-            counterEl.innerText = `₹ ${display80C.toLocaleString('en-IN')} / 1,50,000`;
+            counterEl.textContent = `₹ ${display80C.toLocaleString('en-IN')} / 1,50,000`;
             counterEl.style.color = total80CInput > 150000 ? "#fbbf24" : "#4ade80";
         }
 
         if(window.syncFloatingBar) syncFloatingBar(oldRegimeObj.tax, newRegimeObj.tax);
     },
 
-        updateSummary: (newTax, oldTax) => {
-            // 1. Get DOM Elements
-            const newEl = document.getElementById('new-regime-tax');
-            const oldEl = document.getElementById('old-regime-tax');
-            const newBox = document.getElementById('new-regime-box');
-            const oldBox = document.getElementById('old-regime-box');
-            const recBox = document.getElementById('recommendation-box');
-    
-            // 2. Set the text for the numbers
-            newEl.innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
-            oldEl.innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
-    
-            // 3. Reset Styles to "Neutral" before applying the highlight
-            [newBox, oldBox].forEach(box => {
-                box.style.borderColor = "var(--calc-input-border)";
-                box.style.borderWidth = "1px";
-                box.style.boxShadow = "none";
-            });
-            newEl.style.color = "var(--calc-text-main)";
-            oldEl.style.color = "var(--calc-text-main)";
-    
-            // 4. Handle Equal Tax Case
-            if (newTax === oldTax) {
-                if (recBox) {
-                    recBox.innerHTML = `Both regimes result in the same tax.`;
-                    recBox.style.borderColor = "var(--calc-input-border)";
-                }
-                return;
-            }
-    
-            // 5. Determine the winner and apply highlight
-            const isNewBetter = newTax < oldTax;
-            const winnerBox = isNewBetter ? newBox : oldBox;
-            const winnerText = isNewBetter ? newEl : oldEl;
-            const diff = Math.abs(newTax - oldTax);
-    
-            // Apply Green Highlight to the Winner
-            winnerBox.style.borderColor = "#4ade80"; // Green border
-            winnerBox.style.borderWidth = "2px";
-            winnerBox.style.boxShadow = "0 0 15px rgba(74, 222, 128, 0.1)"; // Subtle green glow
-            winnerText.style.color = "#4ade80"; // Green text for the winning number
-    
-            // 6. Update the Recommendation Text Box
-            if (recBox) {
-                recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
-                recBox.style.borderColor = isNewBetter ? "#4ade80" : "#38bdf8"; 
-            }
+    updateSummary: (newTax, oldTax) => {
+        const newEl = document.getElementById('new-regime-tax');
+        const oldEl = document.getElementById('old-regime-tax');
+        const newBox = document.getElementById('new-regime-box');
+        const oldBox = document.getElementById('old-regime-box');
+        const recBox = document.getElementById('recommendation-box');
+
+        newEl.innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
+        oldEl.innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
+
+        [newBox, oldBox].forEach(box => {
+            box.style.borderColor = "var(--calc-input-border)";
+            box.style.borderWidth = "1px";
+            box.style.boxShadow = "none";
+        });
+        newEl.style.color = "var(--calc-text-main)";
+        oldEl.style.color = "var(--calc-text-main)";
+
+        if (newTax === oldTax) {
+            if (recBox) recBox.innerHTML = `Both regimes result in the same tax.`;
+            return;
         }
+
+        const isNewBetter = newTax < oldTax;
+        const winnerBox = isNewBetter ? newBox : oldBox;
+        const winnerText = isNewBetter ? newEl : oldEl;
+        const diff = Math.abs(newTax - oldTax);
+
+        winnerBox.style.borderColor = "#4ade80";
+        winnerBox.style.borderWidth = "2px";
+        winnerBox.style.boxShadow = "0 0 15px rgba(74, 222, 128, 0.1)";
+        winnerText.style.color = "#4ade80";
+
+        if (recBox) {
+            recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
+            recBox.style.borderColor = isNewBetter ? "#4ade80" : "#38bdf8"; 
+        }
+    }
 };
 
 // --- GLOBAL BRIDGE ---
