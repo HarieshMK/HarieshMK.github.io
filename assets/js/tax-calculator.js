@@ -22,56 +22,53 @@ const TaxController = {
             }
         });
 
+        // 1. Load data from Supabase first
         await TaxController.loadUserData();
-        // If it's a fresh load (no data), pre-fill PT
+
+        // 2. Load data from Local Draft (if any)
+        const savedDraft = localStorage.getItem('tax_calc_draft');
+        if (savedDraft) {
+            const inputs = JSON.parse(savedDraft);
+            TaxController.fillForm(inputs); 
+            localStorage.removeItem('tax_calc_draft');
+            
+            setTimeout(() => {
+                TaxController.calculateAll();
+            }, 200);
+        }
+
+        // 3. Pre-fill PT if empty
         const perksContainer = document.getElementById('perks-rows-container');
         if (perksContainer && perksContainer.children.length === 0) {
             TaxController.addPerkRowWithData("Professional Tax", 2500);
         }
+        
+        // 4. Update Button Label based on Auth status
+        const { data: { session } } = await window.supabase.auth.getSession();
+        const saveBtn = document.getElementById('btn-save-tax');
+        if (saveBtn) {
+            saveBtn.innerText = session ? "Save to Profile" : "Login to Save Progress";
+        }
     },
 
     // --- PERSISTENCE METHODS ---
-    saveUserData: async () => { (passedYear)
+    saveUserData: async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error("AUTH_REQUIRED");
+            const { data: { session } } = await window.supabase.auth.getSession();
+            
+            if (!session) {
+                // Save draft and redirect
+                const formData = TaxController.captureInputs();
+                localStorage.setItem('tax_calc_draft', JSON.stringify(formData));
+                const currentPath = window.location.pathname;
+                window.location.href = `/login/?return_to=${currentPath}`;
+                return false; 
+            }
 
-            // 1. Get the year from the dropdown
+            const user = session.user;
             const selectedYear = document.getElementById('fy-selector').value;
+            const formData = TaxController.captureInputs();
 
-            const formData = {
-                basic: document.getElementById('basic-salary').value,
-                hra: document.getElementById('hra-received').value,
-                rent: document.getElementById('rent-paid').value,
-                isMetro: document.getElementById('is-metro').value,
-                otherIncome: document.getElementById('other-income').value,
-                homeInterest: document.getElementById('home-interest').value,
-                isUnderConstruction: document.getElementById('is-under-construction').checked,
-                healthSelf: document.getElementById('80d-self').value,
-                healthParents: document.getElementById('80d-parents').value,
-                parentsSenior: document.getElementById('parents-senior').checked,
-                npsExtra: document.getElementById('nps-extra').value,
-                perks: [],
-                deductions80C: []
-            };
-
-            document.querySelectorAll('[id^="perk-"]').forEach(row => {
-                const typeSelect = row.querySelector('.perk-type');
-                const amtInput = row.querySelector('.perk-amount'); 
-                if (typeSelect && typeSelect.value) {
-                    formData.perks.push({ type: typeSelect.value, value: amtInput.value });
-                }
-            });
-
-            document.querySelectorAll('[id^="row-"]').forEach(row => {
-                const select = row.querySelector('.row-select-80c');
-                const amtInput = row.querySelector('.row-amount-80c');
-                if (select && select.value && amtInput.value) {
-                    formData.deductions80C.push({ type: select.value, amount: amtInput.value });
-                }
-            });
-
-            // 2. Save with the Year column (onConflict updated)
             const { error } = await supabase
                 .from('tax_user_data')
                 .upsert({ 
@@ -83,11 +80,48 @@ const TaxController = {
 
             if (error) throw error;
             TaxController.isDirty = false;
+            alert("Data saved successfully to your profile!");
             return true;
         } catch (err) {
             console.error("Save process failed:", err);
+            alert("Save failed. Check console for details.");
             throw err;
         }
+    },
+
+    captureInputs: () => {
+        const formData = {
+            basic: document.getElementById('basic-salary').value,
+            hra: document.getElementById('hra-received').value,
+            rent: document.getElementById('rent-paid').value,
+            isMetro: document.getElementById('is-metro').value,
+            otherIncome: document.getElementById('other-income').value,
+            homeInterest: document.getElementById('home-interest').value,
+            isUnderConstruction: document.getElementById('is-under-construction').checked,
+            healthSelf: document.getElementById('80d-self').value,
+            healthParents: document.getElementById('80d-parents').value,
+            parentsSenior: document.getElementById('parents-senior').checked,
+            npsExtra: document.getElementById('nps-extra').value,
+            perks: [],
+            deductions80C: []
+        };
+
+        document.querySelectorAll('[id^="perk-"]').forEach(row => {
+            const typeSelect = row.querySelector('.perk-type');
+            const amtInput = row.querySelector('.perk-amount'); 
+            if (typeSelect && typeSelect.value) {
+                formData.perks.push({ type: typeSelect.value, value: amtInput.value });
+            }
+        });
+
+        document.querySelectorAll('[id^="row-"]').forEach(row => {
+            const select = row.querySelector('.row-select-80c');
+            const amtInput = row.querySelector('.row-amount-80c');
+            if (select && select.value && amtInput.value) {
+                formData.deductions80C.push({ type: select.value, amount: amtInput.value });
+            }
+        });
+        return formData;
     },
 
     loadUserData: async () => {
@@ -95,7 +129,6 @@ const TaxController = {
         if (!user) return;
 
         const selectedYear = document.getElementById('fy-selector').value;
-
         const { data, error } = await supabase
             .from('tax_user_data')
             .select('calculator_inputs')
@@ -103,72 +136,65 @@ const TaxController = {
             .eq('financial_year', selectedYear)
             .maybeSingle(); 
 
-        // Check if we actually got data
         if (data && data.calculator_inputs) {
-            const inputs = data.calculator_inputs;
-            
-            // Map inputs to DOM elements
-            document.getElementById('basic-salary').value = inputs.basic || "";
-            document.getElementById('hra-received').value = inputs.hra || "";
-            document.getElementById('rent-paid').value = inputs.rent || "";
-            document.getElementById('is-metro').value = inputs.isMetro || "false";
-            document.getElementById('other-income').value = inputs.otherIncome || "";
-            document.getElementById('home-interest').value = inputs.homeInterest || "";
-            document.getElementById('is-under-construction').checked = inputs.isUnderConstruction || false;
-            document.getElementById('80d-self').value = inputs.healthSelf || "";
-            document.getElementById('80d-parents').value = inputs.healthParents || "";
-            document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
-            document.getElementById('nps-extra').value = inputs.npsExtra || "";
-
-            if (document.getElementById('clp-note')) {
-                document.getElementById('clp-note').style.display = inputs.isUnderConstruction ? 'block' : 'none';
-            }
-
-            // Restore Perks
-            const perksContainer = document.getElementById('perks-rows-container');
-            perksContainer.innerHTML = '';
-            if (inputs.perks?.length > 0) {
-                inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
-            }
-
-            // Restore 80C Rows
-            const rows80c = document.getElementById('80c-rows-container');
-            rows80c.innerHTML = '';
-            if (inputs.deductions80C?.length > 0) {
-                inputs.deductions80C.forEach(item => {
-                    if (typeof window.add80CRow === 'function') {
-                        add80CRow();
-                        const lastRow = rows80c.lastElementChild;
-                        lastRow.querySelector('.row-select-80c').value = item.type;
-                        lastRow.querySelector('.row-amount-80c').value = item.amount;
-                    }
-                });
-            }
-            
-            setTimeout(() => {
-                TaxController.calculateAll();
-                if(typeof update80CTotal === 'function') update80CTotal();
-            }, 100);
-
+            TaxController.fillForm(data.calculator_inputs);
         } else {
-            // No data for this year? Reset form to blank state
             TaxController.resetForm();
         }
     },
 
+    // ADDED THIS HELPER: Centralizing the "Fill UI" logic
+    fillForm: (inputs) => {
+        document.getElementById('basic-salary').value = inputs.basic || "";
+        document.getElementById('hra-received').value = inputs.hra || "";
+        document.getElementById('rent-paid').value = inputs.rent || "";
+        document.getElementById('is-metro').value = inputs.isMetro || "false";
+        document.getElementById('other-income').value = inputs.otherIncome || "";
+        document.getElementById('home-interest').value = inputs.homeInterest || "";
+        document.getElementById('is-under-construction').checked = inputs.isUnderConstruction || false;
+        document.getElementById('80d-self').value = inputs.healthSelf || "";
+        document.getElementById('80d-parents').value = inputs.healthParents || "";
+        document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
+        document.getElementById('nps-extra').value = inputs.npsExtra || "";
+
+        if (document.getElementById('clp-note')) {
+            document.getElementById('clp-note').style.display = inputs.isUnderConstruction ? 'block' : 'none';
+        }
+
+        const perksContainer = document.getElementById('perks-rows-container');
+        perksContainer.innerHTML = '';
+        if (inputs.perks?.length > 0) {
+            inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
+        }
+
+        const rows80c = document.getElementById('80c-rows-container');
+        rows80c.innerHTML = '';
+        if (inputs.deductions80C?.length > 0) {
+            inputs.deductions80C.forEach(item => {
+                if (typeof window.add80CRow === 'function') {
+                    add80CRow();
+                    const lastRow = rows80c.lastElementChild;
+                    lastRow.querySelector('.row-select-80c').value = item.type;
+                    lastRow.querySelector('.row-amount-80c').value = item.amount;
+                }
+            });
+        }
+        
+        setTimeout(() => {
+            TaxController.calculateAll();
+            if(typeof update80CTotal === 'function') update80CTotal();
+        }, 100);
+    },
+
     resetForm: () => {
-        // Clear all standard number inputs
         document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = "");
-        // Clear checkboxes
         document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
-        // Empty the dynamic containers
         document.getElementById('perks-rows-container').innerHTML = '';
         document.getElementById('80c-rows-container').innerHTML = '';
-        // Set standard select values
         if(document.getElementById('is-metro')) document.getElementById('is-metro').value = "false";
-        
         TaxController.calculateAll();
     },
+    
 
     // --- UI METHODS ---
     addPerkRowWithData: (type = "", value = "") => {
@@ -383,9 +409,6 @@ document.querySelectorAll('[id^="perk-"]').forEach(row => {
 function addPerkRow() { TaxController.addPerkRowWithData(); }
 function runCalculator() { TaxController.calculateAll(); }
 async function saveTaxData() { return await TaxController.saveUserData(); }
-
-function update80CTotal() {
-    TaxController.calculateAll();
-}
+function update80CTotal() { TaxController.calculateAll(); }
 
 window.onload = TaxController.init;
