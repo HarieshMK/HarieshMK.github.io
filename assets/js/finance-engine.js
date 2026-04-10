@@ -109,21 +109,22 @@ FinanceEngine.TaxEngine = {
         let perkBreakdown = [];
 
             perks.forEach(p => {
-                let eligible = 0;
-                const rule = perksConfig[p.type];
-    
-                // If the perk exists in our rules and is allowed in this regime/year
-                const isAllowed = rule && (rule.regime === "both" || rule.regime === "new" || !rule.regime);
-                
-                if (isAllowed) {
-                    // We take the full amount entered by the user
-                    eligible = p.amount; 
+            let eligible = 0;
+            const rule = perksConfig[p.type];
+            const isAllowed = rule && (rule.regime === "both" || rule.regime === "new" || !rule.regime);
+        
+            if (isAllowed) {
+                if (p.type === "Corporate NPS") {
+                    // Apply 14% limit for New Regime
+                    const maxAllowed = basicSalary * (rule.newLimit || 0.14);
+                    eligible = Math.min(p.amount, maxAllowed);
+                } else {
+                    eligible = p.amount;
                 }
-                
-                totalExemptions += eligible;
-                perkBreakdown.push({ type: p.type, eligible });
-            });
-
+            }
+            totalExemptions += eligible;
+            perkBreakdown.push({ type: p.type, eligible });
+        });
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
         
         // New Regime Tax Calculation with Rebate
@@ -152,19 +153,22 @@ FinanceEngine.TaxEngine = {
         let other80C = deductions.section80C || 0;
 
             perks.forEach(p => {
-                const rule = perksConfig[p.type];
-                
-                // In Old Regime, if the perk is marked for "old" or "both" (or not restricted)
-                const isAllowed = rule && (rule.regime === "both" || rule.regime === "old" || !rule.regime);
-    
-                if (isAllowed) {
-                    if (p.type === "VPF") {
-                        other80C += p.amount; // VPF still goes to the 80C bucket
-                    } else {
-                        totalExemptions += p.amount; // Everything else is a direct deduction
-                    }
+            const rule = perksConfig[p.type];
+            const isAllowed = rule && (rule.regime === "both" || rule.regime === "old" || !rule.regime);
+        
+            if (isAllowed) {
+                if (p.type === "Corporate NPS") {
+                    // Apply 10% limit for Old Regime
+                    const maxAllowed = basicSalary * (rule.oldLimit || 0.10);
+                    const eligible = Math.min(p.amount, maxAllowed);
+                    totalExemptions += eligible;
+                } else if (p.type === "VPF") {
+                    other80C += p.amount;
+                } else {
+                    totalExemptions += p.amount;
                 }
-            });
+            }
+        });
 
         // Waterfall: 80C + 80CCD(1B)
         const cappedOther80C = Math.min(other80C, config.limits.section80C);
