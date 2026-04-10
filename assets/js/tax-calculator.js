@@ -199,7 +199,9 @@ const TaxController = {
         container.appendChild(row);
     },
 
-    calculateAll: () => {
+  calculateAll: () => {
+        // 0. Get the selected Year
+        const selectedYear = document.getElementById('fy-selector').value;
         const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
         const hraReceived = parseFloat(document.getElementById('hra-received').value) || 0;
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
@@ -214,53 +216,61 @@ const TaxController = {
         const premSelf = parseFloat(document.getElementById('80d-self')?.value) || 0;
         const premParents = parseFloat(document.getElementById('80d-parents')?.value) || 0;
         const isSr = document.getElementById('parents-senior')?.checked;
-
         const npsExtra = parseFloat(document.getElementById('nps-extra')?.value) || 0;
 
         // 1. Gather 80C
         let total80CInput = 0;
         document.querySelectorAll('.row-amount-80c').forEach(input => {
             total80CInput += parseFloat(input.value) || 0;
-        let epfRow = Array.from(rows80c.querySelectorAll('.perk-row, .row-80c')) // adjust selector based on your HTML class
-                  .find(row => row.querySelector('.row-select-80c')?.value === "EPF");
         });
-            if (!epfRow && basic > 0) {
-            // If no EPF row exists and user has entered salary, create it
+
+        // Handle Automatic EPF Row
+        let epfRow = Array.from(rows80c.querySelectorAll('.row-80c, .perk-row'))
+                          .find(row => row.querySelector('.row-select-80c')?.value === "EPF");
+
+        if (!epfRow && basic > 0) {
             if (typeof window.add80CRow === 'function') {
                 add80CRow();
                 epfRow = rows80c.lastElementChild;
                 const select = epfRow.querySelector('.row-select-80c');
                 select.value = "EPF";
-                // Optional: Disable the select so they can't change it to "LIC"
                 select.disabled = true; 
             }
         }
 
-            if (epfRow) {
-                const amtInput = epfRow.querySelector('.row-amount-80c');
-                amtInput.value = epfAmount;
-                // Optional: Disable the input so they see it's automatic
-                amtInput.readOnly = true; 
-                amtInput.style.opacity = "0.7";
-            }
-        // 2. Process Perks and update individual "Eligible" labels for Perks
+        if (epfRow) {
+            const amtInput = epfRow.querySelector('.row-amount-80c');
+            amtInput.value = epfAmount;
+            amtInput.readOnly = true; 
+            amtInput.style.opacity = "0.7";
+        }
+
+        // 2. Process Perks & Update UI Labels
         let perksData = [];
         document.querySelectorAll('[id^="perk-"]').forEach(row => {
             const type = row.querySelector('.perk-type').value;
             const amtVal = row.querySelector('.perk-amount').value;
+            
             if (type && amtVal) {
                 let amt = amtVal.includes('%') 
                     ? (parseFloat(amtVal.replace('%', '')) / 100) * basic 
                     : parseFloat(amtVal) || 0;
+                
                 perksData.push({ type: type, amount: amt });
 
-                // UI Update: Specific Perk Eligibility
-                let ruleLimit = Infinity;
-                if (type === "Corporate NPS") ruleLimit = basic * 0.14; // Defaulting to New Regime max for display
-                else if (TAX_CONFIG.perkRules[type]?.maxExempt) ruleLimit = TAX_CONFIG.perkRules[type].maxExempt;
-                
-                const eligibleAmt = Math.min(amt, ruleLimit);
-                row.querySelector('.perk-eligible').innerText = `₹ ${Math.round(eligibleAmt).toLocaleString('en-IN')}`;
+                // UI Feedback based on Year/Regime rules
+                const yearData = TAX_CONFIG[selectedYear];
+                const rule = yearData.perkRules[type];
+                const isAllowedInNew = rule && (rule.regime === "both" || rule.regime === "new");
+
+                const label = row.querySelector('.perk-eligible');
+                if (isAllowedInNew) {
+                    label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
+                    label.style.color = "#4ade80"; // Green
+                } else {
+                    label.innerText = `Not in New Regime`;
+                    label.style.color = "#ef4444"; // Red
+                }
             }
         });
 
@@ -269,7 +279,6 @@ const TaxController = {
         // 3. RUN CALCULATIONS
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
         
-        // Show HRA Eligible in UI (Assuming you have an element with this ID near HRA)
         const hraEligibleLabel = document.getElementById('hra-eligible-display');
         if(hraEligibleLabel) {
             hraEligibleLabel.innerText = `Eligible: ₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
@@ -277,8 +286,8 @@ const TaxController = {
 
         const grossSalary = basic + hraReceived + otherIncome;
 
-        const newRegimeObj = FinanceEngine.TaxEngine.calculateNewRegime(grossSalary, perksData, basic);
-        const oldRegimeObj = FinanceEngine.TaxEngine.calculateOldRegime(grossSalary, {
+        const newRegimeObj = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, basic);
+        const oldRegimeObj = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
             section80C: total80CInput,
             npsSelf: npsExtra, 
             section80D: premSelf + premParents,
@@ -290,12 +299,12 @@ const TaxController = {
         // 4. UPDATE MAIN UI
         TaxController.updateSummary(newRegimeObj.tax, oldRegimeObj.tax);
         
-        // 5. UPDATE 80C COUNTER (0 / 1,50,000)
-        const display80C = Math.min(oldRegimeObj.final80C || 0, 150000);
+        // 5. UPDATE 80C COUNTER
+        const display80C = Math.min(total80CInput, 150000); // UI reflects current total vs cap
         const counterEl = document.getElementById('display-80c-total');
         if (counterEl) {
             counterEl.innerText = `₹ ${display80C.toLocaleString('en-IN')} / 1,50,000`;
-            counterEl.style.color = total80CInput > 150000 ? "#fbbf24" : "#4ade80"; // Turn yellow if overflow
+            counterEl.style.color = total80CInput > 150000 ? "#fbbf24" : "#4ade80";
         }
 
         if(window.syncFloatingBar) syncFloatingBar(oldRegimeObj.tax, newRegimeObj.tax);
