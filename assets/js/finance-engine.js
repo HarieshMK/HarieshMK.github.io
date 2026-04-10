@@ -99,23 +99,30 @@ FinanceEngine.TaxEngine = {
     },
 
     // 2. NEW REGIME WITH OBJECT RETURN
-   calculateNewRegime: (grossIncome, perks, basicSalary = 0) => {
-        const config = TAX_CONFIG.newRegime;
+    calculateNewRegime: (selectedYear, grossIncome, perks, basicSalary = 0) => {
+        // Fetch config for the specific year
+        const yearData = TAX_CONFIG[selectedYear];
+        const config = yearData.newRegime;
+        const perksConfig = yearData.perkRules;
+
         let totalExemptions = config.stdDeduction;
         let perkBreakdown = [];
 
-        perks.forEach(p => {
-            let eligible = 0;
-            if (p.type === "Meal Coupons") {
-                eligible = Math.min(p.amount, 105600); // Standard approx for 2 meals/day
-            } else if (p.type === "Corporate NPS") {
-                eligible = Math.min(p.amount, basicSalary * 0.14); // 14% for New Regime
-            } else if (["Mobile & Internet", "Books & Periodicals"].includes(p.type)) {
-                eligible = p.amount; // Usually fully exempt against bills
-            }
-            totalExemptions += eligible;
-            perkBreakdown.push({ type: p.type, eligible });
-        });
+            perks.forEach(p => {
+                let eligible = 0;
+                const rule = perksConfig[p.type];
+    
+                // If the perk exists in our rules and is allowed in this regime/year
+                const isAllowed = rule && (rule.regime === "both" || rule.regime === "new" || !rule.regime);
+                
+                if (isAllowed) {
+                    // We take the full amount entered by the user
+                    eligible = p.amount; 
+                }
+                
+                totalExemptions += eligible;
+                perkBreakdown.push({ type: p.type, eligible });
+            });
 
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
         
@@ -136,40 +143,44 @@ FinanceEngine.TaxEngine = {
         };
     },
 
-   calculateOldRegime: (grossIncome, deductions, perks, basicSalary = 0) => {
-        const config = TAX_CONFIG.oldRegime;
+   calculateOldRegime: (selectedYear, grossIncome, deductions, perks, basicSalary = 0) => {
+        const yearData = TAX_CONFIG[selectedYear];
+        const config = yearData.oldRegime;
+        const perksConfig = yearData.perkRules;
+
         let totalExemptions = config.stdDeduction;
         let other80C = deductions.section80C || 0;
-        let profTax = 0;
 
-        perks.forEach(p => {
-            if (p.type === "Corporate NPS") {
-                totalExemptions += Math.min(p.amount, basicSalary * 0.10); 
-            } else if (p.type === "Professional Tax") {
-                profTax = p.amount;
-                totalExemptions += profTax;
-            } else if (p.type === "VPF") {
-                other80C += p.amount; 
-            } else {
-                totalExemptions += p.amount;
-            }
-        });
+            perks.forEach(p => {
+                const rule = perksConfig[p.type];
+                
+                // In Old Regime, if the perk is marked for "old" or "both" (or not restricted)
+                const isAllowed = rule && (rule.regime === "both" || rule.regime === "old" || !rule.regime);
+    
+                if (isAllowed) {
+                    if (p.type === "VPF") {
+                        other80C += p.amount; // VPF still goes to the 80C bucket
+                    } else {
+                        totalExemptions += p.amount; // Everything else is a direct deduction
+                    }
+                }
+            });
 
         // Waterfall: 80C + 80CCD(1B)
         const cappedOther80C = Math.min(other80C, config.limits.section80C);
-        const spaceLeftIn80C = config.limits.section80C - cappedOther80C;
+        const spaceLeftIn80C = Math.max(0, config.limits.section80C - cappedOther80C);
         const npsUsedIn80C = Math.min(deductions.npsSelf || 0, spaceLeftIn80C);
         const npsFor80CCD = Math.min((deductions.npsSelf || 0) - npsUsedIn80C, config.limits.section80CCD_1B);
 
         const capped24b = Math.min(deductions.homeLoanInterest || 0, config.limits.section24b);
         
+        // Use year-specific limits for 80D
         const limit80D = deductions.parentsSenior ? 
             (config.limits.section80D_Self + config.limits.section80D_SeniorParents) : 
-            (config.limits.section80D_Self + config.limits.section80D_Parents);
+            (config.limits.section80D_Self + (config.limits.section80D_Parents || 25000));
         
         const capped80D = Math.min(deductions.section80D || 0, limit80D);
 
-        // COMBINED DEDUCTION CALCULATION (Fixed variable names)
         const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + capped24b + capped80D + (deductions.exemptHRA || 0);
         
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
@@ -177,12 +188,12 @@ FinanceEngine.TaxEngine = {
         let tax = 0;
         if (netTaxable > config.rebateLimit) {
             const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            // Section 87A Rebate for Old Regime (Income up to 5L)
-            tax = (netTaxable <= 500000) ? Math.max(0, slabTax - 12500) : slabTax;
+            // Section 87A Rebate for Old Regime
+            tax = (netTaxable <= 500000) ? Math.max(0, slabTax - config.maxRebate) : slabTax;
         }
-
+       
         return {
-            tax: tax + (tax * TAX_CONFIG.cessRate),
+            tax: tax + (tax * yearData.cessRate || TAX_CONFIG.cessRate),
             netTaxable,
             totalDeductions
         };
