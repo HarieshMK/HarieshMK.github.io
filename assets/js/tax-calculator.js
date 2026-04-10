@@ -310,25 +310,54 @@ const TaxController = {
         if(window.syncFloatingBar) syncFloatingBar(oldRegimeObj.tax, newRegimeObj.tax);
     },
 
-    updateSummary: (newTax, oldTax) => {
-        document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
-        document.getElementById('old-regime-tax').innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
-        const recBox = document.getElementById('recommendation-box');
-        if (recBox) {
+        updateSummary: (newTax, oldTax) => {
+            // 1. Get DOM Elements
+            const newEl = document.getElementById('new-regime-tax');
+            const oldEl = document.getElementById('old-regime-tax');
+            const newBox = document.getElementById('new-regime-box');
+            const oldBox = document.getElementById('old-regime-box');
+            const recBox = document.getElementById('recommendation-box');
+    
+            // 2. Set the text for the numbers
+            newEl.innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
+            oldEl.innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
+    
+            // 3. Reset Styles to "Neutral" before applying the highlight
+            [newBox, oldBox].forEach(box => {
+                box.style.borderColor = "var(--calc-input-border)";
+                box.style.borderWidth = "1px";
+                box.style.boxShadow = "none";
+            });
+            newEl.style.color = "var(--calc-text-main)";
+            oldEl.style.color = "var(--calc-text-main)";
+    
+            // 4. Handle Equal Tax Case
+            if (newTax === oldTax) {
+                if (recBox) {
+                    recBox.innerHTML = `Both regimes result in the same tax.`;
+                    recBox.style.borderColor = "var(--calc-input-border)";
+                }
+                return;
+            }
+    
+            // 5. Determine the winner and apply highlight
+            const isNewBetter = newTax < oldTax;
+            const winnerBox = isNewBetter ? newBox : oldBox;
+            const winnerText = isNewBetter ? newEl : oldEl;
             const diff = Math.abs(newTax - oldTax);
-            if (newTax < oldTax) {
-                recBox.innerHTML = `<strong>New Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
-                recBox.style.borderColor = "#4ade80";
-            } else if (oldTax < newTax) {
-                recBox.innerHTML = `<strong>Old Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
-                recBox.style.borderColor = "#38bdf8";
-            } else {
-                recBox.innerHTML = `Both regimes result in the same tax.`;
-                recBox.style.borderColor = "var(--calc-input-border)";
+    
+            // Apply Green Highlight to the Winner
+            winnerBox.style.borderColor = "#4ade80"; // Green border
+            winnerBox.style.borderWidth = "2px";
+            winnerBox.style.boxShadow = "0 0 15px rgba(74, 222, 128, 0.1)"; // Subtle green glow
+            winnerText.style.color = "#4ade80"; // Green text for the winning number
+    
+            // 6. Update the Recommendation Text Box
+            if (recBox) {
+                recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. You save <strong>₹${Math.round(diff).toLocaleString('en-IN')}</strong>`;
+                recBox.style.borderColor = isNewBetter ? "#4ade80" : "#38bdf8"; 
             }
         }
-    }
-};
 
 // --- GLOBAL BRIDGE ---
 function addPerkRow() { TaxController.addPerkRowWithData(); }
