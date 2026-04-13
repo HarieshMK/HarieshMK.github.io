@@ -45,8 +45,10 @@ const TaxController = {
         row.id = rowId;
         row.className = isLocked ? "row-80c-statutory" : "row-80c-manual";
         row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
-        
-        const options = ["ELSS Funds", "PPF", "Life Insurance", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed Deposit (5yr)"];
+
+        const options = typeof InvestmentRegistry !== 'undefined' 
+        ? Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C")
+        : ["ELSS Funds", "PPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed Deposit (5yr)", "Term Insurance Premium"];
         
         row.innerHTML = `
             <select class="row-select-80c dynamic-input" style="flex: 2;" ${isLocked ? 'disabled' : ''}>
@@ -183,30 +185,32 @@ const TaxController = {
     },
 
     // --- DB OPERATIONS ---
-    saveUserData: async () => {
-        const btn = document.getElementById('save-btn');
-        try {
-            const { data: { session } } = await window.supabase.auth.getSession();
-            if (!session) {
-                localStorage.setItem('tax_calc_draft', JSON.stringify(TaxController.captureInputs()));
-                window.location.href = `/login/?return_to=${window.location.pathname}`;
-                return;
-            }
-            const selectedYear = document.getElementById('fy-selector').value;
-            const { error } = await supabase.from('tax_user_data').upsert({ 
-                id: session.user.id, 
-                financial_year: selectedYear, 
-                calculator_inputs: TaxController.captureInputs(), 
-                updated_at: new Date() 
-            }, { onConflict: 'id, financial_year' });
-            
-            if (error) throw error;
-            TaxController.isDirty = false;
-        } catch (err) {
-            console.error("Save failed:", err);
-            throw err;
+    saveUserData: async (year) => { // Accept year here
+    const btn = document.getElementById('save-btn');
+    try {
+        const { data: { session } } = await window.supabase.auth.getSession();
+        if (!session) {
+            localStorage.setItem('tax_calc_draft', JSON.stringify(TaxController.captureInputs()));
+            window.location.href = `/login/?return_to=${window.location.pathname}`;
+            return;
         }
-    },
+        // Use the passed year, or fallback to DOM if year is missing
+        const selectedYear = year || document.getElementById('fy-selector').value; 
+        
+        const { error } = await supabase.from('tax_user_data').upsert({ 
+            id: session.user.id, 
+            financial_year: selectedYear, 
+            calculator_inputs: TaxController.captureInputs(), 
+            updated_at: new Date() 
+        }, { onConflict: 'id, financial_year' });
+        
+        if (error) throw error;
+        TaxController.isDirty = false;
+    } catch (err) {
+        console.error("Save failed:", err);
+        throw err;
+    }
+},
 
     captureInputs: () => {
         // Simple capture for storage
@@ -268,6 +272,6 @@ const TaxController = {
 function add80CRow() { TaxController.add80CRow(); }
 function addPerkRow() { TaxController.addPerkRow(); }
 function runCalculator() { TaxController.calculateAll(); }
-async function saveTaxData() { return await TaxController.saveUserData(); }
+async function saveTaxData(year) { return await TaxController.saveUserData(year);}
 
 window.onload = TaxController.init;
