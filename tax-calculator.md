@@ -345,6 +345,9 @@ permalink: /tax-calculator/
         transform: translateY(-2px);
         transition: all 0.2s ease;
     }
+    #hra-eligible-display {
+        transition: all 0.3s ease;
+    }
 
     .dynamic-input {
         background-color: var(--calc-input-bg) !important;
