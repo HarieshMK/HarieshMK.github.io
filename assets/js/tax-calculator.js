@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI with Supabase Persistence
- * VERSION: 2.1 - Robust EPF Duplication Fix & Logic Cleanup
+ * VERSION: 2.2 - Filtered Database Loading & Reactive Deletion
  */
 const TaxController = {
     isDirty: false,
@@ -15,6 +15,7 @@ const TaxController = {
             }
         });
 
+        // This makes the UI "Reactive" - change anything and tax updates instantly
         document.addEventListener('input', (e) => {
             const tag = e.target.tagName;
             if (tag === 'INPUT' || tag === 'SELECT') {
@@ -61,16 +62,23 @@ const TaxController = {
             perks: [],
             deductions80C: []
         };
+        // We only save NON-EPF rows to the database to prevent duplicates on reload
+        document.querySelectorAll('[id^="row-"]').forEach(row => {
+            const type = row.querySelector('.row-select-80c')?.value;
+            const amt = row.querySelector('.row-amount-80c')?.value;
+            const isAutoEPF = row.getAttribute('data-is-epf') === 'true';
+            
+            if (type && !isAutoEPF) { 
+                formData.deductions80C.push({ type: type, amount: amt });
+            }
+        });
+        
         document.querySelectorAll('.perk-row').forEach(row => {
             const type = row.querySelector('.perk-type')?.value;
             const val = row.querySelector('.perk-amount')?.value;
             if (type) formData.perks.push({ type: type, value: val });
         });
-        document.querySelectorAll('[id^="row-"]').forEach(row => {
-            const type = row.querySelector('.row-select-80c')?.value;
-            const amt = row.querySelector('.row-amount-80c')?.value;
-            if (type) formData.deductions80C.push({ type: type, amount: amt });
-        });
+        
         return formData;
     },
 
@@ -132,7 +140,9 @@ const TaxController = {
         if (rows80c) rows80c.innerHTML = '';
         if (inputs.deductions80C) {
             inputs.deductions80C.forEach(item => {
-                if (typeof window.add80CRow === 'function') {
+                // BUG FIX: If the saved data contains "EPF", we skip it.
+                // The calculateAll function will add its own fresh EPF row.
+                if (item.type !== "EPF" && typeof window.add80CRow === 'function') {
                     window.add80CRow();
                     const lastRow = rows80c.lastElementChild;
                     lastRow.querySelector('.row-select-80c').value = item.type;
@@ -170,11 +180,10 @@ const TaxController = {
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rows80c = document.getElementById('80c-rows-container');
         
-        // --- SELF-CLEANING EPF LOGIC ---
-        // 1. Force remove ANY row tagged as EPF first
+        // 1. Wipe out any existing Auto-EPF row
         document.querySelectorAll('[data-is-epf="true"]').forEach(el => el.remove());
 
-        // 2. Only add it back if basic is greater than 0
+        // 2. Add fresh Auto-EPF if basic > 0
         if (basic > 0) {
             const epfAmount = Math.round(basic * 0.12);
             if (typeof window.add80CRow === 'function') {
@@ -183,16 +192,19 @@ const TaxController = {
                 epfRow.setAttribute('data-is-epf', 'true');
                 const select = epfRow.querySelector('.row-select-80c');
                 const amtInput = epfRow.querySelector('.row-amount-80c');
+                const delBtn = epfRow.querySelector('button');
+
                 if (select) { select.value = "EPF"; select.disabled = true; }
                 if (amtInput) { 
                     amtInput.value = epfAmount; 
                     amtInput.readOnly = true; 
                     amtInput.style.opacity = "0.7";
                 }
+                // HIDE the delete button for Auto-EPF to prevent confusion
+                if (delBtn) { delBtn.style.display = "none"; }
             }
         }
 
-        // --- CONTINUE NORMAL CALC ---
         let total80CInput = 0;
         document.querySelectorAll('.row-amount-80c').forEach(input => {
             total80CInput += parseFloat(input.value) || 0;
@@ -257,11 +269,6 @@ const TaxController = {
             box.style.borderColor = "var(--calc-input-border)";
             box.style.borderWidth = "1px";
         });
-
-        if (newTax === oldTax) {
-            if (recBox) recBox.innerHTML = `Both regimes are equal.`;
-            return;
-        }
 
         const isNewBetter = newTax < oldTax;
         const winnerBox = isNewBetter ? newBox : oldBox;
