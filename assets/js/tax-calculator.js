@@ -15,7 +15,6 @@ const TaxController = {
             }
         });
 
-        // This makes the UI "Reactive" - change anything and tax updates instantly
         document.addEventListener('input', (e) => {
             const tag = e.target.tagName;
             if (tag === 'INPUT' || tag === 'SELECT') {
@@ -62,7 +61,6 @@ const TaxController = {
             perks: [],
             deductions80C: []
         };
-        // We only save NON-EPF rows to the database to prevent duplicates on reload
         document.querySelectorAll('[id^="row-"]').forEach(row => {
             const type = row.querySelector('.row-select-80c')?.value;
             const amt = row.querySelector('.row-amount-80c')?.value;
@@ -140,8 +138,6 @@ const TaxController = {
         if (rows80c) rows80c.innerHTML = '';
         if (inputs.deductions80C) {
             inputs.deductions80C.forEach(item => {
-                // BUG FIX: If the saved data contains "EPF", we skip it.
-                // The calculateAll function will add its own fresh EPF row.
                 if (item.type !== "EPF" && typeof window.add80CRow === 'function') {
                     window.add80CRow();
                     const lastRow = rows80c.lastElementChild;
@@ -180,10 +176,8 @@ const TaxController = {
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rows80c = document.getElementById('80c-rows-container');
         
-        // 1. Wipe out any existing Auto-EPF row
         document.querySelectorAll('[data-is-epf="true"]').forEach(el => el.remove());
 
-        // 2. Add fresh Auto-EPF if basic > 0
         if (basic > 0) {
             const epfAmount = Math.round(basic * 0.12);
             if (typeof window.add80CRow === 'function') {
@@ -200,8 +194,11 @@ const TaxController = {
                     amtInput.readOnly = true; 
                     amtInput.style.opacity = "0.7";
                 }
-                // HIDE the delete button for Auto-EPF to prevent confusion
-                if (delBtn) { delBtn.style.display = "none"; }
+                if (delBtn) {
+                    const spacer = document.createElement('div');
+                    spacer.style.width = "30px";
+                    delBtn.parentNode.replaceChild(spacer, delBtn);
+                }
             }
         }
 
