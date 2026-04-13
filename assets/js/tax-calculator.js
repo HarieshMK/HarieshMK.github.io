@@ -156,13 +156,17 @@ const TaxController = {
         const row = document.createElement('div');
         row.id = `perk-${rowId}`;
         row.className = "perk-row";
+        // Removed hardcoded colors, using CSS variables for theme support
         row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Mobile Reimbursement", "Fuel Allowance", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
         let selectOptions = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
+        
         row.innerHTML = `
-            <select class="perk-type" onchange="TaxController.calculateAll();" style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff;">${selectOptions}</select>
-            <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" oninput="TaxController.calculateAll();" style="padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: #fff; text-align: right;">
-            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.85rem; font-weight: bold;">₹ 0</div>
+            <select class="perk-type" onchange="TaxController.calculateAll();" 
+                style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main);">${selectOptions}</select>
+            <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" oninput="TaxController.calculateAll();" 
+                style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main); text-align: right;">
+            <div class="perk-eligible" style="text-align: right; color: var(--calc-accent); font-size: 0.85rem; font-weight: bold;">₹ 0</div>
             <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>`;
         container.appendChild(row);
     },
@@ -176,8 +180,22 @@ const TaxController = {
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rows80c = document.getElementById('80c-rows-container');
         
-        document.querySelectorAll('[data-is-epf="true"]').forEach(el => el.remove());
+        // --- STEP 1: HANDLE 80C ROW RE-ORDERING ---
+        // Capture existing manual rows (VPF, LIC, etc.) before clearing
+        let manualRows = [];
+        document.querySelectorAll('[id^="row-"]').forEach(row => {
+            if (row.getAttribute('data-is-epf') !== 'true') {
+                manualRows.push({
+                    type: row.querySelector('.row-select-80c')?.value,
+                    amount: row.querySelector('.row-amount-80c')?.value
+                });
+            }
+        });
 
+        // Clear the container
+        rows80c.innerHTML = '';
+
+        // Add Auto-EPF FIRST
         if (basic > 0) {
             const epfAmount = Math.round(basic * 0.12);
             if (typeof window.add80CRow === 'function') {
@@ -202,6 +220,15 @@ const TaxController = {
             }
         }
 
+        // Re-add manual rows BELOW the EPF
+        manualRows.forEach(item => {
+            window.add80CRow();
+            const lastRow = rows80c.lastElementChild;
+            lastRow.querySelector('.row-select-80c').value = item.type;
+            lastRow.querySelector('.row-amount-80c').value = item.amount;
+        });
+
+        // --- STEP 2: CALCULATE PERKS & NPS ---
         let total80CInput = 0;
         document.querySelectorAll('.row-amount-80c').forEach(input => {
             total80CInput += parseFloat(input.value) || 0;
@@ -213,12 +240,15 @@ const TaxController = {
             const amtVal = row.querySelector('.perk-amount')?.value || "0";
             let amt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
             perksData.push({ type: type, amount: amt });
+            
             const label = row.querySelector('.perk-eligible');
             if (label) {
-                const cap = basic * 0.14;
-                if (type === "Corporate NPS" && amt > cap) {
-                    label.innerText = `Capped ₹${Math.round(cap).toLocaleString('en-IN')}`;
-                    label.style.color = "#fbbf24";
+                // FIXED NPS LOGIC: 14% is the standard Gov cap for NPS Corporate
+                const cap = basic * 0.14; 
+                if (type === "Corporate NPS") {
+                    const eligibleAmt = Math.min(amt, cap);
+                    label.innerText = `Eligible: ₹${Math.round(eligibleAmt).toLocaleString('en-IN')}`;
+                    label.style.color = amt > cap ? "#fbbf24" : "#4ade80";
                 } else {
                     label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
                     label.style.color = "#4ade80";
@@ -226,6 +256,7 @@ const TaxController = {
             }
         });
 
+        // --- STEP 3: ENGINE CALCULATIONS ---
         if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
 
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
