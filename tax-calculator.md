@@ -228,7 +228,7 @@ permalink: /tax-calculator/
 
             // Only add default rows if the database returned nothing
             if (pContainer && pContainer.children.length === 0) {
-                TaxController.addPerkRowWithData("Professional Tax", 2500);
+                TaxController.addPerkRow("Professional Tax", 2500);
             }
             if (cContainer && (cContainer.children.length === 0 || cContainer.querySelector('#empty-80c-msg'))) {
                 add80CRow(); 
@@ -283,67 +283,6 @@ permalink: /tax-calculator/
     const options80C = typeof InvestmentRegistry !== 'undefined' ? 
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
-       function add80CRow(type = "", amount = "", isLocked = false) {
-    if(emptyMsg) emptyMsg.style.display = 'none';
-    const rowId = Date.now() + Math.random();
-    const row = document.createElement('div');
-    row.id = `row-${rowId}`;
-    row.className = isLocked ? "row-80c-statutory" : "row-80c-manual";
-    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
-    
-    let selectOptions = options80C.map(opt => 
-        `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`
-    ).join('');
-    
-    row.innerHTML = `
-        <select class="row-select-80c dynamic-input" style="flex: 2;" onchange="runCalculator()" ${isLocked ? 'disabled' : ''}>
-            <option value="" disabled ${!type ? 'selected' : ''}>Select Investment</option>
-            ${selectOptions}
-        </select>
-        <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" 
-               oninput="update80CTotal();" value="${amount}" inputmode="decimal" 
-               style="flex: 1; font-family: 'JetBrains Mono', monospace; text-align: right;" 
-               ${isLocked ? 'readonly style="opacity: 0.7; background: var(--calc-card) !important;"' : ''}>
-        ${isLocked ? 
-            `<div style="width: 30px; text-align: center; color: var(--calc-text-muted); font-size: 0.7rem;"><i class="fas fa-lock"></i></div>` : 
-            `<button onclick="document.getElementById('row-${rowId}').remove(); update80CTotal();" 
-                     style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px; width: 30px;">
-                <i class="fas fa-trash"></i>
-            </button>`
-        }
-    `;
-    rowsContainer.appendChild(row);
-}
-
-    function addPerkRow(type = "", amount = "") {
-        const container = document.getElementById('perks-rows-container');
-        const rowId = 'perk-' + Math.floor(Math.random() * 1000000);
-        const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : ["Meal Coupons", "Fuel Allowance", "LTA", "Professional Tax"];
-        
-        const row = document.createElement('div');
-        row.id = rowId;
-        row.className = "perk-row"; // CRITICAL: Added this class for the JS captureInputs to work
-        row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
-        
-        let optionsHTML = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
-        
-        row.innerHTML = `
-            <select class="perk-type dynamic-input" onchange="runCalculator()">
-                <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
-                ${optionsHTML}
-            </select>
-            <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" 
-                   oninput="runCalculator()" value="${amount}"
-                   style="font-family: 'JetBrains Mono', monospace; text-align: right;" inputmode="decimal">
-            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem; font-weight: bold;">₹ 0</div>
-            <button onclick="document.getElementById('${rowId}').remove(); runCalculator();" 
-                    style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-        container.appendChild(row);
-    }
-    
     // --- EXTERNAL BRIDGES ---
    async function handleSave() {
     const btn = document.getElementById('save-btn');
