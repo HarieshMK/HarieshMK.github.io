@@ -62,8 +62,7 @@ permalink: /tax-calculator/
             <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Only add perks here if they are already included in your <strong>Other Taxable Allowances</strong> above.  
             </div>
             <div id="perks-rows-container"></div>
-            <button type="button" onclick="addPerkRow()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
-                <i class="fas fa-plus-circle"></i> Add Benefit/Perk
+            <button type="button" onclick="TaxController.addPerkRowWithData()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;"> <i class="fas fa-plus-circle"></i> Add Benefit/Perk
             </button>
         </div>
 
@@ -203,6 +202,12 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
+        const cleanNum = (val) => {
+        if (!val) return 0;
+        // Removes currency symbols, commas, and spaces so "1,00,000" becomes "100000"
+        const cleanValue = val.toString().replace(/[^0-9.-]+/g, "");
+        return parseFloat(cleanValue) || 0;
+    };
     // --- INITIALIZATION ---
     document.addEventListener("DOMContentLoaded", function() {
         // Ensure all number inputs have correct mobile keyboards
@@ -310,34 +315,35 @@ permalink: /tax-calculator/
     rowsContainer.appendChild(row);
 }
 
-        function addPerkRow() {
-        const container = document.getElementById('perks-rows-container');
-        const rowId = Date.now();
-        const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : [];
-        
-        const row = document.createElement('div');
-        row.id = `perk-${rowId}`;
-        // Updated style to include the 4th column for "Eligible" display
-        row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
-        
-        let optionsHTML = perkOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-        
-        row.innerHTML = `
-            <select class="perk-type dynamic-input" onchange="runCalculator()">
-                <option value="" disabled selected>Select Perk</option>
-                ${optionsHTML}
-            </select>
-            <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" 
-                   oninput="runCalculator()"
-                   style="font-family: 'JetBrains Mono', monospace; text-align: right;">
-            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem; font-weight: bold;">₹ 0</div>
-            <button onclick="document.getElementById('perk-${rowId}').remove(); runCalculator();" 
-                    style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-        container.appendChild(row);
-    }
+        // Replace your old addPerkRow in the .md file with this:
+function addPerkRow(type = "", amount = "") {
+    const container = document.getElementById('perks-rows-container');
+    const rowId = 'perk-' + Math.floor(Math.random() * 1000000);
+    const perkOptions = typeof TAX_CONFIG !== 'undefined' ? Object.keys(TAX_CONFIG.perkRules) : ["Meal Coupons", "Fuel Allowance", "LTA", "Professional Tax"];
+    
+    const row = document.createElement('div');
+    row.id = rowId;
+    // Fixed the grid columns to match the "Eligible" display logic
+    row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
+    
+    let optionsHTML = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
+    
+    row.innerHTML = `
+        <select class="perk-type dynamic-input" onchange="runCalculator()">
+            <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
+            ${optionsHTML}
+        </select>
+        <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" 
+               oninput="runCalculator()" value="${amount}"
+               style="font-family: 'JetBrains Mono', monospace; text-align: right;" inputmode="decimal">
+        <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem; font-weight: bold;">₹ 0</div>
+        <button onclick="document.getElementById('${rowId}').remove(); runCalculator();" 
+                style="background:none; border:none; color:#ef4444; cursor:pointer; padding: 5px;">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    container.appendChild(row);
+}
     
     // --- EXTERNAL BRIDGES ---
    async function handleSave() {
