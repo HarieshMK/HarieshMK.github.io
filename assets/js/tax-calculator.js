@@ -1,52 +1,216 @@
 /**
  * Controller for the Tax Calculator UI with Supabase Persistence
- * VERSION: 2.2 - Filtered Database Loading & Reactive Deletion
+ * VERSION: 3.1 - Full Integration & Reactive UI
  */
 const TaxController = {
     isDirty: false,
 
-    init: async () => { 
-        console.log("Tax Controller Initialized"); 
-        
+    init: async () => {
+        console.log("Tax Controller 3.1 Initialized");
+
+        // 1. Setup Lifecycle - Warn if unsaved changes
         window.addEventListener('beforeunload', (e) => {
-            if (TaxController.isDirty) {
-                e.preventDefault();
-                e.returnValue = ''; 
-            }
+            if (TaxController.isDirty) { e.preventDefault(); e.returnValue = ''; }
         });
 
+        // 2. Global Input Listener - Reactive Calculation
         document.addEventListener('input', (e) => {
-            const tag = e.target.tagName;
-            if (tag === 'INPUT' || tag === 'SELECT') {
+            if (e.target.matches('.dynamic-input, .perk-amount, .perk-type, .row-amount-80c, .row-select-80c')) {
                 TaxController.isDirty = true;
                 TaxController.calculateAll();
             }
         });
 
+        // 3. Load Data from Supabase
         await TaxController.loadUserData();
 
-        const savedDraft = localStorage.getItem('tax_calc_draft');
-        if (savedDraft) {
-            const inputs = JSON.parse(savedDraft);
-            TaxController.fillForm(inputs); 
-            localStorage.removeItem('tax_calc_draft');
-            setTimeout(() => { TaxController.calculateAll(); }, 200);
-        }
-
+        // 4. Default State: If no perks exist, add Professional Tax
         const perksContainer = document.getElementById('perks-rows-container');
         if (perksContainer && perksContainer.children.length === 0) {
-            TaxController.addPerkRowWithData("Professional Tax", 2500);
+            TaxController.addPerkRow("Professional Tax", 2500);
         }
         
-        const { data: { session } } = await window.supabase.auth.getSession();
-        const saveBtn = document.getElementById('btn-save-tax');
-        if (saveBtn) {
-            saveBtn.innerText = session ? "Save to Profile" : "Login to Save Progress";
+        // Final calculation sweep
+        TaxController.calculateAll();
+    },
+
+    // --- ROW MANAGEMENT (UI) ---
+    add80CRow: (type = "", amount = "", isLocked = false) => {
+        const container = document.getElementById('80c-rows-container');
+        const emptyMsg = document.getElementById('empty-80c-msg');
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        const rowId = `row-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+        const row = document.createElement('div');
+        row.id = rowId;
+        row.className = isLocked ? "row-80c-statutory" : "row-80c-manual";
+        row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+        
+        const options = ["ELSS Funds", "PPF", "Life Insurance", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed Deposit (5yr)"];
+        
+        row.innerHTML = `
+            <select class="row-select-80c dynamic-input" style="flex: 2;" ${isLocked ? 'disabled' : ''}>
+                <option value="EPF" ${type === 'EPF' ? 'selected' : ''}>EPF (Statutory)</option>
+                ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
+            </select>
+            <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" value="${amount}" 
+                   style="flex: 1; text-align: right;" ${isLocked ? 'readonly' : ''}>
+            ${isLocked ? '<div style="width:30px; text-align:center; color:var(--calc-text-muted); font-size:0.7rem;"><i class="fas fa-lock"></i></div>' : 
+            `<button type="button" onclick="document.getElementById('${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer; width: 30px;"><i class="fas fa-trash"></i></button>`}
+        `;
+        
+        container.appendChild(row);
+        if (!isLocked) TaxController.calculateAll();
+    },
+
+    addPerkRow: (type = "", value = "") => {
+        const container = document.getElementById('perks-rows-container');
+        const rowId = `perk-${Date.now()}`;
+        const row = document.createElement('div');
+        row.className = "perk-row";
+        row.id = rowId;
+        row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
+        
+        const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
+
+        row.innerHTML = `
+            <select class="perk-type dynamic-input">
+                <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
+                ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
+            </select>
+            <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" value="${value}" style="text-align: right;">
+            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem; font-weight: bold;">₹ 0</div>
+            <button type="button" onclick="document.getElementById('${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>
+        `;
+        
+        container.appendChild(row);
+        TaxController.calculateAll();
+    },
+
+    // --- CALCULATION ENGINE ---
+    calculateAll: () => {
+        const basicInput = document.getElementById('basic-salary');
+        const basicValue = parseFloat(basicInput.value) || 0;
+        const container80c = document.getElementById('80c-rows-container');
+
+        // 1. Reactive EPF Row Management
+        let epfRow = container80c.querySelector('.row-80c-statutory');
+        if (basicValue > 0) {
+            const epfAmt = Math.round(basicValue * 0.12);
+            if (!epfRow) {
+                TaxController.add80CRow("EPF", epfAmt, true);
+            } else {
+                epfRow.querySelector('.row-amount-80c').value = epfAmt;
+            }
+        } else if (epfRow) {
+            epfRow.remove();
+        }
+
+        // 2. Capture Data for Engine
+        const inputs = {
+            basic: basicValue,
+            hra: parseFloat(document.getElementById('hra-received').value) || 0,
+            rent: parseFloat(document.getElementById('rent-paid').value) || 0,
+            isMetro: document.getElementById('is-metro').value === 'true',
+            otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
+            homeInterest: parseFloat(document.getElementById('home-interest').value) || 0,
+            isUnderConstruction: document.getElementById('is-under-construction').checked,
+            healthSelf: parseFloat(document.getElementById('80d-self').value) || 0,
+            healthParents: parseFloat(document.getElementById('80d-parents').value) || 0,
+            parentsSenior: document.getElementById('parents-senior').checked,
+            npsExtra: parseFloat(document.getElementById('nps-extra').value) || 0,
+            perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
+                type: row.querySelector('.perk-type').value,
+                value: row.querySelector('.perk-amount').value
+            })).filter(p => p.type),
+            deductions80C: Array.from(document.querySelectorAll('.row-amount-80c')).map(input => parseFloat(input.value) || 0)
+        };
+
+        const total80C = inputs.deductions80C.reduce((a, b) => a + b, 0);
+        const selectedYear = document.getElementById('fy-selector').value;
+
+        // 3. Process Perks UI & Data
+        const perksData = inputs.perks.map((p, idx) => {
+            let actualAmt = p.value.toString().includes('%') 
+                ? (parseFloat(p.value.replace('%', '')) / 100) * inputs.basic 
+                : parseFloat(p.value) || 0;
+            
+            const label = document.querySelectorAll('.perk-row')[idx].querySelector('.perk-eligible');
+            if (p.type === "Corporate NPS") {
+                const capOld = inputs.basic * 0.10;
+                const capNew = inputs.basic * 0.14;
+                label.innerHTML = `<div style="color:#94a3b8">Old: ₹${Math.round(Math.min(actualAmt, capOld))}</div><div style="color:#4ade80">New: ₹${Math.round(Math.min(actualAmt, capNew))}</div>`;
+            } else {
+                label.innerText = `₹ ${Math.round(actualAmt).toLocaleString('en-IN')}`;
+            }
+            return { type: p.type, amount: actualAmt };
+        });
+
+        // 4. Run Finance Engines
+        if (!window.FinanceEngine) return;
+        
+        const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(inputs.basic, inputs.hra, inputs.rent, inputs.isMetro);
+        const grossSalary = inputs.basic + inputs.hra + inputs.otherIncome;
+
+        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, inputs.basic);
+        const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
+            section80C: total80C,
+            npsSelf: inputs.npsExtra,
+            section80D: inputs.healthSelf + inputs.healthParents,
+            parentsSenior: inputs.parentsSenior,
+            homeLoanInterest: inputs.isUnderConstruction ? 0 : inputs.homeInterest,
+            exemptHRA: hraResult.actualExemption
+        }, perksData, inputs.basic);
+
+        TaxController.updateSummary(newReg.tax, oldReg.tax, total80C);
+    },
+
+    updateSummary: (newTax, oldTax, total80C) => {
+        document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
+        document.getElementById('old-regime-tax').innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
+
+        const isNewBetter = newTax < oldTax;
+        const recBox = document.getElementById('recommendation-box');
+        if (recBox) {
+            recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. Save <strong>₹${Math.round(Math.abs(newTax - oldTax)).toLocaleString('en-IN')}</strong>`;
+        }
+
+        const counterEl = document.getElementById('display-80c-total');
+        if (counterEl) {
+            counterEl.innerText = `₹ ${Math.min(total80C, 150000).toLocaleString('en-IN')} / 1,50,000`;
+            counterEl.style.color = total80C > 150000 ? "#fbbf24" : "#4ade80";
+        }
+    },
+
+    // --- DB OPERATIONS ---
+    saveUserData: async () => {
+        const btn = document.getElementById('save-btn');
+        try {
+            const { data: { session } } = await window.supabase.auth.getSession();
+            if (!session) {
+                localStorage.setItem('tax_calc_draft', JSON.stringify(TaxController.captureInputs()));
+                window.location.href = `/login/?return_to=${window.location.pathname}`;
+                return;
+            }
+            const selectedYear = document.getElementById('fy-selector').value;
+            const { error } = await supabase.from('tax_user_data').upsert({ 
+                id: session.user.id, 
+                financial_year: selectedYear, 
+                calculator_inputs: TaxController.captureInputs(), 
+                updated_at: new Date() 
+            }, { onConflict: 'id, financial_year' });
+            
+            if (error) throw error;
+            TaxController.isDirty = false;
+        } catch (err) {
+            console.error("Save failed:", err);
+            throw err;
         }
     },
 
     captureInputs: () => {
-        const formData = {
+        // Simple capture for storage
+        return {
             basic: document.getElementById('basic-salary').value,
             hra: document.getElementById('hra-received').value,
             rent: document.getElementById('rent-paid').value,
@@ -58,263 +222,52 @@ const TaxController = {
             healthParents: document.getElementById('80d-parents').value,
             parentsSenior: document.getElementById('parents-senior').checked,
             npsExtra: document.getElementById('nps-extra').value,
-            perks: [],
-            deductions80C: []
+            perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
+                type: row.querySelector('.perk-type').value,
+                value: row.querySelector('.perk-amount').value
+            })),
+            deductions80C: Array.from(document.querySelectorAll('.row-80c-manual')).map(row => ({
+                type: row.querySelector('.row-select-80c').value,
+                amount: row.querySelector('.row-amount-80c').value
+            }))
         };
-        document.querySelectorAll('[id^="row-"]').forEach(row => {
-            const type = row.querySelector('.row-select-80c')?.value;
-            const amt = row.querySelector('.row-amount-80c')?.value;
-            const isAutoEPF = row.getAttribute('data-is-epf') === 'true';
-            
-            if (type && !isAutoEPF) { 
-                formData.deductions80C.push({ type: type, amount: amt });
-            }
-        });
-        
-        document.querySelectorAll('.perk-row').forEach(row => {
-            const type = row.querySelector('.perk-type')?.value;
-            const val = row.querySelector('.perk-amount')?.value;
-            if (type) formData.perks.push({ type: type, value: val });
-        });
-        
-        return formData;
-    },
-
-    saveUserData: async () => {
-        try {
-            const { data: { session } } = await window.supabase.auth.getSession();
-            if (!session) {
-                const formData = TaxController.captureInputs();
-                localStorage.setItem('tax_calc_draft', JSON.stringify(formData));
-                window.location.href = `/login/?return_to=${window.location.pathname}`;
-                return false; 
-            }
-            const user = session.user;
-            const selectedYear = document.getElementById('fy-selector').value;
-            const formData = TaxController.captureInputs();
-            const { error } = await supabase.from('tax_user_data').upsert({ 
-                id: user.id, 
-                financial_year: selectedYear, 
-                calculator_inputs: formData, 
-                updated_at: new Date() 
-            }, { onConflict: 'id, financial_year' }); 
-            if (error) throw error;
-            TaxController.isDirty = false;
-            alert("Data saved successfully!");
-            return true;
-        } catch (err) {
-            console.error("Save failed:", err);
-            alert("Save failed.");
-            throw err;
-        }
     },
 
     loadUserData: async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         const selectedYear = document.getElementById('fy-selector').value;
-        const { data } = await supabase.from('tax_user_data').select('calculator_inputs').eq('id', user.id).eq('financial_year', selectedYear).maybeSingle(); 
-        if (data?.calculator_inputs) TaxController.fillForm(data.calculator_inputs);
-    },
-
-    fillForm: (inputs) => {
-        document.getElementById('basic-salary').value = inputs.basic || "";
-        document.getElementById('hra-received').value = inputs.hra || "";
-        document.getElementById('rent-paid').value = inputs.rent || "";
-        document.getElementById('is-metro').value = inputs.isMetro || "false";
-        document.getElementById('other-income').value = inputs.otherIncome || "";
-        document.getElementById('home-interest').value = inputs.homeInterest || "";
-        document.getElementById('is-under-construction').checked = inputs.isUnderConstruction || false;
-        document.getElementById('80d-self').value = inputs.healthSelf || "";
-        document.getElementById('80d-parents').value = inputs.healthParents || "";
-        document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
-        document.getElementById('nps-extra').value = inputs.npsExtra || "";
-
-        const perksContainer = document.getElementById('perks-rows-container');
-        if (perksContainer) perksContainer.innerHTML = '';
-        if (inputs.perks) inputs.perks.forEach(p => TaxController.addPerkRowWithData(p.type, p.value));
-
-        const rows80c = document.getElementById('80c-rows-container');
-        if (rows80c) rows80c.innerHTML = '';
-        if (inputs.deductions80C) {
-            inputs.deductions80C.forEach(item => {
-                if (item.type !== "EPF" && typeof window.add80CRow === 'function') {
-                    window.add80CRow();
-                    const lastRow = rows80c.lastElementChild;
-                    lastRow.querySelector('.row-select-80c').value = item.type;
-                    lastRow.querySelector('.row-amount-80c').value = item.amount;
-                }
-            });
-        }
-        setTimeout(() => { TaxController.calculateAll(); }, 100);
-    },
-
-    addPerkRowWithData: (type = "", value = "") => {
-        const rowId = Date.now() + Math.random();
-        const container = document.getElementById('perks-rows-container');
-        if (!container) return;
-        const row = document.createElement('div');
-        row.id = `perk-${rowId}`;
-        row.className = "perk-row";
-        row.style = "display: grid; grid-template-columns: 2fr 1fr 1.5fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
+        const { data } = await supabase.from('tax_user_data').select('calculator_inputs').eq('id', user.id).eq('financial_year', selectedYear).maybeSingle();
         
-        const perkOptions = ["Meal Coupons", "Corporate NPS", "Mobile Reimbursement", "Fuel Allowance", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
-        let selectOptions = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
-        
-       // Ensure this part in addPerkRowWithData matches exactly
-row.innerHTML = `
-    <select class="perk-type" onchange="TaxController.calculateAll();" 
-        style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main);">${selectOptions}</select>
-    <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" oninput="TaxController.calculateAll();" 
-        style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main); text-align: right;">
-    <div class="perk-eligible" style="text-align: right; color: var(--calc-accent); font-size: 0.75rem; line-height: 1.2;"></div>
-    <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>`;
-        container.appendChild(row);
-    },
+        if (data?.calculator_inputs) {
+            const inputs = data.calculator_inputs;
+            document.getElementById('basic-salary').value = inputs.basic || "";
+            document.getElementById('hra-received').value = inputs.hra || "";
+            document.getElementById('rent-paid').value = inputs.rent || "";
+            document.getElementById('is-metro').value = inputs.isMetro || "false";
+            document.getElementById('other-income').value = inputs.otherIncome || "";
+            document.getElementById('home-interest').value = inputs.homeInterest || "";
+            document.getElementById('is-under-construction').checked = inputs.isUnderConstruction || false;
+            document.getElementById('80d-self').value = inputs.healthSelf || "";
+            document.getElementById('80d-parents').value = inputs.healthParents || "";
+            document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
+            document.getElementById('nps-extra').value = inputs.npsExtra || "";
 
-    calculateAll: () => {
-        const selectedYear = document.getElementById('fy-selector').value;
-        const basic = parseFloat(document.getElementById('basic-salary').value) || 0;
-        const hraReceived = parseFloat(document.getElementById('hra-received').value) || 0;
-        const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0; 
-        const isMetro = document.getElementById('is-metro')?.value === 'true';
-        const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
-        const rows80c = document.getElementById('80c-rows-container');
-        
-        // 1. Re-order 80C Rows (EPF on top)
-        let manualRows = [];
-        document.querySelectorAll('[id^="row-"]').forEach(row => {
-            if (row.getAttribute('data-is-epf') !== 'true') {
-                manualRows.push({
-                    type: row.querySelector('.row-select-80c')?.value,
-                    amount: row.querySelector('.row-amount-80c')?.value
-                });
-            }
-        });
-        rows80c.innerHTML = '';
-        if (basic > 0) {
-            window.add80CRow();
-            const epfRow = rows80c.lastElementChild;
-            epfRow.setAttribute('data-is-epf', 'true');
-            const select = epfRow.querySelector('.row-select-80c');
-            const amtInput = epfRow.querySelector('.row-amount-80c');
-            const delBtn = epfRow.querySelector('button');
-            if (select) { select.value = "EPF"; select.disabled = true; }
-            if (amtInput) { 
-                amtInput.value = Math.round(basic * 0.12); 
-                amtInput.readOnly = true; 
-                amtInput.style.opacity = "0.7";
-            }
-            if (delBtn) {
-                const spacer = document.createElement('div');
-                spacer.style.width = "30px";
-                delBtn.parentNode.replaceChild(spacer, delBtn);
-            }
-        }
-        manualRows.forEach(item => {
-            window.add80CRow();
-            const lastRow = rows80c.lastElementChild;
-            lastRow.querySelector('.row-select-80c').value = item.type;
-            lastRow.querySelector('.row-amount-80c').value = item.amount;
-        });
+            const perksContainer = document.getElementById('perks-rows-container');
+            const rows80c = document.getElementById('80c-rows-container');
+            perksContainer.innerHTML = '';
+            rows80c.innerHTML = '';
 
-        // 2. Calculate Perks with Dual-Regime NPS Logic
-        let total80CInput = 0;
-        document.querySelectorAll('.row-amount-80c').forEach(input => {
-            total80CInput += parseFloat(input.value) || 0;
-        });
-
-        let perksData = []; 
-        document.querySelectorAll('.perk-row').forEach(row => {
-            const type = row.querySelector('.perk-type')?.value;
-            const amtVal = row.querySelector('.perk-amount')?.value || "0";
-            let actualAmt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
-            
-            perksData.push({ type: type, amount: actualAmt });
-            
-            const label = row.querySelector('.perk-eligible');
-            if (label) {
-                if (type === "Corporate NPS") {
-                    const capOld = basic * 0.10;
-                    const capNew = basic * 0.14;
-                    const eligOld = Math.min(actualAmt, capOld);
-                    const eligNew = Math.min(actualAmt, capNew);
-                    
-                    label.innerHTML = `
-                        <div style="color: #94a3b8">Old: ₹${Math.round(eligOld).toLocaleString('en-IN')}</div>
-                        <div style="color: #4ade80">New: ₹${Math.round(eligNew).toLocaleString('en-IN')}</div>
-                    `;
-                } else {
-                    label.innerHTML = `<div style="color: #4ade80">₹${Math.round(actualAmt).toLocaleString('en-IN')}</div>`;
-                }
-            }
-        });
-
-        // 3. Run Engines
-        if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
-
-        const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
-        const grossSalary = basic + hraReceived + otherIncome;
-        
-        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, basic);
-        const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
-            section80C: total80CInput,
-            npsSelf: parseFloat(document.getElementById('nps-extra')?.value) || 0, 
-            section80D: (parseFloat(document.getElementById('80d-self')?.value) || 0) + (parseFloat(document.getElementById('80d-parents')?.value) || 0),
-            parentsSenior: document.getElementById('parents-senior')?.checked,
-            homeLoanInterest: document.getElementById('is-under-construction')?.checked ? 0 : (parseFloat(document.getElementById('home-interest')?.value) || 0),
-            exemptHRA: hraResult.actualExemption
-        }, perksData, basic);
-
-        TaxController.updateSummary(newReg.tax, oldReg.tax);
-        
-        const counterEl = document.getElementById('display-80c-total');
-        if (counterEl) {
-            counterEl.innerText = `₹ ${Math.min(total80CInput, 150000).toLocaleString('en-IN')} / 1,50,000`;
-            counterEl.style.color = total80CInput > 150000 ? "#fbbf24" : "#4ade80";
-        }
-    },
-
-    updateSummary: (newTax, oldTax) => {
-        const newEl = document.getElementById('new-regime-tax');
-        const oldEl = document.getElementById('old-regime-tax');
-        const newBox = document.getElementById('new-regime-box');
-        const oldBox = document.getElementById('old-regime-box');
-        const recBox = document.getElementById('recommendation-box');
-
-        newEl.innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
-        oldEl.innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
-
-        [newBox, oldBox].forEach(box => {
-            box.style.borderColor = "var(--calc-input-border)";
-            box.style.borderWidth = "1px";
-        });
-
-        const isNewBetter = newTax < oldTax;
-        const winnerBox = isNewBetter ? newBox : oldBox;
-        const winnerText = isNewBetter ? newEl : oldEl;
-        winnerBox.style.borderColor = "#4ade80";
-        winnerBox.style.borderWidth = "2px";
-        winnerText.style.color = "#4ade80";
-
-        if (recBox) {
-            recBox.innerHTML = `<strong>${isNewBetter ? 'New' : 'Old'} Regime</strong> is better. Save <strong>₹${Math.round(Math.abs(newTax - oldTax)).toLocaleString('en-IN')}</strong>`;
+            if (inputs.perks) inputs.perks.forEach(p => TaxController.addPerkRow(p.type, p.value));
+            if (inputs.deductions80C) inputs.deductions80C.forEach(d => TaxController.add80CRow(d.type, d.amount));
         }
     }
 };
 
-const originalAdd80C = window.add80CRow;
-window.add80CRow = function() {
-    if (typeof originalAdd80C === 'function') originalAdd80C();
-    const container = document.getElementById('80c-rows-container');
-    const lastRow = container.lastElementChild;
-    const delBtn = lastRow.querySelector('button');
-    if (delBtn) {
-        delBtn.setAttribute('onclick', 'this.parentElement.remove(); TaxController.calculateAll();');
-    }
-};
-
-function addPerkRow() { TaxController.addPerkRowWithData(); }
+// --- GLOBAL BRIDGES (Ensures HTML Buttons Work) ---
+function add80CRow() { TaxController.add80CRow(); }
+function addPerkRow() { TaxController.addPerkRow(); }
 function runCalculator() { TaxController.calculateAll(); }
 async function saveTaxData() { return await TaxController.saveUserData(); }
+
 window.onload = TaxController.init;
