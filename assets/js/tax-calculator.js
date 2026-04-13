@@ -152,6 +152,7 @@ const TaxController = {
         if (!window.FinanceEngine) return;
         
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(inputs.basic, inputs.hra, inputs.rent, inputs.isMetro);
+        document.getElementById('hra-eligible-display').innerText = `Eligible HRA: ₹${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
         const grossSalary = inputs.basic + inputs.hra + inputs.otherIncome;
 
         const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, inputs.basic);
