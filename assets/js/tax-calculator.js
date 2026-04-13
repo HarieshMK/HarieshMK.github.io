@@ -156,18 +156,19 @@ const TaxController = {
         const row = document.createElement('div');
         row.id = `perk-${rowId}`;
         row.className = "perk-row";
-        // Removed hardcoded colors, using CSS variables for theme support
-        row.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
+        row.style = "display: grid; grid-template-columns: 2fr 1fr 1.5fr 30px; gap: 10px; margin-bottom: 10px; align-items: center;";
+        
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Mobile Reimbursement", "Fuel Allowance", "LTA", "Books & Periodicals", "Professional Tax", "Other Flexi-Pay"];
         let selectOptions = perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('');
         
-        row.innerHTML = `
-            <select class="perk-type" onchange="TaxController.calculateAll();" 
-                style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main);">${selectOptions}</select>
-            <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" oninput="TaxController.calculateAll();" 
-                style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main); text-align: right;">
-            <div class="perk-eligible" style="text-align: right; color: var(--calc-accent); font-size: 0.85rem; font-weight: bold;">₹ 0</div>
-            <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>`;
+       // Ensure this part in addPerkRowWithData matches exactly
+row.innerHTML = `
+    <select class="perk-type" onchange="TaxController.calculateAll();" 
+        style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main);">${selectOptions}</select>
+    <input type="text" class="perk-amount" value="${value}" placeholder="Amt or %" oninput="TaxController.calculateAll();" 
+        style="padding: 10px; border-radius: 6px; border: 1px solid var(--calc-input-border); background: var(--calc-input-bg); color: var(--calc-text-main); text-align: right;">
+    <div class="perk-eligible" style="text-align: right; color: var(--calc-accent); font-size: 0.75rem; line-height: 1.2;"></div>
+    <button onclick="document.getElementById('perk-${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>`;
         container.appendChild(row);
     },
 
@@ -180,8 +181,7 @@ const TaxController = {
         const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
         const rows80c = document.getElementById('80c-rows-container');
         
-        // --- STEP 1: HANDLE 80C ROW RE-ORDERING ---
-        // Capture existing manual rows (VPF, LIC, etc.) before clearing
+        // 1. Re-order 80C Rows (EPF on top)
         let manualRows = [];
         document.querySelectorAll('[id^="row-"]').forEach(row => {
             if (row.getAttribute('data-is-epf') !== 'true') {
@@ -191,36 +191,26 @@ const TaxController = {
                 });
             }
         });
-
-        // Clear the container
         rows80c.innerHTML = '';
-
-        // Add Auto-EPF FIRST
         if (basic > 0) {
-            const epfAmount = Math.round(basic * 0.12);
-            if (typeof window.add80CRow === 'function') {
-                window.add80CRow();
-                const epfRow = rows80c.lastElementChild;
-                epfRow.setAttribute('data-is-epf', 'true');
-                const select = epfRow.querySelector('.row-select-80c');
-                const amtInput = epfRow.querySelector('.row-amount-80c');
-                const delBtn = epfRow.querySelector('button');
-
-                if (select) { select.value = "EPF"; select.disabled = true; }
-                if (amtInput) { 
-                    amtInput.value = epfAmount; 
-                    amtInput.readOnly = true; 
-                    amtInput.style.opacity = "0.7";
-                }
-                if (delBtn) {
-                    const spacer = document.createElement('div');
-                    spacer.style.width = "30px";
-                    delBtn.parentNode.replaceChild(spacer, delBtn);
-                }
+            window.add80CRow();
+            const epfRow = rows80c.lastElementChild;
+            epfRow.setAttribute('data-is-epf', 'true');
+            const select = epfRow.querySelector('.row-select-80c');
+            const amtInput = epfRow.querySelector('.row-amount-80c');
+            const delBtn = epfRow.querySelector('button');
+            if (select) { select.value = "EPF"; select.disabled = true; }
+            if (amtInput) { 
+                amtInput.value = Math.round(basic * 0.12); 
+                amtInput.readOnly = true; 
+                amtInput.style.opacity = "0.7";
+            }
+            if (delBtn) {
+                const spacer = document.createElement('div');
+                spacer.style.width = "30px";
+                delBtn.parentNode.replaceChild(spacer, delBtn);
             }
         }
-
-        // Re-add manual rows BELOW the EPF
         manualRows.forEach(item => {
             window.add80CRow();
             const lastRow = rows80c.lastElementChild;
@@ -228,7 +218,7 @@ const TaxController = {
             lastRow.querySelector('.row-amount-80c').value = item.amount;
         });
 
-        // --- STEP 2: CALCULATE PERKS & NPS ---
+        // 2. Calculate Perks with Dual-Regime NPS Logic
         let total80CInput = 0;
         document.querySelectorAll('.row-amount-80c').forEach(input => {
             total80CInput += parseFloat(input.value) || 0;
@@ -238,32 +228,34 @@ const TaxController = {
         document.querySelectorAll('.perk-row').forEach(row => {
             const type = row.querySelector('.perk-type')?.value;
             const amtVal = row.querySelector('.perk-amount')?.value || "0";
-            let amt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
-            perksData.push({ type: type, amount: amt });
+            let actualAmt = amtVal.includes('%') ? (parseFloat(amtVal.replace('%', '')) / 100) * basic : parseFloat(amtVal) || 0;
+            
+            perksData.push({ type: type, amount: actualAmt });
             
             const label = row.querySelector('.perk-eligible');
             if (label) {
-                // FIXED NPS LOGIC: 14% is the standard Gov cap for NPS Corporate
-                const cap = basic * 0.14; 
                 if (type === "Corporate NPS") {
-                    const eligibleAmt = Math.min(amt, cap);
-                    label.innerText = `Eligible: ₹${Math.round(eligibleAmt).toLocaleString('en-IN')}`;
-                    label.style.color = amt > cap ? "#fbbf24" : "#4ade80";
+                    const capOld = basic * 0.10;
+                    const capNew = basic * 0.14;
+                    const eligOld = Math.min(actualAmt, capOld);
+                    const eligNew = Math.min(actualAmt, capNew);
+                    
+                    label.innerHTML = `
+                        <div style="color: #94a3b8">Old: ₹${Math.round(eligOld).toLocaleString('en-IN')}</div>
+                        <div style="color: #4ade80">New: ₹${Math.round(eligNew).toLocaleString('en-IN')}</div>
+                    `;
                 } else {
-                    label.innerText = `₹ ${Math.round(amt).toLocaleString('en-IN')}`;
-                    label.style.color = "#4ade80";
+                    label.innerHTML = `<div style="color: #4ade80">₹${Math.round(actualAmt).toLocaleString('en-IN')}</div>`;
                 }
             }
         });
 
-        // --- STEP 3: ENGINE CALCULATIONS ---
+        // 3. Run Engines
         if (!window.FinanceEngine || !window.FinanceEngine.TaxEngine) return;
 
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraReceived, rentPaid, isMetro);
-        const hraDisplay = document.getElementById('hra-eligible-display');
-        if(hraDisplay) hraDisplay.innerText = `Eligible: ₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
-
         const grossSalary = basic + hraReceived + otherIncome;
+        
         const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, basic);
         const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
             section80C: total80CInput,
