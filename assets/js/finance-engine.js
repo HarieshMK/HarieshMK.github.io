@@ -4,7 +4,7 @@
  */
 var FinanceEngine = window.FinanceEngine || {
     
-    // 1. Core Future Value Math (SIP + Lumpsum)
+    // 1. Core Future Value Math (SIP + Lumpsum) - UNTOUCHED
     calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
         const monthlyRate = (annualRate / 100) / 12;
         const months = years * 12;
@@ -24,7 +24,7 @@ var FinanceEngine = window.FinanceEngine || {
         };
     },
 
-    // 2. Goal Gap Math
+    // 2. Goal Gap Math - UNTOUCHED
     calculateGoalGap: (currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) => {
         const i = inflationRate / 100;
         const r = annualCorpReturn / 100;
@@ -40,7 +40,7 @@ var FinanceEngine = window.FinanceEngine || {
         };
     },
 
-    // 3. Required SIP to bridge a Gap
+    // 3. Required SIP to bridge a Gap - UNTOUCHED
     calculateRequiredSIP: (targetAmount, annualReturnRate, years) => {
         const monthlyRate = (annualReturnRate / 100) / 12;
         const months = years * 12;
@@ -51,12 +51,12 @@ var FinanceEngine = window.FinanceEngine || {
         return (targetAmount * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
     },
 
-    // 4. Inflation Adjustment (Purchasing Power)
+    // 4. Inflation Adjustment (Purchasing Power) - UNTOUCHED
     adjustForInflation: (value, annualInflation, years) => {
         return value / Math.pow(1 + (annualInflation / 100), years);
     },
 
-    // 5. Formatting Utilities
+    // 5. Formatting Utilities - UNTOUCHED
     formatIndian: (num) => {
         if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
         if (num >= 100000) return (num / 100000).toFixed(2) + " L";
@@ -66,7 +66,7 @@ var FinanceEngine = window.FinanceEngine || {
 
 /* 6. Tax Calculation Module attached to FinanceEngine */
 FinanceEngine.TaxEngine = {
-    // 1. IMPROVED HRA LOGIC
+    // 1. IMPROVED HRA LOGIC - UNTOUCHED
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
         const limit1 = hraReceived;
@@ -76,9 +76,9 @@ FinanceEngine.TaxEngine = {
         const finalExemption = Math.min(limit1, limit2, limit3);
         
         return {
-            actualExemption: finalExemption,      // For the Tax Math
-            maxPossibleExemption: Math.min(limit2, limit3), // The "Eligible" column value
-            isLimitedByHRA: limit1 < Math.min(limit2, limit3) // True if they should ask for more HRA
+            actualExemption: finalExemption,
+            maxPossibleExemption: Math.min(limit2, limit3),
+            isLimitedByHRA: limit1 < Math.min(limit2, limit3)
         };
     },
 
@@ -98,25 +98,28 @@ FinanceEngine.TaxEngine = {
         return tax;
     },
 
-    // 2. NEW REGIME WITH OBJECT RETURN
-    calculateNewRegime: (selectedYear, grossIncome, perks, basicSalary = 0) => {
-        // Fetch config for the specific year
+    // 2. NEW REGIME - UPDATED ONLY FOR HOME LOAN
+    calculateNewRegime: (selectedYear, grossIncome, perks, deductions = {}, basicSalary = 0) => {
         perks = perks || [];
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.newRegime;
         const perksConfig = yearData.perkRules;
 
         let totalExemptions = config.stdDeduction;
-        let perkBreakdown = [];
 
-            perks.forEach(p => {
+        // HOME LOAN UPDATE: New Regime only allows deduction for Let-out Property
+        if (deductions.occupancy === 'let-out' && deductions.homeLoanInterest > 0) {
+            totalExemptions += deductions.homeLoanInterest;
+        }
+
+        let perkBreakdown = [];
+        perks.forEach(p => {
             let eligible = 0;
             const rule = perksConfig[p.type];
             const isAllowed = rule && (rule.regime === "both" || rule.regime === "new" || !rule.regime);
         
             if (isAllowed) {
                 if (p.type === "Corporate NPS") {
-                    // Apply 14% limit for New Regime
                     const maxAllowed = basicSalary * (rule.newLimit || 0.14);
                     eligible = Math.min(p.amount, maxAllowed);
                 } else {
@@ -128,11 +131,9 @@ FinanceEngine.TaxEngine = {
         });
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
         
-        // New Regime Tax Calculation with Rebate
         let tax = 0;
         if (netTaxable > config.rebateLimit) {
             const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            // Marginal Relief logic
             const extraIncome = netTaxable - config.rebateLimit;
             tax = Math.min(slabTax, extraIncome);
         }
@@ -146,24 +147,26 @@ FinanceEngine.TaxEngine = {
     },
 
    calculateOldRegime: (selectedYear, grossIncome, deductions, perks, basicSalary = 0) => {
-       perks = perks || [];
+        perks = perks || [];
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.oldRegime;
         const perksConfig = yearData.perkRules;
 
         let totalExemptions = config.stdDeduction;
-        let other80C = deductions.section80C || 0;
+        
+        // HOME LOAN UPDATE: Bundle Principal & Stamp Duty into 80C
+        let other80C = (deductions.section80C || 0) + 
+                       (deductions.homePrincipal || 0) + 
+                       (deductions.stampDuty || 0);
 
-            perks.forEach(p => {
+        perks.forEach(p => {
             const rule = perksConfig[p.type];
             const isAllowed = rule && (rule.regime === "both" || rule.regime === "old" || !rule.regime);
         
             if (isAllowed) {
                 if (p.type === "Corporate NPS") {
-                    // Apply 10% limit for Old Regime
                     const maxAllowed = basicSalary * (rule.oldLimit || 0.10);
-                    const eligible = Math.min(p.amount, maxAllowed);
-                    totalExemptions += eligible;
+                    totalExemptions += Math.min(p.amount, maxAllowed);
                 } else if (p.type === "VPF") {
                     other80C += p.amount;
                 } else {
@@ -172,34 +175,47 @@ FinanceEngine.TaxEngine = {
             }
         });
 
-        // Waterfall: 80C + 80CCD(1B)
+        // Waterfall: 80C + 80CCD(1B) - UNTOUCHED
         const cappedOther80C = Math.min(other80C, config.limits.section80C);
         const spaceLeftIn80C = Math.max(0, config.limits.section80C - cappedOther80C);
         const npsUsedIn80C = Math.min(deductions.npsSelf || 0, spaceLeftIn80C);
         const npsFor80CCD = Math.min((deductions.npsSelf || 0) - npsUsedIn80C, config.limits.section80CCD_1B);
 
-        const capped24b = Math.min(deductions.homeLoanInterest || 0, config.limits.section24b);
+        // HOME LOAN UPDATE: Section 24b and 80EEA logic
+        let interest24b = 0;
+        let interest80EEA = 0;
+        const totalInterestPaid = deductions.homeLoanInterest || 0;
+
+        if (deductions.occupancy === 'let-out') {
+            interest24b = Math.min(totalInterestPaid, 200000); // Cap offset against salary at 2L
+        } else {
+            interest24b = Math.min(totalInterestPaid, config.limits.section24b || 200000);
+            
+            const remainingInterest = totalInterestPaid - interest24b;
+            if (remainingInterest > 0 && deductions.isEligible80EEA) {
+                interest80EEA = Math.min(remainingInterest, 150000);
+            }
+        }
         
-        // Use year-specific limits for 80D
+        // 80D Calculation - UNTOUCHED
         const limit80D = deductions.parentsSenior ? 
             (config.limits.section80D_Self + config.limits.section80D_SeniorParents) : 
             (config.limits.section80D_Self + (config.limits.section80D_Parents || 25000));
         
         const capped80D = Math.min(deductions.section80D || 0, limit80D);
 
-        const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + capped24b + capped80D + (deductions.exemptHRA || 0);
+        const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + interest24b + interest80EEA + capped80D + (deductions.exemptHRA || 0);
         
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
 
         let tax = 0;
         if (netTaxable > config.rebateLimit) {
             const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            // Section 87A Rebate for Old Regime
             tax = (netTaxable <= 500000) ? Math.max(0, slabTax - config.maxRebate) : slabTax;
         }
        
         return {
-            tax: tax + (tax * yearData.cessRate || TAX_CONFIG.cessRate),
+            tax: tax + (tax * (yearData.cessRate || TAX_CONFIG.cessRate)),
             netTaxable,
             totalDeductions
         };
