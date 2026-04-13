@@ -110,13 +110,82 @@ permalink: /tax-calculator/
                 <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>80CCD (1B): Extra NPS</h3>
                 <i id="nps-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
             </div>
+            
             <div id="nps-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
                 <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Voluntary NPS Contribution</label>
                 <input type="number" id="nps-extra" class="dynamic-input" placeholder="Max ₹50,000" style="width: 100%; margin-top: 5px;">
                 <p style="font-size: 0.7rem; color: var(--calc-text-muted); margin-top: 8px;">* This is over and above the ₹1.5L limit of 80C.</p>
             </div>
         </div>
-
+            <div class="calc-card" style="margin-bottom: 20px; border: 1px solid var(--calc-border); border-radius: 8px; overflow: hidden;">
+            <div onclick="document.getElementById('home-loan-content').classList.toggle('hidden')" style="background: var(--calc-bg-subtle); padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: bold;">🏠 Advanced Home Loan Assistant</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            
+            <div id="home-loan-content" class="padding-15">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <label>Do you have an active Home Loan?</label>
+                    <input type="checkbox" id="has-home-loan" onchange="TaxController.toggleHomeLoanUI()">
+                </div>
+        
+                <div id="home-loan-wizard" class="hidden" style="border-top: 1px dashed var(--calc-border); pt-15;">
+                    <div class="input-group">
+                        <label>Possession Status</label>
+                        <select id="loan-possession" class="dynamic-input" onchange="TaxController.toggleHomeLoanUI()">
+                            <option value="completed">Completed / Fully Constructed</option>
+                            <option value="under-construction">Under Construction</option>
+                        </select>
+                    </div>
+        
+                    <div id="under-construction-msg" class="hidden" style="color: #fbbf24; font-size: 0.85rem; padding: 10px; background: rgba(251, 191, 36, 0.1); border-radius: 5px; margin-bottom: 10px;">
+                        You are not eligible for deductions yet. But don't worry, once you get possession, you can claim the interest in 5 equal portions. Chin up! :P
+                    </div>
+        
+                    <div id="completed-loan-fields" class="hidden">
+                        <div class="input-group">
+                            <label>Property Occupancy</label>
+                            <select id="loan-occupancy" class="dynamic-input">
+                                <option value="self">Self-Occupied</option>
+                                <option value="let-out">Let-out (Rented)</option>
+                            </select>
+                        </div>
+        
+                        <div class="input-group">
+                            <label>Loan Sanction Date</label>
+                            <input type="date" id="loan-sanction-date" class="dynamic-input" onchange="TaxController.check80EEA()">
+                        </div>
+        
+                        <div id="80eea-fields" class="hidden" style="background: rgba(74, 222, 128, 0.05); padding: 10px; border-radius: 5px; border-left: 3px solid #4ade80; margin-bottom: 15px;">
+                            <p style="font-size: 0.75rem; font-weight: bold; margin-bottom: 8px;">Potential Extra ₹1.5L Benefit (Sec 80EEA)!</p>
+                            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+                                <input type="checkbox" id="is-first-home"> <label style="font-size: 0.8rem;">First-time home buyer?</label>
+                            </div>
+                            <div class="input-group">
+                                <label style="font-size: 0.75rem;">Property Stamp Value (₹)</label>
+                                <input type="number" id="stamp-value" class="dynamic-input" placeholder="e.g. 4000000">
+                            </div>
+                        </div>
+        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="input-group">
+                                <label>Principal Paid (FY)</label>
+                                <input type="number" id="loan-principal" class="dynamic-input" placeholder="₹">
+                            </div>
+                            <div class="input-group">
+                                <label>Interest Paid (FY)</label>
+                                <input type="number" id="loan-interest" class="dynamic-input" placeholder="₹">
+                            </div>
+                        </div>
+        
+                        <div class="input-group">
+                            <label>Did you pay Stamp Duty this year?</label>
+                            <input type="number" id="loan-stamp-duty" class="dynamic-input" placeholder="Enter if paid, else leave empty">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
             <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-coins" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
@@ -348,6 +417,7 @@ permalink: /tax-calculator/
     #hra-eligible-display {
         transition: all 0.3s ease;
     }
+    .hidden { display: none !important; }
 
     .dynamic-input {
         background-color: var(--calc-input-bg) !important;
