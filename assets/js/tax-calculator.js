@@ -148,19 +148,39 @@ const TaxController = {
             hraDisplay.innerText = `Eligible HRA: ₹${hraResult.actualExemption.toLocaleString('en-IN')}`;
         }
 
-        // 4. Perks/NPS UI Update (The "Missing" Loop)
+        // 4. Perks/NPS UI Update (Corrected Law: 10% Old vs 14% New)
         const perksData = inputs.perks.map(p => {
             let rawValue = p.value.toString();
             let actualAmt = rawValue.includes('%') ? (parseFloat(rawValue.replace('%', '')) / 100) * inputs.basic : parseFloat(rawValue) || 0;
             
-            // Limit Corporate NPS to 10% of basic
-            let eligibleAmt = p.type === "Corporate NPS" ? Math.min(actualAmt, inputs.basic * 0.10) : actualAmt;
+            let eligibleOld = 0;
+            let eligibleNew = 0;
+
+            if (p.type === "Corporate NPS") {
+                // LAW: 10% for Old Regime, 14% for New Regime
+                eligibleOld = Math.min(actualAmt, inputs.basic * 0.10);
+                eligibleNew = Math.min(actualAmt, inputs.basic * 0.14);
+            } else {
+                eligibleOld = actualAmt;
+                eligibleNew = 0; 
+            }
             
-            // Update the UI label next to the row
             const label = p.rowRef.querySelector('.perk-eligible');
-            if (label) label.innerText = `Eligible: ₹${Math.round(eligibleAmt).toLocaleString('en-IN')}`;
+            if (label) {
+                if (p.type === "Corporate NPS") {
+                    label.innerHTML = `Eligible:<br>Old (10%): ₹${Math.round(eligibleOld).toLocaleString('en-IN')}<br>New (14%): ₹${Math.round(eligibleNew).toLocaleString('en-IN')}`;
+                    label.style.lineHeight = "1.2";
+                } else {
+                    label.innerText = `Eligible (Old): ₹${Math.round(eligibleOld).toLocaleString('en-IN')}`;
+                }
+            }
             
-            return { type: p.type, amount: eligibleAmt };
+            // We return an object so the TaxEngine can pick the right one per regime
+            return { 
+                type: p.type, 
+                amount: eligibleOld, 
+                amountNew: eligibleNew 
+            };
         });
 
         // 5. Final Tax Engine Calls
