@@ -1,7 +1,7 @@
 ---
 layout: dashboard
 title: Income Tax Calculator (FY 2026-27)
-permalink: /tax-calculator/
+permalink: /tax-calculators/
 ---
 
 <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
