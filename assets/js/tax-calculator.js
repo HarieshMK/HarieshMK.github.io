@@ -1,13 +1,13 @@
 /**
  * Controller for the Tax Calculator UI with Supabase Persistence
- * VERSION: 3.4 - Fixed Ordering, Clean Naming & 80EEA Visibility
+ * VERSION: 3.5 - Aligned with Home Loan Assistant IDs & Select Logic
  */
 
 const TaxController = {
     isDirty: false,
 
     init: async () => {
-        console.log("Tax Controller 3.4 Initialized");
+        console.log("Tax Controller 3.5 Initialized");
 
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) { e.preventDefault(); e.returnValue = ''; }
@@ -99,7 +99,7 @@ const TaxController = {
         const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
         const container80c = document.getElementById('80c-rows-container');
 
-        // 1. Statutory 80C Rows (Ordering Logic)
+        // 1. Statutory 80C Rows
         let epfRow = container80c.querySelector('.row-80c-statutory-epf');
         if (basicValue > 0) {
             const epfAmt = Math.round(basicValue * 0.12);
@@ -123,9 +123,10 @@ const TaxController = {
             otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
             homePrincipal: principalInput,
             homeInterest: parseFloat(document.getElementById('home-interest')?.value) || 0,
-            stampDuty: parseFloat(document.getElementById('stamp-duty')?.value) || 0,
-            occupancy: document.getElementById('property-occupancy')?.value || 'self-occupied',
-            isUnderConstruction: document.getElementById('is-under-construction')?.checked || false,
+            stampDuty: parseFloat(document.getElementById('loan-stamp-duty')?.value) || 0,
+            occupancy: document.getElementById('loan-occupancy')?.value || 'self-occupied',
+            // LOGIC CHANGE: Check for 'under-construction' string
+            isUnderConstruction: document.getElementById('loan-possession')?.value === 'under-construction',
             healthSelf: parseFloat(document.getElementById('80d-self').value) || 0,
             healthParents: parseFloat(document.getElementById('80d-parents').value) || 0,
             parentsSenior: document.getElementById('parents-senior').checked,
@@ -141,14 +142,14 @@ const TaxController = {
         if (!window.FinanceEngine) return;
         const selectedYear = document.getElementById('fy-selector').value;
 
-        // 3. HRA Calculation & UI Update
+        // 3. HRA Calculation
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(inputs.basic, inputs.hra, inputs.rent, inputs.isMetro);
         const hraDisplay = document.getElementById('hra-eligible-display');
         if (hraDisplay) {
             hraDisplay.innerText = `Eligible HRA: ₹${hraResult.actualExemption.toLocaleString('en-IN')}`;
         }
 
-        // 4. Perks/NPS UI Update (Corrected Law: 10% Old vs 14% New)
+        // 4. Perks/NPS Logic
         const perksData = inputs.perks.map(p => {
             let rawValue = p.value.toString();
             let actualAmt = rawValue.includes('%') ? (parseFloat(rawValue.replace('%', '')) / 100) * inputs.basic : parseFloat(rawValue) || 0;
@@ -157,7 +158,6 @@ const TaxController = {
             let eligibleNew = 0;
 
             if (p.type === "Corporate NPS") {
-                // LAW: 10% for Old Regime, 14% for New Regime
                 eligibleOld = Math.min(actualAmt, inputs.basic * 0.10);
                 eligibleNew = Math.min(actualAmt, inputs.basic * 0.14);
             } else {
@@ -174,13 +174,7 @@ const TaxController = {
                     label.innerText = `Eligible (Old): ₹${Math.round(eligibleOld).toLocaleString('en-IN')}`;
                 }
             }
-            
-            // We return an object so the TaxEngine can pick the right one per regime
-            return { 
-                type: p.type, 
-                amount: eligibleOld, 
-                amountNew: eligibleNew 
-            };
+            return { type: p.type, amount: eligibleOld, amountNew: eligibleNew };
         });
 
         // 5. Final Tax Engine Calls
@@ -197,11 +191,10 @@ const TaxController = {
 
         const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, inputs, inputs.basic);
 
-        // 6. Final UI Updates
+        // 6. UI Updates
         TaxController.updateSummary(newReg.tax, oldReg.tax, inputs.deductions80C.reduce((a, b) => a + b, 0));
         TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
     },
-    
     
     updateSummary: (newTax, oldTax, total80CCombined) => {
         document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
@@ -251,11 +244,11 @@ const TaxController = {
             otherIncome: document.getElementById('other-income').value,
             homePrincipal: document.getElementById('home-principal')?.value,
             homeInterest: document.getElementById('home-interest')?.value,
-            stampDuty: document.getElementById('stamp-duty')?.value,
+            stampDuty: document.getElementById('loan-stamp-duty')?.value,
             loanSanctionDate: document.getElementById('loan-sanction-date')?.value,
             propertyStampValue: document.getElementById('property-stamp-value')?.value,
-            propertyOccupancy: document.getElementById('property-occupancy')?.value,
-            isUnderConstruction: document.getElementById('is-under-construction')?.checked,
+            propertyOccupancy: document.getElementById('loan-occupancy')?.value,
+            isUnderConstruction: document.getElementById('loan-possession')?.value === 'under-construction',
             firstTimeBuyer: document.getElementById('first-time-buyer')?.checked,
             healthSelf: document.getElementById('80d-self').value,
             healthParents: document.getElementById('80d-parents').value,
@@ -313,11 +306,11 @@ const TaxController = {
             
             if(document.getElementById('home-principal')) document.getElementById('home-principal').value = inputs.homePrincipal || "";
             if(document.getElementById('home-interest')) document.getElementById('home-interest').value = inputs.homeInterest || "";
-            if(document.getElementById('stamp-duty')) document.getElementById('stamp-duty').value = inputs.stampDuty || "";
+            if(document.getElementById('loan-stamp-duty')) document.getElementById('loan-stamp-duty').value = inputs.stampDuty || "";
             if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = inputs.loanSanctionDate || "";
             if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = inputs.propertyStampValue || "";
-            if(document.getElementById('property-occupancy')) document.getElementById('property-occupancy').value = inputs.propertyOccupancy || "self-occupied";
-            if(document.getElementById('is-under-construction')) document.getElementById('is-under-construction').checked = inputs.isUnderConstruction || false;
+            if(document.getElementById('loan-occupancy')) document.getElementById('loan-occupancy').value = inputs.propertyOccupancy || "self-occupied";
+            if(document.getElementById('loan-possession')) document.getElementById('loan-possession').value = inputs.isUnderConstruction ? 'under-construction' : 'ready-to-move';
             if(document.getElementById('first-time-buyer')) document.getElementById('first-time-buyer').checked = inputs.firstTimeBuyer || false;
 
             document.getElementById('80d-self').value = inputs.healthSelf || "";
@@ -336,7 +329,7 @@ const TaxController = {
     }
 };
 
-// Global helper functions
+// Global helpers
 function add80CRow() { TaxController.add80CRow(); }
 function addPerkRow() { TaxController.addPerkRow(); }
 function runCalculator() { TaxController.calculateAll(); }
