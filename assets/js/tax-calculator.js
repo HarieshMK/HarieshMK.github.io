@@ -1,19 +1,17 @@
 /**
  * Controller for the Tax Calculator UI with Supabase Persistence
- * VERSION: 3.2 - Integrated Advanced Home Loan & 80EEA Logic
+ * VERSION: 3.3 - Auto-Locking Home Loan Principal & EPF
  */
 const TaxController = {
     isDirty: false,
 
     init: async () => {
-        console.log("Tax Controller 3.2 Initialized");
+        console.log("Tax Controller 3.3 Initialized");
 
-        // 1. Lifecycle Management
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) { e.preventDefault(); e.returnValue = ''; }
         });
 
-        // 2. Global Reactive Listener
         document.addEventListener('input', (e) => {
             if (e.target.matches('.dynamic-input, .perk-amount, .perk-type, .row-amount-80c, .row-select-80c, .home-loan-input')) {
                 TaxController.isDirty = true;
@@ -21,10 +19,8 @@ const TaxController = {
             }
         });
 
-        // 3. Load Persistence Data
         await TaxController.loadUserData();
 
-        // 4. Default State check
         const perksContainer = document.getElementById('perks-rows-container');
         if (perksContainer && perksContainer.children.length === 0) {
             TaxController.addPerkRow("Professional Tax", 2500);
@@ -34,7 +30,8 @@ const TaxController = {
     },
 
     // --- ROW MANAGEMENT (UI) ---
-    add80CRow: (type = "", amount = "", isLocked = false) => {
+    // Added 'customClass' to arguments to fix the crash
+    add80CRow: (type = "", amount = "", isLocked = false, customClass = "") => {
         const container = document.getElementById('80c-rows-container');
         const emptyMsg = document.getElementById('empty-80c-msg');
         if (emptyMsg) emptyMsg.style.display = 'none';
@@ -42,19 +39,21 @@ const TaxController = {
         const rowId = `row-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
         const row = document.createElement('div');
         row.id = rowId;
-        row.className = isLocked ? "row-80c-statutory" : "row-80c-manual";
+        
+        // Fix: Use the argument or default to empty string
+        row.className = (isLocked ? "row-80c-statutory " : "row-80c-manual ") + (customClass || "");
         row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
 
         const options = ["ELSS Funds", "PPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed Deposit (5yr)", "Term Insurance Premium"];
         
         row.innerHTML = `
-            <select class="row-select-80c dynamic-input" style="flex: 2;" ${isLocked ? 'disabled' : ''}>
-                <option value="EPF" ${type === 'EPF' ? 'selected' : ''}>EPF (Statutory)</option>
-                ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
+            <select class="row-select-80c dynamic-input" style="flex: 2; background-color: ${isLocked ? '#f3f4f6' : 'white'};" ${isLocked ? 'disabled' : ''}>
+                <option value="${type}" selected>${type}${isLocked ? ' (Auto)' : ''}</option>
+                ${!isLocked ? options.map(opt => `<option value="${opt}">${opt}</option>`).join('') : ''}
             </select>
             <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" value="${amount}" 
-                   style="flex: 1; text-align: right;" ${isLocked ? 'readonly' : ''}>
-            ${isLocked ? '<div style="width:30px; text-align:center; color:var(--calc-text-muted); font-size:0.7rem;"><i class="fas fa-lock"></i></div>' : 
+                   style="flex: 1; text-align: right; background-color: ${isLocked ? '#f3f4f6' : 'white'};" ${isLocked ? 'readonly' : ''}>
+            ${isLocked ? '<div style="width:30px; text-align:center; color:#9ca3af; font-size:0.8rem;"><i class="fas fa-lock"></i></div>' : 
             `<button type="button" onclick="document.getElementById('${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer; width: 30px;"><i class="fas fa-trash"></i></button>`}
         `;
         
@@ -91,10 +90,10 @@ const TaxController = {
         const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
         const container80c = document.getElementById('80c-rows-container');
 
-        // 1. Reactive Row Management (EPF & Home Loan Principal)
+        // 1. Reactive Management for Auto-Locked Rows
         
-        // Handle EPF Row
-        let epfRow = container80c.querySelector('.row-80c-statutory-epf'); // Added specific class
+        // EPF
+        let epfRow = container80c.querySelector('.row-80c-statutory-epf');
         if (basicValue > 0) {
             const epfAmt = Math.round(basicValue * 0.12);
             if (!epfRow) {
@@ -104,20 +103,18 @@ const TaxController = {
             }
         } else if (epfRow) { epfRow.remove(); }
 
-        // Handle Home Loan Principal Row
+        // Home Loan Principal
         const principalInput = parseFloat(document.getElementById('home-principal')?.value) || 0;
         let principalRow = container80c.querySelector('.row-80c-statutory-principal');
         if (principalInput > 0) {
             if (!principalRow) {
-                // We pass a custom label here by slightly tweaking add80CRow or handling it here
                 TaxController.add80CRow("Home Loan Principal", principalInput, true, "row-80c-statutory-principal");
             } else {
                 principalRow.querySelector('.row-amount-80c').value = principalInput;
             }
         } else if (principalRow) { principalRow.remove(); }
 
-
-        // 2. ADVANCED HOME LOAN CAPTURE
+        // 2. Logic & Engine Capture
         const loanSanctionDate = new Date(document.getElementById('loan-sanction-date')?.value);
         const stampValue = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
         const isFirstTimeBuyer = document.getElementById('first-time-buyer')?.checked || false;
@@ -127,7 +124,6 @@ const TaxController = {
                                 loanSanctionDate >= new Date('2019-04-01') && 
                                 loanSanctionDate <= new Date('2022-03-31');
 
-        // 3. Capture Data for Engine
         const inputs = {
             basic: basicValue,
             hra: parseFloat(document.getElementById('hra-received').value) || 0,
@@ -154,7 +150,6 @@ const TaxController = {
         const total80C = inputs.deductions80C.reduce((a, b) => a + b, 0);
         const selectedYear = document.getElementById('fy-selector').value;
 
-        // 4. Run Engines
         if (!window.FinanceEngine) return;
         const perksData = inputs.perks.map(p => {
             let actualAmt = p.value.toString().includes('%') ? (parseFloat(p.value.replace('%', '')) / 100) * inputs.basic : parseFloat(p.value) || 0;
@@ -174,14 +169,13 @@ const TaxController = {
             exemptHRA: hraResult.actualExemption
         }, perksData, inputs.basic);
 
-        TaxController.updateSummary(newReg.tax, oldReg.tax, total80C, 0, 0); // Note: principal/stamp are now inside total80C already
+        TaxController.updateSummary(newReg.tax, oldReg.tax, total80C, 0, 0); 
     },
     
-    updateSummary: (newTax, oldTax, manual80C, principal, stampDuty) => {
+    updateSummary: (newTax, oldTax, total80CCombined) => {
         document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
         document.getElementById('old-regime-tax').innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
 
-        const total80CCombined = manual80C + principal + stampDuty;
         const isNewBetter = newTax < oldTax;
         const recBox = document.getElementById('recommendation-box');
         
@@ -290,7 +284,6 @@ const TaxController = {
     }
 };
 
-// --- GLOBAL BRIDGES ---
 function add80CRow() { TaxController.add80CRow(); }
 function addPerkRow() { TaxController.addPerkRow(); }
 function runCalculator() { TaxController.calculateAll(); }
