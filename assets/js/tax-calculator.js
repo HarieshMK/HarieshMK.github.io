@@ -2,6 +2,7 @@
  * Controller for the Tax Calculator UI with Supabase Persistence
  * VERSION: 3.3 - Auto-Locking Home Loan Principal & EPF
  */
+
 const TaxController = {
     isDirty: false,
 
