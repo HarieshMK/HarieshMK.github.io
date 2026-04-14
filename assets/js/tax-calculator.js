@@ -99,6 +99,7 @@ const TaxController = {
         const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
         const container80c = document.getElementById('80c-rows-container');
 
+        // 1. Statutory 80C Rows (Ordering Logic)
         let epfRow = container80c.querySelector('.row-80c-statutory-epf');
         if (basicValue > 0) {
             const epfAmt = Math.round(basicValue * 0.12);
@@ -113,14 +114,7 @@ const TaxController = {
             else principalRow.querySelector('.row-amount-80c').value = principalInput;
         } else if (principalRow) principalRow.remove();
 
-        const loanSanctionDate = new Date(document.getElementById('loan-sanction-date')?.value);
-        const stampValue = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
-        const isFirstTimeBuyer = document.getElementById('first-time-buyer')?.checked || false;
-        
-        const isEligible80EEA = isFirstTimeBuyer && stampValue <= 4500000 && 
-                                loanSanctionDate >= new Date('2019-04-01') && 
-                                loanSanctionDate <= new Date('2022-03-31');
-
+        // 2. Capture all Inputs
         const inputs = {
             basic: basicValue,
             hra: parseFloat(document.getElementById('hra-received').value) || 0,
@@ -132,12 +126,12 @@ const TaxController = {
             stampDuty: parseFloat(document.getElementById('stamp-duty')?.value) || 0,
             occupancy: document.getElementById('property-occupancy')?.value || 'self-occupied',
             isUnderConstruction: document.getElementById('is-under-construction')?.checked || false,
-            isEligible80EEA: isEligible80EEA,
             healthSelf: parseFloat(document.getElementById('80d-self').value) || 0,
             healthParents: parseFloat(document.getElementById('80d-parents').value) || 0,
             parentsSenior: document.getElementById('parents-senior').checked,
             npsExtra: parseFloat(document.getElementById('nps-extra').value) || 0,
             perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
+                rowRef: row,
                 type: row.querySelector('.perk-type').value,
                 value: row.querySelector('.perk-amount').value
             })).filter(p => p.type),
@@ -145,27 +139,50 @@ const TaxController = {
         };
 
         if (!window.FinanceEngine) return;
-
         const selectedYear = document.getElementById('fy-selector').value;
+
+        // 3. HRA Calculation & UI Update
+        const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(inputs.basic, inputs.hra, inputs.rent, inputs.isMetro);
+        const hraDisplay = document.getElementById('hra-eligible-display');
+        if (hraDisplay) {
+            hraDisplay.innerText = `Eligible HRA: ₹${hraResult.actualExemption.toLocaleString('en-IN')}`;
+        }
+
+        // 4. Perks/NPS UI Update (The "Missing" Loop)
         const perksData = inputs.perks.map(p => {
-            let actualAmt = p.value.toString().includes('%') ? (parseFloat(p.value.replace('%', '')) / 100) * inputs.basic : parseFloat(p.value) || 0;
-            return { type: p.type, amount: actualAmt };
+            let rawValue = p.value.toString();
+            let actualAmt = rawValue.includes('%') ? (parseFloat(rawValue.replace('%', '')) / 100) * inputs.basic : parseFloat(rawValue) || 0;
+            
+            // Limit Corporate NPS to 10% of basic
+            let eligibleAmt = p.type === "Corporate NPS" ? Math.min(actualAmt, inputs.basic * 0.10) : actualAmt;
+            
+            // Update the UI label next to the row
+            const label = p.rowRef.querySelector('.perk-eligible');
+            if (label) label.innerText = `Eligible: ₹${Math.round(eligibleAmt).toLocaleString('en-IN')}`;
+            
+            return { type: p.type, amount: eligibleAmt };
         });
 
-        const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, (inputs.basic + inputs.hra + inputs.otherIncome), {
+        // 5. Final Tax Engine Calls
+        const grossSalary = inputs.basic + inputs.hra + inputs.otherIncome;
+        
+        const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(selectedYear, grossSalary, {
             ...inputs,
             section80C: inputs.deductions80C.reduce((a, b) => a + b, 0),
             npsSelf: inputs.npsExtra,
             section80D: inputs.healthSelf + inputs.healthParents,
-            homeLoanInterest: inputs.isUnderConstruction ? 0 : inputs.homeInterest
+            homeLoanInterest: inputs.isUnderConstruction ? 0 : inputs.homeInterest,
+            exemptHRA: hraResult.actualExemption
         }, perksData, inputs.basic);
 
-        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, (inputs.basic + inputs.hra + inputs.otherIncome), perksData, inputs, inputs.basic);
+        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, inputs, inputs.basic);
 
+        // 6. Final UI Updates
         TaxController.updateSummary(newReg.tax, oldReg.tax, inputs.deductions80C.reduce((a, b) => a + b, 0));
         TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
     },
-
+    
+    
     updateSummary: (newTax, oldTax, total80CCombined) => {
         document.getElementById('new-regime-tax').innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
         document.getElementById('old-regime-tax').innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
