@@ -122,7 +122,7 @@ permalink: /tax-calculator/
                 </select>
             </div>
 
-            <div id="clp-note" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
+            <div id="under-construction-msg" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
                 <i class="fas fa-info-circle"></i> You are not eligible for deductions yet. Once you get possession, you can claim the pre-construction interest in 5 equal portions. Chin up! :)
             </div>
 
