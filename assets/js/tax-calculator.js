@@ -99,10 +99,25 @@ const TaxController = {
     const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
     const container80c = document.getElementById('80c-rows-container');
 
-    // --- 1. HOME LOAN STATE CHECK ---
+    // --- 1. HOME LOAN STATE & 80EEA UI CHECK ---
     const hasHomeLoan = document.getElementById('has-home-loan')?.checked;
-    const isUnderConstruction = document.getElementById('loan-possession')?.value === 'under-construction';
-    const isCompleted = hasHomeLoan && !isUnderConstruction;
+    // Get the actual value from the dropdown
+    const loanPossessionValue = document.getElementById('loan-possession')?.value; 
+    const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
+    const additionalLoanCard = document.getElementById('additional-loan-card');
+    
+    // UI Trigger for 80EEA Card
+    if (sanctionDateVal && additionalLoanCard) {
+        const sDate = new Date(sanctionDateVal);
+        const startLimit = new Date('2019-04-01');
+        const endLimit = new Date('2022-03-31');
+        
+        // Logic: Show card only if date is in range
+        additionalLoanCard.style.display = (sDate >= startLimit && sDate <= endLimit) ? 'block' : 'none';
+    }
+    
+    // Logic: Possession is only "completed" if the checkbox is ON and dropdown is "completed"
+    const isCompleted = hasHomeLoan && (loanPossessionValue === 'completed');
 
     // --- 2. STATUTORY 80C ROWS (EPF & Principal) ---
     // Handle EPF
@@ -225,18 +240,22 @@ const TaxController = {
         
         // 6. UI Updates
         TaxController.updateSummary(newReg.tax, oldReg.tax, inputs.deductions80C.reduce((a, b) => a + b, 0));
-        TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
-        
-        const hraWarning = document.getElementById('hra-loan-conflict-warning');
-        if (hraWarning) {
-            const isClaimingHRA = inputs.rent > 0;
+            TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
             
-            // Updated Logic: Check if it's completed AND the occupancy is specifically 'self' or 'self-occupied'
-            const isClaimingSelfOccupied = isCompleted && 
-                                          (inputs.occupancy === 'self' || inputs.occupancy === 'self-occupied');
-            
-            hraWarning.style.display = (isClaimingHRA && isClaimingSelfOccupied) ? 'block' : 'none';
-        }
+            const hraWarning = document.getElementById('hra-loan-conflict-warning');
+            if (hraWarning) {
+                const isClaimingHRA = inputs.rent > 0;
+                const isOccupancySelf = (inputs.occupancy === 'self' || inputs.occupancy === 'self-occupied');
+                
+                // FIX: The warning only shows if:
+                // 1. User pays rent AND 
+                // 2. Home Loan checkbox is TICKED AND 
+                // 3. Possession is COMPLETED AND 
+                // 4. Occupancy is SELF
+                const showWarning = isClaimingHRA && hasHomeLoan && isCompleted && isOccupancySelf;
+                
+                hraWarning.style.display = showWarning ? 'block' : 'none';
+            }
         const occupancy = document.getElementById('loan-occupancy')?.value || 'self';
         const eligible24b = (occupancy === 'self' || occupancy === 'self-occupied') 
                             ? Math.min(inputs.homeInterest, 200000) 
