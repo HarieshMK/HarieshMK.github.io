@@ -337,7 +337,6 @@ permalink: /tax-calculator/
     });
     
     // --- UI HELPERS ---
-    const clpNote = document.getElementById('clp-note');
     const rowsContainer = document.getElementById('80c-rows-container');
     const emptyMsg = document.getElementById('empty-80c-msg');
 
@@ -442,6 +441,13 @@ permalink: /tax-calculator/
         opacity: 0.7;
         cursor: not-allowed;
     }
+    #hra-loan-conflict-warning {
+    animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
     #mobile-tax-bar {
         display: none;
