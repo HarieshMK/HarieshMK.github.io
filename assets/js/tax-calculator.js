@@ -183,32 +183,22 @@ const TaxController = {
             hraDisplay.innerText = `Eligible HRA: ₹${hraResult.actualExemption.toLocaleString('en-IN')}`;
         }
 
-        // 4. Perks/NPS Logic
+        // 4. Perks/NPS Logic - Aligned with Engine Config
         const perksData = inputs.perks.map(p => {
             let rawValue = p.value.toString();
             let actualAmt = rawValue.includes('%') ? (parseFloat(rawValue.replace('%', '')) / 100) * inputs.basic : parseFloat(rawValue) || 0;
             
-            let eligibleOld = 0;
-            let eligibleNew = 0;
-
-            if (p.type === "Corporate NPS") {
-                eligibleOld = Math.min(actualAmt, inputs.basic * 0.10);
-                eligibleNew = Math.min(actualAmt, inputs.basic * 0.14);
-            } else {
-                eligibleOld = actualAmt;
-                eligibleNew = 0; 
-            }
-            
+            // UI labels only (Engine handles the actual math)
             const label = p.rowRef.querySelector('.perk-eligible');
             if (label) {
                 if (p.type === "Corporate NPS") {
-                    label.innerHTML = `Eligible:<br>Old (10%): ₹${Math.round(eligibleOld).toLocaleString('en-IN')}<br>New (14%): ₹${Math.round(eligibleNew).toLocaleString('en-IN')}`;
-                    label.style.lineHeight = "1.2";
+                    label.innerHTML = `Eligible:<br>Old (10%): ₹${Math.round(Math.min(actualAmt, inputs.basic * 0.10)).toLocaleString('en-IN')}<br>New (14%): ₹${Math.round(Math.min(actualAmt, inputs.basic * 0.14)).toLocaleString('en-IN')}`;
                 } else {
-                    label.innerText = `Eligible (Old): ₹${Math.round(eligibleOld).toLocaleString('en-IN')}`;
+                    label.innerText = `Eligible (Old): ₹${Math.round(actualAmt).toLocaleString('en-IN')}`;
                 }
             }
-            return { type: p.type, amount: eligibleOld, amountNew: eligibleNew };
+            // Just return the type and the total amount paid
+            return { type: p.type, amount: actualAmt }; 
         });
 
         // 5. Final Tax Engine Calls
@@ -222,11 +212,17 @@ const TaxController = {
             healthParents: inputs.healthParents,
             parentsSenior: inputs.parentsSenior,
             homeLoanInterest: inputs.isUnderConstruction ? 0 : inputs.homeInterest,
+            extraLoanInterest: inputs.extraLoanInterest, // Explicitly passed for 80EEA
             exemptHRA: hraResult.actualExemption
         }, perksData, inputs.basic);
 
-        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, inputs, inputs.basic);
+        // For New Regime, we pass 'inputs' directly which now contains 'occupancy' and 'homeLoanInterest'
+        const newReg = FinanceEngine.TaxEngine.calculateNewRegime(selectedYear, grossSalary, perksData, {
+            ...inputs,
+            homeLoanInterest: inputs.homeInterest // Ensure key matches Engine's expectations
+        }, inputs.basic);
 
+        
         // 6. UI Updates
         TaxController.updateSummary(newReg.tax, oldReg.tax, inputs.deductions80C.reduce((a, b) => a + b, 0));
         TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
