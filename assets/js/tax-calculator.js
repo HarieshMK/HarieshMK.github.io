@@ -226,10 +226,15 @@ const TaxController = {
         // 6. UI Updates
         TaxController.updateSummary(newReg.tax, oldReg.tax, inputs.deductions80C.reduce((a, b) => a + b, 0));
         TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
+        
         const hraWarning = document.getElementById('hra-loan-conflict-warning');
         if (hraWarning) {
             const isClaimingHRA = inputs.rent > 0;
-            const isClaimingSelfOccupied = isCompleted && inputs.occupancy === 'self';
+            
+            // Updated Logic: Check if it's completed AND the occupancy is specifically 'self' or 'self-occupied'
+            const isClaimingSelfOccupied = isCompleted && 
+                                          (inputs.occupancy === 'self' || inputs.occupancy === 'self-occupied');
+            
             hraWarning.style.display = (isClaimingHRA && isClaimingSelfOccupied) ? 'block' : 'none';
         }
         const occupancy = document.getElementById('loan-occupancy')?.value || 'self';
