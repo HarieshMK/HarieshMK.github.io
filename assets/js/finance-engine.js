@@ -114,7 +114,7 @@ FinanceEngine.TaxEngine = {
         const perksConfig = yearData.perkRules;
 
         let totalExemptions = config.stdDeduction;
-        let other80C = (deductions.section80C || 0) + (deductions.homePrincipal || 0) + (deductions.stampDuty || 0);
+        let other80C = deductions.section80C || 0;
 
         perks.forEach(p => {
             const rule = perksConfig[p.type];
@@ -148,29 +148,35 @@ FinanceEngine.TaxEngine = {
             }
         }
         
-        const limit80D = deductions.parentsSenior ? 
-            (config.limits.section80D_Self + config.limits.section80D_SeniorParents) : 
-            (config.limits.section80D_Self + (config.limits.section80D_Parents || 25000));
-        const capped80D = Math.min(deductions.section80D || 0, limit80D);
+        // --- IMPROVED 80D LOGIC ---
+        const selfLimit = config.limits.section80D_Self || 25000;
+        const parentsLimit = deductions.parentsSenior 
+            ? (config.limits.section80D_SeniorParents || 50000) 
+            : (config.limits.section80D_Parents || 25000);
+        
+        const cappedSelf80D = Math.min(deductions.healthSelf || 0, selfLimit);
+        const cappedParents80D = Math.min(deductions.healthParents || 0, parentsLimit);
+        const totalCapped80D = cappedSelf80D + cappedParents80D;
 
-        const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + interest24b + interest80EEA + capped80D + (deductions.exemptHRA || 0);
+        const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + interest24b + interest80EEA + totalCapped80D + (deductions.exemptHRA || 0);
+
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
 
         let tax = 0;
         if (netTaxable > config.rebateLimit) {
             const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            tax = (netTaxable <= 500000) ? Math.max(0, slabTax - config.maxRebate) : slabTax;
+            tax = (netTaxable <= config.rebateLimit) ? Math.max(0, slabTax - config.maxRebate) : slabTax;
         }
        
         return {
-            tax: tax + (tax * (yearData.cessRate || TAX_CONFIG.cessRate)),
-            netTaxable,
-            totalDeductions,
-            appliedDeductions: {
-                homeInterestSection24: interest24b,
-                homeInterest80EEA: interest80EEA,
-                section80C: cappedOther80C,
-                section80D: capped80D
+        tax: tax + (tax * (yearData.cessRate || TAX_CONFIG.cessRate)),
+        netTaxable,
+        totalDeductions,
+        appliedDeductions: {
+            homeInterestSection24: interest24b,
+            homeInterest80EEA: interest80EEA,
+            section80C: cappedOther80C,
+            section80D: totalCapped80D
             }
         };
     }
