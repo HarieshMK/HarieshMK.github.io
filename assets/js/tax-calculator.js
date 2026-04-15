@@ -145,7 +145,19 @@ const TaxController = {
         isUnderConstruction: isUnderConstruction,
         homeInterest: isCompleted ? (parseFloat(document.getElementById('home-interest')?.value) || 0) : 0,
         homePrincipal: isCompleted ? principalInput : 0,
-        extraLoanInterest: parseFloat(document.getElementById('extra-loan-amount')?.value) || 0, // For 80EEA
+        extraLoanInterest: (() => {
+        const sDateVal = document.getElementById('loan-sanction-date')?.value;
+        if (!sDateVal) return 0;
+        
+        const sDate = new Date(sDateVal);
+        const startLimit = new Date('2019-04-01');
+        const endLimit = new Date('2022-03-31');
+        
+        // Only return value if it falls within the 80EEA window
+        return (sDate >= startLimit && sDate <= endLimit) 
+               ? (parseFloat(document.getElementById('extra-loan-amount')?.value) || 0) 
+               : 0;
+        })(),
         occupancy: document.getElementById('loan-occupancy')?.value || 'self',
         
         healthSelf: parseFloat(document.getElementById('80d-self').value) || 0,
@@ -206,7 +218,9 @@ const TaxController = {
             ...inputs,
             section80C: inputs.deductions80C.reduce((a, b) => a + b, 0),
             npsSelf: inputs.npsExtra,
-            section80D: inputs.healthSelf + inputs.healthParents,
+            healthSelf: inputs.healthSelf,
+            healthParents: inputs.healthParents,
+            parentsSenior: inputs.parentsSenior,
             homeLoanInterest: inputs.isUnderConstruction ? 0 : inputs.homeInterest,
             exemptHRA: hraResult.actualExemption
         }, perksData, inputs.basic);
@@ -221,6 +235,15 @@ const TaxController = {
             const isClaimingHRA = inputs.rent > 0;
             const isClaimingSelfOccupied = isCompleted && inputs.occupancy === 'self';
             hraWarning.style.display = (isClaimingHRA && isClaimingSelfOccupied) ? 'block' : 'none';
+        }
+        const occupancy = document.getElementById('loan-occupancy')?.value || 'self';
+        const eligible24b = (occupancy === 'self' || occupancy === 'self-occupied') 
+                            ? Math.min(inputs.homeInterest, 200000) 
+                            : inputs.homeInterest;
+        
+        const display24b = document.getElementById('eligible-24b-display');
+        if (display24b) {
+            display24b.innerText = `Eligible u/s 24b: ₹${eligible24b.toLocaleString('en-IN')}`;
         }
     },
     
