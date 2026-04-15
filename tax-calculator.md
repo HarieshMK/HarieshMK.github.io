@@ -130,10 +130,13 @@ permalink: /tax-calculator/
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div>
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy</label>
-                        <select id="loan-occupancy" class="dynamic-input" style="width: 100%; margin-top: 5px;">
-                            <option value="self">Self-Occupied</option>
-                            <option value="let-out">Let-out (Rented)</option>
+                        <select id="loan-occupancy" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="updateLoanUI()">
+                        <option value="self">Self-Occupied</option>
+                        <option value="let-out">Let-out (Rented)</option>
                         </select>
+                        <div id="hra-loan-conflict-warning" style="display: none; font-size: 0.7rem; color: #fbbf24; margin-top: 8px; background: rgba(251, 191, 36, 0.1); padding: 8px; border-radius: 4px; border-left: 2px solid #fbbf24;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> You are claiming both HRA and Self-Occupied property. Ensure your rented house and owned house are in different locations to avoid IT scrutiny.
+                    </div>
                     </div>
                     <div>
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
@@ -188,9 +191,9 @@ permalink: /tax-calculator/
             </p>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div style="flex-grow: 1;">
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest Amount (Above 2L)</label>
-                    <input type="number" id="extra-loan-amount" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal">
-                </div>
+                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Total Home Loan Interest Paid</label>
+                <input type="number" id="extra-loan-amount" class="dynamic-input" placeholder="Enter total interest" style="width: 100%; margin-top: 5px;" inputmode="decimal">
+            </div>
             </div>
             <div style="margin-top: 10px; font-size: 0.7rem; color: #fbbf24;">
                 <i class="fas fa-info-circle"></i> This is applicable only for the Old Tax Regime.
