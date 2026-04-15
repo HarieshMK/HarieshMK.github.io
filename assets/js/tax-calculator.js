@@ -14,7 +14,7 @@ const TaxController = {
         });
 
         document.addEventListener('input', (e) => {
-            if (e.target.matches('.dynamic-input, .perk-amount, .perk-type, .row-amount-80c, .row-select-80c, .home-loan-input')) {
+            if (e.target.matches('.dynamic-input, .perk-amount, .perk-type, .row-amount-80c, .row-select-80c, .home-loan-input, #has-home-loan')) {
                 TaxController.isDirty = true;
                 TaxController.calculateAll();
             }
@@ -96,48 +96,70 @@ const TaxController = {
 
     // --- CALCULATION ENGINE ---
     calculateAll: () => {
-        const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
-        const container80c = document.getElementById('80c-rows-container');
+    const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
+    const container80c = document.getElementById('80c-rows-container');
 
-        // 1. Statutory 80C Rows
-        let epfRow = container80c.querySelector('.row-80c-statutory-epf');
-        if (basicValue > 0) {
-            const epfAmt = Math.round(basicValue * 0.12);
-            if (!epfRow) TaxController.add80CRow("Employee PF", epfAmt, true, "row-80c-statutory-epf");
-            else epfRow.querySelector('.row-amount-80c').value = epfAmt;
-        } else if (epfRow) epfRow.remove();
+    // --- 1. HOME LOAN STATE CHECK ---
+    const hasHomeLoan = document.getElementById('has-home-loan')?.checked;
+    const isUnderConstruction = document.getElementById('loan-possession')?.value === 'under-construction';
+    const isCompleted = hasHomeLoan && !isUnderConstruction;
 
-        const principalInput = parseFloat(document.getElementById('home-principal')?.value) || 0;
-        let principalRow = container80c.querySelector('.row-80c-statutory-principal');
-        if (principalInput > 0) {
-            if (!principalRow) TaxController.add80CRow("Home Loan Principal", principalInput, true, "row-80c-statutory-principal");
-            else principalRow.querySelector('.row-amount-80c').value = principalInput;
-        } else if (principalRow) principalRow.remove();
+    // --- 2. STATUTORY 80C ROWS (EPF & Principal) ---
+    // Handle EPF
+    let epfRow = container80c.querySelector('.row-80c-statutory-epf');
+    if (basicValue > 0) {
+        const epfAmt = Math.round(basicValue * 0.12);
+        if (!epfRow) TaxController.add80CRow("Employee PF", epfAmt, true, "row-80c-statutory-epf");
+        else epfRow.querySelector('.row-amount-80c').value = epfAmt;
+    } else if (epfRow) epfRow.remove();
 
-        // 2. Capture all Inputs
-        const inputs = {
-            basic: basicValue,
-            hra: parseFloat(document.getElementById('hra-received').value) || 0,
-            rent: parseFloat(document.getElementById('rent-paid').value) || 0,
-            isMetro: document.getElementById('is-metro').value === 'true',
-            otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
-            homePrincipal: principalInput,
-            homeInterest: parseFloat(document.getElementById('home-interest')?.value) || 0,
-            stampDuty: parseFloat(document.getElementById('loan-stamp-duty')?.value) || 0,
-            occupancy: document.getElementById('loan-occupancy')?.value || 'self-occupied',
-            // LOGIC CHANGE: Check for 'under-construction' string
-            isUnderConstruction: document.getElementById('loan-possession')?.value === 'under-construction',
-            healthSelf: parseFloat(document.getElementById('80d-self').value) || 0,
-            healthParents: parseFloat(document.getElementById('80d-parents').value) || 0,
-            parentsSenior: document.getElementById('parents-senior').checked,
-            npsExtra: parseFloat(document.getElementById('nps-extra').value) || 0,
-            perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
-                rowRef: row,
-                type: row.querySelector('.perk-type').value,
-                value: row.querySelector('.perk-amount').value
-            })).filter(p => p.type),
-            deductions80C: Array.from(document.querySelectorAll('.row-amount-80c')).map(input => parseFloat(input.value) || 0)
-        };
+    // Handle Home Loan Principal (Only if possession is completed)
+    const principalInput = parseFloat(document.getElementById('home-principal')?.value) || 0;
+    let principalRow = container80c.querySelector('.row-80c-statutory-principal');
+    
+    if (isCompleted && principalInput > 0) {
+        if (!principalRow) TaxController.add80CRow("Home Loan Principal", principalInput, true, "row-80c-statutory-principal");
+        else principalRow.querySelector('.row-amount-80c').value = principalInput;
+    } else if (principalRow) {
+        principalRow.remove();
+    }
+
+    // Handle Stamp Duty (Part of 80C)
+    const stampDutyInput = parseFloat(document.getElementById('loan-stamp-duty')?.value) || 0;
+    let stampRow = container80c.querySelector('.row-80c-statutory-stamp');
+    if (isCompleted && stampDutyInput > 0) {
+        if (!stampRow) TaxController.add80CRow("Stamp Duty", stampDutyInput, true, "row-80c-statutory-stamp");
+        else stampRow.querySelector('.row-amount-80c').value = stampDutyInput;
+    } else if (stampRow) stampRow.remove();
+
+    // --- 3. CAPTURE INPUTS FOR ENGINE ---
+    const inputs = {
+        basic: basicValue,
+        hra: parseFloat(document.getElementById('hra-received').value) || 0,
+        rent: parseFloat(document.getElementById('rent-paid').value) || 0,
+        isMetro: document.getElementById('is-metro').value === 'true',
+        otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
+        
+        // Home Loan Specifics
+        hasHomeLoan: hasHomeLoan,
+        isUnderConstruction: isUnderConstruction,
+        homeInterest: isCompleted ? (parseFloat(document.getElementById('home-interest')?.value) || 0) : 0,
+        homePrincipal: isCompleted ? principalInput : 0,
+        extraLoanInterest: parseFloat(document.getElementById('extra-loan-amount')?.value) || 0, // For 80EEA
+        occupancy: document.getElementById('loan-occupancy')?.value || 'self',
+        
+        healthSelf: parseFloat(document.getElementById('80d-self').value) || 0,
+        healthParents: parseFloat(document.getElementById('80d-parents').value) || 0,
+        parentsSenior: document.getElementById('parents-senior').checked,
+        npsExtra: parseFloat(document.getElementById('nps-extra').value) || 0,
+        
+        perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
+            rowRef: row,
+            type: row.querySelector('.perk-type').value,
+            value: row.querySelector('.perk-amount').value
+        })).filter(p => p.type),
+        deductions80C: Array.from(document.querySelectorAll('.row-amount-80c')).map(input => parseFloat(input.value) || 0)
+    };
 
         if (!window.FinanceEngine) return;
         const selectedYear = document.getElementById('fy-selector').value;
@@ -194,6 +216,12 @@ const TaxController = {
         // 6. UI Updates
         TaxController.updateSummary(newReg.tax, oldReg.tax, inputs.deductions80C.reduce((a, b) => a + b, 0));
         TaxController.updateDeductionDisplay(oldReg.appliedDeductions || {});
+        const hraWarning = document.getElementById('hra-loan-conflict-warning');
+        if (hraWarning) {
+            const isClaimingHRA = inputs.rent > 0;
+            const isClaimingSelfOccupied = isCompleted && inputs.occupancy === 'self';
+            hraWarning.style.display = (isClaimingHRA && isClaimingSelfOccupied) ? 'block' : 'none';
+        }
     },
     
     updateSummary: (newTax, oldTax, total80CCombined) => {
@@ -242,12 +270,15 @@ const TaxController = {
             rent: document.getElementById('rent-paid').value,
             isMetro: document.getElementById('is-metro').value,
             otherIncome: document.getElementById('other-income').value,
+            hasHomeLoan: document.getElementById('has-home-loan')?.checked,
+            possessionStatus: document.getElementById('loan-possession')?.value,
             homePrincipal: document.getElementById('home-principal')?.value,
             homeInterest: document.getElementById('home-interest')?.value,
             stampDuty: document.getElementById('loan-stamp-duty')?.value,
             loanSanctionDate: document.getElementById('loan-sanction-date')?.value,
             propertyStampValue: document.getElementById('property-stamp-value')?.value,
             propertyOccupancy: document.getElementById('loan-occupancy')?.value,
+            extraLoanInterest: document.getElementById('extra-loan-amount')?.value,
             isUnderConstruction: document.getElementById('loan-possession')?.value === 'under-construction',
             firstTimeBuyer: document.getElementById('first-time-buyer')?.checked,
             healthSelf: document.getElementById('80d-self').value,
@@ -304,15 +335,42 @@ const TaxController = {
             document.getElementById('is-metro').value = inputs.isMetro || "false";
             document.getElementById('other-income').value = inputs.otherIncome || "";
             
-            if(document.getElementById('home-principal')) document.getElementById('home-principal').value = inputs.homePrincipal || "";
-            if(document.getElementById('home-interest')) document.getElementById('home-interest').value = inputs.homeInterest || "";
-            if(document.getElementById('loan-stamp-duty')) document.getElementById('loan-stamp-duty').value = inputs.stampDuty || "";
-            if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = inputs.loanSanctionDate || "";
-            if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = inputs.propertyStampValue || "";
-            if(document.getElementById('loan-occupancy')) document.getElementById('loan-occupancy').value = inputs.propertyOccupancy || "self-occupied";
-            if(document.getElementById('loan-possession')) document.getElementById('loan-possession').value = inputs.isUnderConstruction ? 'under-construction' : 'ready-to-move';
-            if(document.getElementById('first-time-buyer')) document.getElementById('first-time-buyer').checked = inputs.firstTimeBuyer || false;
+           // --- CLEANED HOME LOAN UI BLOCK ---
+            if (document.getElementById('has-home-loan')) {
+                const hasLoan = inputs.hasHomeLoan || false;
+                document.getElementById('has-home-loan').checked = hasLoan;
+                document.getElementById('home-loan-wizard').style.display = hasLoan ? 'block' : 'none';
+            }
+            
+            // Helper to set values only if the element exists
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val || "";
+            };
+            
+            setVal('home-principal', inputs.homePrincipal);
+            setVal('home-interest', inputs.homeInterest);
+            setVal('loan-stamp-duty', inputs.stampDuty);
+            setVal('loan-sanction-date', inputs.loanSanctionDate);
+            setVal('property-stamp-value', inputs.propertyStampValue);
+            setVal('extra-loan-amount', inputs.extraLoanInterest); // Aligned with captureInputs
+            
+            if (document.getElementById('loan-occupancy')) 
+                document.getElementById('loan-occupancy').value = inputs.propertyOccupancy || "self-occupied";
+            
+            if (document.getElementById('loan-possession')) {
+                // Priority: 1. possessionStatus string, 2. boolean fallback, 3. default
+                document.getElementById('loan-possession').value = inputs.possessionStatus || 
+                    (inputs.isUnderConstruction ? 'under-construction' : 'ready-to-move');
+                
+                // Refresh the UI to hide/show specific fields based on the loaded state
+                if (typeof updateLoanUI === 'function') updateLoanUI(); 
+            }
+            
+            if (document.getElementById('first-time-buyer')) 
+                document.getElementById('first-time-buyer').checked = inputs.firstTimeBuyer || false;
 
+            
             document.getElementById('80d-self').value = inputs.healthSelf || "";
             document.getElementById('80d-parents').value = inputs.healthParents || "";
             document.getElementById('parents-senior').checked = inputs.parentsSenior || false;
