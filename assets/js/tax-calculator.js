@@ -118,6 +118,7 @@ const TaxController = {
     
     // Logic: Possession is only "completed" if the checkbox is ON and dropdown is "completed"
     const isCompleted = hasHomeLoan && (loanPossessionValue === 'completed');
+    const isUnderConstruction = hasHomeLoan && (loanPossessionValue === 'under-construction');
 
     // --- 2. STATUTORY 80C ROWS (EPF & Principal) ---
     // Handle EPF
@@ -399,14 +400,14 @@ const TaxController = {
             setVal('extra-loan-amount', inputs.extraLoanInterest); // Aligned with captureInputs
             
             if (document.getElementById('loan-occupancy')) 
-                document.getElementById('loan-occupancy').value = inputs.propertyOccupancy || "self-occupied";
+                document.getElementById('loan-occupancy').value = inputs.propertyOccupancy || "self";
             
             if (document.getElementById('loan-possession')) {
-                // Priority: 1. possessionStatus string, 2. boolean fallback, 3. default
-                document.getElementById('loan-possession').value = inputs.possessionStatus || 
-                    (inputs.isUnderConstruction ? 'under-construction' : 'ready-to-move');
+                // Standardize to the strings used in your calculateAll logic
+                const savedStatus = inputs.possessionStatus || (inputs.isUnderConstruction ? 'under-construction' : 'completed');
+                document.getElementById('loan-possession').value = savedStatus;
                 
-                // Refresh the UI to hide/show specific fields based on the loaded state
+                // Crucial: Trigger the UI wizard visibility
                 if (typeof updateLoanUI === 'function') updateLoanUI(); 
             }
             
