@@ -104,7 +104,10 @@ FinanceEngine.TaxEngine = {
             tax = Math.min(slabTax, netTaxable - config.rebateLimit);
         }
 
-        return { tax: tax + (tax * TAX_CONFIG.cessRate), netTaxable, totalExemptions, perkBreakdown };
+        const cess = yearData.cessRate !== undefined ? yearData.cessRate : TAX_CONFIG.cessRate;
+const totalTax = tax + (tax * cess);
+
+return {tax: totalTax, netTaxable, totalExemptions, perkBreakdown };
     },
 
     calculateOldRegime: (selectedYear, grossIncome, deductions, perks, basicSalary = 0) => {
@@ -167,17 +170,19 @@ FinanceEngine.TaxEngine = {
             const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
             tax = (netTaxable <= config.rebateLimit) ? Math.max(0, slabTax - config.maxRebate) : slabTax;
         }
-       
-        return {
-        tax: tax + (tax * (yearData.cessRate || TAX_CONFIG.cessRate)),
-        netTaxable,
-        totalDeductions,
-        appliedDeductions: {
-            homeInterestSection24: interest24b,
-            homeInterest80EEA: interest80EEA,
-            section80C: cappedOther80C,
-            section80D: totalCapped80D
-            }
-        };
+           const cess = yearData.cessRate !== undefined ? yearData.cessRate : TAX_CONFIG.cessRate;
+            const totalTax = tax + (tax * cess);
+           
+            return {
+                tax: totalTax,
+                netTaxable,
+                totalDeductions,
+                appliedDeductions: {
+                    homeInterestSection24: interest24b,
+                    homeInterest80EEA: interest80EEA,
+                    section80C: cappedOther80C,
+                    section80D: totalCapped80D
+                }
+            };    
     }
 };
