@@ -142,9 +142,9 @@ FinanceEngine.TaxEngine = {
         if (deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') {
             interest24b = totalInterestPaid; 
         } else {
-            interest24b = Math.min(totalInterestPaid, 200000);
+            interest24b = Math.min(totalInterestPaid, config.limits.section24b || 200000);
             if (deductions.extraLoanInterest > 0) {
-                interest80EEA = Math.min(deductions.extraLoanInterest, 150000);
+                interest80EEA = Math.min(deductions.extraLoanInterest, config.limits.section80EEA || 150000);
             }
         }
         
