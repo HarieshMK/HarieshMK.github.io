@@ -179,6 +179,23 @@ permalink: /tax-calculator/
             </div>
         </div>
     </div> 
+    <div id="additional-loan-card" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #4ade80;">
+            <h3 id="extra-loan-label" style="margin-top: 0; color: #4ade80;">
+                <i class="fas fa-house-user" style="margin-right: 10px;"></i>Section 80EEA
+            </h3>
+            <p id="extra-loan-desc" style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">
+                Additional deduction for first-time home buyers.
+            </p>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="flex-grow: 1;">
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest Amount (Above 2L)</label>
+                    <input type="number" id="extra-loan-amount" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal">
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.7rem; color: #fbbf24;">
+                <i class="fas fa-info-circle"></i> This is applicable only for the Old Tax Regime.
+            </div>
+        </div>
 
    <div style="flex: 1 1 300px;">
     <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
@@ -317,15 +334,9 @@ permalink: /tax-calculator/
     });
     
     // --- UI HELPERS ---
-    const clpCheck = document.getElementById('is-under-construction');
     const clpNote = document.getElementById('clp-note');
     const rowsContainer = document.getElementById('80c-rows-container');
     const emptyMsg = document.getElementById('empty-80c-msg');
-
-    clpCheck.addEventListener('change', (e) => {
-        clpNote.style.display = e.target.checked ? 'block' : 'none';
-        runCalculator(); // Trigger calc on checkbox change
-    });
 
     function setupToggle(headerId, contentId, iconId) {
         const header = document.getElementById(headerId);
