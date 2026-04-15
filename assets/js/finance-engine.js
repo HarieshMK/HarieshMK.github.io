@@ -104,8 +104,8 @@ FinanceEngine.TaxEngine = {
             tax = Math.min(slabTax, netTaxable - config.rebateLimit);
         }
 
-        const cess = yearData.cessRate !== undefined ? yearData.cessRate : TAX_CONFIG.cessRate;
-const totalTax = tax + (tax * cess);
+        const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : (TAX_CONFIG.cessRate || 0.04);
+        const totalTax = tax + (tax * cess);
 
 return {tax: totalTax, netTaxable, totalExemptions, perkBreakdown };
     },
