@@ -296,6 +296,55 @@ permalink: /tax-calculator/
                 }
             });
         });
+        // Function to handle perk-specific UI feedback
+        function handlePerkUIFeedback(inputElement, perkName) {
+            const value = cleanNum(inputElement.value);
+            const selectedYear = document.getElementById('fy-selector').value;
+            const config = TAX_CONFIG[selectedYear] || TAX_CONFIG["2026-27"];
+            
+            // 1. MEAL COUPON WARNING LOGIC
+            if (perkName === "Meal Coupons") {
+                let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
+                
+                // Create warning div if it doesn't exist
+                if (!warningDiv) {
+                    warningDiv = document.createElement('div');
+                    warningDiv.className = 'perk-limit-warning';
+                    inputElement.parentNode.appendChild(warningDiv);
+                }
+        
+                const limit = config.perkRules["Meal Coupons"].govtLimit;
+                
+                if (value > limit) {
+                    warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Standard exempt limit is ₹${limit.toLocaleString('en-IN')}. Amounts above this may be treated as taxable perquisites unless specifically allowed by your employer's policy.`;
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            }
+        
+            // 2. FUEL & MOBILE PLACEHOLDER/HINT LOGIC
+            if (perkName === "Fuel Allowances" || perkName === "Mobile & Internet") {
+                inputElement.classList.add('actuals-hint');
+                inputElement.placeholder = "Enter amount as per bills";
+            }
+        }
+        
+        // Hook this into your existing input listener
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('dynamic-input')) {
+                // Find the perk name if this input is inside a perk row
+                const row = e.target.closest('.perk-row'); // Assuming your rows have this class
+                if (row) {
+                    const perkSelect = row.querySelector('select');
+                    if (perkSelect) handlePerkUIFeedback(e.target, perkSelect.value);
+                }
+                
+                if (typeof runCalculator === 'function') {
+                    runCalculator();
+                }
+            }
+        });
         
         // --- HOME LOAN ASSISTANT LOGIC ---
         function toggleLoanWizard() {
@@ -458,7 +507,12 @@ permalink: /tax-calculator/
         border-left: 2px solid #fbbf24;
         display: none; /* Hidden by default */
     }
-    
+    /* Add this to your <style> section */
+    .perk-amount::placeholder {
+        font-size: 0.75rem;
+        color: var(--calc-text-muted);
+        opacity: 0.7;
+    }
     /* Style for inputs to show they are 'against bills' */
     .actuals-hint::placeholder {
         font-style: italic;
