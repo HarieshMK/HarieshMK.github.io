@@ -15,6 +15,15 @@ const TaxController = {
 
         document.addEventListener('input', (e) => {
             if (e.target.matches('.dynamic-input, .perk-amount, .perk-type, .row-amount-80c, .row-select-80c, .home-loan-input, #has-home-loan')) {
+
+                // If the change happened inside a perk row, trigger the UI feedback (warning)
+            const row = e.target.closest('.perk-row');
+            if (row && typeof handlePerkUIFeedback === 'function') {
+                const inputEl = row.querySelector('.perk-amount');
+                const typeEl = row.querySelector('.perk-type');
+                handlePerkUIFeedback(inputEl, typeEl.value);
+            }
+                
                 TaxController.isDirty = true;
                 TaxController.calculateAll();
             }
@@ -85,7 +94,10 @@ const TaxController = {
                 <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
                 ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>
-            <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" value="${value}" style="text-align: right;">
+            <div>
+                <input type="text" class="perk-amount dynamic-input" placeholder="Amt or %" value="${value}" style="text-align: right; width: 100%;">
+                <div class="perk-feedback" style="font-size: 0.7rem; margin-top: 4px;"></div>
+            </div>
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem; font-weight: bold;">₹ 0</div>
             <button type="button" onclick="document.getElementById('${rowId}').remove(); TaxController.calculateAll();" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>
         `;
