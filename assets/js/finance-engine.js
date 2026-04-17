@@ -79,7 +79,7 @@ FinanceEngine.TaxEngine = {
 
         // HOME LOAN: New Regime only allows deduction for Let-out Property
         if ((deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') && (deductions.homeLoanInterest > 0)) {
-            totalExemptions += deductions.homeLoanInterest;
+            totalExemptions += (deductions.homeInterest || deductions.homeLoanInterest || 0);
         }
 
         let perkBreakdown = [];
