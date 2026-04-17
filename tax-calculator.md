@@ -448,6 +448,22 @@ permalink: /tax-calculator/
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .perk-limit-warning {
+        font-size: 0.7rem;
+        color: #fbbf24;
+        margin-top: 4px;
+        background: rgba(251, 191, 36, 0.1);
+        padding: 6px;
+        border-radius: 4px;
+        border-left: 2px solid #fbbf24;
+        display: none; /* Hidden by default */
+    }
+    
+    /* Style for inputs to show they are 'against bills' */
+    .actuals-hint::placeholder {
+        font-style: italic;
+        opacity: 0.6;
+    }
 
     #mobile-tax-bar {
         display: none;
