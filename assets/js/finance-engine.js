@@ -78,7 +78,7 @@ FinanceEngine.TaxEngine = {
         let totalExemptions = config.stdDeduction;
 
         // HOME LOAN: New Regime only allows deduction for Let-out Property
-        if ((deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') && (deductions.homeLoanInterest > 0)) {
+        if ((deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') && (deductions.homeInterest > 0)) {
             totalExemptions += (deductions.homeInterest || deductions.homeLoanInterest || 0);
         }
 
@@ -167,8 +167,7 @@ return {tax: totalTax, netTaxable, totalExemptions, perkBreakdown };
 
         let tax = 0;
         if (netTaxable > config.rebateLimit) {
-            const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            tax = (netTaxable <= config.rebateLimit) ? Math.max(0, slabTax - config.maxRebate) : slabTax;
+            tax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
         }
            const cess = yearData.cessRate !== undefined ? yearData.cessRate : TAX_CONFIG.cessRate;
             const totalTax = tax + (tax * cess);
