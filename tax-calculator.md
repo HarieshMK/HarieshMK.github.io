@@ -126,19 +126,44 @@ permalink: /tax-calculator/
                 <i class="fas fa-info-circle"></i> You are not eligible for deductions yet. Once you get possession, you can claim the pre-construction interest in 5 equal portions. Chin up! :)
             </div>
 
-            <div id="completed-loan-fields">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy</label>
-                        <select id="loan-occupancy" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="updateLoanUI()">
+           <div id="completed-loan-fields">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy</label>
+                    <select id="loan-occupancy" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="updateLoanUI()">
                         <option value="self">Self-Occupied</option>
                         <option value="let-out">Let-out (Rented)</option>
-                        </select>
-                        <div id="hra-loan-conflict-warning" style="display: none; font-size: 0.7rem; color: #fbbf24; margin-top: 8px; background: rgba(251, 191, 36, 0.1); padding: 8px; border-radius: 4px; border-left: 2px solid #fbbf24;">
-                        <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> You are claiming both HRA and Self-Occupied property. Ensure your rented house and owned house are in different locations to avoid IT scrutiny.
+                    </select>
+                    
+                    <div id="hra-loan-conflict-warning" style="display: none; font-size: 0.7rem; color: #fbbf24; margin-top: 8px; background: rgba(251, 191, 36, 0.1); padding: 8px; border-radius: 4px; border-left: 2px solid #fbbf24;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> You are claiming both HRA and Self-Occupied property. Ensure your rented house and owned house are in different locations.
                     </div>
-                    </div>
-                    <div>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
+                    <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%; margin-top: 5px;">
+                </div>
+            </div>
+        
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest Paid (FY)</label>
+                    <input type="number" id="home-interest" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Principal Paid (FY)</label>
+                    <input type="number" id="home-principal" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;">
+                </div>
+            </div>
+        
+            <div id="eligible-24b-display" style="font-size: 0.75rem; color: #4ade80; margin-top: 10px; font-weight: bold;"></div>
+            <div id="extra-deductions-info" style="margin-top: 10px; font-size: 0.75rem; border-top: 1px dashed var(--calc-input-border); padding-top: 8px; display: none; color: var(--calc-text-muted);"></div>
+        
+            <div style="margin-top: 10px;">
+                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Stamp Duty Paid this Year?</label>
+                <input type="number" id="loan-stamp-duty" class="dynamic-input" placeholder="Optional" style="width: 100%; margin-top: 5px;">
+            </div>
+        </div>
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
                         <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%; margin-top: 5px;">
                     </div>
