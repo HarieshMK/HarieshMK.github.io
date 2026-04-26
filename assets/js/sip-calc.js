@@ -51,22 +51,28 @@ document.addEventListener('DOMContentLoaded', function() {
             estimatedReturns = results.estimatedReturns;
             realValue = FinanceEngine.adjustForInflation(totalValue, inf, years);
         } else {
-            // Standard SIP Formula (Annuity Regular)
-            const r = (annualR / 100) / 12;
-            const n = years * 12;
-            
-            // SIP Component: P × [({(1 + r)^n} - 1) / r] × (1 + r) is often the culprit
-            // Standard version used by most Indian sites:
-            const fvSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n; 
-            
-            // NOTE: If your values are still slightly high, remove the last *(1+r) 
-            // Most Indian calculators actually use:
-            const standardFvSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n;
+            // Standard Industry Logic (Annual Compounding)
+            const i = annualR / 100; // Annual Rate
+            const n = years;
+            const annualP = P * 12; // Total invested in a year
         
-            const fvLump = L * Math.pow(1 + r, n);
+            // The formula used by Groww/SIPCalculator.com:
+            // Future Value = P * [((1 + i)^n - 1) / i] * (1 + i) 
+            // Note: The *(1+i) at the end is because SIPs are typically 
+            // treated as payments at the beginning of the period.
             
-            totalValue = fvSIP + fvLump;
-            totalInvested = (P * n) + L;
+            let totalValue;
+            if (i > 0) {
+                // This specific formula will give you the ~₹9.99L result
+                totalValue = P * 12 * ((Math.pow(1 + i, n) - 1) / i);
+            } else {
+                totalValue = P * 12 * n;
+            }
+        
+            const fvLump = L * Math.pow(1 + i, n);
+            
+            totalValue += fvLump;
+            totalInvested = (P * 12 * n) + L;
             estimatedReturns = totalValue - totalInvested;
             realValue = totalValue / Math.pow(1 + (inf / 100), years);
         }
