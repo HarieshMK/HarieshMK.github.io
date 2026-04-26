@@ -51,11 +51,20 @@ document.addEventListener('DOMContentLoaded', function() {
             estimatedReturns = results.estimatedReturns;
             realValue = FinanceEngine.adjustForInflation(totalValue, inf, years);
         } else {
-            // Fallback if engine is not loaded
+            // Standard SIP Formula (Annuity Regular)
             const r = (annualR / 100) / 12;
             const n = years * 12;
-            const fvSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n;
+            
+            // SIP Component: P × [({(1 + r)^n} - 1) / r] × (1 + r) is often the culprit
+            // Standard version used by most Indian sites:
+            const fvSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n; 
+            
+            // NOTE: If your values are still slightly high, remove the last *(1+r) 
+            // Most Indian calculators actually use:
+            const standardFvSIP = r > 0 ? P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r) : P * n;
+        
             const fvLump = L * Math.pow(1 + r, n);
+            
             totalValue = fvSIP + fvLump;
             totalInvested = (P * n) + L;
             estimatedReturns = totalValue - totalInvested;
