@@ -84,21 +84,43 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof window.autoScaleNumbers === 'function') {
                 window.autoScaleNumbers();
             }
-            // Near the end of your calculate() function
-        if (elements.totalValue) {
-            const years = elements.yearsInput.value;
-            const futureDate = new Date();
-            futureDate.setFullYear(futureDate.getFullYear() + parseInt(years));
+            // Inside calculate() function
+            if (elements.totalValue) {
+                const years = parseFloat(elements.yearsInput.value) || 0;
+                
+                // Logic: Use Start Date if provided, otherwise use Today
+                const baseDate = (elements.dateInput && elements.dateInput.value) 
+                    ? new Date(elements.dateInput.value) 
+                    : new Date();
             
-            // Formatting the date to look nice (e.g., April 2051)
-            const options = { month: 'long', year: 'numeric' };
-            const dateString = futureDate.toLocaleDateString('en-IN', options);
-        
-            const messageElement = document.getElementById('future-message');
-            if (messageElement) {
-                messageElement.innerHTML = `Your estimated maturity of <strong>${elements.totalValue.innerText}</strong> is expected to be reached by <strong>${dateString}</strong>.`;
+                const futureDate = new Date(baseDate);
+                
+                // Add total months to handle fractional years accurately
+                const totalMonths = Math.round(years * 12);
+                futureDate.setMonth(futureDate.getMonth() + totalMonths);
+                
+                const day = futureDate.getDate();
+                const month = futureDate.toLocaleDateString('en-IN', { month: 'long' });
+                const year = futureDate.getFullYear();
+            
+                // Adding an ordinal suffix (st, nd, rd, th)
+                const getOrdinal = (d) => {
+                    if (d > 3 && d < 21) return 'th';
+                    switch (d % 10) {
+                        case 1:  return "st";
+                        case 2:  return "nd";
+                        case 3:  return "rd";
+                        default: return "th";
+                    }
+                };
+            
+                const messageElement = document.getElementById('future-message');
+                if (messageElement) {
+                    const maturityAmount = elements.totalValue.innerText;
+                    // The "Funny/Interactive" touch
+                    messageElement.innerHTML = `Set a reminder! Approximately <strong>${maturityAmount}</strong> is expected to land in your bank account on <strong>${month} ${day}${getOrdinal(day)}, ${year}</strong>. 🚀`;
+                }
             }
-        }
         } else {
             console.error("FinanceEngine not found.");
         }
