@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalValue;
         if (r > 0) {
             // This is the specific "Annuity Due" formula for 9.99L
-            totalValue = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+            totalValue = P * ((Math.pow(1 + r, n) - 1) / r);
             totalValue += L * Math.pow(1 + r, n);
         } else {
             totalValue = (P * n) + L;
