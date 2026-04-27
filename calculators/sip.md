@@ -98,7 +98,7 @@ Estimate the wealth you can create through monthly or yearly Systematic Investme
     <div class="result-item highlight">
       <div style="display: flex; align-items: center; gap: 6px;">
         <span>Expected Maturity amount</span>
-        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="The value may not be attractive, but closer to accurate.">
+        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="This value is calculated using CAGR approach. So, it may not be attractive, but closer to accurate.">
           <i class="fas fa-info-circle"></i>
         </span>
       </div>
