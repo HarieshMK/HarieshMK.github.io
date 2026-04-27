@@ -99,7 +99,21 @@ document.addEventListener('DOMContentLoaded', function() {
     if(elements.dateInput) {
         elements.dateInput.addEventListener('change', calculate);
     }
-
+    // Near the end of your calculate() function
+    if (elements.totalValue) {
+        const years = elements.yearsInput.value;
+        const futureDate = new Date();
+        futureDate.setFullYear(futureDate.getFullYear() + parseInt(years));
+        
+        // Formatting the date to look nice (e.g., April 2051)
+        const options = { month: 'long', year: 'numeric' };
+        const dateString = futureDate.toLocaleDateString('en-IN', options);
+    
+        const messageElement = document.getElementById('future-message');
+        if (messageElement) {
+            messageElement.innerHTML = `Your estimated maturity of <strong>${elements.totalValue.innerText}</strong> is expected to be reached by <strong>${dateString}</strong>.`;
+        }
+    }
     // Run once on load
     calculate();
 }); // End of DOMContentLoaded
