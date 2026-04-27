@@ -89,22 +89,29 @@ FinanceEngine.TaxEngine = {
     },
 
     // NEW: Asset-specific Tax Logic
-    calculateCapitalTax: function(gain, years, assetType = 'EQUITY_MF', userSlab = 0) {
-        if (gain <= 0) return 0;
-
-        if (assetType === 'EQUITY_MF') {
-            if (years < this.TaxConfig.EQUITY_MF.holdingPeriodForLongTerm) {
-                return gain * this.TaxConfig.EQUITY_MF.stcgRate;
-            } else {
-                const taxableGain = Math.max(0, gain - this.TaxConfig.EQUITY_MF.exemption);
-                return taxableGain * this.TaxConfig.EQUITY_MF.ltcgRate;
+        calculateCapitalTax: function(gain, years, assetName, userSlab = 0) {
+            if (gain <= 0) return 0;
+        
+            const asset = InvestmentRegistry[assetName];
+            const treatment = asset ? asset.taxTreatment : "EQUITY_CAPITAL_GAINS"; 
+        
+            if (treatment === "EQUITY_CAPITAL_GAINS") {
+                // Equity rules: < 1 year is STCG (20%), > 1 year is LTCG (12.5% after 1.25L)
+                if (years < 1) {
+                    return gain * 0.20; 
+                } else {
+                    const ltcgExemption = 125000;
+                    const taxableGain = Math.max(0, gain - ltcgExemption);
+                    return taxableGain * 0.125;
+                }
             }
+            
+            if (treatment === "SLAB_RATE") {
+                return gain * (userSlab / 100);
+            }
+        
+            return 0;
         }
-        if (assetType === 'FD') {
-            return gain * this.TaxConfig.FD.getRate(userSlab);
-        }
-        return 0;
-    },
 
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
