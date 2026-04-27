@@ -4,28 +4,59 @@
  */
 var FinanceEngine = {
     
-      calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
-        // 1. SCIENTIFIC GEOMETRIC RATE (SEBI Standard)
-        // Instead of (7.1 / 100) / 12, we find the rate that actually equals 7.1% per year
-        const r = Math.pow(1 + (annualRate / 100), 1/12) - 1;
-        const n = years * 12;
-        
-        // 2. We use 'Annuity Due' logic because SIPs happen at the start of the month
+      calculateFutureValue: function(investmentAmount, lumpSum, annualRate, years, frequency = 'monthly') {
+    // 1. Convert annual rate to decimal
+    const r_annual = annualRate / 100;
+    
+    let totalValue = 0;
+    let totalInvested = 0;
+    let n = 0; // Number of periods per year
+    let r_periodic = 0; // Interest rate per period
+
+    if (frequency === 'monthly') {
+        // --- MONTHLY SIP LOGIC ---
+        // SEBI Standard Geometric Rate: find 'r' such that (1+r)^12 = (1 + annualRate)
+        r_periodic = Math.pow(1 + r_annual, 1/12) - 1;
+        n = 12;
+        const totalPeriods = years * n;
+
+        // Annuity Due Formula (Investment at start of month)
         let fvSIP = 0;
-        if (r > 0) {
-            fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        if (r_periodic > 0) {
+            fvSIP = investmentAmount * ((Math.pow(1 + r_periodic, totalPeriods) - 1) / r_periodic) * (1 + r_periodic);
         } else {
-            fvSIP = monthlySIP * n;
+            fvSIP = investmentAmount * totalPeriods;
+        }
+
+        // Lump sum growth using periodic rate
+            const fvLumpSum = lumpSum * Math.pow(1 + r_periodic, totalPeriods);
+            
+            totalValue = fvSIP + fvLumpSum;
+            totalInvested = (investmentAmount * totalPeriods) + lumpSum;
+    
+        } else {
+            // --- YEARLY INVESTMENT LOGIC ---
+            r_periodic = r_annual; // Annual compounding
+            n = 1;
+            const totalPeriods = years * n;
+    
+            // Annuity Due Formula (Investment at start of year)
+            let fvYearly = 0;
+            if (r_periodic > 0) {
+                fvYearly = investmentAmount * ((Math.pow(1 + r_periodic, totalPeriods) - 1) / r_periodic) * (1 + r_periodic);
+            } else {
+                fvYearly = investmentAmount * totalPeriods;
+            }
+    
+            // Lump sum growth using annual rate
+            const fvLumpSum = lumpSum * Math.pow(1 + r_periodic, totalPeriods);
+    
+            totalValue = fvYearly + fvLumpSum;
+            totalInvested = (investmentAmount * totalPeriods) + lumpSum;
         }
     
-        // Lump sum compounding using the same scientific rate
-        const fvLumpSum = lumpSum * Math.pow(1 + r, n);
-        
-        const totalValue = fvSIP + fvLumpSum;
-        const totalInvested = (monthlySIP * n) + lumpSum;
-    
         return { 
-            totalValue: Math.round(totalValue), // Results in ~10.13 L
+            totalValue: Math.round(totalValue), 
             totalInvested: Math.round(totalInvested), 
             estimatedReturns: Math.round(totalValue - totalInvested) 
         };
