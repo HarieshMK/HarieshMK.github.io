@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
             const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
 
-            const format = (num) => Math.round(num).toLocaleString('en-IN');
+            const format = (num) => FinanceEngine.formatIndian(num);
             
             if(elements.totalInvested) elements.totalInvested.innerText = "₹" + format(results.totalInvested);
             if(elements.totalReturns) elements.totalReturns.innerText = "₹" + format(results.estimatedReturns);
