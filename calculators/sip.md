@@ -23,7 +23,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
         <label>Expected Return Rate (% p.a)</label>
         <input type="number" id="return-rate" value="10">
       </div>
-      <input type="range" id="return-rate-slider" min="1" max="30" step="0.5" value="10" class="slider">
+      <input type="range" id="return-rate-slider" min="1" max="20" step="0.1" value="10" class="slider">
     </div>
 
     <div class="input-group">
@@ -31,7 +31,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
         <label>Time Period (Years)</label>
         <input type="number" id="years" value="10">
       </div>
-      <input type="range" id="years-slider" min="1" max="40" step="1" value="10" class="slider">
+      <input type="range" id="years-slider" min="1" max="30" step="0.1" value="10" class="slider">
     </div>
 
     <div class="input-group">
@@ -47,7 +47,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
         <label>Expected Inflation (%) (Optional)</label>
         <input type="number" id="inflation-rate" value="6">
       </div>
-      <input type="range" class="slider" id="inflation-slider" min="0" max="15" step="0.5" value="6">
+      <input type="range" class="slider" id="inflation-slider" min="0" max="15" step="0.1" value="6">
     </div>
 
     <div class="input-group">
