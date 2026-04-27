@@ -93,13 +93,12 @@
 .segmented-control-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: 25px;
   width: 100%;
 }
 
 .segmented-control {
   display: inline-flex;
-  background: #f1f5f9; /* Match your input background */
+  background: #f1f5f9;
   padding: 4px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
@@ -115,28 +114,19 @@
   font-family: inherit;
   transition: all 0.2s ease;
   background: transparent;
-  color: #64748b; /* Muted text */
+  color: #64748b;
 }
 
 .toggle-btn.active {
-  background: #0ea5e9; /* Your primary brand blue */
+  background: #0ea5e9; /* Matches your slider color */
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
 }
 
-.toggle-btn:not(.active):hover {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-
-/* Dark Mode Integration */
+/* Dark Mode Support */
 .dark-theme .segmented-control {
-  background: #020617; /* Matches your dark input background */
+  background: #020617;
   border-color: #334155;
-}
-
-.dark-theme .toggle-btn {
-  color: #94a3b8;
 }
 
 .dark-theme .toggle-btn:not(.active):hover {
