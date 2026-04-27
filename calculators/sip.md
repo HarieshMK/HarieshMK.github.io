@@ -7,6 +7,23 @@ permalink: /calculators/sip/
 # SIP Calculator
 Estimate the wealth you can create through monthly Systematic Investment Plans.
 
+<div class="segmented-control-wrapper">
+  <div class="segmented-control">
+    <button id="btn-monthly" class="toggle-btn active" onclick="setFrequency('monthly')">Monthly</button>
+    <button id="btn-yearly" class="toggle-btn" onclick="setFrequency('yearly')">Yearly</button>
+  </div>
+</div>
+
+<div class="calculator-container">
+  <div class="calc-inputs">
+    <div class="input-group">
+      <div class="label-row">
+        <label id="investment-label">Monthly Investment (₹)</label>
+        <input type="number" id="monthly-sip" value="5000">
+      </div>
+      <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="5000" class="slider">
+    </div>
+
 <div class="calculator-container">
   <div class="calc-inputs">
     <div class="input-group">
