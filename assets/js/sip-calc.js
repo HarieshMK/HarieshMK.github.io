@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculate() {
+        console.log("Input Years:", elements.yearsInput.value);
+        console.log("Calculated Months (n):", parseFloat(elements.yearsInput.value) * 12);
         const P = parseFloat(elements.monthlySIP?.value) || 0;
         const L = parseFloat(elements.lumpSumInput?.value) || 0;
         const annualR = parseFloat(elements.returnRate?.value) || 0;
