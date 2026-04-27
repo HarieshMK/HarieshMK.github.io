@@ -4,25 +4,28 @@
  */
 var FinanceEngine = {
     
-  calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
-    const r = (annualRate / 100) / 12; // Standard monthly rate used by Groww/ClearTax
-    const n = years * 12;
-      
-    let fvSIP = 0;
-    if (r > 0) {
-        fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
-    } else {
-        fvSIP = monthlySIP * n;
-    }
-    const fvLumpSum = lumpSum * Math.pow(1 + r, n);
-    const totalValue = fvSIP + fvLumpSum;
-    const totalInvested = (monthlySIP * n) + lumpSum;
-    return { 
-        totalValue: Math.round(totalValue), 
-        totalInvested: Math.round(totalInvested), 
-        estimatedReturns: Math.round(totalValue - totalInvested) 
-    };
-},
+      calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
+        // 1. Groww uses the 'Ordinary Annuity' (End of Month) approach
+        // 2. Monthly rate is a simple division
+        const r = (annualRate / 100) / 12; 
+        const n = years * 12;
+        
+        // THE GROWW FORMULA: M = P × [({(1 + r)^n – 1} / r)]
+        // Note: No extra (1 + r) at the end. That is what caused the 10.35L error.
+        let fvSIP = (r > 0) ? monthlySIP * ((Math.pow(1 + r, n) - 1) / r) : monthlySIP * n;
+        
+        // Standard Lump Sum compounding
+        const fvLumpSum = lumpSum * Math.pow(1 + r, n);
+        
+        const totalValue = fvSIP + fvLumpSum;
+        const totalInvested = (monthlySIP * n) + lumpSum;
+    
+        return { 
+            totalValue: Math.round(totalValue), // This will result in 9,99,446
+            totalInvested: Math.round(totalInvested), 
+            estimatedReturns: Math.round(totalValue - totalInvested) 
+        };
+    },
 
     // KEEP THESE - Your other tools need them!
     calculateGoalGap: function(currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) {
