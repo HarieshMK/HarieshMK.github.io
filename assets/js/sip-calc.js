@@ -96,9 +96,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const insightElement = document.getElementById('inflation-insight');
                 const insightContainer = document.getElementById('inflation-insight-container');
                 
+                // Logic for the message
                 if (insightElement && inf > 0) {
+                    // Show the box by setting display to block
                     insightContainer.style.display = 'block';
-                    insightElement.innerHTML = `Note: ₹${fullMaturity} in the year ${year} will have the same purchasing power as <strong>₹${todayEquivalent}</strong> does today.`;
+                    
+                    // Set the dynamic content
+                    insightElement.innerHTML = `Note: <strong>₹${fullMaturity}</strong> in ${year} will buy you the same things that <strong>₹${todayEquivalent}</strong> can buy today, due to inflation.`;
                 } else {
                     insightContainer.style.display = 'none';
                 }
