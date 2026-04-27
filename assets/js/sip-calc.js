@@ -1,3 +1,46 @@
+// 1. Global State Tracker (Place this at the very top)
+let currentFrequency = 'monthly'; 
+
+// 2. The Toggle Handler (Needs to be window-scoped for the onclick in HTML)
+window.setFrequency = function(freq) {
+    if (currentFrequency === freq) return;
+    
+    currentFrequency = freq;
+    
+    // UI: Update active states of buttons
+    const btnMonthly = document.getElementById('btn-monthly');
+    const btnYearly = document.getElementById('btn-yearly');
+    if(btnMonthly) btnMonthly.classList.toggle('active', freq === 'monthly');
+    if(btnYearly) btnYearly.classList.toggle('active', freq === 'yearly');
+
+    // UI: Update Labels and Sliders
+    const label = document.getElementById('investment-label');
+    const slider = document.getElementById('monthly-sip-slider');
+    const input = document.getElementById('monthly-sip');
+
+    if (freq === 'yearly') {
+        if(label) label.innerText = "Yearly Amount (₹)";
+        if(slider) {
+            slider.max = 1200000; // 12 Lakhs
+            slider.step = 5000;
+        }
+        if(input) input.value = input.value * 12; // Auto-scale up
+    } else {
+        if(label) label.innerText = "Monthly Amount (₹)";
+        if(slider) {
+            slider.max = 100000; // 1 Lakh
+            slider.step = 500;
+        }
+        if(input) input.value = Math.round(input.value / 12); // Auto-scale down
+    }
+
+    if(slider && input) slider.value = input.value;
+    
+    // Trigger calculation (since calculate is defined inside the DOM listener, 
+    // we manually dispatch an event to the input to trigger the sync logic)
+    if(input) input.dispatchEvent(new Event('input'));
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Element Mapping
     const elements = {
@@ -25,13 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
         valueTodayDisplay: document.getElementById('value-today')
     };
 
-    function sync(input, slider) {
-        if(!input || !slider) return;
-        input.addEventListener('input', () => { slider.value = input.value; calculate(); });
-        slider.addEventListener('input', () => { input.value = slider.value; calculate(); });
-    }
-
-    function calculate() {
+    // Make calculate available globally so setFrequency can call it directly if needed
+    window.calculate = function() {
         // --- DEBUG: INITIAL INPUTS ---
         console.group("--- [SIP-CALC] NEW CALCULATION ---");
         
@@ -41,12 +79,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const years = parseFloat(elements.yearsInput?.value) || 0;
         const inf = parseFloat(elements.inflationInput?.value) || 0;
 
-        console.log("Inputs:", { monthly: P, lumpSum: L, rate: annualR, years: years, inflation: inf });
+        console.log("Inputs:", { mode: currentFrequency, amount: P, lumpSum: L, rate: annualR, years: years });
 
         if (typeof FinanceEngine !== 'undefined') {
             try {
-                // 1. MAIN CALCULATION
-                const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
+                // 3. UPDATED MAIN CALCULATION (Added currentFrequency)
+                const results = FinanceEngine.calculateFutureValue(P, L, annualR, years, currentFrequency);
                 const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
 
                 console.log("Calculation Results:", results);
@@ -67,12 +105,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     const totalMonths = years * 12;
                     const effectiveMonths = Math.max(0, Math.min(monthsPassed, totalMonths));
 
-                    console.log("Progress Tracking:", { monthsPassed, effectiveMonths });
-
                     if (effectiveMonths > 0 && elements.progressSection) {
                         elements.progressSection.style.display = 'block';
-                        const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12);
-                        const investedToday = (P * effectiveMonths) + L;
+                        // Use years (effectiveMonths/12) for the engine
+                        const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12, currentFrequency);
+                        
+                        // Invested Today Calculation needs frequency check
+                        let investedToday = L;
+                        if (currentFrequency === 'monthly') {
+                            investedToday += (P * effectiveMonths);
+                        } else {
+                            investedToday += (P * Math.floor(effectiveMonths / 12));
+                        }
+                        
                         const gainToday = progressResults.totalValue - investedToday;
 
                         if (elements.completedTenure) elements.completedTenure.innerText = `${Math.floor(effectiveMonths / 12)}y ${effectiveMonths % 12}m`;
@@ -102,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const day = futureDate.getDate();
                     const month = futureDate.toLocaleDateString('en-IN', { month: 'long' });
                     const year = futureDate.getFullYear();
-                    const exactAmount = Math.round(results.totalValue).toLocaleString('en-IN');
+                    const exactAmount = format(Math.round(results.totalValue));
 
                     const getOrdinal = (d) => {
                         if (d > 3 && d < 21) return 'th';
@@ -122,10 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (err) {
                 console.error("[SIP-CALC] Error during calculation:", err);
             }
-        } else {
-            console.error("[SIP-CALC] Critical Failure: FinanceEngine library not loaded.");
         }
         console.groupEnd();
+    };
+
+    function sync(input, slider) {
+        if(!input || !slider) return;
+        input.addEventListener('input', () => { slider.value = input.value; window.calculate(); });
+        slider.addEventListener('input', () => { input.value = slider.value; window.calculate(); });
     }
 
     // Initialize Syncing
@@ -135,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
     sync(elements.lumpSumInput, elements.lumpSumSlider);
     sync(elements.inflationInput, elements.inflationSlider);
     
-    if(elements.dateInput) elements.dateInput.addEventListener('change', calculate);
+    if(elements.dateInput) elements.dateInput.addEventListener('change', window.calculate);
 
-    calculate();
+    window.calculate();
 });
