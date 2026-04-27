@@ -51,31 +51,25 @@ document.addEventListener('DOMContentLoaded', function() {
             estimatedReturns = results.estimatedReturns;
             realValue = FinanceEngine.adjustForInflation(totalValue, inf, years);
         } else {
-            // Standard Industry Logic (Annual Compounding)
-            const i = annualR / 100; // Annual Rate
-            const n = years;
-            const annualP = P * 12; // Total invested in a year
-        
-            // The formula used by Groww/SIPCalculator.com:
-            // Future Value = P * [((1 + i)^n - 1) / i] * (1 + i) 
-            // Note: The *(1+i) at the end is because SIPs are typically 
-            // treated as payments at the beginning of the period.
-            
-            let totalValue;
-            if (i > 0) {
-                // This specific formula will give you the ~₹9.99L result
-                totalValue = P * 12 * ((Math.pow(1 + i, n) - 1) / i);
-            } else {
-                totalValue = P * 12 * n;
-            }
-        
-            const fvLump = L * Math.pow(1 + i, n);
-            
-            totalValue += fvLump;
-            totalInvested = (P * 12 * n) + L;
-            estimatedReturns = totalValue - totalInvested;
-            realValue = totalValue / Math.pow(1 + (inf / 100), years);
+        // Standard Industry Logic (Annual Compounding)
+        const i = annualR / 100;
+        const n = years;
+        const annualP = P * 12;
+    
+        // REMOVE the word 'let' here. Use the variable declared at the top of the function.
+        if (i > 0) {
+            totalValue = annualP * ((Math.pow(1 + i, n) - 1) / i);
+        } else {
+            totalValue = annualP * n;
         }
+    
+        const fvLump = L * Math.pow(1 + i, n);
+        totalValue += fvLump; // This now correctly updates the top-level totalValue
+        
+        totalInvested = (P * 12 * n) + L;
+        estimatedReturns = totalValue - totalInvested;
+        realValue = totalValue / Math.pow(1 + (inf / 100), years);
+    }
 
         // --- UI UPDATES ---
         const format = (num) => {
