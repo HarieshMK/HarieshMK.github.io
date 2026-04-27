@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
         yearsSlider: document.getElementById('years-slider'),
         invToday: document.getElementById('inv-today'),
         gainToday: document.getElementById('gain-today'),
-        // Note: Using your sip.md ID 'initial-lump-sum'
         lumpSumInput: document.getElementById('initial-lump-sum'),
         lumpSumSlider: document.getElementById('lump-sum-slider'),
         inflationInput: document.getElementById('inflation-rate'),
@@ -35,63 +34,62 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculate() {
-    const P = parseFloat(elements.monthlySIP?.value) || 0;
-    const L = parseFloat(elements.lumpSumInput?.value) || 0;
-    const annualR = parseFloat(elements.returnRate?.value) || 0;
-    const years = parseFloat(elements.yearsInput?.value) || 0;
-    const inf = parseFloat(elements.inflationInput?.value) || 0;
+        // Log to console so you can see it working
+        console.log("SIP Calculation running...");
 
-    // 1. MAIN CALCULATION (Maturity Value)
-    // We only use the FinanceEngine now. No fallback.
-    const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
-    const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
+        const P = parseFloat(elements.monthlySIP?.value) || 0;
+        const L = parseFloat(elements.lumpSumInput?.value) || 0;
+        const annualR = parseFloat(elements.returnRate?.value) || 0;
+        const years = parseFloat(elements.yearsInput?.value) || 0;
+        const inf = parseFloat(elements.inflationInput?.value) || 0;
 
-    // Update UI for Maturity
-    const format = (num) => Math.round(num).toLocaleString('en-IN');
-    
-    if(elements.totalInvested) elements.totalInvested.innerText = "₹" + format(results.totalInvested);
-    if(elements.totalReturns) elements.totalReturns.innerText = "₹" + format(results.estimatedReturns);
-    if(elements.totalValue) elements.totalValue.innerText = "₹" + format(results.totalValue);
-    if(elements.realFuture) elements.realFuture.innerText = "₹" + format(realValue);
+        // Ensure FinanceEngine exists before calling
+        if (typeof FinanceEngine !== 'undefined') {
+            // 1. MAIN CALCULATION (Maturity Value)
+            const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
+            const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
 
-    // 2. PROGRESS LOGIC (Current Value)
-    // This section handles the "As on today" numbers based on Start Date
-    if (elements.dateInput && elements.dateInput.value) {
-        const startDate = new Date(elements.dateInput.value);
-        const today = new Date();
-        
-        let monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
-        const totalMonths = years * 12;
-        const effectiveMonths = Math.max(0, Math.min(monthsPassed, totalMonths));
-
-        if (effectiveMonths > 0 && elements.progressSection) {
-            elements.progressSection.style.display = 'block';
+            const format = (num) => Math.round(num).toLocaleString('en-IN');
             
-            // We use the same engine but with "months passed" instead of "total years"
-            const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12);
-            
-            const investedToday = (P * effectiveMonths) + L;
-            const gainToday = progressResults.totalValue - investedToday;
+            if(elements.totalInvested) elements.totalInvested.innerText = "₹" + format(results.totalInvested);
+            if(elements.totalReturns) elements.totalReturns.innerText = "₹" + format(results.estimatedReturns);
+            if(elements.totalValue) elements.totalValue.innerText = "₹" + format(results.totalValue);
+            if(elements.realFuture) elements.realFuture.innerText = "₹" + format(realValue);
 
-            if (elements.completedTenure) elements.completedTenure.innerText = `${Math.floor(effectiveMonths / 12)}y ${effectiveMonths % 12}m`;
-            
-            // CRITICAL: Ensure 'valueTodayDisplay' is NOT the same ID as 'totalValue'
-            if (elements.valueTodayDisplay) elements.valueTodayDisplay.innerText = "₹" + format(progressResults.totalValue);
-            if (elements.invToday) elements.invToday.innerText = "₹" + format(investedToday);
-            if (elements.gainToday) elements.gainToday.innerText = "₹" + format(gainToday);
+            // 2. PROGRESS LOGIC (Current Value)
+            if (elements.dateInput && elements.dateInput.value) {
+                const startDate = new Date(elements.dateInput.value);
+                const today = new Date();
+                
+                let monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
+                const totalMonths = years * 12;
+                const effectiveMonths = Math.max(0, Math.min(monthsPassed, totalMonths));
 
-        } else if (elements.progressSection) {
-            elements.progressSection.style.display = 'none';
-        }
-    }
-}
+                if (effectiveMonths > 0 && elements.progressSection) {
+                    elements.progressSection.style.display = 'block';
+                    
+                    const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12);
+                    const investedToday = (P * effectiveMonths) + L;
+                    const gainToday = progressResults.totalValue - investedToday;
 
-        // --- AUTO-SCALE TRIGGER ---
-        // We look for autoScaleNumbers in the global window object (defined in script.js)
-        if (typeof window.autoScaleNumbers === 'function') {
-            window.autoScaleNumbers();
-        } else if (typeof autoScaleNumbers === 'function') {
-            autoScaleNumbers();
+                    if (elements.completedTenure) elements.completedTenure.innerText = `${Math.floor(effectiveMonths / 12)}y ${effectiveMonths % 12}m`;
+                    if (elements.valueTodayDisplay) elements.valueTodayDisplay.innerText = "₹" + format(progressResults.totalValue);
+                    if (elements.invToday) elements.invToday.innerText = "₹" + format(investedToday);
+                    if (elements.gainToday) elements.gainToday.innerText = "₹" + format(gainToday);
+
+                } else if (elements.progressSection) {
+                    elements.progressSection.style.display = 'none';
+                }
+            }
+
+            // --- AUTO-SCALE TRIGGER (Inside calculate) ---
+            if (typeof window.autoScaleNumbers === 'function') {
+                window.autoScaleNumbers();
+            } else if (typeof autoScaleNumbers === 'function') {
+                autoScaleNumbers();
+            }
+        } else {
+            console.error("FinanceEngine not found. Check finance-engine.js");
         }
     }
 
@@ -106,5 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.dateInput.addEventListener('change', calculate);
     }
 
+    // Run once on load
     calculate();
 });
