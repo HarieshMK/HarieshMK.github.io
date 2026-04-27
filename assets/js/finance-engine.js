@@ -3,58 +3,42 @@
  * This file is UI-agnostic (no DOM references).
  */
 var FinanceEngine = {
-    
-      calculateFutureValue: function(investmentAmount, lumpSum, annualRate, years, frequency = 'monthly') {
-    // 1. Convert annual rate to decimal
-    const r_annual = annualRate / 100;
-    
-    let totalValue = 0;
-    let totalInvested = 0;
-    let n = 0; // Number of periods per year
-    let r_periodic = 0; // Interest rate per period
 
-    if (frequency === 'monthly') {
-        // --- MONTHLY SIP LOGIC ---
-        // SEBI Standard Geometric Rate: find 'r' such that (1+r)^12 = (1 + annualRate)
-        r_periodic = Math.pow(1 + r_annual, 1/12) - 1;
-        n = 12;
-        const totalPeriods = years * n;
+    calculateFutureValue: function(investmentAmount, lumpSum, annualRate, years, frequency = 'monthly') {
+        const r_annual = annualRate / 100;
+        let totalValue = 0;
+        let totalInvested = 0;
+        let n = 0; 
+        let r_periodic = 0; 
 
-        // Annuity Due Formula (Investment at start of month)
-        let fvSIP = 0;
-        if (r_periodic > 0) {
-            fvSIP = investmentAmount * ((Math.pow(1 + r_periodic, totalPeriods) - 1) / r_periodic) * (1 + r_periodic);
-        } else {
-            fvSIP = investmentAmount * totalPeriods;
-        }
+        if (frequency === 'monthly') {
+            // SEBI Standard Geometric Rate: find 'r' such that (1+r)^12 = (1 + annualRate)
+            r_periodic = Math.pow(1 + r_annual, 1/12) - 1;
+            n = 12;
+            const totalPeriods = years * n;
 
-        // Lump sum growth using periodic rate
+            let fvSIP = (r_periodic > 0) 
+                ? investmentAmount * ((Math.pow(1 + r_periodic, totalPeriods) - 1) / r_periodic) * (1 + r_periodic)
+                : investmentAmount * totalPeriods;
+
             const fvLumpSum = lumpSum * Math.pow(1 + r_periodic, totalPeriods);
-            
             totalValue = fvSIP + fvLumpSum;
             totalInvested = (investmentAmount * totalPeriods) + lumpSum;
-    
+
         } else {
-            // --- YEARLY INVESTMENT LOGIC ---
-            r_periodic = r_annual; // Annual compounding
+            r_periodic = r_annual; 
             n = 1;
             const totalPeriods = years * n;
-    
-            // Annuity Due Formula (Investment at start of year)
-            let fvYearly = 0;
-            if (r_periodic > 0) {
-                fvYearly = investmentAmount * ((Math.pow(1 + r_periodic, totalPeriods) - 1) / r_periodic) * (1 + r_periodic);
-            } else {
-                fvYearly = investmentAmount * totalPeriods;
-            }
-    
-            // Lump sum growth using annual rate
+
+            let fvYearly = (r_periodic > 0)
+                ? investmentAmount * ((Math.pow(1 + r_periodic, totalPeriods) - 1) / r_periodic) * (1 + r_periodic)
+                : investmentAmount * totalPeriods;
+
             const fvLumpSum = lumpSum * Math.pow(1 + r_periodic, totalPeriods);
-    
             totalValue = fvYearly + fvLumpSum;
             totalInvested = (investmentAmount * totalPeriods) + lumpSum;
         }
-    
+
         return { 
             totalValue: Math.round(totalValue), 
             totalInvested: Math.round(totalInvested), 
@@ -83,24 +67,55 @@ var FinanceEngine = {
     },
 
     formatIndian: function(num) {
-        // If it's a Crore
-        if (num >= 10000000) {return (num / 10000000).toFixed(2) + " Cr";}
-        // If it's a Lakh (matches "9.99 L" style)
-        if (num >= 100000) {return (num / 100000).toFixed(2) + " L";}
-        // For thousands, use the standard Indian comma format (e.g., 10,000)
+        if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
+        if (num >= 100000) return (num / 100000).toFixed(2) + " L";
         return Math.round(num).toLocaleString('en-IN');
     }
-    };
+};
 
 /* Tax Calculation Module */
 FinanceEngine.TaxEngine = {
+    // NEW: Capital Gains & FD Tax Constants
+    TaxConfig: {
+        EQUITY_MF: {
+            stcgRate: 0.20, 
+            ltcgRate: 0.125, 
+            exemption: 125000,
+            holdingPeriodForLongTerm: 1 // year
+        },
+        FD: {
+            getRate: (slab) => slab / 100 
+        }
+    },
+
+    // NEW: Asset-specific Tax Logic
+    calculateCapitalTax: function(gain, years, assetType = 'EQUITY_MF', userSlab = 0) {
+        if (gain <= 0) return 0;
+
+        if (assetType === 'EQUITY_MF') {
+            if (years < this.TaxConfig.EQUITY_MF.holdingPeriodForLongTerm) {
+                return gain * this.TaxConfig.EQUITY_MF.stcgRate;
+            } else {
+                const taxableGain = Math.max(0, gain - this.TaxConfig.EQUITY_MF.exemption);
+                return taxableGain * this.TaxConfig.EQUITY_MF.ltcgRate;
+            }
+        }
+        if (assetType === 'FD') {
+            return gain * this.TaxConfig.FD.getRate(userSlab);
+        }
+        return 0;
+    },
+
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
         const limit1 = hraReceived;
         const limit2 = basic * metroFactor;
         const limit3 = Math.max(0, (rentPaid * 12) - (basic * 0.1));
-        const finalExemption = Math.min(limit1, limit2, limit3);
-        return { actualExemption: finalExemption, maxPossibleExemption: Math.min(limit2, limit3), isLimitedByHRA: limit1 < Math.min(limit2, limit3) };
+        return { 
+            actualExemption: Math.min(limit1, limit2, limit3), 
+            maxPossibleExemption: Math.min(limit2, limit3), 
+            isLimitedByHRA: limit1 < Math.min(limit2, limit3) 
+        };
     },
 
     calculateBaseSlabTax: (income, slabs) => {
@@ -119,48 +134,40 @@ FinanceEngine.TaxEngine = {
     },
 
     calculateNewRegime: (selectedYear, grossIncome, perks, deductions = {}, basicSalary = 0) => {
-        perks = perks || [];
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.newRegime;
         const perksConfig = yearData.perkRules;
-
         let totalExemptions = config.stdDeduction;
 
-        // HOME LOAN: New Regime only allows deduction for Let-out Property
         if ((deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') && (deductions.homeLoanInterest > 0)) {
             totalExemptions += (deductions.homeLoanInterest || 0);
         }
 
         let perkBreakdown = [];
-        perks.forEach(p => {
+        (perks || []).forEach(p => {
             let eligible = 0;
             const rule = perksConfig[p.type];
             if (rule && (rule.regime === "both" || rule.regime === "new" || !rule.regime)) {
-                if (p.type === "Corporate NPS") {
-                    eligible = Math.min(p.amount, basicSalary * (rule.newLimit || 0.14));
-                } else {
-                    eligible = p.amount;
-                }
+                eligible = (p.type === "Corporate NPS") ? Math.min(p.amount, basicSalary * (rule.newLimit || 0.14)) : p.amount;
             }
             totalExemptions += eligible;
             perkBreakdown.push({ type: p.type, eligible });
         });
 
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
-        let tax = 0;
-        if (netTaxable > config.rebateLimit) {
-            const slabTax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            tax = Math.min(slabTax, netTaxable - config.rebateLimit);
+        let tax = (netTaxable > config.rebateLimit) ? FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs) : 0;
+        
+        // Marginal Relief check for rebate
+        if (tax > 0 && netTaxable <= config.rebateLimit) tax = 0; 
+        else if (netTaxable > config.rebateLimit) {
+            tax = Math.min(tax, netTaxable - config.rebateLimit);
         }
 
-        const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : (TAX_CONFIG.cessRate || 0.04);
-        const totalTax = tax + (tax * cess);
-
-return {tax: totalTax, netTaxable, totalExemptions, perkBreakdown };
+        const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : 0.04;
+        return { tax: tax + (tax * cess), netTaxable, totalExemptions, perkBreakdown };
     },
 
     calculateOldRegime: (selectedYear, grossIncome, deductions, perks, basicSalary = 0) => {
-        perks = perks || [];
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.oldRegime;
         const perksConfig = yearData.perkRules;
@@ -168,16 +175,12 @@ return {tax: totalTax, netTaxable, totalExemptions, perkBreakdown };
         let totalExemptions = config.stdDeduction;
         let other80C = deductions.section80C || 0;
 
-        perks.forEach(p => {
+        (perks || []).forEach(p => {
             const rule = perksConfig[p.type];
             if (rule && (rule.regime === "both" || rule.regime === "old" || !rule.regime)) {
-                if (p.type === "Corporate NPS") {
-                    totalExemptions += Math.min(p.amount, basicSalary * (rule.oldLimit || 0.10));
-                } else if (p.type === "VPF") {
-                    other80C += p.amount;
-                } else {
-                    totalExemptions += p.amount;
-                }
+                if (p.type === "Corporate NPS") totalExemptions += Math.min(p.amount, basicSalary * (rule.oldLimit || 0.10));
+                else if (p.type === "VPF") other80C += p.amount;
+                else totalExemptions += p.amount;
             }
         });
 
@@ -186,51 +189,26 @@ return {tax: totalTax, netTaxable, totalExemptions, perkBreakdown };
         const npsUsedIn80C = Math.min(deductions.npsSelf || 0, spaceLeftIn80C);
         const npsFor80CCD = Math.min((deductions.npsSelf || 0) - npsUsedIn80C, config.limits.section80CCD_1B);
 
-        // --- HOME LOAN LOGIC ---
-        let interest24b = 0;
-        let interest80EEA = 0;
-        const totalInterestPaid = deductions.homeLoanInterest || 0;
+        const interest24b = (deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') 
+            ? (deductions.homeLoanInterest || 0) 
+            : Math.min(deductions.homeLoanInterest || 0, config.limits.section24b || 200000);
+        
+        const interest80EEA = (interest24b < (deductions.homeLoanInterest || 0)) ? Math.min(deductions.extraLoanInterest || 0, config.limits.section80EEA || 150000) : 0;
 
-        if (deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') {
-            interest24b = totalInterestPaid; 
-        } else {
-            interest24b = Math.min(totalInterestPaid, config.limits.section24b || 200000);
-            if (deductions.extraLoanInterest > 0) {
-                interest80EEA = Math.min(deductions.extraLoanInterest, config.limits.section80EEA || 150000);
-            }
-        }
-        
-        // --- IMPROVED 80D LOGIC ---
         const selfLimit = config.limits.section80D_Self || 25000;
-        const parentsLimit = deductions.parentsSenior 
-            ? (config.limits.section80D_SeniorParents || 50000) 
-            : (config.limits.section80D_Parents || 25000);
-        
-        const cappedSelf80D = Math.min(deductions.healthSelf || 0, selfLimit);
-        const cappedParents80D = Math.min(deductions.healthParents || 0, parentsLimit);
-        const totalCapped80D = cappedSelf80D + cappedParents80D;
+        const parentsLimit = deductions.parentsSenior ? (config.limits.section80D_SeniorParents || 50000) : (config.limits.section80D_Parents || 25000);
+        const totalCapped80D = Math.min(deductions.healthSelf || 0, selfLimit) + Math.min(deductions.healthParents || 0, parentsLimit);
 
         const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + interest24b + interest80EEA + totalCapped80D + (deductions.exemptHRA || 0);
-
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
+        let tax = (netTaxable > config.rebateLimit) ? FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs) : 0;
 
-        let tax = 0;
-        if (netTaxable > config.rebateLimit) {
-            tax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-        }
-           const cess = yearData.cessRate !== undefined ? yearData.cessRate : TAX_CONFIG.cessRate;
-            const totalTax = tax + (tax * cess);
-           
-            return {
-                tax: totalTax,
-                netTaxable,
-                totalDeductions,
-                appliedDeductions: {
-                    homeInterestSection24: interest24b,
-                    homeInterest80EEA: interest80EEA,
-                    section80C: cappedOther80C,
-                    section80D: totalCapped80D
-                }
-            };    
+        const cess = yearData.cessRate !== undefined ? yearData.cessRate : 0.04;
+        return {
+            tax: tax + (tax * cess),
+            netTaxable,
+            totalDeductions,
+            appliedDeductions: { section80C: cappedOther80C, section80D: totalCapped80D, homeInterest: interest24b + interest80EEA }
+        };
     }
 };
