@@ -9,7 +9,6 @@ Estimate the wealth you can create through monthly or yearly SIPs.
 
 <div class="calculator-container">
   <div class="calc-inputs">
-    
     <div class="segmented-control-wrapper" style="margin-bottom: 25px;">
       <div class="segmented-control" style="width: 100%; display: flex;">
         <button id="btn-monthly" class="toggle-btn active" onclick="setFrequency('monthly')" style="flex: 1;">Monthly Investment</button>
@@ -97,35 +96,34 @@ Estimate the wealth you can create through monthly or yearly SIPs.
     
     <div class="result-item highlight">
       <div style="display: flex; align-items: center; gap: 6px;">
-        <span>Expected Maturity amount</span>
-        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="This value is calculated using CAGR approach. So, it may not be attractive, but closer to accurate.">
-          <i class="fas fa-info-circle"></i>
+        <span>Expected Maturity Amount</span>
+        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="This value is calculated using CAGR approach.">
+          <i class="fas fa-info-circle info-icon"></i>
         </span>
       </div>
       <strong id="total-value">₹0</strong>
     </div>
-    <div class="result-row" id="post-tax-row">
-      <div class="result-label">
-          Estimated Post-Tax Wealth
-          <span class="info-icon" title="The calculation assumes Equity Taxation">ⓘ</span>
+
+    <div class="result-item" id="post-tax-row">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span>Estimated Post-Tax Wealth</span>
+        <span class="info-icon" style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="Assumes Equity Taxation">
+          <i class="fas fa-info-circle"></i>
+        </span>
       </div>
-      <div class="result-value" id="post-tax-wealth">₹0</div>
-  </div>
+      <strong id="post-tax-wealth">₹0</strong>
+    </div>
 
     <div class="result-item">
-      <span>Inflation adjusted maturity amount</span>
+      <span>Inflation Adjusted Maturity Amount</span>
       <strong id="real-future-value">₹0</strong>
     </div>
-    
-    <div id="inflation-insight-container" class="calc-insight-box">
-      <p id="inflation-insight"></p>
-    </div>
-    
-    <div id="inflation-insight-container" style="margin-top: 8px; font-size: 0.85rem; color: #64748b; font-style: italic; display: none;">
-      <p id="inflation-insight"></p>
+
+    <div id="inflation-insight-container" class="calc-insight-box" style="display: none; margin-top: 15px;">
+      <p id="inflation-insight" style="margin: 0;"></p>
     </div>
 
-    <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color, #e2e8f0);">
+    <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
       <p id="future-message" style="font-size: 1rem; line-height: 1.6; margin: 0;"></p>
     </div>
   </div>
