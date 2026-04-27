@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculate() {
-        // Log to console so you can see it working
         console.log("SIP Calculation running...");
 
         const P = parseFloat(elements.monthlySIP?.value) || 0;
@@ -43,9 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const years = parseFloat(elements.yearsInput?.value) || 0;
         const inf = parseFloat(elements.inflationInput?.value) || 0;
 
-        // Ensure FinanceEngine exists before calling
         if (typeof FinanceEngine !== 'undefined') {
-            // 1. MAIN CALCULATION (Maturity Value)
+            // 1. MAIN CALCULATION
             const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
             const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
 
@@ -56,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(elements.totalValue) elements.totalValue.innerText = "₹" + format(results.totalValue);
             if(elements.realFuture) elements.realFuture.innerText = "₹" + format(realValue);
 
-            // 2. PROGRESS LOGIC (Current Value)
+            // 2. PROGRESS LOGIC
             if (elements.dateInput && elements.dateInput.value) {
                 const startDate = new Date(elements.dateInput.value);
                 const today = new Date();
@@ -82,18 +80,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // --- AUTO-SCALE TRIGGER (Inside calculate) ---
+            // --- AUTO-SCALE TRIGGER ---
             if (typeof window.autoScaleNumbers === 'function') {
                 window.autoScaleNumbers();
-            } else if (typeof autoScaleNumbers === 'function') {
-                autoScaleNumbers();
             }
         } else {
-            console.error("FinanceEngine not found. Check finance-engine.js");
+            console.error("FinanceEngine not found.");
         }
-    }
+    } // End of calculate function
 
-    // Initialize
+    // Initialize Syncing
     sync(elements.monthlySIP, elements.monthlySlider);
     sync(elements.returnRate, elements.returnSlider);
     sync(elements.yearsInput, elements.yearsSlider);
@@ -106,4 +102,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Run once on load
     calculate();
-});
+}); // End of DOMContentLoaded
