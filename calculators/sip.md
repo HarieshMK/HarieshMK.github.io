@@ -95,5 +95,9 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
       <span>Inflation adjusted maturity amount</span>
       <strong id="real-future-value">₹0</strong>
     </div>
+    <p class="text-muted small">
+      <i class="fas fa-info-circle"></i> 
+      Calculated using CAGR. This value may not be attractive, but close to accurate.
+    </p>
   </div>
 </div>
