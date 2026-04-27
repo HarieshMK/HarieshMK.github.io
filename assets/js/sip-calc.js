@@ -69,17 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const results = FinanceEngine.calculateFutureValue(P, L, annualR, years, currentFrequency);
                 const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
                 const format = (num) => FinanceEngine.formatIndian(num);
-                // --- DYNAMIC TAX LOGIC & MESSAGE ---
+                // --- TAX CALCULATION ---
                 const totalGain = results.estimatedReturns;
                 const taxAmount = FinanceEngine.TaxEngine.calculateCapitalTax(totalGain, years, "Nifty 50");
                 const postTaxWealth = results.totalValue - taxAmount;
-    
-                // Update Value
+                
+                // Update UI Value
                 if (elements.postTaxDisplay) {
                     elements.postTaxDisplay.innerText = "₹" + format(postTaxWealth);
                 }
-    
-                // Update Tooltip Message Dynamically
+                
+                // Update Tooltip Dynamically
                 const taxTooltip = document.querySelector('#post-tax-row .info-icon');
                 if (taxTooltip) {
                     if (years < 1) {
