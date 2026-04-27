@@ -84,8 +84,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof FinanceEngine !== 'undefined') {
             try {
                 // 3. UPDATED MAIN CALCULATION (Added currentFrequency)
+                // 1. Main Calculation:
                 const results = FinanceEngine.calculateFutureValue(P, L, annualR, years, currentFrequency);
                 const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
+                // 2. Formatting (Using your L/Cr format for the "as on today" part)
+                const format = (num) => FinanceEngine.formatIndian(num);
+                const fullMaturity = format(results.totalValue);
+                const todayEquivalent = format(realValue);
+                
+                // 3. The "Real Wealth" Insight Message
+                const insightElement = document.getElementById('inflation-insight');
+                const insightContainer = document.getElementById('inflation-insight-container');
+                
+                if (insightElement && inf > 0) {
+                    insightContainer.style.display = 'block';
+                    insightElement.innerHTML = `Note: ₹${fullMaturity} in the year ${year} will have the same purchasing power as <strong>₹${todayEquivalent}</strong> does today.`;
+                } else {
+                    insightContainer.style.display = 'none';
+                }
 
                 console.log("Calculation Results:", results);
 
