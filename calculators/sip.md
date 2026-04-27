@@ -104,7 +104,7 @@ Estimate the wealth you can create through monthly or yearly SIPs.
       </div>
       <strong id="total-value">₹0</strong>
     </div>
-    <div class="result-row">
+    <div class="result-row" id="post-tax-row">
       <div class="result-label">
           Estimated Post-Tax Wealth
           <span class="info-icon" title="The calculation assumes Equity Taxation">ⓘ</span>
