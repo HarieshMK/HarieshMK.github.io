@@ -35,8 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculate() {
-        console.log("Input Years:", elements.yearsInput.value);
-        console.log("Calculated Months (n):", parseFloat(elements.yearsInput.value) * 12);
+        console.group("SIP Calculation Debug");
+        console.log("Monthly SIP (P):", parseFloat(elements.monthlySIP?.value));
+        console.log("Lump Sum (L):", parseFloat(elements.lumpSumInput?.value));
+        console.log("Return Rate (R):", parseFloat(elements.returnRate?.value));
+        console.log("Years (N):", parseFloat(elements.yearsInput?.value));
+        console.log("Inflation:", parseFloat(elements.inflationInput?.value));
+        console.log("Is FinanceEngine Loaded?:", typeof FinanceEngine !== 'undefined');
+        console.groupEnd();
         const P = parseFloat(elements.monthlySIP?.value) || 0;
         const L = parseFloat(elements.lumpSumInput?.value) || 0;
         const annualR = parseFloat(elements.returnRate?.value) || 0;
