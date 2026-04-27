@@ -102,8 +102,8 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
       <strong id="real-future-value">₹0</strong>
     </div>
 
-    <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
-      <p id="future-message" style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin: 0;"></p>
+    <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color, #e2e8f0);">
+    <p id="future-message" style="font-size: 1rem; line-height: 1.6; margin: 0;"></p>
     </div>
   </div>
 </div>
