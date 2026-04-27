@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const day = futureDate.getDate();
                     const month = futureDate.toLocaleDateString('en-IN', { month: 'long' });
                     const year = futureDate.getFullYear();
-                    const exactAmount = format(Math.round(results.totalValue));
+                    const exactAmount = Math.round(results.totalValue).toLocaleString('en-IN');
 
                     const getOrdinal = (d) => {
                         if (d > 3 && d < 21) return 'th';
