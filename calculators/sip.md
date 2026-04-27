@@ -4,7 +4,6 @@ title: SIP Calculator
 permalink: /calculators/sip/
 ---
 
-
 # SIP Calculator
 Estimate the wealth you can create through monthly Systematic Investment Plans.
 
@@ -13,25 +12,25 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     <div class="input-group">
       <div class="label-row">
         <label>Monthly Investment (₹)</label>
-        <input type="number" id="monthly-sip" value="5000">
+        <input type="number" id="monthly-sip" value="1250">
       </div>
-      <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="5000" class="slider">
+      <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="1250" class="slider">
     </div>
 
     <div class="input-group">
       <div class="label-row">
         <label>Expected Return Rate (% p.a)</label>
-        <input type="number" id="return-rate" value="10">
+        <input type="number" id="return-rate" value="7.1">
       </div>
-      <input type="range" id="return-rate-slider" min="1" max="20" step="0.1" value="10" class="slider">
+      <input type="range" id="return-rate-slider" min="1" max="20" step="0.1" value="7.1" class="slider">
     </div>
 
     <div class="input-group">
       <div class="label-row">
         <label>Time Period (Years)</label>
-        <input type="number" id="years" value="10">
+        <input type="number" id="years" value="25">
       </div>
-      <input type="range" id="years-slider" min="1" max="30" step="0.1" value="10" class="slider">
+      <input type="range" id="years-slider" min="1" max="40" step="1" value="25" class="slider">
     </div>
 
     <div class="input-group">
@@ -77,17 +76,24 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     </div>
 
     <h4 class="input-header">Future Expectation</h4>
+    
     <div class="result-item">
       <span>Total Investment Planned</span>
       <strong id="total-invested">₹0</strong>
     </div>
+    
     <div class="result-item">
       <span>Estimated Returns (Profit)</span>
       <strong id="total-returns">₹0</strong>
     </div>
     
     <div class="result-item highlight">
-      <span>Expected Maturity amount</span>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span>Expected Maturity amount</span>
+        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="Calculated using CAGR method. The value may not be attractive, but closer to accurate.">
+          <i class="fas fa-info-circle"></i>
+        </span>
+      </div>
       <strong id="total-value">₹0</strong>
     </div>
 
@@ -95,9 +101,9 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
       <span>Inflation adjusted maturity amount</span>
       <strong id="real-future-value">₹0</strong>
     </div>
-    <p class="text-muted small">
-      <i class="fas fa-info-circle"></i> 
-      Calculated using CAGR method. The value may not be attractive, but closer to accurate.
-    </p>
+
+    <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+      <p id="future-message" style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin: 0;"></p>
+    </div>
   </div>
 </div>
