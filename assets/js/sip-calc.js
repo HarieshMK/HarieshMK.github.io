@@ -15,13 +15,11 @@ document.addEventListener('DOMContentLoaded', function() {
         inflationSlider: document.getElementById('inflation-slider'),
         dateInput: document.getElementById('start-date'),
         
-        // Output Displays
         totalInvested: document.getElementById('total-invested'),
         totalReturns: document.getElementById('total-returns'),
         totalValue: document.getElementById('total-value'),
         realFuture: document.getElementById('real-future-value'),
         
-        // Progress Section Elements
         progressSection: document.getElementById('current-progress'),
         completedTenure: document.getElementById('completed-tenure'),
         valueTodayDisplay: document.getElementById('value-today')
@@ -34,97 +32,101 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculate() {
-        console.log("SIP Calculation running...");
-
+        // --- DEBUG: INITIAL INPUTS ---
+        console.group("--- [SIP-CALC] NEW CALCULATION ---");
+        
         const P = parseFloat(elements.monthlySIP?.value) || 0;
         const L = parseFloat(elements.lumpSumInput?.value) || 0;
         const annualR = parseFloat(elements.returnRate?.value) || 0;
         const years = parseFloat(elements.yearsInput?.value) || 0;
         const inf = parseFloat(elements.inflationInput?.value) || 0;
 
+        console.log("Inputs:", { monthly: P, lumpSum: L, rate: annualR, years: years, inflation: inf });
+
         if (typeof FinanceEngine !== 'undefined') {
-            // 1. MAIN CALCULATION
-            const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
-            const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
+            try {
+                // 1. MAIN CALCULATION
+                const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
+                const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
 
-            const format = (num) => FinanceEngine.formatIndian(num);
-            
-            if(elements.totalInvested) elements.totalInvested.innerText = "₹" + format(results.totalInvested);
-            if(elements.totalReturns) elements.totalReturns.innerText = "₹" + format(results.estimatedReturns);
-            if(elements.totalValue) elements.totalValue.innerText = "₹" + format(results.totalValue);
-            if(elements.realFuture) elements.realFuture.innerText = "₹" + format(realValue);
+                console.log("Calculation Results:", results);
 
-            // 2. PROGRESS LOGIC
-            if (elements.dateInput && elements.dateInput.value) {
-                const startDate = new Date(elements.dateInput.value);
-                const today = new Date();
+                const format = (num) => FinanceEngine.formatIndian(num);
                 
-                let monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
-                const totalMonths = years * 12;
-                const effectiveMonths = Math.max(0, Math.min(monthsPassed, totalMonths));
+                if(elements.totalInvested) elements.totalInvested.innerText = "₹" + format(results.totalInvested);
+                if(elements.totalReturns) elements.totalReturns.innerText = "₹" + format(results.estimatedReturns);
+                if(elements.totalValue) elements.totalValue.innerText = "₹" + format(results.totalValue);
+                if(elements.realFuture) elements.realFuture.innerText = "₹" + format(realValue);
 
-                if (effectiveMonths > 0 && elements.progressSection) {
-                    elements.progressSection.style.display = 'block';
+                // 2. PROGRESS LOGIC
+                if (elements.dateInput && elements.dateInput.value) {
+                    const startDate = new Date(elements.dateInput.value);
+                    const today = new Date();
                     
-                    const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12);
-                    const investedToday = (P * effectiveMonths) + L;
-                    const gainToday = progressResults.totalValue - investedToday;
+                    let monthsPassed = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
+                    const totalMonths = years * 12;
+                    const effectiveMonths = Math.max(0, Math.min(monthsPassed, totalMonths));
 
-                    if (elements.completedTenure) elements.completedTenure.innerText = `${Math.floor(effectiveMonths / 12)}y ${effectiveMonths % 12}m`;
-                    if (elements.valueTodayDisplay) elements.valueTodayDisplay.innerText = "₹" + format(progressResults.totalValue);
-                    if (elements.invToday) elements.invToday.innerText = "₹" + format(investedToday);
-                    if (elements.gainToday) elements.gainToday.innerText = "₹" + format(gainToday);
+                    console.log("Progress Tracking:", { monthsPassed, effectiveMonths });
 
-                } else if (elements.progressSection) {
-                    elements.progressSection.style.display = 'none';
-                }
-            }
+                    if (effectiveMonths > 0 && elements.progressSection) {
+                        elements.progressSection.style.display = 'block';
+                        const progressResults = FinanceEngine.calculateFutureValue(P, L, annualR, effectiveMonths / 12);
+                        const investedToday = (P * effectiveMonths) + L;
+                        const gainToday = progressResults.totalValue - investedToday;
 
-            // --- AUTO-SCALE TRIGGER ---
-            if (typeof window.autoScaleNumbers === 'function') {
-                window.autoScaleNumbers();
-            }
-            // Inside calculate() function
-            if (elements.totalValue) {
-                const years = parseFloat(elements.yearsInput.value) || 0;
-                
-                // Logic: Use Start Date if provided, otherwise use Today
-                const baseDate = (elements.dateInput && elements.dateInput.value) 
-                    ? new Date(elements.dateInput.value) 
-                    : new Date();
-            
-                const futureDate = new Date(baseDate);
-                
-                // Add total months to handle fractional years accurately
-                const totalMonths = Math.round(years * 12);
-                futureDate.setMonth(futureDate.getMonth() + totalMonths);
-                
-                const day = futureDate.getDate();
-                const month = futureDate.toLocaleDateString('en-IN', { month: 'long' });
-                const year = futureDate.getFullYear();
-            
-                // Adding an ordinal suffix (st, nd, rd, th)
-                const getOrdinal = (d) => {
-                    if (d > 3 && d < 21) return 'th';
-                    switch (d % 10) {
-                        case 1:  return "st";
-                        case 2:  return "nd";
-                        case 3:  return "rd";
-                        default: return "th";
+                        if (elements.completedTenure) elements.completedTenure.innerText = `${Math.floor(effectiveMonths / 12)}y ${effectiveMonths % 12}m`;
+                        if (elements.valueTodayDisplay) elements.valueTodayDisplay.innerText = "₹" + format(progressResults.totalValue);
+                        if (elements.invToday) elements.invToday.innerText = "₹" + format(investedToday);
+                        if (elements.gainToday) elements.gainToday.innerText = "₹" + format(gainToday);
+                    } else if (elements.progressSection) {
+                        elements.progressSection.style.display = 'none';
                     }
-                };
-            
-                const messageElement = document.getElementById('future-message');
-                if (messageElement) {
-                    const maturityAmount = elements.totalValue.innerText;
-                    // The "Funny/Interactive" touch
-                    messageElement.innerHTML = `Set a reminder! Approximately <strong>${maturityAmount}</strong> is expected to land in your bank account on <strong>${month} ${day}${getOrdinal(day)}, ${year}</strong>. 🚀`;
                 }
+
+                // 3. AUTO-SCALE TRIGGER
+                if (typeof window.autoScaleNumbers === 'function') {
+                    window.autoScaleNumbers();
+                }
+
+                // 4. THE INTERACTIVE MESSAGE
+                if (elements.totalValue) {
+                    const baseDate = (elements.dateInput && elements.dateInput.value) 
+                        ? new Date(elements.dateInput.value) 
+                        : new Date();
+
+                    const futureDate = new Date(baseDate);
+                    const totalMonths = Math.round(years * 12);
+                    futureDate.setMonth(futureDate.getMonth() + totalMonths);
+                    
+                    const day = futureDate.getDate();
+                    const month = futureDate.toLocaleDateString('en-IN', { month: 'long' });
+                    const year = futureDate.getFullYear();
+                    const exactAmount = Math.round(results.totalValue).toLocaleString('en-IN');
+
+                    const getOrdinal = (d) => {
+                        if (d > 3 && d < 21) return 'th';
+                        switch (d % 10) {
+                            case 1:  return "st";
+                            case 2:  return "nd";
+                            case 3:  return "rd";
+                            default: return "th";
+                        }
+                    };
+
+                    const messageElement = document.getElementById('future-message');
+                    if (messageElement) {
+                        messageElement.innerHTML = `Set a reminder! Approximately <strong>₹${exactAmount}</strong> is expected to land in your bank account on <strong>${month} ${day}${getOrdinal(day)}, ${year}</strong>. 🚀`;
+                    }
+                }
+            } catch (err) {
+                console.error("[SIP-CALC] Error during calculation:", err);
             }
         } else {
-            console.error("FinanceEngine not found.");
+            console.error("[SIP-CALC] Critical Failure: FinanceEngine library not loaded.");
         }
-    } // End of calculate function
+        console.groupEnd();
+    }
 
     // Initialize Syncing
     sync(elements.monthlySIP, elements.monthlySlider);
@@ -133,9 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
     sync(elements.lumpSumInput, elements.lumpSumSlider);
     sync(elements.inflationInput, elements.inflationSlider);
     
-    if(elements.dateInput) {
-        elements.dateInput.addEventListener('change', calculate);
-    }
-    // Run once on load
+    if(elements.dateInput) elements.dateInput.addEventListener('change', calculate);
+
     calculate();
-}); // End of DOMContentLoaded
+});
