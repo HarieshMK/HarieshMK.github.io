@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const insightContainer = document.getElementById('inflation-insight-container');
                 if (insightElement && inf > 0) {
                     insightContainer.style.display = 'block';
-                    insightElement.innerHTML = `Note: <strong>₹${format(results.totalValue)}</strong> in ${year} will buy you the same things that <strong>₹${format(realValue)}</strong> can buy today, due to inflation.`;
+                    insightElement.innerHTML = `Note: <strong>₹${format(results.totalValue)}</strong> in ${year} will buy you the same things that <strong>₹${format(realValue)}</strong> can buy you today, thanks to inflation.`;
                 } else if (insightContainer) {
                     insightContainer.style.display = 'none';
                 }
