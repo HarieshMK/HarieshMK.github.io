@@ -4,24 +4,17 @@
  */
 var FinanceEngine = {
     
-    calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
-        const r = (annualRate / 100) / 12;
-        const n = years * 12;
-        let fvSIP = 0;
-        if (r > 0) {
-            fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
-        } else {
-            fvSIP = monthlySIP * n;
-        }
-        const fvLumpSum = lumpSum * Math.pow(1 + r, n);
-        const totalValue = fvSIP + fvLumpSum;
-        const totalInvested = (monthlySIP * n) + lumpSum;
-        return { 
-            totalValue: totalValue, 
-            totalInvested: totalInvested, 
-            estimatedReturns: totalValue - totalInvested 
-        };
-    },
+  calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
+    const r = (annualRate / 100) / 12;
+    const n = years * 12;
+    let fvSIP = (r > 0) ? monthlySIP * ((Math.pow(1 + r, n) - 1) / r) : monthlySIP * n;
+    const fvLumpSum = lumpSum * Math.pow(1 + r, n);
+    return { 
+        totalValue: Math.round(fvSIP + fvLumpSum), 
+        totalInvested: Math.round((monthlySIP * n) + lumpSum), 
+        estimatedReturns: Math.round((fvSIP + fvLumpSum) - ((monthlySIP * n) + lumpSum)) 
+    };
+}
 
     // KEEP THESE - Your other tools need them!
     calculateGoalGap: function(currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) {
