@@ -5,14 +5,22 @@
 var FinanceEngine = {
     
   calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
-    const r = (annualRate / 100) / 12;
+    const r = (annualRate / 100) / 12; // Standard monthly rate used by Groww/ClearTax
     const n = years * 12;
-    let fvSIP = (r > 0) ? monthlySIP * ((Math.pow(1 + r, n) - 1) / r) : monthlySIP * n;
+      
+    let fvSIP = 0;
+    if (r > 0) {
+        fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+    } else {
+        fvSIP = monthlySIP * n;
+    }
     const fvLumpSum = lumpSum * Math.pow(1 + r, n);
+    const totalValue = fvSIP + fvLumpSum;
+    const totalInvested = (monthlySIP * n) + lumpSum;
     return { 
-        totalValue: Math.round(fvSIP + fvLumpSum), 
-        totalInvested: Math.round((monthlySIP * n) + lumpSum), 
-        estimatedReturns: Math.round((fvSIP + fvLumpSum) - ((monthlySIP * n) + lumpSum)) 
+        totalValue: Math.round(totalValue), 
+        totalInvested: Math.round(totalInvested), 
+        estimatedReturns: Math.round(totalValue - totalInvested) 
     };
 },
 
@@ -38,8 +46,11 @@ var FinanceEngine = {
     },
 
     formatIndian: function(num) {
+        // If it's a Crore
         if (num >= 10000000) {return (num / 10000000).toFixed(2) + " Cr";}
+        // If it's a Lakh (matches "9.99 L" style)
         if (num >= 100000) {return (num / 100000).toFixed(2) + " L";}
+        // For thousands, use the standard Indian comma format (e.g., 10,000)
         return Math.round(num).toLocaleString('en-IN');
     }
     };
