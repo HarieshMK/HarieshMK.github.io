@@ -14,7 +14,7 @@ var FinanceEngine = {
         totalInvested: Math.round((monthlySIP * n) + lumpSum), 
         estimatedReturns: Math.round((fvSIP + fvLumpSum) - ((monthlySIP * n) + lumpSum)) 
     };
-}
+},
 
     // KEEP THESE - Your other tools need them!
     calculateGoalGap: function(currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) {
