@@ -12,25 +12,25 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     <div class="input-group">
       <div class="label-row">
         <label>Monthly Investment (₹)</label>
-        <input type="number" id="monthly-sip" value="1250">
+        <input type="number" id="monthly-sip" value="5000">
       </div>
-      <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="1250" class="slider">
+      <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="5000" class="slider">
     </div>
 
     <div class="input-group">
       <div class="label-row">
         <label>Expected Return Rate (% p.a)</label>
-        <input type="number" id="return-rate" value="7.1">
+        <input type="number" id="return-rate" value="12">
       </div>
-      <input type="range" id="return-rate-slider" min="1" max="20" step="0.1" value="7.1" class="slider">
+      <input type="range" id="return-rate-slider" min="1" max="20" step="0.1" value="12" class="slider">
     </div>
 
     <div class="input-group">
       <div class="label-row">
         <label>Time Period (Years)</label>
-        <input type="number" id="years" value="25">
+        <input type="number" id="years" value="15">
       </div>
-      <input type="range" id="years-slider" min="1" max="40" step="1" value="25" class="slider">
+      <input type="range" id="years-slider" min="1" max="40" step="0.1" value="15" class="slider">
     </div>
 
     <div class="input-group">
