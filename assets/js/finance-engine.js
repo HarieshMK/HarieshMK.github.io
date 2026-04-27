@@ -4,16 +4,30 @@
  */
 var FinanceEngine = window.FinanceEngine || {
     
-    calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
-        const monthlyRate = (annualRate / 100) / 12;
-        const months = years * 12;
-        const fvSIP = monthlyRate > 0 
-            ? monthlySIP * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate) 
-            : monthlySIP * months;
-        const fvLumpSum = lumpSum * Math.pow(1 + monthlyRate, months);
+        calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
+        const i = annualRate / 100; // Annual Interest Rate
+        const n = years;
+        const annualP = monthlySIP * 12; // Annual contribution
+    
+        let fvSIP;
+        if (i > 0) {
+            // Standard Annual Compounding Formula to match Groww/PPF
+            fvSIP = annualP * ((Math.pow(1 + i, n) - 1) / i);
+        } else {
+            fvSIP = annualP * n;
+        }
+    
+        // Lump sum also uses Annual Compounding
+        const fvLumpSum = lumpSum * Math.pow(1 + i, n);
+        
         const totalValue = fvSIP + fvLumpSum;
-        const totalInvested = (monthlySIP * months) + lumpSum;
-        return { totalValue, totalInvested, estimatedReturns: totalValue - totalInvested };
+        const totalInvested = (monthlySIP * 12 * n) + lumpSum;
+        
+        return { 
+            totalValue, 
+            totalInvested, 
+            estimatedReturns: totalValue - totalInvested 
+        };
     },
 
     calculateGoalGap: (currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) => {
