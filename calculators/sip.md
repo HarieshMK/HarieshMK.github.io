@@ -110,6 +110,10 @@ Estimate the wealth you can create through monthly or yearly Systematic Investme
       <strong id="real-future-value">₹0</strong>
     </div>
     
+    <div id="inflation-insight-container" class="calc-insight-box">
+      <p id="inflation-insight"></p>
+    </div>
+    
     <div id="inflation-insight-container" style="margin-top: 8px; font-size: 0.85rem; color: #64748b; font-style: italic; display: none;">
       <p id="inflation-insight"></p>
     </div>
