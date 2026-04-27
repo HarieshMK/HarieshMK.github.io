@@ -4,27 +4,28 @@
  */
 var FinanceEngine = window.FinanceEngine || {
     
-        calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
+    calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
         const r = (annualRate / 100) / 12;
         const n = years * 12;
     
         let fvSIP;
         if (r > 0) {
+            // This is the formula for ₹9.99 L (Monthly Compounding + Annuity Due)
             fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
         } else {
             fvSIP = monthlySIP * n;
         }
-        // Lump sum compounding (Monthly frequency to match)
+
         const fvLumpSum = lumpSum * Math.pow(1 + r, n);
         const totalValue = fvSIP + fvLumpSum;
         const totalInvested = (monthlySIP * n) + lumpSum;
+
         return { 
             totalValue: Math.round(totalValue), 
             totalInvested, 
             estimatedReturns: Math.round(totalValue - totalInvested) 
         };
-    },
-    },
+    }, // Corrected the closing here
 
     calculateGoalGap: (currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) => {
         const i = inflationRate / 100;
