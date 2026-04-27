@@ -97,7 +97,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     </div>
     <p class="text-muted small">
       <i class="fas fa-info-circle"></i> 
-      Calculated using CAGR. This value may not be attractive, but close to accurate.
+      Calculated using CAGR method. The value may not be attractive, but close to accurate.
     </p>
   </div>
 </div>
