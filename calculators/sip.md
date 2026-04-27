@@ -5,31 +5,21 @@ permalink: /calculators/sip/
 ---
 
 # SIP Calculator
-Estimate the wealth you can create through monthly Systematic Investment Plans.
-
-<div class="segmented-control-wrapper">
-  <div class="segmented-control">
-    <button id="btn-monthly" class="toggle-btn active" onclick="setFrequency('monthly')">Monthly</button>
-    <button id="btn-yearly" class="toggle-btn" onclick="setFrequency('yearly')">Yearly</button>
-  </div>
-</div>
+Estimate the wealth you can create through monthly or yearly Systematic Investment Plans.
 
 <div class="calculator-container">
   <div class="calc-inputs">
+    
     <div class="input-group">
-      <div class="label-row">
+      <div class="label-row" style="margin-bottom: 15px;">
         <label id="investment-label">Monthly Investment (₹)</label>
-        <input type="number" id="monthly-sip" value="5000">
+        <div class="segmented-control mini">
+          <button id="btn-monthly" class="toggle-btn active" onclick="setFrequency('monthly')">M</button>
+          <button id="btn-yearly" class="toggle-btn" onclick="setFrequency('yearly')">Y</button>
+        </div>
       </div>
-      <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="5000" class="slider">
-    </div>
-
-<div class="calculator-container">
-  <div class="calc-inputs">
-    <div class="input-group">
       <div class="label-row">
-        <label>Monthly Investment (₹)</label>
-        <input type="number" id="monthly-sip" value="5000">
+        <input type="number" id="monthly-sip" value="5000" style="width: 100%;">
       </div>
       <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="5000" class="slider">
     </div>
@@ -107,7 +97,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     <div class="result-item highlight">
       <div style="display: flex; align-items: center; gap: 6px;">
         <span>Expected Maturity amount</span>
-        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="Calculated using CAGR method. The value may not be attractive, but closer to accurate.">
+        <span style="cursor: help; color: #94a3b8; font-size: 0.9rem;" title="The value may not be attractive, but closer to accurate.">
           <i class="fas fa-info-circle"></i>
         </span>
       </div>
@@ -120,7 +110,7 @@ Estimate the wealth you can create through monthly Systematic Investment Plans.
     </div>
 
     <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color, #e2e8f0);">
-    <p id="future-message" style="font-size: 1rem; line-height: 1.6; margin: 0;"></p>
+      <p id="future-message" style="font-size: 1rem; line-height: 1.6; margin: 0;"></p>
     </div>
   </div>
 </div>
