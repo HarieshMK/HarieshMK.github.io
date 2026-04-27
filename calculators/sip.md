@@ -5,7 +5,7 @@ permalink: /calculators/sip/
 ---
 
 # SIP Calculator
-Estimate the wealth you can create through monthly or yearly Systematic Investment Plans.
+Estimate the wealth you can create through monthly or yearly SIPs.
 
 <div class="calculator-container">
   <div class="calc-inputs">
