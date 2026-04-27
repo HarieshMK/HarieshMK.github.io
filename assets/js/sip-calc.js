@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         realFuture: document.getElementById('real-future-value'),
         progressSection: document.getElementById('current-progress'),
         completedTenure: document.getElementById('completed-tenure'),
+        postTaxDisplay: document.getElementById('post-tax-wealth'),
         valueTodayDisplay: document.getElementById('value-today')
     };
 
@@ -68,6 +69,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 const results = FinanceEngine.calculateFutureValue(P, L, annualR, years, currentFrequency);
                 const realValue = FinanceEngine.adjustForInflation(results.totalValue, inf, years);
                 const format = (num) => FinanceEngine.formatIndian(num);
+                // --- DYNAMIC TAX LOGIC & MESSAGE ---
+                const totalGain = results.estimatedReturns;
+                const taxAmount = FinanceEngine.TaxEngine.calculateCapitalTax(totalGain, years, "Nifty 50");
+                const postTaxWealth = results.totalValue - taxAmount;
+    
+                // Update Value
+                if (elements.postTaxDisplay) {
+                    elements.postTaxDisplay.innerText = "₹" + format(postTaxWealth);
+                }
+    
+                // Update Tooltip Message Dynamically
+                const taxTooltip = document.querySelector('#post-tax-row .info-icon');
+                if (taxTooltip) {
+                    if (years < 1) {
+                        taxTooltip.title = "Since your tenure is less than 1 year, a flat 20% Short Term Capital Gains (STCG) tax applies to your profits. Fast money, fast taxes! ⚡";
+                    } else {
+                        taxTooltip.title = "Assumes 12.5% Long Term Capital Gains (LTCG) tax on profits above ₹1.25 Lakh. This is the standard for Equity investments held over a year. ⚖️";
+                    }
+                }
 
                 // 2. Date Setup (Moved up so Insight Message can use it!)
                 const baseDate = (elements.dateInput && elements.dateInput.value) ? new Date(elements.dateInput.value) : new Date();
