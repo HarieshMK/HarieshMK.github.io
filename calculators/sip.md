@@ -10,16 +10,17 @@ Estimate the wealth you can create through monthly or yearly Systematic Investme
 <div class="calculator-container">
   <div class="calc-inputs">
     
-    <div class="input-group">
-      <div class="label-row" style="margin-bottom: 15px;">
-        <label id="investment-label">Monthly Investment (₹)</label>
-        <div class="segmented-control mini">
-          <button id="btn-monthly" class="toggle-btn active" onclick="setFrequency('monthly')">M</button>
-          <button id="btn-yearly" class="toggle-btn" onclick="setFrequency('yearly')">Y</button>
-        </div>
+    <div class="segmented-control-wrapper" style="margin-bottom: 25px;">
+      <div class="segmented-control" style="width: 100%; display: flex;">
+        <button id="btn-monthly" class="toggle-btn active" onclick="setFrequency('monthly')" style="flex: 1;">Monthly Investment</button>
+        <button id="btn-yearly" class="toggle-btn" onclick="setFrequency('yearly')" style="flex: 1;">Yearly Investment</button>
       </div>
+    </div>
+
+    <div class="input-group">
       <div class="label-row">
-        <input type="number" id="monthly-sip" value="5000" style="width: 100%;">
+        <label id="investment-label">Monthly Amount (₹)</label>
+        <input type="number" id="monthly-sip" value="5000">
       </div>
       <input type="range" id="monthly-sip-slider" min="500" max="100000" step="500" value="5000" class="slider">
     </div>
