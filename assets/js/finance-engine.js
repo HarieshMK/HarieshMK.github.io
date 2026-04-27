@@ -2,32 +2,29 @@
  * FinanceEngine: The core logic for all financial calculations.
  * This file is UI-agnostic (no DOM references).
  */
-var FinanceEngine = window.FinanceEngine || {
+var FinanceEngine = {
     
-    calculateFutureValue: (monthlySIP, lumpSum, annualRate, years) => {
+    calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
         const r = (annualRate / 100) / 12;
         const n = years * 12;
-    
-        let fvSIP;
+        let fvSIP = 0;
         if (r > 0) {
-            // This is the formula for ₹9.99 L (Monthly Compounding + Annuity Due)
             fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
         } else {
             fvSIP = monthlySIP * n;
         }
-
         const fvLumpSum = lumpSum * Math.pow(1 + r, n);
         const totalValue = fvSIP + fvLumpSum;
         const totalInvested = (monthlySIP * n) + lumpSum;
-
         return { 
-            totalValue: Math.round(totalValue), 
-            totalInvested, 
-            estimatedReturns: Math.round(totalValue - totalInvested) 
+            totalValue: totalValue, 
+            totalInvested: totalInvested, 
+            estimatedReturns: totalValue - totalInvested 
         };
-    }, // Corrected the closing here
+    },
 
-    calculateGoalGap: (currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) => {
+    // KEEP THESE - Your other tools need them!
+    calculateGoalGap: function(currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) {
         const i = inflationRate / 100;
         const r = annualCorpReturn / 100;
         const futureCost = currentPrice * Math.pow(1 + i, years);
@@ -35,7 +32,7 @@ var FinanceEngine = window.FinanceEngine || {
         return { futureCost, grownSavings, gap: Math.max(0, futureCost - grownSavings) };
     },
 
-    calculateRequiredSIP: (targetAmount, annualReturnRate, years) => {
+    calculateRequiredSIP: function(targetAmount, annualReturnRate, years) {
         const monthlyRate = (annualReturnRate / 100) / 12;
         const months = years * 12;
         if (targetAmount <= 0) return 0;
@@ -43,11 +40,11 @@ var FinanceEngine = window.FinanceEngine || {
         return (targetAmount * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
     },
 
-    adjustForInflation: (value, annualInflation, years) => {
+    adjustForInflation: function(value, annualInflation, years) {
         return value / Math.pow(1 + (annualInflation / 100), years);
     },
 
-    formatIndian: (num) => {
+    formatIndian: function(num) {
         if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
         if (num >= 100000) return (num / 100000).toFixed(2) + " L";
         return Math.round(num).toLocaleString('en-IN');
