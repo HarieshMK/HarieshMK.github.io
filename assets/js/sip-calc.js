@@ -40,42 +40,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const annualR = parseFloat(elements.returnRate?.value) || 0;
         const years = parseFloat(elements.yearsInput?.value) || 0;
         const inf = parseFloat(elements.inflationInput?.value) || 0;
-
-        let totalInvested, totalValue, estimatedReturns, realValue;
-
-        // --- MATH EXECUTION ---
-        if (typeof FinanceEngine !== 'undefined' && typeof FinanceEngine.calculateFutureValue === 'function') {
-            const results = FinanceEngine.calculateFutureValue(P, L, annualR, years);
-            totalInvested = results.totalInvested;
-            totalValue = results.totalValue;
-            estimatedReturns = results.estimatedReturns;
-            realValue = FinanceEngine.adjustForInflation(totalValue, inf, years);
+    
+        // PRECISE MATH (9.99L Logic)
+        const r = (annualR / 100) / 12;
+        const n = years * 12;
+        
+        let totalValue;
+        if (r > 0) {
+            // This is the specific "Annuity Due" formula for 9.99L
+            totalValue = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+            totalValue += L * Math.pow(1 + r, n);
         } else {
-            // Standard Industry Fallback (Matches Groww 9.99L logic)
-            const r = (annualR / 100) / 12;
-            const n = years * 12;
-            
-            if (r > 0) {
-                totalValue = P * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
-            } else {
-                totalValue = P * n;
-            }
-            
-            const fvLump = L * Math.pow(1 + r, n);
-            totalValue += fvLump;
-            
-            totalInvested = (P * n) + L;
-            estimatedReturns = totalValue - totalInvested;
-            realValue = totalValue / Math.pow(1 + (inf / 100), years);
+            totalValue = (P * n) + L;
         }
-
-        // --- UI UPDATES ---
-        const format = (num) => {
-            return (typeof FinanceEngine !== 'undefined') ? 
-                FinanceEngine.formatIndian(num) : 
-                Math.round(num).toLocaleString('en-IN');
-        };
-
+    
+        const totalInvested = (P * n) + L;
+        const estimatedReturns = totalValue - totalInvested;
+        const realValue = totalValue / Math.pow(1 + (inf / 100), years);
+    
+        // UI UPDATES (Using standard formatting since Engine might be blocked)
+        const format = (num) => Math.round(num).toLocaleString('en-IN');
+    
         if(elements.totalInvested) elements.totalInvested.innerText = "₹" + format(totalInvested);
         if(elements.totalReturns) elements.totalReturns.innerText = "₹" + format(estimatedReturns);
         if(elements.totalValue) elements.totalValue.innerText = "₹" + format(totalValue);
