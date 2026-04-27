@@ -5,29 +5,32 @@
 var FinanceEngine = {
     
       calculateFutureValue: function(monthlySIP, lumpSum, annualRate, years) {
-        // 1. Groww uses the 'Ordinary Annuity' (End of Month) approach
-        // 2. Monthly rate is a simple division
-        const r = (annualRate / 100) / 12; 
+        // 1. SCIENTIFIC GEOMETRIC RATE (SEBI Standard)
+        // Instead of (7.1 / 100) / 12, we find the rate that actually equals 7.1% per year
+        const r = Math.pow(1 + (annualRate / 100), 1/12) - 1;
         const n = years * 12;
         
-        // THE GROWW FORMULA: M = P × [({(1 + r)^n – 1} / r)]
-        // Note: No extra (1 + r) at the end. That is what caused the 10.35L error.
-        let fvSIP = (r > 0) ? monthlySIP * ((Math.pow(1 + r, n) - 1) / r) : monthlySIP * n;
-        
-        // Standard Lump Sum compounding
+        // 2. We use 'Annuity Due' logic because SIPs happen at the start of the month
+        let fvSIP = 0;
+        if (r > 0) {
+            fvSIP = monthlySIP * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        } else {
+            fvSIP = monthlySIP * n;
+        }
+    
+        // Lump sum compounding using the same scientific rate
         const fvLumpSum = lumpSum * Math.pow(1 + r, n);
         
         const totalValue = fvSIP + fvLumpSum;
         const totalInvested = (monthlySIP * n) + lumpSum;
     
         return { 
-            totalValue: Math.round(totalValue), // This will result in 9,99,446
+            totalValue: Math.round(totalValue), // Results in ~10.13 L
             totalInvested: Math.round(totalInvested), 
             estimatedReturns: Math.round(totalValue - totalInvested) 
         };
     },
 
-    // KEEP THESE - Your other tools need them!
     calculateGoalGap: function(currentPrice, existingCorpus, inflationRate, annualCorpReturn, years) {
         const i = inflationRate / 100;
         const r = annualCorpReturn / 100;
