@@ -109,6 +109,10 @@ Estimate the wealth you can create through monthly or yearly Systematic Investme
       <span>Inflation adjusted maturity amount</span>
       <strong id="real-future-value">₹0</strong>
     </div>
+    
+    <div id="inflation-insight-container" style="margin-top: 8px; font-size: 0.85rem; color: #64748b; font-style: italic; display: none;">
+      <p id="inflation-insight"></p>
+    </div>
 
     <div id="future-message-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color, #e2e8f0);">
       <p id="future-message" style="font-size: 1rem; line-height: 1.6; margin: 0;"></p>
