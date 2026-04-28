@@ -128,3 +128,6 @@ Estimate the wealth you can create through monthly or yearly SIPs.
     </div>
   </div>
 </div>
+<script src="/assets/js/investment-options.js"></script>
+<script src="/assets/js/finance-engine.js"></script>
+<script src="/assets/js/sip-calc.js"></script>
