@@ -1,4 +1,42 @@
 /* ================================================================
+   PHASE 1: THE COLOR BRAIN (Variables)
+   ================================================================ */
+:root {
+  /* Backgrounds */
+  --bg-main: #f8fafc;       /* Outer background */
+  --bg-container: #ffffff;  /* Main content area & cards */
+  --bg-offset: #f1f5f9;     /* Inputs & calculator results */
+  
+  /* Text */
+  --text-primary: #0f172a;   /* Headings & Bold text */
+  --text-secondary: #334155; /* Paragraphs */
+  --text-muted: #64748b;     /* Dates & small labels */
+  
+  /* Branding & Logic */
+  --brand-primary: #0ea5e9;  /* Your Finance Blue */
+  --color-success: #10b981;  /* Green for profits/wealth */
+  --color-danger: #ef4444;   /* Red for losses/expenses */
+  --border-base: #e2e8f0;    /* Standard borders */
+}
+
+.dark-theme {
+  /* Backgrounds */
+  --bg-main: #0b1120;
+  --bg-container: #0f172a;
+  --bg-offset: #1e293b;
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  
+  /* Branding & Logic */
+  --brand-primary: #38bdf8;
+  --color-success: #34d399;
+  --color-danger: #f87171;
+  --border-base: #334155;
+}
+/* ================================================================
    PART 1: CONTENTS FROM GLOBAL-STYLES.CSS
    ================================================================ */
 
