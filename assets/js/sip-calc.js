@@ -1,5 +1,7 @@
 // 1. Global State Tracker
-let currentFrequency = 'monthly'; 
+if (typeof currentFrequency === 'undefined') {
+    var currentFrequency = 'monthly';
+}
 
 // 2. The Toggle Handler
 window.setFrequency = function(freq) {
