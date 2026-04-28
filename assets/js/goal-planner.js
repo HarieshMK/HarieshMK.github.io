@@ -114,48 +114,56 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     // 4. Event Listeners
-    els.hasCorpusCheck.addEventListener('change', function() {
-        els.corpusSection.style.display = this.checked ? 'block' : 'none';
-        calculate(false);
-    });
+    if (els.hasCorpusCheck && els.corpusSection) {
+        els.hasCorpusCheck.addEventListener('change', function() {
+            els.corpusSection.style.display = this.checked ? 'block' : 'none';
+            calculate(false);
+        });
+    }
 
     // Download Button Logic
-if(els.downloadBtn) {
-    els.downloadBtn.addEventListener('click', function() {
-        window.print();
-    });
-}
+    if (els.downloadBtn) {
+        els.downloadBtn.addEventListener('click', function() {
+            window.print();
+        });
+    }
 
-    if(els.goal) {
+    if (els.goal) {
         els.goal.addEventListener('change', function() {
             const t = config[this.value];
             if (t) {
-                els.price.value = els.priceS.value = t.p;
-                els.sipRet.value = els.sipRetS.value = t.r;
-                els.infl.value = els.inflS.value = t.i;
+                if(els.price) els.price.value = els.priceS.value = t.p;
+                if(els.sipRet) els.sipRet.value = els.sipRetS.value = t.r;
+                if(els.infl) els.infl.value = els.inflS.value = t.i;
                 if(els.nudge) els.nudge.innerText = t.m;
                 const start = new Date();
                 const end = new Date();
                 end.setFullYear(end.getFullYear() + t.y);
-                els.startD.valueAsDate = start;
-                els.targetD.valueAsDate = end;
+                if(els.startD) els.startD.valueAsDate = start;
+                if(els.targetD) els.targetD.valueAsDate = end;
                 calculate(false);
             }
         });
     }
 
     function sync(input, slider, isCorp = false) {
-        if(!input || !slider) return;
+        if (!input || !slider) return; // This already has a guard! Good.
         input.addEventListener('input', () => { slider.value = input.value; calculate(isCorp); });
         slider.addEventListener('input', () => { input.value = slider.value; calculate(isCorp); });
     }
 
-    sync(els.price, els.priceS); sync(els.sipRet, els.sipRetS); sync(els.corpus, els.corpusS); 
-    sync(els.corpRet, els.corpRetS, true); sync(els.infl, els.inflS);
-    els.startD.addEventListener('change', () => calculate(false));
-    els.targetD.addEventListener('change', () => calculate(false));
+    sync(els.price, els.priceS); 
+    sync(els.sipRet, els.sipRetS); 
+    sync(els.corpus, els.corpusS); 
+    sync(els.corpRet, els.corpRetS, true); 
+    sync(els.infl, els.inflS);
     
-    // 5. Initialize
-    els.goal.value = "Custom Plan";
-    els.goal.dispatchEvent(new Event('change'));
+    if (els.startD) els.startD.addEventListener('change', () => calculate(false));
+    if (els.targetD) els.targetD.addEventListener('change', () => calculate(false));
+    
+    // 5. Initialize (WITH GUARD)
+    if (els.goal) {
+        els.goal.value = "Custom Plan";
+        els.goal.dispatchEvent(new Event('change'));
+    }
 });
