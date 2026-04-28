@@ -93,9 +93,9 @@ FinanceEngine.TaxEngine = {
             if (gain <= 0) return 0;
         
             const asset = InvestmentRegistry[assetName];
-            const treatment = asset ? asset.taxTreatment : "EQUITY_CAPITAL_GAINS"; 
+            const treatment = asset ? asset.taxTreatment : "EQUITY_CAP_GAINS"; 
         
-            if (treatment === "EQUITY_CAPITAL_GAINS") {
+            if (treatment === "EQUITY_CAP_GAINS") {
                 // Equity rules: < 1 year is STCG (20%), > 1 year is LTCG (12.5% after 1.25L)
                 if (years < 1) {
                     return gain * 0.20; 
