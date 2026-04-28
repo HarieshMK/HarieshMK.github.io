@@ -1,4 +1,4 @@
-const InvestmentRegistry = {
+const window.InvestmentRegistry = {
     // --- GROWTH INVESTMENTS (isInvestment: true) ---
     "Bank savings account": { liquidity: "Very high", type: "Debt", returns: 2.5, taxCategory: "80TTA", taxTreatment: "SLAB_RATE", isInvestment: true },
     "RD": { liquidity: "Very high", type: "Debt", returns: 6.0, taxCategory: "NONE", taxTreatment: "SLAB_RATE", isInvestment: true },
