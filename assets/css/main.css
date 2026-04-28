@@ -230,15 +230,6 @@
    ================================================================ */
 
 /* ===== 0. GLOBAL COLOR VARIABLES ===== */
-:root {
-  --text-color: #000000;
-  --bg-color: #ffffff;
-}
-
-.dark-theme {
-  --text-color: #ffffff;
-  --bg-color: #0f172a; /* Your site's dark background */
-}
 
 *, *:before, *:after {
   box-sizing: border-box;
@@ -246,14 +237,23 @@
 
 /* ===== 1. CORE STYLES & PREMIUM TYPOGRAPHY ===== */
 html { scroll-behavior: smooth; width: 100%;} 
+
 body {
-  background-color: #f8fafc; color: #334155; font-family: 'Inter', -apple-system, sans-serif; 
+  /* Use Variables here */
+  background-color: var(--bg-main); 
+  color: var(--text-secondary); 
+  
+  font-family: 'Inter', -apple-system, sans-serif; 
   font-size: 18px; line-height: 1.7; margin: 0; padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease; overflow-x: hidden;
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
+
 .container {
-  max-width: 850px; margin: 0 auto; background: #ffffff; padding: 60px 50px; 
+  max-width: 850px; margin: 0 auto; padding: 60px 50px; 
+  
+  /* Use Variables here */
+  background: var(--bg-container); 
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 h1, h2, h3, h4, h5, h6 {
