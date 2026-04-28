@@ -7,16 +7,14 @@
   <meta name="description" content="{{ site.description }}">
   <meta name="google-site-verification" content="e6EpGOk8cuF4WFQ3d3xcEiGgboMHxt4PCp3xXBQw8vE" />
   
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
   <link rel="icon" type="image/png" href="{{ '/favicon-96x96.png' | relative_url }}" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}" />
   <link rel="shortcut icon" href="{{ '/favicon.ico' | relative_url }}" />
   <link rel="apple-touch-icon" sizes="180x180" href="{{ '/apple-touch-icon.png' | relative_url }}" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/css/global-styles.css' | relative_url }}"> 
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -44,19 +42,26 @@
   </script>
 </head>
 <body>
+
+  {% if page.layout == 'post' %}
+  <div class="progress-container">
+    <div class="progress-bar-track">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+  </div>
+  {% endif %}
  
   <button id="theme-toggle" aria-label="Toggle Dark Mode">
     <span id="theme-icon">🌙</span>
   </button>
   
-<div class="floating-auth">
-  <a href="/login" id="auth-btn" class="auth-link">Sign In / Register</a>
-  <div id="user-profile-box" class="profile-card" style="display:none;">
-    <div id="user-display-name" class="user-greeting"></div>
-    <a href="#" id="logout-btn" class="logout-link">Logout</a>
+  <div class="floating-auth">
+    <a href="/login" id="auth-btn" class="auth-link">Sign In / Register</a>
+    <div id="user-profile-box" class="profile-card" style="display:none;">
+      <div id="user-display-name" class="user-greeting"></div>
+      <a href="#" id="logout-btn" class="logout-link">Logout</a>
+    </div>
   </div>
-</div>
-  
 
   <div class="container">
     <header>
@@ -74,7 +79,82 @@
       </nav>
     </header>
 
-    <main>{{ content }}</main>
+    <main>
+      {% if page.layout == 'post' %}
+        <article class="post-content">
+          <header class="post-header">
+            <h1>{{ page.title }}</h1>
+            <div class="post-meta">
+              <time>{{ page.date | date: "%B %d, %Y" }}</time>
+              <span class="separator">•</span>
+              <span class="reading-time">
+                {% assign words = content | number_of_words %}
+                {{ words | divided_by: 180 | plus: 1 }} min read
+              </span>
+            </div>
+          </header>
+
+          <div class="entry-content">
+            {{ content }}
+          </div>
+        </article>
+
+        <section class="subscribe-box">
+           <div class="ml-embedded" data-form="TsxbQJ"></div>
+        </section>
+
+        <section class="comments">
+          <h3>Discussion</h3>
+          <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">
+            Have a thought or a question? Share it below. (No account required)
+          </p>
+          
+          <div id="cusdis_thread"
+            data-host="https://cusdis.com"
+            data-app-id="078e37ac-a7c4-4015-a9ec-e3e1aa8ca3f0"
+            data-page-id="{{ page.url }}"
+            data-page-url="{{ site.url }}{{ page.url }}"
+            data-page-title="{{ page.title }}"
+            data-theme="auto"> 
+          </div>
+
+          <script>
+            window.CUSDIS_CONFIG = {
+              target: '#cusdis_thread',
+              dataset: document.querySelector('#cusdis_thread').dataset,
+              theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
+            }
+          </script>
+          <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        </section>
+
+        <div class="post-footer">
+          <div class="post-nav">
+            <div class="nav-prev">
+              {% if page.previous %}
+                <a href="{{ page.previous.url | relative_url }}" class="nav-link">
+                  <span class="nav-label">← Previous</span>
+                  <span class="nav-title">{{ page.previous.title }}</span>
+                </a>
+              {% endif %}
+            </div>
+            <div class="nav-next">
+              {% if page.next %}
+                <a href="{{ page.next.url | relative_url }}" class="nav-link">
+                  <span class="nav-label">Next →</span>
+                  <span class="nav-title">{{ page.next.title }}</span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="back-to-blogs-container">
+            <a href="{{ '/blogs/' | relative_url }}" class="back-link">View All Writing</a>
+          </div>
+        </div>
+        {% else %}
+        {{ content }}
+      {% endif %}
+    </main>
     
     <footer>
       <div class="footer-grid">
@@ -114,9 +194,9 @@
   <script src="{{ '/assets/js/script.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/auth-logic.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/auth-check.js' | relative_url }}"></script>
-{% if page.url contains 'calculators' %}
+  {% if page.url contains 'calculators' %}
   <script src="{{ '/assets/js/sip-calc.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/goal-planner.js' | relative_url }}"></script>
-{% endif %}
+  {% endif %}
 </body>
 </html>
