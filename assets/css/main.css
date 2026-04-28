@@ -296,23 +296,22 @@ header .tagline { color: #64748b; font-size: 1.1rem; font-style: italic; margin:
 }
 
 /* ===== 3. BLOG CARDS & HOVER ===== */
-.post-card-link { display: block; text-decoration: none !important; color: inherit !important; margin-bottom: 25px; }
-.post-card, .home-card, .folder-card { 
-  padding: 22px 25px; margin-bottom: 25px !important; border: 1px solid #f1f5f9; border-radius: 12px; 
-  background: #fff; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; position: relative; z-index: 1;
-}
-.post-date, span.post-date { font-size: 0.82rem !important; font-style: italic !important; color: #64748b !important; display: block !important; margin-bottom: 8px !important; }
-.post-title, .post-card h2, .home-card h2, .post-card-link h2, .post-card h2 a {
-  font-style: normal !important; font-size: 1.85rem !important; font-weight: 700 !important; line-height: 1.2 !important; 
-  font-family: 'Lora', serif !important; color: #0f172a !important; text-decoration: none !important; 
-  display: block !important; margin-top: 0 !important; margin-bottom: 10px !important;
-}
-.post-card p, .home-card p { font-style: normal !important; font-size: 0.95rem !important; color: #334155 !important; }
-.post-card-link:hover .post-card, .post-card:hover, .home-card:hover, .folder-card:hover { 
-  transform: translateY(-8px) !important; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important; border-color: #38bdf8 !important; z-index: 10 !important;
-}
-.post-card-link:hover .post-title, .post-card-link:hover h2, .folder-card:hover .folder-name { color: #38bdf8 !important; }
-.post-title, .folder-name { transition: color 0.3s ease; }
+.post-card-link {display: block;  text-decoration: none;  color: inherit;   margin-bottom: 25px; }
+
+.post-card, .home-card, .folder-card {   padding: 22px 25px;   margin-bottom: 25px;  border-radius: 12px;   position: relative;   z-index: 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;  background: var(--bg-container);  border: 1px solid var(--border-base); }
+
+/* We use a 'Compound Selector' to beat any default theme styles without !important */
+.container .post-title, .container .post-card h2, .container .home-card h2, .container .folder-name {  font-family: 'Lora', serif;   font-weight: 700;   line-height: 1.2;
+  margin-top: 0;  margin-bottom: 10px;  transition: color 0.3s ease;
+  
+  /* The variable handles the theme switching automatically */
+  color: var(--text-primary);}
+
+/* Hover effects */.post-card-link:hover .post-card, .post-card:hover, .home-card:hover, .folder-card:hover {   transform: translateY(-8px); 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);   border-color: var(--brand-primary); }
+
+.post-card-link:hover .post-title {  color: var(--brand-primary);}
  
 /* ===== 4. FOOTER SECTION ===== */
 footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
