@@ -111,7 +111,7 @@ FinanceEngine.TaxEngine = {
             }
         
             return 0;
-        }
+        },
 
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
