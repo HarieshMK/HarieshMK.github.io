@@ -2,10 +2,11 @@
    PHASE 1: THE COLOR BRAIN (Variables)
    ================================================================ */
 :root {
-  /* Backgrounds */
-  --bg-main: #f8fafc;       /* Outer background */
-  --bg-container: #ffffff;  /* Main content area & cards */
-  --bg-offset: #f1f5f9;     /* Inputs & calculator results */
+  /* Backgrounds */\
+   --bg-main: #f8fafc;       /* Outer background */
+   --bg-container: #ffffff;  /* Main content area & cards */
+   --bg-offset: #f1f5f9;     /* Inputs & calculator results */
+   --text-on-brand: #ffffff; /* White text on blue for light mode */
   
   /* Text */
   --text-primary: #0f172a;   /* Headings & Bold text */
@@ -24,6 +25,7 @@
   --bg-main: #0b1120;
   --bg-container: #0f172a;
   --bg-offset: #1e293b;
+   --text-on-brand: #0f172a; /* Dark text on blue for dark mode */
   
   /* Text */
   --text-primary: #ffffff;
@@ -94,9 +96,9 @@
 .result-item { display: flex; flex-direction: column; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(226, 232, 240, 0.5); }
 .result-item span { font-size: 0.85rem; margin-bottom: 5px; color: var(--text-muted); }
 .result-item strong { font-size: 1.5rem; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-.result-item.highlight { background: #0c4a6e; padding: 20px; border-radius: 15px; margin: 15px 0; border: none; }
-.result-item.highlight span { color: #bae6fd; }
-.result-item.highlight strong { color: #ffffff !important; font-size: 2rem; }
+.result-item.highlight { background: var(--brand-primary); padding: 20px; border-radius: 15px; margin: 15px 0; border: none;}
+.result-item.highlight span { color: var(--text-on-brand); opacity: 0.8;}
+.result-item.highlight strong { color: var(--text-on-brand); font-size: 2rem;}
 
 /* Disclaimer */
 .calc-disclaimer { margin-top: 20px; padding: 20px; background: #fffbeb; border-radius: 14px; border-left: 5px solid #f59e0b; }
@@ -221,8 +223,8 @@ body {
   
   font-family: 'Inter', -apple-system, sans-serif; 
   font-size: 18px; line-height: 1.7; margin: 0; padding: 0;
-  transition: background-color 0.3s ease, color 0.3s ease; overflow-x: hidden;
-  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .container {
@@ -517,20 +519,5 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 }
 
 /* ROW 5: The View All container */
-.view-all-row {
-    display: flex;
-    justify-content: flex-end; 
-    margin-top: 8px;
-}
-
-.view-all-link {
-    font-size: 0.85rem !important;
-    font-style: italic !important;
-    color: var(--text-muted);
-    text-decoration: none;
-}
-
-.view-all-link:hover {
-    color: var(--brand-primary);
-}
-      
+.view-all-row .view-all-link { font-size: 0.85rem; font-style: italic; color: var(--text-muted);  text-decoration: none;  transition: color 0.2s ease;}
+.view-all-row .view-all-link:hover { color: var(--brand-primary);}
