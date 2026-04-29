@@ -42,25 +42,10 @@ body {
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
 }
 
-/* POINT 1 & 2 FIX: Dynamic Link and Premium Underline Logic */
+/* POINT 1 & 7: Global Link Reset */
 a { color: inherit; text-decoration: none; transition: all 0.3s ease; }
 a:visited { color: inherit; }
-
-/* The "Shiny Blue" Underline Effect from your old code */
-.view-all-link, .view-all-writing, .back-link, .generic-link {
-  display: inline-block;
-  color: var(--brand-primary);
-  font-weight: 700;
-  border-bottom: 2px solid var(--border-base);
-  padding-bottom: 2px;
-  transition: all 0.3s ease;
-}
-
-.view-all-link:hover, .view-all-writing:hover, .back-link:hover {
-  color: var(--text-primary);
-  border-bottom-color: var(--brand-primary);
-  transform: translateY(-1px);
-}
+a:hover { color: var(--brand-primary); }
 
 .container {
   max-width: 850px; margin: 0 auto; padding: 60px 50px; 
@@ -72,11 +57,28 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em; margin-top: 1.5em; margin-bottom: 0.5em;
 }
 
+/* POINT 2: Premium "Shiny" Underline Effect */
+.view-all-link, .view-all-writing, .back-link {
+  display: inline-block;
+  color: var(--brand-primary);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-base); /* Start with light underline */
+  padding-bottom: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.view-all-link:hover, .view-all-writing:hover, .back-link:hover {
+  color: var(--text-primary);
+  border-bottom-color: var(--brand-primary); /* Underline turns shiny blue */
+  transform: translateY(-2px);
+}
+
 /* ================================================================
-   PART 2: HEADER, NAV & THEME TOGGLE (Point 12)
+   PART 2: HEADER & THEME TOGGLE (Point 12)
    ================================================================ */
 header { text-align: center; padding: 40px 0 20px 0; border-bottom: 1px solid var(--border-base); margin-bottom: 40px; }
-header h1 a:hover { color: var(--brand-primary); }
+header h1 { font-size: 2.8rem; margin: 0; }
+header h1 a { color: var(--text-primary); text-decoration: none; }
+header .tagline { color: var(--text-muted); font-size: 1.1rem; font-style: italic; margin: 10px auto 25px; max-width: 550px; line-height: 1.5; }
 
 #theme-toggle {
   position: fixed; bottom: 30px; right: 30px; background: var(--bg-container);
@@ -86,10 +88,10 @@ header h1 a:hover { color: var(--brand-primary); }
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 #theme-toggle:hover { transform: scale(1.15) rotate(15deg); border-color: var(--brand-primary); }
-#theme-icon { font-size: 1.8rem; }
+#theme-icon { font-size: 1.8rem; transition: transform 0.3s ease; }
 
 /* ================================================================
-   PART 3: CALCULATOR SYSTEM (Point 6, 7, 8)
+   PART 3: CALCULATOR SYSTEM (Point 6, 8)
    ================================================================ */
 .calculator-grid {
   display: grid;
@@ -100,80 +102,87 @@ header h1 a:hover { color: var(--brand-primary); }
 
 .calculator-container {
   display: flex; flex-wrap: wrap; gap: 20px; padding: 40px; border-radius: 24px;
-  background: var(--bg-container); border: 1px solid var(--border-base);
+  margin-top: 20px; background: var(--bg-container); border: 1px solid var(--border-base);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, border-color 0.3s ease;
 }
+.calculator-container:hover { border-color: var(--brand-primary); }
 
-/* Point 7 FIX: Premium Yellow Box for Dark Mode */
+/* POINT 7 & 9: Premium Message Boxes */
 .calc-disclaimer { 
-  margin-top: 20px; padding: 20px; border-radius: 14px; 
+  margin-top: 20px; padding: 25px; border-radius: 14px; 
   border-left: 5px solid #f59e0b; background: #fffbeb; 
 }
 .dark-theme .calc-disclaimer { 
-  background: #1e1b0a; /* Deep elegant gold-black */
+  background: #1e1b0a; /* Premium Dark Gold */
   border-left-color: #f59e0b;
 }
-.dark-theme .calc-disclaimer p { color: #fef3c7; }
+.dark-theme .calc-disclaimer p { color: #fde68a; } /* Brighter text for readability */
 
 /* ================================================================
    PART 4: BLOGS & FOLDERS (Point 3)
    ================================================================ */
-.folder-card {
-  flex: 1 1 300px; padding: 24px; border-radius: 15px;
-  display: flex; align-items: center; gap: 15px;
+.folder-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+.folder-card { 
+  flex: 1 1 300px; padding: 24px; border-radius: 15px; 
+  display: flex; align-items: center; gap: 20px;
   background: var(--bg-container); border: 1px solid var(--border-base);
   transition: all 0.3s ease;
 }
+.folder-card:hover { transform: translateY(-8px); border-color: var(--brand-primary); }
 
-/* Point 3 FIX: Stack name and count on two lines */
-.folder-info-wrapper { display: flex; flex-direction: column; }
-.folder-name { font-weight: 700; color: var(--text-primary); display: block; }
-.folder-count { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-
-.post-card:hover, .folder-card:hover { 
-  transform: translateY(-8px); border-color: var(--brand-primary); 
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
-}
+/* POINT 3 FIX: Name on 1st line, Count on 2nd line */
+.folder-content { display: flex; flex-direction: column; }
+.folder-name { font-weight: 700; color: var(--text-primary); font-size: 1.1rem; }
+.folder-count { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
 
 /* ================================================================
    PART 5: AUTH & PREMIUM BUTTONS (Point 10, 11)
    ================================================================ */
 .download-btn, .auth-link, .register-btn {
-  display: inline-block; padding: 12px 26px; border-radius: 12px;
+  display: inline-block; padding: 14px 28px; border-radius: 12px;
   background: var(--brand-primary); color: var(--text-on-brand) !important;
   font-weight: 800; text-transform: uppercase; font-size: 0.85rem;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
-  transition: all 0.3s ease; border: none;
+  letter-spacing: 0.05em; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; cursor: pointer;
 }
-.download-btn:hover { background: var(--brand-hover); transform: translateY(-2px); }
+.download-btn:hover, .auth-link:hover { 
+  background: var(--brand-hover); transform: translateY(-3px); 
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.5); 
+}
 
-/* POINT 1 FIX: Dynamic Subscribe Box Text */
-.dark-theme .ml-form-embedWrapper, .dark-theme .ml-form-embedBody { 
-  background: transparent !important; 
-}
+/* POINT 1 FIX: Dynamic Subscribe Box */
+.dark-theme .ml-form-embedWrapper, 
+.dark-theme .ml-form-embedBody { background: transparent !important; }
 .dark-theme .ml-form-embedBody h4, 
 .dark-theme .ml-form-embedBody p,
 .dark-theme .ml-form-embedBody label { color: #ffffff !important; }
+.dark-theme .ml-form-embedBody input { background: var(--bg-offset) !important; color: #fff !important; }
 
 /* ================================================================
    PART 6: COMMENT SYSTEM (Point 5)
    ================================================================ */
 #cusdis_thread { 
   width: 100% !important; 
-  min-height: 500px; 
+  min-height: 450px; 
   overflow: hidden !important; 
-  margin-top: 20px; /* Reduced gap */
+  margin-top: 10px; /* Reduced gap */
 }
 .dark-theme #cusdis_thread iframe { color-scheme: dark; }
 
 /* ================================================================
-   PART 7: TABLES & MOBILE
+   PART 7: THEME REFINEMENTS
    ================================================================ */
-.table-wrapper { width: 100%; overflow-x: auto; margin: 25px 0; border: 1px solid var(--border-base); border-radius: 8px; }
-table { width: 100%; border-collapse: collapse; background: var(--bg-container); }
-table th { background: var(--bg-offset); color: var(--text-primary); padding: 12px 15px; }
+.nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.nav-list li a { 
+  text-decoration: none; color: var(--text-secondary); font-weight: 700; font-size: 0.85rem; 
+  text-transform: uppercase; padding: 10px 22px; border-radius: 10px; transition: 0.3s; 
+}
+.nav-list li a:hover { color: var(--brand-primary) !important; background: var(--bg-offset); }
+.nav-list li a.active { color: var(--text-primary); background: var(--bg-offset) !important; border: 1px solid var(--border-base); }
 
 @media (max-width: 768px) {
   .container { padding: 30px 15px; }
   .calculator-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
 }
