@@ -42,10 +42,25 @@ body {
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
 }
 
-/* POINT 1 & 7 FIX: Removing default blue/purple browser link colors */
+/* POINT 1 & 2 FIX: Dynamic Link and Premium Underline Logic */
 a { color: inherit; text-decoration: none; transition: all 0.3s ease; }
-a:hover { color: var(--brand-primary); }
-a:visited { color: inherit; } /* Fixes the purple "visited" link issue */
+a:visited { color: inherit; }
+
+/* The "Shiny Blue" Underline Effect from your old code */
+.view-all-link, .view-all-writing, .back-link, .generic-link {
+  display: inline-block;
+  color: var(--brand-primary);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-base);
+  padding-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.view-all-link:hover, .view-all-writing:hover, .back-link:hover {
+  color: var(--text-primary);
+  border-bottom-color: var(--brand-primary);
+  transform: translateY(-1px);
+}
 
 .container {
   max-width: 850px; margin: 0 auto; padding: 60px 50px; 
@@ -57,34 +72,12 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em; margin-top: 1.5em; margin-bottom: 0.5em;
 }
 
-p { margin-bottom: 1.6em; }
-img { max-width: 100%; height: auto; border-radius: 8px; }
-::selection { background: var(--brand-primary); color: var(--text-on-brand); }
-
-/* POINT 2 FIX: Premium Underline Effect for "View All" */
-.view-all-link, .view-all-writing {
-  display: inline-block;
-  color: var(--brand-primary);
-  font-weight: 700;
-  font-size: 0.9rem;
-  border-bottom: 2px solid var(--brand-primary);
-  padding-bottom: 2px;
-  transition: all 0.3s ease;
-}
-.view-all-link:hover, .view-all-writing:hover {
-  color: var(--text-primary);
-  border-bottom-color: var(--text-primary);
-}
-
 /* ================================================================
-   PART 2: HEADER, NAV & THEME TOGGLE
+   PART 2: HEADER, NAV & THEME TOGGLE (Point 12)
    ================================================================ */
 header { text-align: center; padding: 40px 0 20px 0; border-bottom: 1px solid var(--border-base); margin-bottom: 40px; }
-header h1 { font-size: 2.8rem; margin: 0; }
-header h1 a { color: var(--text-primary); text-decoration: none; }
-header .tagline { color: var(--text-muted); font-size: 1.1rem; font-style: italic; margin: 10px auto 25px; max-width: 550px; line-height: 1.5; }
+header h1 a:hover { color: var(--brand-primary); }
 
-/* POINT 12 FIX: Restored the tilt and size for the Theme Toggle */
 #theme-toggle {
   position: fixed; bottom: 30px; right: 30px; background: var(--bg-container);
   border: 1px solid var(--border-base); width: 55px; height: 55px; 
@@ -95,18 +88,9 @@ header .tagline { color: var(--text-muted); font-size: 1.1rem; font-style: itali
 #theme-toggle:hover { transform: scale(1.15) rotate(15deg); border-color: var(--brand-primary); }
 #theme-icon { font-size: 1.8rem; }
 
-.nav-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.nav-list li a { 
-  text-decoration: none; color: var(--text-secondary); font-weight: 700; font-size: 0.85rem; 
-  text-transform: uppercase; padding: 10px 22px; border-radius: 10px; transition: all 0.3s ease; 
-}
-.nav-list li a:hover { color: var(--brand-primary) !important; background: var(--bg-offset); }
-.nav-list li a.active { color: var(--text-primary); background: var(--bg-offset) !important; border: 1px solid var(--border-base); }
-
 /* ================================================================
-   PART 3: CALCULATOR SYSTEM
+   PART 3: CALCULATOR SYSTEM (Point 6, 7, 8)
    ================================================================ */
-/* POINT 8 FIX: Restored the Grid layout for calculator cards */
 .calculator-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -116,106 +100,80 @@ header .tagline { color: var(--text-muted); font-size: 1.1rem; font-style: itali
 
 .calculator-container {
   display: flex; flex-wrap: wrap; gap: 20px; padding: 40px; border-radius: 24px;
-  margin-top: 20px; background: var(--bg-container); border: 1px solid var(--border-base);
+  background: var(--bg-container); border: 1px solid var(--border-base);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
-.calc-inputs { flex: 1.2; min-width: 300px; }
-.calc-results { flex: 1; min-width: 300px; padding: 25px; border-radius: 20px; background: var(--bg-offset); }
-
-/* Segmented Control (Toggle) */
-.segmented-control-wrapper { display: flex; justify-content: center; width: 100%; margin-bottom: 20px; }
-.segmented-control { background: var(--bg-offset); padding: 4px; border-radius: 12px; border: 1px solid var(--border-base); display: inline-flex; }
-.toggle-btn { padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: var(--text-muted); background: transparent; transition: 0.2s; }
-.toggle-btn.active { background: var(--brand-primary); color: var(--text-on-brand) !important; }
-
-/* Inputs & Sliders */
-.label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.label-row input[type="number"] { 
-  width: 120px; padding: 8px 12px; border-radius: 10px; border: 2px solid var(--border-base); 
-  background: var(--bg-container); color: var(--brand-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace; 
+/* Point 7 FIX: Premium Yellow Box for Dark Mode */
+.calc-disclaimer { 
+  margin-top: 20px; padding: 20px; border-radius: 14px; 
+  border-left: 5px solid #f59e0b; background: #fffbeb; 
 }
-.slider { -webkit-appearance: none; width: 100%; height: 6px; background: var(--border-base); border-radius: 10px; }
-.slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--brand-primary); border: 3px solid var(--bg-container); cursor: pointer; }
-
-/* Results & Insight */
-.result-item { display: flex; flex-direction: column; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-base); }
-.result-item strong { font-size: 1.5rem; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-.result-item.highlight { background: var(--brand-primary); padding: 20px; border-radius: 15px; margin: 15px 0; border: none; }
-.result-item.highlight strong { color: var(--text-on-brand); font-size: 2rem; }
-.result-item.highlight span { color: var(--text-on-brand); opacity: 0.8; }
-
-.calc-insight-box { display: none; background: var(--bg-offset); border-left: 4px solid var(--brand-primary); padding: 12px 16px; margin-top: 20px; border-radius: 6px; }
-
-/* POINT 9 FIX: Brighter yellow boxes for Dark Mode */
-.calc-disclaimer { margin-top: 20px; padding: 20px; background: #fffbeb; border-radius: 14px; border-left: 5px solid #f59e0b; color: #92400e; }
-.dark-theme .calc-disclaimer { background: #2d2a14; color: #fde68a; border-left-color: #f59e0b; }
+.dark-theme .calc-disclaimer { 
+  background: #1e1b0a; /* Deep elegant gold-black */
+  border-left-color: #f59e0b;
+}
+.dark-theme .calc-disclaimer p { color: #fef3c7; }
 
 /* ================================================================
-   PART 4: BLOGS, FOLDERS & LISTS
+   PART 4: BLOGS & FOLDERS (Point 3)
    ================================================================ */
-.posts-stack-vertical { display: flex; flex-direction: column; gap: 15px; }
-.category-header-row { width: 100%; border-bottom: 1px solid var(--border-base); margin-bottom: 30px; padding-bottom: 10px; }
-
-.post-card, .folder-card { 
-  padding: 22px 25px; border-radius: 12px; background: var(--bg-container); 
-  border: 1px solid var(--border-base); transition: all 0.3s ease; 
+.folder-card {
+  flex: 1 1 300px; padding: 24px; border-radius: 15px;
+  display: flex; align-items: center; gap: 15px;
+  background: var(--bg-container); border: 1px solid var(--border-base);
+  transition: all 0.3s ease;
 }
-.post-card:hover, .folder-card:hover { transform: translateY(-8px); border-color: var(--brand-primary); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
 
-.folder-grid { display: flex; flex-wrap: wrap; gap: 20px; }
-.folder-card { flex: 1 1 300px; display: flex; align-items: center; gap: 15px; }
+/* Point 3 FIX: Stack name and count on two lines */
+.folder-info-wrapper { display: flex; flex-direction: column; }
+.folder-name { font-weight: 700; color: var(--text-primary); display: block; }
+.folder-count { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+.post-card:hover, .folder-card:hover { 
+  transform: translateY(-8px); border-color: var(--brand-primary); 
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
+}
 
 /* ================================================================
-   PART 5: AUTH, FOOTER & PREMIUM BUTTONS (Point 10, 11)
+   PART 5: AUTH & PREMIUM BUTTONS (Point 10, 11)
    ================================================================ */
-.download-btn, .auth-link, .register-btn, .btn-premium {
-  display: inline-block; padding: 12px 24px; border-radius: 12px;
+.download-btn, .auth-link, .register-btn {
+  display: inline-block; padding: 12px 26px; border-radius: 12px;
   background: var(--brand-primary); color: var(--text-on-brand) !important;
-  font-weight: 800; text-transform: uppercase; font-size: 0.8rem;
-  letter-spacing: 0.05em; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
-  transition: all 0.3s ease; border: none; cursor: pointer;
+  font-weight: 800; text-transform: uppercase; font-size: 0.85rem;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+  transition: all 0.3s ease; border: none;
 }
-.download-btn:hover, .auth-link:hover, .btn-premium:hover { 
-  background: var(--brand-hover); transform: translateY(-2px); 
-  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+.download-btn:hover { background: var(--brand-hover); transform: translateY(-2px); }
+
+/* POINT 1 FIX: Dynamic Subscribe Box Text */
+.dark-theme .ml-form-embedWrapper, .dark-theme .ml-form-embedBody { 
+  background: transparent !important; 
 }
-
-.floating-auth { position: fixed; top: 15px; right: 15px; z-index: 1000; transform: scale(0.9); }
-.profile-card { padding: 20px 24px; background: var(--bg-container); border: 1px solid var(--border-base); border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-
-.progress-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 850px; }
-.progress-bar { height: 6px; background: var(--brand-primary); width: 0%; border-radius: 10px; }
-
-footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border-base); }
-.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; }
-
-/* POINT 3 FIX: Subscribe box dark mode background */
-.dark-theme .ml-form-embedWrapper, 
-.dark-theme .ml-form-embedBody { background: transparent !important; }
-.dark-theme .ml-form-embedBody input { background: var(--bg-offset) !important; color: #fff !important; border-color: var(--border-base) !important; }
+.dark-theme .ml-form-embedBody h4, 
+.dark-theme .ml-form-embedBody p,
+.dark-theme .ml-form-embedBody label { color: #ffffff !important; }
 
 /* ================================================================
-   PART 6: TABLES & COMMENT SYSTEM FIXES
+   PART 6: COMMENT SYSTEM (Point 5)
    ================================================================ */
-.table-wrapper { width: 100%; overflow-x: auto; margin: 25px 0; border: 1px solid var(--border-base); border-radius: 8px; }
-table { width: 100%; border-collapse: collapse; background: var(--bg-container); font-size: 0.9rem; }
-table th { background: var(--bg-offset); color: var(--text-primary); padding: 12px 15px; text-align: left; }
-table td { border: 1px solid var(--border-base); padding: 12px 15px; }
-
-/* POINT 5 FIX: No more scroll bars for comments */
-#cusdis_thread { width: 100% !important; min-height: 600px; overflow: hidden !important; }
+#cusdis_thread { 
+  width: 100% !important; 
+  min-height: 500px; 
+  overflow: hidden !important; 
+  margin-top: 20px; /* Reduced gap */
+}
 .dark-theme #cusdis_thread iframe { color-scheme: dark; }
 
 /* ================================================================
-   PART 7: MOBILE OVERRIDES
+   PART 7: TABLES & MOBILE
    ================================================================ */
+.table-wrapper { width: 100%; overflow-x: auto; margin: 25px 0; border: 1px solid var(--border-base); border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; background: var(--bg-container); }
+table th { background: var(--bg-offset); color: var(--text-primary); padding: 12px 15px; }
+
 @media (max-width: 768px) {
   .container { padding: 30px 15px; }
   .calculator-grid { grid-template-columns: 1fr; }
-  .calculator-container { flex-direction: column; padding: 15px; }
-  .footer-grid { grid-template-columns: 1fr; }
-  .nav-list li { width: 100%; }
-  .nav-list li a { display: block; text-align: center; }
-  header h1 { font-size: 1.8rem; }
 }
