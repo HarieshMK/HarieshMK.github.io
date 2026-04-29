@@ -487,10 +487,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
   transition: all 0.2s;
 }
 
-.logout-link:hover {
-  background: rgba(100, 116, 139, 0.1);
-  color: var(--text-color);
-}
+.logout-link:hover { background: rgba(100, 116, 139, 0.1); color: var(--text-primary);}
 
 /* 3. Dark Mode Overrides (Isolated to this card only) */
 .dark-theme .profile-card {
@@ -522,12 +519,18 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 /* ROW 5: The View All container */
 .view-all-row {
     display: flex;
-    justify-content: flex-end; /* Pushes link to the right */
+    justify-content: flex-end; 
     margin-top: 8px;
 }
 
 .view-all-link {
     font-size: 0.85rem !important;
     font-style: italic !important;
-    text-decoration:
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.view-all-link:hover {
+    color: var(--brand-primary);
+}
       
