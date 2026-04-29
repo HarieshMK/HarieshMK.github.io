@@ -68,6 +68,36 @@ permalink: /tax-calculator/
         </div>
 
         <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+            <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-coins" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
+                <i id="80c-icon" class="fas fa-chevron-up" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
+            </div>
+            <div id="80c-content" style="display: block; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
+                <div id="80c-rows-container">
+                    <p id="empty-80c-msg" style="color: var(--calc-text-muted); font-size: 0.85rem; font-style: italic; text-align: center; margin: 20px 0;">No entries added yet.</p>
+                </div>
+                <button type="button" onclick="add80CRow()" style="background: none; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                    <i class="fas fa-plus-circle"></i> Add entry
+                </button>
+                <div style="margin-top: 15px; text-align: right; font-size: 0.8rem; color: var(--calc-text-muted);">
+                    Total 80C: <span id="display-80c-total" style="color: #4ade80; font-weight: bold;">₹ 0</span> / ₹ 1,50,000
+                </div>
+            </div>
+        </div>
+
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+            <div id="nps-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>80CCD (1B): Extra NPS</h3>
+                <i id="nps-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
+            </div>
+            <div id="nps-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
+                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Voluntary NPS Contribution</label>
+                <input type="number" id="nps-extra" class="dynamic-input" placeholder="Max ₹50,000" style="width: 100%; margin-top: 5px;">
+                <p style="font-size: 0.7rem; color: var(--calc-text-muted); margin-top: 8px;">* This is over and above the ₹1.5L limit of 80C.</p>
+            </div>
+        </div>
+
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
             <div id="80d-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: #f87171;"></i>Section 80D: Health Insurance</h3>
                 <i id="80d-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
@@ -84,18 +114,6 @@ permalink: /tax-calculator/
                         <input type="checkbox" id="parents-senior"> Parents are Senior Citizens (60+)
                     </label>
                 </div>
-            </div>
-        </div>
-
-        <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
-            <div id="nps-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>80CCD (1B): Extra NPS</h3>
-                <i id="nps-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
-            </div>
-            <div id="nps-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
-                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Voluntary NPS Contribution</label>
-                <input type="number" id="nps-extra" class="dynamic-input" placeholder="Max ₹50,000" style="width: 100%; margin-top: 5px;">
-                <p style="font-size: 0.7rem; color: var(--calc-text-muted); margin-top: 8px;">* This is over and above the ₹1.5L limit of 80C.</p>
             </div>
         </div>
 
@@ -156,37 +174,42 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
-            <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-coins" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
-                <i id="80c-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
-            </div>
-            <div id="80c-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
-                <div id="80c-rows-container">
-                    <p id="empty-80c-msg" style="color: var(--calc-text-muted); font-size: 0.85rem; font-style: italic; text-align: center; margin: 20px 0;">No entries added yet.</p>
-                </div>
-                <button type="button" onclick="add80CRow()" style="background: none; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;">
-                    <i class="fas fa-plus-circle"></i> Add entry
-                </button>
-                <div style="margin-top: 15px; text-align: right; font-size: 0.8rem; color: var(--calc-text-muted);">
-                    Total 80C: <span id="display-80c-total" style="color: #4ade80; font-weight: bold;">₹ 0</span> / ₹ 1,50,000
-                </div>
+        <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card); border-left: 4px solid #38bdf8;">
+            <h3 style="margin-top: 0; color: var(--calc-text-main);">
+                <i class="fas fa-percentage" style="margin-right: 10px; color: #38bdf8;"></i>Section 24(B): Interest on Home Loan
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 10px;">This value is automatically captured from the Home Loan Assistant.</p>
+            <div style="background: var(--calc-input-bg); padding: 15px; border-radius: 8px;">
+                <label style="font-size: 0.75rem; color: var(--calc-text-muted); text-transform: uppercase;">Total Eligible Deduction</label>
+                <div id="display-24b-value" style="font-size: 1.4rem; font-weight: bold; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
             </div>
         </div>
 
-        <div id="additional-loan-card" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #4ade80;">
-            <h3 id="extra-loan-label" style="margin-top: 0; color: #4ade80;">
+        <div id="card-80eea" class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+            <h3 style="margin-top: 0; color: #4ade80;">
                 <i class="fas fa-house-user" style="margin-right: 10px;"></i>Section 80EEA
             </h3>
-            <p id="extra-loan-desc" style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction for first-time home buyers.</p>
+            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹1.5L) for Affordable Housing.</p>
             <div style="flex-grow: 1;">
-                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Total Home Loan Interest Paid</label>
-                <input type="number" id="extra-loan-amount" class="dynamic-input" placeholder="Enter total interest" style="width: 100%; margin-top: 5px;" inputmode="decimal">
+                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest for 80EEA</label>
+                <input type="number" id="80eea-amount" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal">
             </div>
             <div style="margin-top: 10px; font-size: 0.7rem; color: #fbbf24;">
-                <i class="fas fa-info-circle"></i> This is applicable only for the Old Tax Regime.
+                <i class="fas fa-info-circle"></i> Only for Old Regime. Loan must be sanctioned between 01-Apr-19 to 31-Mar-22.
             </div>
         </div>
+
+        <div id="card-80ee" class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+            <h3 style="margin-top: 0; color: #f472b6;">
+                <i class="fas fa-key" style="margin-right: 10px;"></i>Section 80EE
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹50k) for loans sanctioned in FY 2016-17.</p>
+            <div style="flex-grow: 1;">
+                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest for 80EE</label>
+                <input type="number" id="80ee-amount" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal">
+            </div>
+        </div>
+
     </div> <div style="flex: 1 1 300px;">
         <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
             <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
@@ -227,7 +250,10 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-    </div> </div> <div id="mobile-tax-bar">
+    </div> 
+</div> 
+
+<div id="mobile-tax-bar">
     <div style="text-align: center;">
         <div style="font-size: 0.6rem; color: #94a3b8;">OLD</div>
         <div id="float-old-tax" class="tax-val">₹ 0</div>
