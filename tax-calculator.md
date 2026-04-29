@@ -125,10 +125,17 @@ permalink: /tax-calculator/
                 <i id="home-loan-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
             </div>
             <div id="home-loan-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: rgba(56, 189, 248, 0.05); padding: 12px; border-radius: 8px; border: 1px dashed var(--calc-accent);">
-                    <label style="font-size: 0.9rem; color: var(--calc-text-main); font-weight: 500;">Do you have an active Home Loan?</label>
-                    <input type="checkbox" id="has-home-loan" onchange="toggleLoanWizard()" style="width: 18px; height: 18px; cursor: pointer;">
+                <div style="background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--calc-accent); margin-bottom: 15px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                        <label style="font-size: 0.9rem; color: var(--calc-text-main); font-weight: 500;">Do you have an active Home Loan?</label>
+                        <input type="checkbox" id="has-home-loan" onchange="toggleLoanWizard()" style="width: 18px; height: 18px; cursor: pointer;">
+                    </div>
+                    <div id="first-home-container" style="display: none; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(56, 189, 248, 0.2);">
+                        <label style="font-size: 0.85rem; color: var(--calc-text-main);">Is this your <u>first</u> home purchase?</label>
+                        <input type="checkbox" id="is-first-home" onchange="runCalculator()" style="width: 18px; height: 18px; cursor: pointer;">
+                    </div>
                 </div>
+
                 <div id="home-loan-wizard" style="display: none;">
                     <div style="margin-bottom: 15px;">
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Possession Status</label>
@@ -151,7 +158,7 @@ permalink: /tax-calculator/
                             </div>
                             <div>
                                 <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
-                                <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%; margin-top: 5px;">
+                                <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="runCalculator()">
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -174,23 +181,23 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card); border-left: 4px solid #38bdf8;">
+        <div id="card-24b" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border-left: 4px solid #38bdf8;">
             <h3 style="margin-top: 0; color: var(--calc-text-main);">
                 <i class="fas fa-percentage" style="margin-right: 10px; color: #38bdf8;"></i>Section 24(B): Interest on Home Loan
             </h3>
-            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 10px;">This value is automatically captured from the Home Loan Assistant.</p>
+            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 10px;">Automatically captured from the Home Loan Assistant.</p>
             <div style="background: var(--calc-input-bg); padding: 15px; border-radius: 8px;">
                 <label style="font-size: 0.75rem; color: var(--calc-text-muted); text-transform: uppercase;">Total Eligible Deduction</label>
                 <div id="display-24b-value" style="font-size: 1.4rem; font-weight: bold; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">₹ 0</div>
             </div>
         </div>
 
-        <div id="card-80eea" class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+        <div id="card-80eea" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #4ade80;">
             <h3 style="margin-top: 0; color: #4ade80;">
                 <i class="fas fa-house-user" style="margin-right: 10px;"></i>Section 80EEA
             </h3>
-            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹1.5L) for Affordable Housing.</p>
-            <div style="flex-grow: 1;">
+            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹1.5L) for first-time buyers.</p>
+            <div>
                 <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest for 80EEA</label>
                 <input type="number" id="80eea-amount" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal">
             </div>
@@ -199,18 +206,23 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <div id="card-80ee" class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+        <div id="card-80ee" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #f472b6;">
             <h3 style="margin-top: 0; color: #f472b6;">
                 <i class="fas fa-key" style="margin-right: 10px;"></i>Section 80EE
             </h3>
-            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹50k) for loans sanctioned in FY 2016-17.</p>
-            <div style="flex-grow: 1;">
+            <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹50k) for first-time buyers.</p>
+            <div>
                 <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest for 80EE</label>
                 <input type="number" id="80ee-amount" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal">
             </div>
+            <div style="margin-top: 10px; font-size: 0.7rem; color: #fbbf24;">
+                <i class="fas fa-info-circle"></i> Only for Old Regime. Loan must be sanctioned between 01-Apr-16 to 31-Mar-17.
+            </div>
         </div>
 
-    </div> <div style="flex: 1 1 300px;">
+    </div>
+
+    <div style="flex: 1 1 300px;">
         <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
             <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
@@ -262,6 +274,7 @@ permalink: /tax-calculator/
         <div style="font-size: 0.6rem; color: #94a3b8;">NEW</div>
         <div id="float-new-tax" class="tax-val">₹ 0</div>
     </div>
+</div>
 </div>
 
 <script src="/assets/js/tax-config.js"></script>
