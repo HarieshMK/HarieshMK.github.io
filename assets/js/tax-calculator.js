@@ -1,11 +1,84 @@
 /**
  * Controller for the Tax Calculator UI with Supabase Persistence
- * VERSION: 3.5 - Aligned with Home Loan Assistant IDs & Select Logic
+ * VERSION: 3.6 - Optimized Eligibility & Logic Flow
  */
+
+const ELIGIBILITY_RULES = {
+    sec80EE: {
+        start: new Date('2016-04-01'),
+        end: new Date('2017-03-31'),
+        loanLimit: 3500000,
+        propertyLimit: 5000000
+    },
+    sec80EEA: {
+        start: new Date('2019-04-01'),
+        end: new Date('2022-03-31'),
+        propertyLimit: 4500000
+    }
+};
+
+function updateHomeLoanDeductions(sanctionDateStr, propertyValue, loanAmount) {
+    const sanctionDate = new Date(sanctionDateStr);
+    const isOldRegime = document.getElementById('regime-toggle').value === 'old';
+
+    // Reset visibility first
+    toggleVisibility('sec-24b', false);
+    toggleVisibility('sec-80EE', false);
+    toggleVisibility('sec-80EEA', false);
+
+    if (!isOldRegime) return; // These don't apply to New Regime
+
+    // Section 24(b) - Always available in Old Regime
+    toggleVisibility('sec-24b', true);
+
+    // Section 80EE Check
+    if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+        sanctionDate <= ELIGIBILITY_RULES.sec80EE.end &&
+        loanAmount <= ELIGIBILITY_RULES.sec80EE.loanLimit &&
+        propertyValue <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
+        toggleVisibility('sec-80EE', true);
+    }
+
+    // Section 80EEA Check
+    if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
+        sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end &&
+        propertyValue <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
+        toggleVisibility('sec-80EEA', true);
+    }
+},
 
 const TaxController = {
     isDirty: false,
 
+    // Helper to handle card visibility based on complex rules
+    updateDeductionVisibility: (sanctionDateStr, propertyValue, loanAmount, isOldRegime) => {
+        const toggle = (id, show) => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = (show && isOldRegime) ? 'block' : 'none';
+        };
+
+        if (!sanctionDateStr) {
+            toggle('sec-24b-card', true);
+            toggle('sec-80EEA-card', false);
+            toggle('sec-80EE-card', false);
+            return;
+        }
+
+        const sanctionDate = new Date(sanctionDateStr);
+        toggle('sec-24b-card', true);
+
+        const is80EEA = (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
+                        sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
+                        propertyValue <= ELIGIBILITY_RULES.sec80EEA.propertyLimit);
+        toggle('sec-80EEA-card', is80EEA);
+
+        const is80EE = (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+                       sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
+                       loanAmount <= ELIGIBILITY_RULES.sec80EE.loanLimit && 
+                       propertyValue <= ELIGIBILITY_RULES.sec80EE.propertyLimit);
+        toggle('sec-80EE-card', is80EE);
+    },
+    
     init: async () => {
         console.log("Tax Controller 3.5 Initialized");
 
@@ -107,30 +180,27 @@ const TaxController = {
     },
 
     // --- CALCULATION ENGINE ---
-    calculateAll: () => {
-    const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
-    const container80c = document.getElementById('80c-rows-container');
+calculateAll: () => {
+        const basicValue = parseFloat(document.getElementById('basic-salary').value) || 0;
+        const container80c = document.getElementById('80c-rows-container');
+        const isOldRegime = document.getElementById('regime-toggle')?.value === 'old';
 
-    // --- 1. HOME LOAN STATE & 80EEA UI CHECK ---
-    const hasHomeLoan = document.getElementById('has-home-loan')?.checked;
-    // Get the actual value from the dropdown
-    const loanPossessionValue = document.getElementById('loan-possession')?.value; 
-    const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
-    const additionalLoanCard = document.getElementById('additional-loan-card');
-    
-    // UI Trigger for 80EEA Card
-    if (sanctionDateVal && additionalLoanCard) {
-        const sDate = new Date(sanctionDateVal);
-        const startLimit = new Date('2019-04-01');
-        const endLimit = new Date('2022-03-31');
-        
-        // Logic: Show card only if date is in range
-        additionalLoanCard.style.display = (sDate >= startLimit && sDate <= endLimit) ? 'block' : 'none';
-    }
-    
-    // Logic: Possession is only "completed" if the checkbox is ON and dropdown is "completed"
-    const isCompleted = hasHomeLoan && (loanPossessionValue === 'completed');
-    const isUnderConstruction = hasHomeLoan && (loanPossessionValue === 'under-construction');
+        // 1. Home Loan & Education Loan UI Logic
+        const hasHomeLoan = document.getElementById('has-home-loan')?.checked;
+        const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
+        const propertyValue = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
+        const loanAmount = parseFloat(document.getElementById('home-loan-amount')?.value) || 0;
+        const loanPossessionValue = document.getElementById('loan-possession')?.value; 
+
+        // Update Visibility of 80EE/80EEA cards
+        TaxController.updateDeductionVisibility(sanctionDateVal, propertyValue, loanAmount, isOldRegime);
+
+        const hasEduLoan = document.getElementById('has-edu-loan')?.checked;
+        const eduLoanDisplay = document.getElementById('sec-80E-container'); 
+        if (eduLoanDisplay) eduLoanDisplay.style.display = (hasEduLoan && isOldRegime) ? 'block' : 'none';
+
+        const isCompleted = hasHomeLoan && (loanPossessionValue === 'completed');
+        const isUnderConstruction = hasHomeLoan && (loanPossessionValue === 'under-construction');
 
     // --- 2. STATUTORY 80C ROWS (EPF & Principal) ---
     // Handle EPF
@@ -162,11 +232,11 @@ const TaxController = {
 
     // --- 3. CAPTURE INPUTS FOR ENGINE ---
     const inputs = {
-        basic: basicValue,
-        hra: parseFloat(document.getElementById('hra-received').value) || 0,
-        rent: parseFloat(document.getElementById('rent-paid').value) || 0,
-        isMetro: document.getElementById('is-metro').value === 'true',
-        otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
+            basic: basicValue,
+            hra: parseFloat(document.getElementById('hra-received').value) || 0,
+            rent: parseFloat(document.getElementById('rent-paid').value) || 0,
+            isMetro: document.getElementById('is-metro').value === 'true',
+            otherIncome: parseFloat(document.getElementById('other-income').value) || 0,
         
         // Home Loan Specifics
         hasHomeLoan: hasHomeLoan,
@@ -174,8 +244,14 @@ const TaxController = {
         homeInterest: isCompleted ? (parseFloat(document.getElementById('home-interest')?.value) || 0) : 0,
         homePrincipal: isCompleted ? principalInput : 0,
         extraLoanInterest: (() => {
-        const sDateVal = document.getElementById('loan-sanction-date')?.value;
-        if (!sDateVal) return 0;
+            if (!isOldRegime || !sanctionDateVal) return 0;
+            const sDate = new Date(sanctionDateVal);
+            const startLimit = new Date('2019-04-01');
+            const endLimit = new Date('2022-03-31');
+            return (sDate >= startLimit && sDate <= endLimit) 
+                   ? (parseFloat(document.getElementById('extra-loan-amount')?.value) || 0) 
+                   : 0;
+        })(),
         
         const sDate = new Date(sDateVal);
         const startLimit = new Date('2019-04-01');
@@ -340,6 +416,8 @@ const TaxController = {
             healthSelf: document.getElementById('80d-self').value,
             healthParents: document.getElementById('80d-parents').value,
             parentsSenior: document.getElementById('parents-senior').checked,
+            eduLoanInterest: document.getElementById('edu-loan-interest')?.value || 0, 
+            hasEduLoan: document.getElementById('has-edu-loan')?.checked || false,
             npsExtra: document.getElementById('nps-extra').value,
             perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
                 type: row.querySelector('.perk-type').value,
@@ -410,6 +488,11 @@ const TaxController = {
             setVal('loan-sanction-date', inputs.loanSanctionDate);
             setVal('property-stamp-value', inputs.propertyStampValue);
             setVal('extra-loan-amount', inputs.extraLoanInterest); // Aligned with captureInputs
+            setVal('nps-extra', inputs.npsExtra);
+            setVal('edu-loan-interest', inputs.eduLoanInterest);
+
+            if (document.getElementById('has-edu-loan')) 
+                document.getElementById('has-edu-loan').checked = inputs.hasEduLoan || false;
             
             if (document.getElementById('loan-occupancy')) 
                 document.getElementById('loan-occupancy').value = inputs.propertyOccupancy || "self";
