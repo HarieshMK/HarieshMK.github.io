@@ -5,7 +5,6 @@ permalink: /tax-calculator/
 ---
 
 <div id="calculator-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <!-- HEADER SECTION -->
     <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
         <div>
             <h1 style="margin: 0; color: #38bdf8; font-family: 'Lora', serif;">💰 Income Tax Calculator</h1>
@@ -23,10 +22,8 @@ permalink: /tax-calculator/
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 25px;">
-        <!-- LEFT COLUMN: INPUTS -->
-        <div style="flex: 3; min-width: 320px;">
+        <div style="flex: 1 1 550px;">
 
-            <!-- SALARY DETAILS -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; color: var(--calc-text-main);">
                     <i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details
@@ -59,11 +56,10 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- PERKS SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; color: var(--calc-text-main);"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
                 <div style="font-size: 0.75rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #fbbf24;">
-                    <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Only add perks if included in <strong>Other Taxable Allowances</strong>.
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Only add perks here if they are already included in your <strong>Other Taxable Allowances</strong> above.
                 </div>
                 <div id="perks-rows-container"></div>
                 <button type="button" onclick="addPerkRow()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;"> 
@@ -71,7 +67,6 @@ permalink: /tax-calculator/
                 </button>
             </div>
 
-            <!-- 80C SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleSection('80c-content', '80c-icon')">
                     <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-coins" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
@@ -90,7 +85,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- NPS SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <div id="nps-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleSection('nps-content', 'nps-icon')">
                     <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-piggy-bank" style="margin-right: 10px; color: #fbbf24;"></i>80CCD (1B): Extra NPS</h3>
@@ -99,10 +93,10 @@ permalink: /tax-calculator/
                 <div id="nps-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
                     <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Voluntary NPS Contribution</label>
                     <input type="number" id="nps-extra" class="dynamic-input" placeholder="Max ₹50,000" style="width: 100%; margin-top: 5px;" oninput="runCalculator()">
+                    <p style="font-size: 0.7rem; color: var(--calc-text-muted); margin-top: 8px;">* This is over and above the ₹1.5L limit of 80C.</p>
                 </div>
             </div>
 
-            <!-- 80D SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <div id="80d-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleSection('80d-content', '80d-icon')">
                     <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: #f87171;"></i>Section 80D: Health Insurance</h3>
@@ -115,7 +109,7 @@ permalink: /tax-calculator/
                     </div>
                     <div>
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Parents Premium</label>
-                        <input type="number" id="80d-parents" class="dynamic-input" placeholder="Max ₹25k / ₹50k" style="width: 100%; margin-top: 5px;" oninput="runCalculator()">
+                        <input type="number" id="80d-parents" class="dynamic-input" placeholder="Max ₹25,000 / ₹50,000" style="width: 100%; margin-top: 5px;" oninput="runCalculator()">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--calc-text-muted); font-size: 0.8rem; margin-top: 8px;">
                             <input type="checkbox" id="parents-senior" onchange="runCalculator()"> Parents are Senior Citizens (60+)
                         </label>
@@ -123,7 +117,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- HOME LOAN ASSISTANT (CONSOLIDATED) -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <div id="home-loan-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleSection('home-loan-content', 'home-loan-icon')">
                     <h3 style="margin: 0; color: var(--calc-text-main);">
@@ -133,109 +126,130 @@ permalink: /tax-calculator/
                 </div>
 
                 <div id="home-loan-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
-                    
-                    <div style="background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #38bdf8; margin-bottom: 20px;">
+                    <div style="background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #38bdf8; margin-bottom: 15px;">
                         <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <label style="font-size: 0.95rem; color: var(--calc-text-main); font-weight: 600;">Do you have an active Home Loan?</label>
-                            <input type="checkbox" id="has-home-loan" onchange="toggleLoanWizard()" style="width: 20px; height: 20px; cursor: pointer;">
+                            <label style="font-size: 0.9rem; color: var(--calc-text-main); font-weight: 500;">Do you have an active Home Loan?</label>
+                            <input type="checkbox" id="has-home-loan" onchange="toggleLoanWizard()" style="width: 18px; height: 18px; cursor: pointer;">
                         </div>
                     </div>
 
                     <div id="home-loan-wizard" style="display: none;">
-                        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                            <input type="checkbox" id="hl-is-first-home" onchange="runCalculator()" style="width: 16px; height: 16px;">
-                            <label for="hl-is-first-home" style="font-size: 0.9rem; color: var(--calc-text-main); cursor: pointer;">This is my first/only residential property</label>
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Possession Status</label>
+                            <select id="loan-possession" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="updateLoanVisibility(); runCalculator();">
+                                <option value="completed">Completed / Fully Constructed</option>
+                                <option value="under-construction">Under Construction (CLP)</option>
+                            </select>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                            <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Property Stamp Value</label>
-                                <input type="number" id="hl-property-value" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Loan Sanction Date</label>
-                                <input type="date" id="hl-sanction-date" class="dynamic-input" style="width: 100%;" onchange="runCalculator()">
-                            </div>
+                        <div id="under-construction-msg" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
+                            <i class="fas fa-info-circle"></i> Deductions apply after possession. You can claim pre-construction interest in 5 equal portions later.
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                            <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Possession Status</label>
-                                <div style="display: flex; gap: 10px; margin-top: 5px;">
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="possession" value="ready" checked onchange="runCalculator()"> Ready to Move In</label>
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="possession" value="under" onchange="runCalculator()"> Under Construction</label>
+                        <div id="completed-loan-fields">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy</label>
+                                    <select id="loan-occupancy" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="runCalculator()">
+                                        <option value="self">Self-Occupied</option>
+                                        <option value="let-out">Let-out</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
+                                    <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="runCalculator()">
                                 </div>
                             </div>
-                            <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy Status</label>
-                                <div style="display: flex; gap: 10px; margin-top: 5px;">
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="occupancy" value="self-occupied" checked onchange="runCalculator()"> Self-Occupied</label>
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="occupancy" value="let-out" onchange="runCalculator()"> Let-out</label>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest Paid</label>
+                                    <input type="number" id="home-interest" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Principal Paid</label>
+                                    <input type="number" id="home-principal" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
                                 </div>
                             </div>
-                        </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                            <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest Paid (Annual)</label>
-                                <input type="number" id="home-interest" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
+                            <div id="eligible-24b-display" style="font-size: 0.75rem; color: #4ade80; margin-top: 10px; font-weight: bold;"></div>
+
+                            <div style="margin-top: 10px;">
+                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Stamp Duty Paid?</label>
+                                <input type="number" id="loan-stamp-duty" class="dynamic-input" placeholder="Optional" style="width: 100%; margin-top: 5px;" oninput="runCalculator()">
                             </div>
-                            <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Principal Paid (80C)</label>
-                                <input type="number" id="home-principal" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 10px;">
-                            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Stamp Duty (Optional)</label>
-                            <input type="number" id="loan-stamp-duty" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
-                        </div>
-
-                        <div id="hra-loan-conflict-warning" style="display: none; color: #fbbf24; font-size: 0.75rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 4px solid #fbbf24; margin-top: 15px;">
-                            <i class="fas fa-exclamation-triangle"></i> Claiming HRA + Self-Occupied Home Loan may trigger an audit.
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- DYNAMIC WATERFALL RESULTS (Output Only) -->
-            <div id="hl-deduction-cards" style="display: none; margin-bottom: 25px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
-                    <div class="post-card" style="padding: 15px; border-top: 3px solid #4ade80; text-align: center;">
-                        <div style="font-size: 0.65rem; color: var(--calc-text-muted);">Sec 24(B)</div>
-                        <div id="display-24b" style="font-weight: 700; color: var(--calc-text-main);">₹ 0</div>
-                    </div>
-                    <div id="waterfall-80eea" class="post-card" style="padding: 15px; border-top: 3px solid #38bdf8; text-align: center; display: none;">
-                        <div style="font-size: 0.65rem; color: var(--calc-text-muted);">Sec 80EEA</div>
-                        <div id="display-80eea" style="font-weight: 700; color: var(--calc-text-main);">₹ 0</div>
-                    </div>
-                    <div id="waterfall-80ee" class="post-card" style="padding: 15px; border-top: 3px solid #f472b6; text-align: center; display: none;">
-                        <div style="font-size: 0.65rem; color: var(--calc-text-muted);">Sec 80EE</div>
-                        <div id="display-80ee" style="font-weight: 700; color: var(--calc-text-main);">₹ 0</div>
-                    </div>
-                </div>
+            <div id="card-80eea" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #4ade80;">
+                <h3 style="margin-top: 0; color: #4ade80;"><i class="fas fa-house-user" style="margin-right: 10px;"></i>Section 80EEA</h3>
+                <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹1.5L) for first-time buyers.</p>
+                <input type="number" id="80eea-amount" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #fbbf24;"><i class="fas fa-info-circle"></i> Only for Old Regime. Loan sanctioned 01-Apr-19 to 31-Mar-22.</div>
             </div>
-        </div>
 
-        <!-- RIGHT COLUMN: RESULTS STICKY -->
-        <div style="flex: 1; min-width: 300px;">
+            <div id="card-80ee" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #f472b6;">
+                <h3 style="margin-top: 0; color: #f472b6;"><i class="fas fa-key" style="margin-right: 10px;"></i>Section 80EE</h3>
+                <p style="font-size: 0.8rem; color: var(--calc-text-muted); margin-bottom: 15px;">Additional deduction (up to ₹50k) for first-time buyers.</p>
+                <input type="number" id="80ee-amount" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="runCalculator()">
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #fbbf24;"><i class="fas fa-info-circle"></i> Only for Old Regime. Loan sanctioned 01-Apr-16 to 31-Mar-17.</div>
+            </div>
+
+        </div> <div style="flex: 1 1 300px;">
             <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
-                <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; margin-bottom: 15px;">
-                    <div style="font-size: 0.75rem; color: var(--calc-text-muted);">OLD REGIME</div>
-                    <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main);">₹ 0</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
+                    <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
+                        <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">OLD REGIME</div>
+                        <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+                    </div>
+                    <div id="new-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
+                        <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">NEW REGIME</div>
+                        <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+                    </div>
+                    <div id="recommendation-box" style="margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 0.9rem; text-align: center; border: 1px solid var(--calc-input-border); color: var(--calc-text-main);">
+                        Enter your details to see the recommendation.
+                    </div>
                 </div>
-                <div id="new-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px;">
-                    <div style="font-size: 0.75rem; color: var(--calc-text-muted);">NEW REGIME</div>
-                    <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main);">₹ 0</div>
-                </div>
-                <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; background: #38bdf8; color: #0f172a; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">Calculate</button>
-                <div id="comparison-table-container" style="margin-top: 20px; font-size: 0.8rem;">
-                    <table style="width: 100%;" id="comparison-table">
-                        <tbody id="comparison-table-body"></tbody>
-                    </table>
+
+                <button onclick="runCalculator()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;">
+                    <i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculate Tax
+                </button>
+                <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8;">
+                    <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i>Save to Profile
+                </button>
+                <div id="save-status" style="margin-top: 10px; font-size: 0.75rem; text-align: center; color: var(--calc-text-muted); min-height: 1.2em;"></div>
+                
+                <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
+                    <h4 style="color: var(--calc-text-main); margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase;">Breakdown</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--calc-text-main);">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left;">
+                                    <th style="padding: 8px 4px;">Component</th>
+                                    <th style="padding: 8px 4px; color: #4ade80;">New</th>
+                                    <th style="padding: 8px 4px; color: #38bdf8;">Old</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparison-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+        </div> 
+    </div> 
+
+    <div id="mobile-tax-bar">
+        <div style="text-align: center;">
+            <div style="font-size: 0.6rem; color: #94a3b8;">OLD</div>
+            <div id="float-old-tax" class="tax-val">₹ 0</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 0.6rem; color: #94a3b8;">NEW</div>
+            <div id="float-new-tax" class="tax-val">₹ 0</div>
         </div>
     </div>
 </div>
