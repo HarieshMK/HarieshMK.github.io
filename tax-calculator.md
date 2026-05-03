@@ -160,16 +160,16 @@ permalink: /tax-calculator/
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                             <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Possession</label>
+                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Possession Status</label>
                                 <div style="display: flex; gap: 10px; margin-top: 5px;">
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="possession" value="ready" checked onchange="runCalculator()"> Ready</label>
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="possession" value="under" onchange="runCalculator()"> Under Const.</label>
+                                    <label style="font-size: 0.8rem;"><input type="radio" name="possession" value="ready" checked onchange="runCalculator()"> Ready to Move In</label>
+                                    <label style="font-size: 0.8rem;"><input type="radio" name="possession" value="under" onchange="runCalculator()"> Under Construction</label>
                                 </div>
                             </div>
                             <div>
-                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy</label>
+                                <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy Status</label>
                                 <div style="display: flex; gap: 10px; margin-top: 5px;">
-                                    <label style="font-size: 0.8rem;"><input type="radio" name="occupancy" value="self-occupied" checked onchange="runCalculator()"> Self</label>
+                                    <label style="font-size: 0.8rem;"><input type="radio" name="occupancy" value="self-occupied" checked onchange="runCalculator()"> Self-Occupied</label>
                                     <label style="font-size: 0.8rem;"><input type="radio" name="occupancy" value="let-out" onchange="runCalculator()"> Let-out</label>
                                 </div>
                             </div>
