@@ -239,6 +239,7 @@ const TaxController = {
             console.log("No saved data found for this year.");
         }
     }
+}
 
 // GLOBAL BRIDGE
 window.TaxController = TaxController;
