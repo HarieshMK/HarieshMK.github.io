@@ -231,105 +231,124 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-        const cleanNum = (val) => {
+    // --- DIRTY STATE TRACKING (THE MISSING WARNING LOGIC) ---
+    let isDirty = false;
+
+    window.addEventListener('beforeunload', function (e) {
+        if (isDirty) {
+            const message = "You have unsaved tax data. Are you sure you want to leave?";
+            e.returnValue = message; 
+            return message;
+        }
+    });
+
+    const cleanNum = (val) => {
         if (!val) return 0;
         // Removes currency symbols, commas, and spaces so "1,00,000" becomes "100000"
         const cleanValue = val.toString().replace(/[^0-9.-]+/g, "");
         return parseFloat(cleanValue) || 0;
     };
+
     // --- INITIALIZATION ---
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('input[type="number"]').forEach(input => {
-                if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
-            });
-        
-            // Cleaned up Toggles (Removed 24b, Added home-loan)
-            setupToggle('80c-header', '80c-content', '80c-icon');
-            setupToggle('80d-header', '80d-content', '80d-icon');
-            setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon'); // ADDED THIS
-            setupToggle('nps-header', 'nps-content', 'nps-icon');
-        
-            TaxController.init().then(() => {
-                const pContainer = document.getElementById('perks-rows-container');
-                const cContainer = document.getElementById('80c-rows-container');
-        
-                if (pContainer && pContainer.children.length === 0) {
-                    TaxController.addPerkRow("Professional Tax", 2500);
-                }
-                if (cContainer && (cContainer.children.length === 0 || cContainer.querySelector('#empty-80c-msg'))) {
-                    add80CRow(); 
-                }
-            });
-        });
-        // Function to handle perk-specific UI feedback
-        function handlePerkUIFeedback(inputElement, perkName) {
-            const value = cleanNum(inputElement.value);
-            const selectedYear = document.getElementById('fy-selector').value;
-            const config = TAX_CONFIG[selectedYear] || TAX_CONFIG["2026-27"];
-            
-            // 1. MEAL COUPON WARNING LOGIC
-            if (perkName === "Meal Coupons") {
-                let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
-                
-                // Create warning div if it doesn't exist
-                if (!warningDiv) {
-                    warningDiv = document.createElement('div');
-                    warningDiv.className = 'perk-limit-warning';
-                    inputElement.parentNode.appendChild(warningDiv);
-                }
-        
-                const limit = config.perkRules["Meal Coupons"].govtLimit;
-                
-                if (value > limit) {
-                    warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Standard exempt limit is ₹${limit.toLocaleString('en-IN')}. Amounts above this may be treated as taxable perquisites unless specifically allowed by your employer's policy.`;
-                    warningDiv.style.display = 'block';
-                } else {
-                    warningDiv.style.display = 'none';
-                }
-            }
-        
-            // 2. FUEL & MOBILE PLACEHOLDER/HINT LOGIC
-            if (perkName === "Fuel Allowances" || perkName === "Mobile & Internet") {
-                inputElement.classList.add('actuals-hint');
-                inputElement.placeholder = "Enter amount as per bills";
-            }
-        }
-        
-        // Hook this into your existing input listener
-        document.addEventListener('input', (e) => {
-            if (e.target.classList.contains('dynamic-input')) {
-                // Find the perk name if this input is inside a perk row
-                const row = e.target.closest('.perk-row'); // Assuming your rows have this class
-                if (row) {
-                    const perkSelect = row.querySelector('select');
-                    if (perkSelect) handlePerkUIFeedback(e.target, perkSelect.value);
-                }
-                
-                if (typeof runCalculator === 'function') {
-                    runCalculator();
-                }
-            }
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
         });
         
-        // --- HOME LOAN ASSISTANT LOGIC ---
-        function toggleLoanWizard() {
-            const isChecked = document.getElementById('has-home-loan').checked;
-            const wizard = document.getElementById('home-loan-wizard');
-            wizard.style.display = isChecked ? 'block' : 'none';
-            
-            // Only call calc if it's not handled by the general 'input' listener
-            updateLoanUI();
-        }
+        // Cleaned up Toggles (Removed 24b, Added home-loan)
+        setupToggle('80c-header', '80c-content', '80c-icon');
+        setupToggle('80d-header', '80d-content', '80d-icon');
+        setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon'); 
+        setupToggle('nps-header', 'nps-content', 'nps-icon');
         
-        function updateLoanUI() {
-            const status = document.getElementById('loan-possession').value;
-            const isUC = (status === 'under-construction');
-            
-            document.getElementById('under-construction-msg').style.display = isUC ? 'block' : 'none';
-            document.getElementById('completed-loan-fields').style.display = isUC ? 'none' : 'block';
-            
+        TaxController.init().then(() => {
+            const pContainer = document.getElementById('perks-rows-container');
+            const cContainer = document.getElementById('80c-rows-container');
+    
+            if (pContainer && pContainer.children.length === 0) {
+                TaxController.addPerkRow("Professional Tax", 2500);
+            }
+            if (cContainer && (cContainer.children.length === 0 || cContainer.querySelector('#empty-80c-msg'))) {
+                add80CRow(); 
+            }
+
+            // TRIGGER CALCULATION AFTER SUPABASE DATA LOADS
             if (typeof runCalculator === 'function') runCalculator();
+            
+            // RESET DIRTY STATE AFTER INITIAL LOAD
+            setTimeout(() => { isDirty = false; }, 500);
+        });
+    });
+
+    // Function to handle perk-specific UI feedback
+    function handlePerkUIFeedback(inputElement, perkName) {
+        const value = cleanNum(inputElement.value);
+        const selectedYear = document.getElementById('fy-selector').value;
+        const config = TAX_CONFIG[selectedYear] || TAX_CONFIG["2026-27"];
+        
+        // 1. MEAL COUPON WARNING LOGIC
+        if (perkName === "Meal Coupons") {
+            let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
+            
+            // Create warning div if it doesn't exist
+            if (!warningDiv) {
+                warningDiv = document.createElement('div');
+                warningDiv.className = 'perk-limit-warning';
+                inputElement.parentNode.appendChild(warningDiv);
+            }
+    
+            const limit = config.perkRules["Meal Coupons"].govtLimit;
+            
+            if (value > limit) {
+                warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Standard exempt limit is ₹${limit.toLocaleString('en-IN')}. Amounts above this may be treated as taxable perquisites unless specifically allowed by your employer's policy.`;
+                warningDiv.style.display = 'block';
+            } else {
+                warningDiv.style.display = 'none';
+            }
         }
+    
+        // 2. FUEL & MOBILE PLACEHOLDER/HINT LOGIC
+        if (perkName === "Fuel Allowances" || perkName === "Mobile & Internet") {
+            inputElement.classList.add('actuals-hint');
+            inputElement.placeholder = "Enter amount as per bills";
+        }
+    }
+    
+    // Hook this into your existing input listener
+    document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('dynamic-input')) {
+            isDirty = true; // MARK AS DIRTY
+            // Find the perk name if this input is inside a perk row
+            const row = e.target.closest('.perk-row'); 
+            if (row) {
+                const perkSelect = row.querySelector('select');
+                if (perkSelect) handlePerkUIFeedback(e.target, perkSelect.value);
+            }
+            
+            if (typeof runCalculator === 'function') {
+                runCalculator();
+            }
+        }
+    });
+    
+    // --- HOME LOAN ASSISTANT LOGIC ---
+    function toggleLoanWizard() {
+        const isChecked = document.getElementById('has-home-loan').checked;
+        const wizard = document.getElementById('home-loan-wizard');
+        wizard.style.display = isChecked ? 'block' : 'none';
+        isDirty = true; // MARK AS DIRTY
+        updateLoanUI();
+    }
+    
+    function updateLoanUI() {
+        const status = document.getElementById('loan-possession').value;
+        const isUC = (status === 'under-construction');
+        
+        document.getElementById('under-construction-msg').style.display = isUC ? 'block' : 'none';
+        document.getElementById('completed-loan-fields').style.display = isUC ? 'none' : 'block';
+        
+        if (typeof runCalculator === 'function') runCalculator();
+    }
 
     // --- YEAR SELECTOR LOGIC ---
     const fySelector = document.getElementById('fy-selector');
@@ -344,6 +363,7 @@ permalink: /tax-calculator/
     // --- AUTOMATIC CALCULATION TRIGGER ---
     document.addEventListener('input', (e) => {
         if (e.target.classList.contains('dynamic-input') || e.target.type === 'checkbox') {
+            isDirty = true; // MARK AS DIRTY
             if (typeof runCalculator === 'function') {
                 runCalculator();
             }
@@ -367,39 +387,42 @@ permalink: /tax-calculator/
         }
     }
 
-    // --- DYNAMIC ROW LOGIC (Updated for Auto-Calc) ---
+    // --- DYNAMIC ROW LOGIC ---
     const options80C = typeof InvestmentRegistry !== 'undefined' ? 
                        Object.keys(InvestmentRegistry).filter(k => InvestmentRegistry[k].taxCategory === "80C") : [];
 
     // --- EXTERNAL BRIDGES ---
-   async function handleSave() {
-    const btn = document.getElementById('save-btn');
-    const status = document.getElementById('save-status');
-    
-    // 1. GET THE YEAR FROM THE DROPDOWN HERE
-    const selectedYear = document.getElementById('fy-selector').value; 
+    async function handleSave() {
+        const btn = document.getElementById('save-btn');
+        const status = document.getElementById('save-status');
+        const selectedYear = document.getElementById('fy-selector').value; 
 
-    try {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        status.innerText = "Connecting to database...";
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            if(status) status.innerText = "Connecting to database...";
 
-        // 2. PASS THE YEAR TO THE SAVE FUNCTION
-        // (Make sure your saveTaxData function in tax-calculator.js is updated to accept this)
-        await saveTaxData(selectedYear); 
+            await saveTaxData(selectedYear); 
 
-        btn.innerHTML = `<i class="fas fa-check-circle"></i> Saved for ${selectedYear}!`;
-        status.style.color = "#4ade80";
-        status.innerText = `Data for ${selectedYear} synced successfully.`;
-        
-        setTimeout(() => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
-        }, 3000);
-    } catch (error) {
+            // RESET DIRTY STATE ON SUCCESSFUL SAVE
+            isDirty = false;
+
+            btn.innerHTML = `<i class="fas fa-check-circle"></i> Saved for ${selectedYear}!`;
+            if(status) {
+                status.style.color = "#4ade80";
+                status.innerText = `Data for ${selectedYear} synced successfully.`;
+            }
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
+            }, 3000);
+        } catch (error) {
             console.error(error);
-            status.style.color = "#ef4444";
-            status.innerText = "Error saving data.";
+            if(status) {
+                status.style.color = "#ef4444";
+                status.innerText = "Error saving data.";
+            }
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Try Again';
         }
