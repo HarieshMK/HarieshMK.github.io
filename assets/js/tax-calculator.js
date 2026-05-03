@@ -181,27 +181,64 @@ const TaxController = {
 
     loadUserData: async () => {
         if (!window.supabase) return;
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        
+        // Ensure we have a user session
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (!user || authError) {
+            console.log("No active session found.");
+            return;
+        }
 
-        const { data } = await supabase.from('tax_user_data')
+        const selectedYear = document.getElementById('fy-selector').value;
+        console.log(`Fetching data for User: ${user.id} and Year: ${selectedYear}`);
+
+        const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
-            .eq('id', user.id)
-            .eq('financial_year', document.getElementById('fy-selector').value)
+            .eq('user_id', user.id) // Changed 'id' to 'user_id' (Common Supabase standard)
+            .eq('financial_year', selectedYear)
             .maybeSingle();
+
+        if (error) {
+            console.error("Supabase Fetch Error:", error);
+            return;
+        }
 
         if (data?.calculator_inputs) {
             const i = data.calculator_inputs;
-            document.getElementById('basic-salary').value = i.basic || "";
-            document.getElementById('hra-received').value = i.hra || "";
-            document.getElementById('rent-paid').value = i.rent || "";
             
-            // Clear and add perks
-            document.getElementById('perks-rows-container').innerHTML = '';
-            if (i.perks) i.perks.forEach(p => TaxController.addPerkRow(p.type, p.value));
+            // Map Basic Fields
+            if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
+            if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hra || "";
+            if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rent || "";
+            if(document.getElementById('other-income')) document.getElementById('other-income').value = i.other_income || "";
+
+            // Clear and Restore Perks
+            const pContainer = document.getElementById('perks-rows-container');
+            if (pContainer && i.perks) {
+                pContainer.innerHTML = '';
+                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.amount || p.value));
+            }
+
+            // Clear and Restore 80C Rows (THIS WAS MISSING)
+            const cContainer = document.getElementById('80c-rows-container');
+            if (cContainer && i.investments80C) {
+                // Keep only statutory rows (like EPF), remove manual ones
+                const manualRows = cContainer.querySelectorAll('.row-80c-manual');
+                manualRows.forEach(row => row.remove());
+                
+                i.investments80C.forEach(inv => {
+                    // Don't duplicate EPF if it's already there
+                    if (inv.type !== "Employee PF") {
+                        TaxController.add80CRow(inv.type, inv.amount);
+                    }
+                });
+            }
+            
+            console.log("Data loaded and UI updated.");
+        } else {
+            console.log("No saved data found for this year.");
         }
     }
-};
 
 // GLOBAL BRIDGE
 window.TaxController = TaxController;
