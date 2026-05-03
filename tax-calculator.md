@@ -24,7 +24,7 @@ permalink: /tax-calculator/
 
     <div style="display: flex; flex-wrap: wrap; gap: 25px;">
         <!-- LEFT COLUMN: INPUTS -->
-        <div style="flex: 1 1 360px; min-width: 300px;">
+        <div style="flex: 1 1 550px;">
 
             <!-- SALARY DETAILS -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
@@ -218,7 +218,7 @@ permalink: /tax-calculator/
         </div>
 
         <!-- RIGHT COLUMN: RESULTS STICKY -->
-        <div style="flex: 0 0 360px;">
+        <div style="flex: 1 1 300px;">
             <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
                 <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; margin-bottom: 15px;">
