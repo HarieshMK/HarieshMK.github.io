@@ -131,14 +131,30 @@ const TaxController = {
         }
     },
 
-    toggleLoanWizard: () => {
-        const isChecked = document.getElementById('has-home-loan')?.checked;
+    toggleLoanWizard() {
+        const hasLoan = document.getElementById('has-home-loan').checked;
         const wizard = document.getElementById('home-loan-wizard');
-        if(wizard) wizard.style.display = isChecked ? 'block' : 'none';
-        TaxController.isDirty = true;
-        TaxController.calculateAll();
+        const deductions = document.getElementById('conditional-deductions');
+        
+        wizard.style.display = hasLoan ? 'block' : 'none';
+        deductions.style.display = hasLoan ? 'block' : 'none';
+        calculateAll();
     },
-
+    handleLoanStatusChange() {
+        const status = document.querySelector('input[name="possession"]:checked').value;
+        const msg = document.getElementById('under-construction-msg');
+        const fields = document.getElementById('completed-loan-fields');
+        
+        if (status === 'under-construction') {
+            msg.style.display = 'block';
+            fields.style.display = 'none';
+        } else {
+            msg.style.display = 'none';
+            fields.style.display = 'block';
+        }
+        calculateAll();
+    },
+    
     handleSave: async () => {
         const btn = document.getElementById('save-btn');
         const status = document.getElementById('save-status');
@@ -228,7 +244,10 @@ const TaxController = {
         const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
         const sanctionDate = new Date(document.getElementById('loan-sanction-date')?.value);
         const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
-        const occupancy = document.getElementById('loan-occupancy')?.value || 'self-occupied';
+        const occupancy = document.querySelector('input[name="occupancy"]:checked')?.value || 'self-occupied';
+        const isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self-occupied';
+        const isClaimingHRA = (parseFloat(document.getElementById('rent-paid')?.value) || 0) > 0;
+        const hasLoan = document.getElementById('has-home-loan')?.checked;
 
         let dExtra = 0;
         let lExtra = "No Extra Deduction";
@@ -246,6 +265,14 @@ const TaxController = {
                 
                 dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
                 lExtra = "Section 80EE (Legacy)";
+            }
+        }
+        const warning = document.getElementById('hra-warning');
+        if (warning) {
+            if (hasLoan && isSelfOccupied && isClaimingHRA) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
             }
         }
         
