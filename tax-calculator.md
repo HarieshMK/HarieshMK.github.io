@@ -185,7 +185,7 @@ permalink: /tax-calculator/
                         </div>
                         <div>
                             <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Stamp Duty Value</label>
-                            <input type="number" id="stamp-duty" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
+                            <input type="number" id="property-stamp-value" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
                         </div>
                     </div>
                 </div>
