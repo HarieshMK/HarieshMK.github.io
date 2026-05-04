@@ -49,7 +49,7 @@ permalink: /tax-calculator/
                             <option value="false">Non-Metro</option>
                             <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
                         </select>
-                        <div id="hra-loan-conflict-warning" style="display: none; color: #f87171; font-size: 0.75rem; margin-top: 8px; padding: 8px; background: rgba(248, 113, 113, 0.1); border-radius: 6px; border-left: 3px solid #f87171;">
+                        <div id="hra-warning" style="display: none; color: #f87171; font-size: 0.75rem; margin-top: 8px; padding: 8px; background: rgba(248, 113, 113, 0.1); border-radius: 6px; border-left: 3px solid #f87171;">
                         <i class="fas fa-exclamation-triangle"></i> Note: You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.
                     </div>
                     </div>
@@ -282,7 +282,7 @@ permalink: /tax-calculator/
         opacity: 0.7;
         cursor: not-allowed;
     }
-    #hra-loan-conflict-warning {
+    #hra-warning {
     animation: fadeIn 0.3s ease-in;
         }
         @keyframes fadeIn {
