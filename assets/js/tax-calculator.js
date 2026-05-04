@@ -241,9 +241,9 @@ const TaxController = {
     }
 }
 
-// GLOBAL BRIDGE
+// GLOBAL BRIDGE - Connects Internal Controller to External HTML
 window.TaxController = TaxController;
-window.runCalculator = TaxController.calculateAll;
+window.toggleSection = TaxController.toggleSection;
 window.add80CRow = TaxController.add80CRow;
 window.addPerkRow = TaxController.addPerkRow;
 window.calculateAll = TaxController.calculateAll;
