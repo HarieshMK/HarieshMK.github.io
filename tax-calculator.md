@@ -113,76 +113,116 @@ permalink: /tax-calculator/
             </div>
 
             <!-- HOME LOAN ASSISTANT -->
-            <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
-                <div id="home-loan-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="TaxController.setupToggle('home-loan-header','home-loan-content', 'home-loan-icon')">
-                    <h3 style="margin: 0; color: var(--calc-text-main);">
-                        <i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Home Loan Assistant
-                    </h3>
-                    <i id="home-loan-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
-                </div>
+<div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+    <div id="home-loan-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="TaxController.setupToggle('home-loan-header','home-loan-content', 'home-loan-icon')">
+        <h3 style="margin: 0; color: var(--calc-text-main);">
+            <i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Home Loan Assistant
+        </h3>
+        <i id="home-loan-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--calc-text-muted);"></i>
+    </div>
 
-                <div id="home-loan-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
-                    <div style="background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #38bdf8; margin-bottom: 15px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <label style="font-size: 0.9rem; color: var(--calc-text-main); font-weight: 500;">Do you have an active Home Loan?</label>
-                            <input type="checkbox" id="has-home-loan" onchange="TaxController.toggleLoanWizard()" style="width: 18px; height: 18px; cursor: pointer;">
-                        </div>
+    <div id="home-loan-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
+        
+        <!-- STEP 1: Main Toggle -->
+        <div style="background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #38bdf8; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="font-size: 0.9rem; color: var(--calc-text-main); font-weight: 500;">Do you have an active Home Loan?</label>
+                <input type="checkbox" id="has-home-loan" onchange="TaxController.toggleLoanWizard()" style="width: 18px; height: 18px; cursor: pointer;">
+            </div>
+        </div>
+
+        <div id="home-loan-wizard" style="display: none;">
+            <!-- STEP 2: First Home Check -->
+            <div style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid var(--calc-input-border);">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--calc-text-main);">
+                    <input type="checkbox" id="is-first-home" onchange="calculateAll()" style="width: 16px; height: 16px;"> 
+                    Is this your first home? (Required for 80EE/80EEA)
+                </label>
+            </div>
+
+            <!-- STEP 3: Status Radios -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted); display: block; margin-bottom: 8px;">Possession Status</label>
+                    <div style="display: flex; gap: 10px; font-size: 0.85rem;">
+                        <label><input type="radio" name="possession" value="completed" onchange="TaxController.handleLoanStatusChange()" checked> Fully Constructed</label>
+                        <label><input type="radio" name="possession" value="under-construction" onchange="TaxController.handleLoanStatusChange()"> Under Construction</label>
                     </div>
-
-                    <div id="home-loan-wizard" style="display: none;">
-                        <div style="margin-bottom: 15px;">
-                            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Possession Status</label>
-                            <select id="loan-possession" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="calculateAll();">
-                                <option value="completed">Completed / Fully Constructed</option>
-                                <option value="under-construction">Under Construction (CLP)</option>
-                            </select>
-                        </div>
-
-                        <div id="under-construction-msg" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
-                            <i class="fas fa-info-circle"></i> Deductions apply after possession.
-                        </div>
-
-                        <div id="completed-loan-fields">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                <div>
-                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Occupancy</label>
-                                    <select id="loan-occupancy" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="calculateAll()">
-                                        <option value="self">Self-Occupied</option>
-                                        <option value="let-out">Let-out</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
-                                    <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%; margin-top: 5px;" onchange="calculateAll()">
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div>
-                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Interest Paid</label>
-                                    <input type="number" id="loan-interest" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Principal Paid</label>
-                                    <input type="number" id="loan-principal" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--calc-text-muted); display: block; margin-bottom: 8px;">Occupancy Status</label>
+                    <div style="display: flex; gap: 10px; font-size: 0.85rem;">
+                        <label><input type="radio" name="occupancy" value="self" onchange="calculateAll()" checked> Self-Occupied</label>
+                        <label><input type="radio" name="occupancy" value="rented" onchange="calculateAll()"> Rented-out</label>
                     </div>
                 </div>
             </div>
 
-            <!-- ELIGIBILITY CARDS -->
-            <div id="card-80eea" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #4ade80;">
-                <h3 style="margin-top: 0; color: #4ade80;"><i class="fas fa-house-user" style="margin-right: 10px;"></i>Section 80EEA</h3>
-                <input type="number" id="80eea-amount" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
+            <!-- STEP 4: Under Construction Message -->
+            <div id="under-construction-msg" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
+                <i class="fas fa-info-circle"></i> You cannot get tax benefits as of now. Once your house is constructed, you can claim the interest in 5 equal installments.
             </div>
 
-            <div id="card-80ee" class="post-card" style="display: none; margin-bottom: 20px; padding: 25px; background: var(--calc-card); border: 1px solid #f472b6;">
-                <h3 style="margin-top: 0; color: #f472b6;"><i class="fas fa-key" style="margin-right: 10px;"></i>Section 80EE</h3>
-                <input type="number" id="80ee-amount" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
-            </div>
+            <!-- STEP 5: Input Fields (Fully Constructed) -->
+            <div id="completed-loan-fields">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Total Principal Paid</label>
+                        <input type="number" id="loan-principal" class="dynamic-input" placeholder="e.g. 150000" style="width: 100%;" oninput="calculateAll()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Total Interest Paid</label>
+                        <input type="number" id="loan-interest" class="dynamic-input" placeholder="e.g. 240000" style="width: 100%;" oninput="calculateAll()">
+                    </div>
+                </div>
 
-        </div> 
+                <!-- Conditional Eligibility Info (Sanction Date & Stamp Duty) -->
+                <div style="background: var(--calc-input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--calc-input-border);">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Sanction Date</label>
+                            <input type="date" id="loan-sanction-date" class="dynamic-input" style="width: 100%;" onchange="calculateAll()">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Stamp Duty Value</label>
+                            <input type="number" id="stamp-duty" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AUTO-CALCULATED DEDUCTION BOXES (ReadOnly/Conditional) -->
+<div id="conditional-deductions" style="display: none;">
+    <!-- Section 24(b) - Calculated automatically -->
+    <div id="card-24b" class="post-card" style="margin-bottom: 20px; padding: 20px; background: var(--calc-card); border-left: 4px solid #38bdf8;">
+        <h4 style="margin: 0; color: #38bdf8; font-size: 0.9rem;">Section 24(b): Home Loan Interest</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <span style="font-size: 0.8rem; color: var(--calc-text-muted);">Applicable Deduction:</span>
+            <span id="display-24b-value" style="font-weight: bold; color: var(--calc-text-main);">₹ 0</span>
+        </div>
+    </div>
+
+    <!-- Section 80EEA - Visible based on Logic -->
+    <div id="card-80eea" class="post-card" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--calc-card); border-left: 4px solid #4ade80;">
+        <h4 style="margin: 0; color: #4ade80; font-size: 0.9rem;">Section 80EEA: Additional Interest</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <span style="font-size: 0.8rem; color: var(--calc-text-muted);">Eligible Amount:</span>
+            <span id="display-80eea-value" style="font-weight: bold; color: var(--calc-text-main);">₹ 0</span>
+        </div>
+    </div>
+
+    <!-- Section 80EE - Visible based on Logic -->
+    <div id="card-80ee" class="post-card" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--calc-card); border-left: 4px solid #f472b6;">
+        <h4 style="margin: 0; color: #f472b6; font-size: 0.9rem;">Section 80EE: Additional Interest</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <span style="font-size: 0.8rem; color: var(--calc-text-muted);">Eligible Amount:</span>
+            <span id="display-80ee-value" style="font-weight: bold; color: var(--calc-text-main);">₹ 0</span>
+        </div>
+    </div>
+</div>
 
         <!-- RIGHT COLUMN: RESULTS -->
         <div style="flex: 1 1 300px;">
