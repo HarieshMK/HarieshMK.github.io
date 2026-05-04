@@ -202,7 +202,7 @@ const TaxController = {
                 <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
                 ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>
-            <input type="text" class="perk-amount dynamic-input" placeholder="Amt" value="${value}" style="text-align: right;">
+            <input type="number" class="perk-amount dynamic-input" placeholder="Amt" value="${value}" style="text-align: right;">
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem;">₹ 0</div>
             <button type="button" onclick="this.parentElement.remove(); TaxController.calculateAll();" style="color:#ef4444; background:none; border:none;"><i class="fas fa-trash"></i></button>
         `;
@@ -213,58 +213,77 @@ const TaxController = {
     calculateAll: () => {
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
 
+        // 1. Gather Basic Inputs
         const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
         const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
         const isMetro = document.getElementById('is-metro')?.value === 'true';
         const fy = document.getElementById('fy-selector')?.value || '2024-25';
+    
+        // 2. Update dynamic UI (EPF rows) based on Basic Salary
+        TaxController.manageStatutoryRows(basic);
 
+        // 3. Home Loan Logic
         const hasHome = document.getElementById('has-home-loan')?.checked;
-        const interest = parseFloat(document.getElementById('home-interest')?.value) || 0;
-        const sDateStr = document.getElementById('loan-sanction-date')?.value;
+        const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
+        const sanctionDate = new Date(document.getElementById('loan-sanction-date')?.value);
         const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
         const occupancy = document.getElementById('loan-occupancy')?.value || 'self-occupied';
 
         let dExtra = 0;
-        let lExtra = "";
-
-        if (hasHome && sDateStr && interest > 0) {
-            const sDate = new Date(sDateStr);
-            if (sDate >= ELIGIBILITY_RULES.sec80EEA.start && sDate <= ELIGIBILITY_RULES.sec80EEA.end && propVal <= 4500000) {
-                dExtra = Math.min(Math.max(0, interest - 200000), 150000);
+        let lExtra = "No Extra Deduction";
+    
+        if (hasHome && homeLoanInterest > 200000 && !isNaN(sanctionDate.getTime())) {
+            if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
+                sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
+                propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
+                
+                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit);
                 lExtra = "Section 80EEA (Affordable Housing)";
-            } else if (sDate >= ELIGIBILITY_RULES.sec80EE.start && sDate <= ELIGIBILITY_RULES.sec80EE.end && propVal <= 5000000) {
-                dExtra = Math.min(Math.max(0, interest - 200000), 50000);
+            } else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+                       sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
+                       propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
+                
+                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
                 lExtra = "Section 80EE (Legacy)";
             }
         }
-
+        
+        // Update UI for 80EE/EEA
         const extraBox = document.getElementById('extra-loan-logic-container');
         if (extraBox) {
             extraBox.style.display = dExtra > 0 ? 'block' : 'none';
-            document.getElementById('extra-loan-label').innerText = lExtra;
-            document.getElementById('extra-loan-display-val').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
+            const labelEl = document.getElementById('extra-loan-label');
+            const valEl = document.getElementById('extra-loan-display-val');
+            if(labelEl) labelEl.innerText = lExtra;
+            if(valEl) valEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
         }
 
-        TaxController.manageStatutoryRows(basic);
+        // 4. Gather Totals for Perks and Deductions
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
         
-        const deductionsObj = {
-            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
-            healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
-            homeLoanInterest: interest,
-            extraLoanInterest: dExtra,
-            occupancy: occupancy,
-            exemptHRA: hraResult.actualExemption
-        };
-
         const perksArr = Array.from(document.querySelectorAll('.perk-row')).map(row => ({
             type: row.querySelector('.perk-type').value,
             amount: parseFloat(row.querySelector('.perk-amount').value) || 0
         }));
 
+        const perksTotal = perksArr.reduce((s, p) => s + p.amount, 0);
+        const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
+
+        // Calculate Final Gross
+        const gross = basic + hraRec + perksTotal + otherIncome;
+
+        const deductionsObj = {
+            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
+            healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
+            homeLoanInterest: homeLoanInterest,
+            extraLoanInterest: dExtra,
+            occupancy: occupancy,
+            exemptHRA: hraResult.actualExemption
+        };
+
+        // 5. Run Calculation Engines
         try {
-            const gross = basic + hraRec + (parseFloat(document.getElementById('other-income')?.value) || 0);
             const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
             const newReg = FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax);
@@ -303,11 +322,37 @@ const TaxController = {
 
         if (data?.calculator_inputs) {
             const i = data.calculator_inputs;
-            document.getElementById('basic-salary').value = i.basic || "";
-            // ... [Rest of your loading logic]
+            
+            // Map saved values to UI IDs
+            if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
+            if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hraReceived || "";
+            if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rentPaid || "";
+            if(document.getElementById('is-metro')) document.getElementById('is-metro').value = i.isMetro ? "true" : "false";
+            if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
+            
+            // Home Loan Fields
+            if(document.getElementById('has-home-loan')) {
+                document.getElementById('has-home-loan').checked = i.hasHomeLoan || false;
+                TaxController.toggleLoanWizard(); // Open wizard if they have a loan
+            }
+            if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeLoanInterest || "";
+            if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
+            if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = i.propertyValue || "";
+            
+            // Section 80D
+            if(document.getElementById('80d-self')) document.getElementById('80d-self').value = i.healthSelf || "";
+
+            // Restore Dynamic Rows (Perks & 80C)
+            if (i.perks && i.perks.length > 0) {
+                document.getElementById('perks-rows-container').innerHTML = "";
+                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.amount));
+            }
+            if (i.investments80C && i.investments80C.length > 0) {
+                document.getElementById('80c-rows-container').innerHTML = "";
+                i.investments80C.forEach(inv => TaxController.add80CRow(inv.type, inv.amount));
+            }
         }
-    }
-};
+    };
 
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
