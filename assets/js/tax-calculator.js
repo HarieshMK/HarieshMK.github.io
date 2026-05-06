@@ -136,23 +136,24 @@ const TaxController = {
         const wizard = document.getElementById('home-loan-wizard');
         const deductions = document.getElementById('conditional-deductions');
         
-        wizard.style.display = hasLoan ? 'block' : 'none';
-        deductions.style.display = hasLoan ? 'block' : 'none';
-        calculateAll();
+        if(wizard) wizard.style.display = hasLoan ? 'block' : 'none';
+        if(deductions) deductions.style.display = hasLoan ? 'block' : 'none';
+        TaxController.calculateAll(); // Added "TaxController." prefix
     },
+    
     handleLoanStatusChange() {
-        const status = document.querySelector('input[name="possession"]:checked').value;
+        const status = document.querySelector('input[name="possession"]:checked')?.value;
         const msg = document.getElementById('under-construction-msg');
         const fields = document.getElementById('completed-loan-fields');
         
         if (status === 'under-construction') {
-            msg.style.display = 'block';
-            fields.style.display = 'none';
+            if(msg) msg.style.display = 'block';
+            if(fields) fields.style.display = 'none';
         } else {
-            msg.style.display = 'none';
-            fields.style.display = 'block';
+            if(msg) msg.style.display = 'none';
+            if(fields) fields.style.display = 'block';
         }
-        calculateAll();
+        TaxController.calculateAll(); // Added "TaxController." prefix
     },
     
     handleSave: async () => {
