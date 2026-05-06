@@ -379,7 +379,7 @@ const TaxController = {
                 i.investments80C.forEach(inv => TaxController.add80CRow(inv.type, inv.amount));
             }
         }
-    };
+    }
 
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
