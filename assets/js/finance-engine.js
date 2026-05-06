@@ -156,7 +156,6 @@ FinanceEngine.TaxEngine = {
         });
 
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
-        let tax = (netTaxable > config.rebateLimit) ? FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs) : 0;
         
         // Marginal Relief check for rebate
         if (netTaxable <= config.rebateLimit) {
