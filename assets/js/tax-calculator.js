@@ -344,7 +344,7 @@ const TaxController = {
         const fy = document.getElementById('fy-selector').value;
         const { data } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
-            .eq('user_id', user.id)
+            .eq('id', user.id)
             .eq('financial_year', fy)
             .maybeSingle();
 
