@@ -41,7 +41,7 @@ const TAX_CONFIG = {
             "VPF": { regime: "old" },
             "LTA": { regime: "old" },
             "Mobile & Internet": { maxExempt: Infinity },
-            "Fuel Allowances": { maxExempt: Infinity },
+            "Fuel Allowance": { maxExempt: Infinity },
             "Books & Periodicals": { maxExempt: Infinity }
         }
     },
