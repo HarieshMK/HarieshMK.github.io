@@ -337,6 +337,40 @@ const TaxController = {
     },
 
     loadUserData: async () => {
+        console.log("Attempting to load user data...");
+    if (!window.supabase) {
+        console.error("Supabase client not found on window!");
+        return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        console.warn("No logged-in user found.");
+        return;
+    }
+    console.log("Logged in user ID:", user.id);
+
+    const fy = document.getElementById('fy-selector').value;
+    console.log("Querying for FY:", fy);
+
+    const { data, error } = await supabase.from('tax_user_data')
+        .select('calculator_inputs')
+        .eq('user_id', user.id)
+        .eq('financial_year', fy)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Database query error:", error);
+        return;
+    }
+
+    if (!data) {
+        console.log("No data record found for this user/FY combo.");
+        return;
+    }
+
+    console.log("Data received from Supabase:", data.calculator_inputs);
+        
         if (!window.supabase) return;
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
