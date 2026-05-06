@@ -212,7 +212,6 @@ FinanceEngine.TaxEngine = {
             netTaxable,
             totalDeductions,
             appliedDeductions: { section80C: cappedOther80C, section80D: totalCapped80D, homeInterest: interest24b + interest80EEA }
-            };
-        } 
-    }
+        };
+    } 
 };
