@@ -338,84 +338,84 @@ const TaxController = {
 
     loadUserData: async () => {
         console.log("Attempting to load user data...");
-    if (!window.supabase) {
-        console.error("Supabase client not found on window!");
-        return;
-    }
+        if (!window.supabase) {
+            console.error("Supabase client not found on window!");
+            return;
+        }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        console.warn("No logged-in user found.");
-        return;
-    }
-    console.log("Logged in user ID:", user.id);
+        // 1. Get the authenticated user
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+        const user = authData?.user;
 
-    const fy = document.getElementById('fy-selector').value;
-    console.log("Querying for FY:", fy);
+        if (authError || !user) {
+            console.warn("No logged-in user found.");
+            return;
+        }
+        console.log("Logged in user ID:", user.id);
 
-    const { data, error } = await supabase.from('tax_user_data')
-        .select('calculator_inputs')
-        .eq('user_id', user.id)
-        .eq('financial_year', fy)
-        .maybeSingle();
+        // 2. Get the selected Financial Year
+        const fySelector = document.getElementById('fy-selector');
+        const fy = fySelector ? fySelector.value : '2024-25';
+        console.log("Querying for FY:", fy);
 
-    if (error) {
-        console.error("Database query error:", error);
-        return;
-    }
-
-    if (!data) {
-        console.log("No data record found for this user/FY combo.");
-        return;
-    }
-
-    console.log("Data received from Supabase:", data.calculator_inputs);
-        
-        if (!window.supabase) return;
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const fy = document.getElementById('fy-selector').value;
-        const { data } = await supabase.from('tax_user_data')
+        // 3. Fetch data using 'id' as the column (per your finding)
+        const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
-            .eq('id', user.id)
+            .eq('id', user.id) // Using 'id' instead of 'user_id'
             .eq('financial_year', fy)
             .maybeSingle();
 
-        if (data?.calculator_inputs) {
-            const i = data.calculator_inputs;
-            
-            // Map saved values to UI IDs
-            if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
-            if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hraReceived || "";
-            if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rentPaid || "";
-            if(document.getElementById('is-metro')) document.getElementById('is-metro').value = i.isMetro ? "true" : "false";
-            if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
-            
-            // Home Loan Fields
-            if(document.getElementById('has-home-loan')) {
-                document.getElementById('has-home-loan').checked = i.hasHomeLoan || false;
-                TaxController.toggleLoanWizard(); // Open wizard if they have a loan
-            }
-            if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeLoanInterest || "";
-            if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
-            if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = i.propertyValue || "";
-            
-            // Section 80D
-            if(document.getElementById('80d-self')) document.getElementById('80d-self').value = i.healthSelf || "";
+        if (error) {
+            console.error("Database query error:", error);
+            return;
+        }
 
-            // Restore Dynamic Rows (Perks & 80C)
-            if (i.perks && i.perks.length > 0) {
-                document.getElementById('perks-rows-container').innerHTML = "";
+        if (!data || !data.calculator_inputs) {
+            console.log("No data record found for this user/FY combo in 'tax_user_data' table.");
+            return;
+        }
+
+        const i = data.calculator_inputs;
+        console.log("Data received from Supabase:", i);
+        
+        // 4. Map saved values to UI IDs
+        if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
+        if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hraReceived || "";
+        if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rentPaid || "";
+        if(document.getElementById('is-metro')) document.getElementById('is-metro').value = i.isMetro ? "true" : "false";
+        if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
+        
+        // Home Loan Fields
+        if(document.getElementById('has-home-loan')) {
+            document.getElementById('has-home-loan').checked = i.hasHomeLoan || false;
+            TaxController.toggleLoanWizard(); 
+        }
+        if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeLoanInterest || "";
+        if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
+        if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = i.propertyValue || "";
+        
+        // Section 80D
+        if(document.getElementById('80d-self')) document.getElementById('80d-self').value = i.healthSelf || "";
+
+        // Restore Dynamic Rows (Perks & 80C)
+        if (i.perks && i.perks.length > 0) {
+            const pContainer = document.getElementById('perks-rows-container');
+            if (pContainer) {
+                pContainer.innerHTML = "";
                 i.perks.forEach(p => TaxController.addPerkRow(p.type, p.amount));
             }
-            if (i.investments80C && i.investments80C.length > 0) {
-                document.getElementById('80c-rows-container').innerHTML = "";
+        }
+        if (i.investments80C && i.investments80C.length > 0) {
+            const cContainer = document.getElementById('80c-rows-container');
+            if (cContainer) {
+                cContainer.innerHTML = "";
                 i.investments80C.forEach(inv => TaxController.add80CRow(inv.type, inv.amount));
             }
         }
+        
+        // Trigger a final calculation to update the UI totals
+        TaxController.calculateAll();
     }
-};
 
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
