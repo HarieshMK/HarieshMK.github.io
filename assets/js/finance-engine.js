@@ -91,7 +91,6 @@ FinanceEngine.TaxEngine = {
     // NEW: Asset-specific Tax Logic
         calculateCapitalTax: function(gain, years, taxTreatment, userSlab = 0) {
             if (gain <= 0) return 0;
-        
             // taxTreatment would be "EQUITY" or "SLAB"
             if (taxTreatment === "EQUITY") {
                 if (years < 1) {
@@ -101,16 +100,8 @@ FinanceEngine.TaxEngine = {
                     return taxableGain * 0.125; // LTCG
                 }
             }
-            
             if (taxTreatment === "SLAB") {
                 return gain * (userSlab / 100); // Fixed Deposits, etc.
-            }
-        
-            return 0;
-        }
-            
-            if (treatment === "SLAB_RATE") {
-                return gain * (userSlab / 100);
             }
         
             return 0;
