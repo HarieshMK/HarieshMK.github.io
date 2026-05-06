@@ -381,6 +381,7 @@ const TaxController = {
             }
         }
     }
+};
 
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
