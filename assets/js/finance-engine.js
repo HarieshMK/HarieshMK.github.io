@@ -89,22 +89,25 @@ FinanceEngine.TaxEngine = {
     },
 
     // NEW: Asset-specific Tax Logic
-        calculateCapitalTax: function(gain, years, assetName, userSlab = 0) {
+        calculateCapitalTax: function(gain, years, taxTreatment, userSlab = 0) {
             if (gain <= 0) return 0;
         
-            const asset = InvestmentRegistry[assetName];
-            const treatment = asset ? asset.taxTreatment : "EQUITY_CAP_GAINS"; 
-        
-            if (treatment === "EQUITY_CAP_GAINS") {
-                // Equity rules: < 1 year is STCG (20%), > 1 year is LTCG (12.5% after 1.25L)
+            // taxTreatment would be "EQUITY" or "SLAB"
+            if (taxTreatment === "EQUITY") {
                 if (years < 1) {
-                    return gain * 0.20; 
+                    return gain * 0.20; // STCG
                 } else {
-                    const ltcgExemption = 125000;
-                    const taxableGain = Math.max(0, gain - ltcgExemption);
-                    return taxableGain * 0.125;
+                    const taxableGain = Math.max(0, gain - 125000);
+                    return taxableGain * 0.125; // LTCG
                 }
             }
+            
+            if (taxTreatment === "SLAB") {
+                return gain * (userSlab / 100); // Fixed Deposits, etc.
+            }
+        
+            return 0;
+        }
             
             if (treatment === "SLAB_RATE") {
                 return gain * (userSlab / 100);
