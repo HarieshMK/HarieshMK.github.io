@@ -159,9 +159,12 @@ FinanceEngine.TaxEngine = {
         let tax = (netTaxable > config.rebateLimit) ? FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs) : 0;
         
         // Marginal Relief check for rebate
-        if (tax > 0 && netTaxable <= config.rebateLimit) tax = 0; 
-        else if (netTaxable > config.rebateLimit) {
-            tax = Math.min(tax, netTaxable - config.rebateLimit);
+        if (netTaxable <= config.rebateLimit) {
+            tax = 0; 
+        } else {
+            let taxBeforeRelief = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+            let excessIncome = netTaxable - config.rebateLimit;
+            tax = Math.min(taxBeforeRelief, excessIncome);
         }
 
         const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : 0.04;
