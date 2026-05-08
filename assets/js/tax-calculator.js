@@ -361,7 +361,7 @@ const TaxController = {
         // 3. Fetch data using 'id' as the column (per your finding)
         const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
-            .eq('id', user.id) // Using 'id' instead of 'user_id'
+            .eq('user_id', user.id) // Using 'id' instead of 'user_id'
             .eq('financial_year', fy)
             .maybeSingle();
 
