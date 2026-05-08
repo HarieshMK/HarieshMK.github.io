@@ -337,6 +337,41 @@ const TaxController = {
     },
 
     loadUserData: async () => {
+        console.log("DEBUG: loadUserData started");
+        if (!window.supabase) {
+            console.error("DEBUG: Supabase not found");
+            return;
+        }
+    
+        const { data: authData } = await supabase.auth.getUser();
+        const user = authData?.user;
+    
+        if (!user) {
+            console.log("DEBUG: No user logged in");
+            return;
+        }
+    
+        const fy = document.getElementById('fy-selector').value;
+        console.log("DEBUG: Searching for User:", user.id, "and FY:", fy);
+    
+        const { data, error } = await supabase.from('tax_user_data')
+            .select('*') // Select everything to see what we get
+            .eq('user_id', user.id)
+            .eq('financial_year', fy)
+            .maybeSingle();
+    
+        if (error) {
+            console.error("DEBUG: Supabase Error:", error.message);
+            return;
+        }
+    
+        if (!data) {
+            console.warn("DEBUG: Query successful, but ZERO rows found in DB for this User/FY.");
+            return;
+        }
+    
+        console.log("DEBUG: Success! Data found:", data.calculator_inputs);
+        
         console.log("Attempting to load user data...");
         if (!window.supabase) {
             console.error("Supabase client not found on window!");
@@ -361,7 +396,7 @@ const TaxController = {
         // 3. Fetch data using 'id' as the column (per your finding)
         const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
-            .eq('user_id', user.id) // Using 'id' instead of 'user_id'
+            .eq('user_id', user.id) // It must be 'user_id' now
             .eq('financial_year', fy)
             .maybeSingle();
 
