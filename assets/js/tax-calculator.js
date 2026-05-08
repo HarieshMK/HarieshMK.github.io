@@ -342,76 +342,41 @@ const TaxController = {
             console.error("DEBUG: Supabase not found");
             return;
         }
-    
-        const { data: authData } = await supabase.auth.getUser();
-        const user = authData?.user;
-    
-        if (!user) {
-            console.log("DEBUG: No user logged in");
-            return;
-        }
-    
-        const fy = document.getElementById('fy-selector').value;
-        console.log("DEBUG: Searching for User:", user.id, "and FY:", fy);
-    
-        const { data, error } = await supabase.from('tax_user_data')
-            .select('*') // Select everything to see what we get
-            .eq('user_id', user.id)
-            .eq('financial_year', fy)
-            .maybeSingle();
-    
-        if (error) {
-            console.error("DEBUG: Supabase Error:", error.message);
-            return;
-        }
-    
-        if (!data) {
-            console.warn("DEBUG: Query successful, but ZERO rows found in DB for this User/FY.");
-            return;
-        }
-    
-        console.log("DEBUG: Success! Data found:", data.calculator_inputs);
-        
-        console.log("Attempting to load user data...");
-        if (!window.supabase) {
-            console.error("Supabase client not found on window!");
-            return;
-        }
 
         // 1. Get the authenticated user
-        const { data: authData, error: authError } = await supabase.auth.getUser();
-        const user = authData?.user;
+        const { data: authRecord, error: authError } = await supabase.auth.getUser();
+        const user = authRecord?.user;
 
         if (authError || !user) {
-            console.warn("No logged-in user found.");
+            console.log("DEBUG: No logged-in user found.");
             return;
         }
-        console.log("Logged in user ID:", user.id);
+        console.log("DEBUG: Logged in user ID:", user.id);
 
         // 2. Get the selected Financial Year
         const fySelector = document.getElementById('fy-selector');
         const fy = fySelector ? fySelector.value : '2024-25';
-        console.log("Querying for FY:", fy);
+        console.log("DEBUG: Searching for FY:", fy);
 
-        // 3. Fetch data using 'id' as the column (per your finding)
+        // 3. Fetch data
         const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
-            .eq('user_id', user.id) // It must be 'user_id' now
+            .eq('user_id', user.id)
             .eq('financial_year', fy)
             .maybeSingle();
 
         if (error) {
-            console.error("Database query error:", error);
+            console.error("DEBUG: Database query error:", error.message);
             return;
         }
 
         if (!data || !data.calculator_inputs) {
-            console.log("No data record found for this user/FY combo in 'tax_user_data' table.");
+            console.warn("DEBUG: ZERO rows found in DB for this User/FY combo.");
             return;
         }
 
         const i = data.calculator_inputs;
-        console.log("Data received from Supabase:", i);
+        console.log("DEBUG: Success! Data received:", i);
         
         // 4. Map saved values to UI IDs
         if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
@@ -451,7 +416,6 @@ const TaxController = {
         // Trigger a final calculation to update the UI totals
         TaxController.calculateAll();
     }
-};
         
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
