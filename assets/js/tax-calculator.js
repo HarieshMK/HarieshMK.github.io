@@ -416,6 +416,7 @@ const TaxController = {
         // Trigger a final calculation to update the UI totals
         TaxController.calculateAll();
     }
+};
         
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
