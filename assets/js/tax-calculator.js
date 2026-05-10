@@ -236,80 +236,88 @@ const TaxController = {
         const fy = document.getElementById('fy-selector')?.value || '2024-25';
     
         TaxController.manageStatutoryRows(basic);
-
-        const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
-        const sanctionDate = new Date(document.getElementById('loan-sanction-date')?.value);
-        const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
-        const occupancy = document.querySelector('input[name="occupancy"]:checked')?.value || 'self-occupied';
-        const isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self-occupied';
-        const isClaimingHRA = (parseFloat(document.getElementById('rent-paid')?.value) || 0) > 0;
-        const hasLoan = document.getElementById('has-home-loan')?.checked;
-
-        let dExtra = 0;
-        let lExtra = "No Extra Deduction";
     
-        if (hasLoan && homeLoanInterest > 200000 && !isNaN(sanctionDate.getTime())) {
+        // --- HOME LOAN LOGIC START ---
+        const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
+        const homeLoanPrincipal = parseFloat(document.getElementById('loan-principal')?.value) || 0;
+        const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
+        const sanctionDate = sanctionDateVal ? new Date(sanctionDateVal) : null;
+        const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
+        const isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
+        const hasLoan = document.getElementById('has-home-loan')?.checked;
+    
+        let dExtra = 0;
+        let extraSection = null; // To track which UI card to show (EE or EEA)
+    
+        if (hasLoan && homeLoanInterest > 0 && sanctionDate && !isNaN(sanctionDate.getTime())) {
+            // Calculate 80EEA
             if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
                 sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
                 propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
                 
-                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit);
-                lExtra = "Section 80EEA (Affordable Housing)";
-            } else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
-                       sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
-                       propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
+                dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EEA.deductionLimit);
+                extraSection = 'card-80eea';
+                document.getElementById('display-80eea-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
+            } 
+            // Calculate 80EE
+            else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+                     sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
+                     propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
                 
-                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
-                lExtra = "Section 80EE (Legacy)";
+                dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EE.deductionLimit);
+                extraSection = 'card-80ee';
+                document.getElementById('display-80ee-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
             }
         }
-        const warning = document.getElementById('hra-warning');
-        if (warning) {
-            if (hasLoan && isSelfOccupied && isClaimingHRA) {
-                warning.style.display = 'block';
-            } else {
-                warning.style.display = 'none';
-            }
-        }
-        
-        const extraBox = document.getElementById('extra-loan-logic-container');
-        if (extraBox) {
-            extraBox.style.display = dExtra > 0 ? 'block' : 'none';
-            const labelEl = document.getElementById('extra-loan-label');
-            const valEl = document.getElementById('extra-loan-display-val');
-            if(labelEl) labelEl.innerText = lExtra;
-            if(valEl) valEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
-        }
-
+    
+        // Toggle Extra Logic UI Cards
+        document.getElementById('card-80eea').style.display = (extraSection === 'card-80eea' && dExtra > 0) ? 'block' : 'none';
+        document.getElementById('card-80ee').style.display = (extraSection === 'card-80ee' && dExtra > 0) ? 'block' : 'none';
+    
+        // Update Section 24b Display
+        const eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
+        const display24b = document.getElementById('display-24b-value');
+        if(display24b) display24b.innerText = `₹ ${Math.round(eligible24b).toLocaleString('en-IN')}`;
+        // --- HOME LOAN LOGIC END ---
+    
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
     
-            // Gather Perks
-            const perkRows = document.querySelectorAll('.perk-row');
-            const perksArr = Array.from(perkRows).map(row => ({
-                type: row.querySelector('.perk-type').value,
-                amount: parseFloat(row.querySelector('.perk-amount').value) || 0,
-                element: row.querySelector('.perk-eligible') // Store reference to update UI
-            }));
-
-        const perksTotal = perksArr.reduce((s, p) => s + p.amount, 0);
+        // Gather Perks
+        const perkRows = document.querySelectorAll('.perk-row');
+        const perksArr = Array.from(perkRows).map(row => ({
+            type: row.querySelector('.perk-type').value,
+            amount: parseFloat(row.querySelector('.perk-amount').value) || 0,
+            element: row.querySelector('.perk-eligible')
+        }));
+    
         const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
         const gross = basic + hraRec + otherIncome;
-
+    
+        // Build Deductions Object
         const deductionsObj = {
-            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
+            // Collect all 80C rows PLUS the Principal from the Home Loan assistant
+            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0) + (hasLoan ? homeLoanPrincipal : 0),
             healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
             healthParents: parseFloat(document.getElementById('80d-parents')?.value) || 0,
             parentsSenior: document.getElementById('parents-senior')?.checked || false,
             npsExtra: parseFloat(document.getElementById('nps-80ccd-1b')?.value) || 0,
-            homeLoanInterest: parseFloat(document.getElementById('loan-interest')?.value) || 0,
-            extraLoanInterest: 0, // This would be your EE/EEA calculation result
-            occupancy: document.querySelector('input[name="occupancy"]:checked')?.value || 'self-occupied',
+            homeLoanInterest: homeLoanInterest,
+            extraLoanInterest: dExtra, // Pass the 80EE/EEA calculated value here
+            occupancy: isSelfOccupied ? 'self' : 'rented',
             exemptHRA: hraResult.actualExemption
         };
-
+    
+        // Update 80C total display in UI
+        const total80CDisplay = document.getElementById('display-80c-total');
+        if(total80CDisplay) {
+            const total80C = Math.min(deductionsObj.section80C, 150000);
+            total80CDisplay.innerText = `₹ ${total80C.toLocaleString('en-IN')}`;
+        }
+    
         try {
             const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
             const newReg = FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
+            
             newReg.perkBreakdown.forEach((item, index) => {
                 if (perksArr[index] && perksArr[index].element) {
                     perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
