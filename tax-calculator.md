@@ -16,7 +16,6 @@ permalink: /tax-calculator/
                 <option value="2027-28">FY 2027-28</option>
                 <option value="2026-27" selected>FY 2026-27</option>
                 <option value="2025-26">FY 2025-26</option>
-                <option value="2024-25">FY 2024-25</option>
             </select>
         </div>
     </div>
