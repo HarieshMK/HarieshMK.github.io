@@ -380,9 +380,9 @@ const TaxController = {
         
         // 4. Map saved values to UI IDs
         if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
-        if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hraReceived || "";
-        if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rentPaid || "";
-        if(document.getElementById('is-metro')) document.getElementById('is-metro').value = i.isMetro ? "true" : "false";
+        if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hra || "";
+        if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rent || "";
+        if(document.getElementById('is-metro')) document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
         if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
         
         // Home Loan Fields
