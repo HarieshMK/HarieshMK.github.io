@@ -20,10 +20,9 @@ permalink: /tax-calculator/
         </div>
     </div>
 
-    <div style="display: flex; flex-wrap: wrap; gap: 25px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: flex-start;">
         <div style="flex: 1 1 550px;">
 
-            <!-- SALARY SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; color: var(--calc-text-main);">
                     <i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details
@@ -59,7 +58,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- PERKS SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; color: var(--calc-text-main);"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
                 <div style="font-size: 0.75rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #fbbf24;">
@@ -71,7 +69,6 @@ permalink: /tax-calculator/
                 </button>
             </div>
 
-            <!-- 80C SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <div id="80c-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="TaxController.setupToggle('80c-header', '80c-content', '80c-icon')">
                     <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-coins" style="margin-right: 10px; color: #fbbf24;"></i>Section 80C Deductions</h3>
@@ -90,7 +87,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- 80D SECTION -->
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <div id="80d-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="TaxController.setupToggle('80d-header', '80d-content', '80d-icon')">
                     <h3 style="margin: 0; color: var(--calc-text-main);"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: #f87171;"></i>Section 80D: Health Insurance</h3>
@@ -111,8 +107,7 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- HOME LOAN ASSISTANT -->
-<div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+            <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
     <div id="home-loan-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="TaxController.setupToggle('home-loan-header','home-loan-content', 'home-loan-icon')">
         <h3 style="margin: 0; color: var(--calc-text-main);">
             <i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Home Loan Assistant
@@ -122,7 +117,6 @@ permalink: /tax-calculator/
 
     <div id="home-loan-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--calc-input-border); padding-top: 15px;">
         
-        <!-- STEP 1: Main Toggle -->
         <div style="background: rgba(56, 189, 248, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #38bdf8; margin-bottom: 15px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <label style="font-size: 0.9rem; color: var(--calc-text-main); font-weight: 500;">Do you have an active Home Loan?</label>
@@ -131,7 +125,6 @@ permalink: /tax-calculator/
         </div>
 
         <div id="home-loan-wizard" style="display: none;">
-            <!-- STEP 2: First Home Check -->
             <div style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid var(--calc-input-border);">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--calc-text-main);">
                     <input type="checkbox" id="is-first-home" onchange="calculateAll()" style="width: 16px; height: 16px;"> 
@@ -139,7 +132,6 @@ permalink: /tax-calculator/
                 </label>
             </div>
 
-            <!-- STEP 3: Status Radios -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <div>
                     <label style="font-size: 0.8rem; color: var(--calc-text-muted); display: block; margin-bottom: 8px;">Possession Status</label>
@@ -157,12 +149,10 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <!-- STEP 4: Under Construction Message -->
             <div id="under-construction-msg" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
                 <i class="fas fa-info-circle"></i> You cannot get tax benefits as of now. Once your house is constructed, you can claim the interest in 5 equal installments.
             </div>
 
-            <!-- STEP 5: Input Fields (Fully Constructed) -->
             <div id="completed-loan-fields">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div>
@@ -175,7 +165,6 @@ permalink: /tax-calculator/
                     </div>
                 </div>
 
-                <!-- Conditional Eligibility Info (Sanction Date & Stamp Duty) -->
                 <div style="background: var(--calc-input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--calc-input-border);">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div>
@@ -193,9 +182,7 @@ permalink: /tax-calculator/
     </div>
 </div>
 
-<!-- AUTO-CALCULATED DEDUCTION BOXES (ReadOnly/Conditional) -->
 <div id="conditional-deductions" style="display: none;">
-    <!-- Section 24(b) - Calculated automatically -->
     <div id="card-24b" class="post-card" style="margin-bottom: 20px; padding: 20px; background: var(--calc-card); border-left: 4px solid #38bdf8;">
         <h4 style="margin: 0; color: #38bdf8; font-size: 0.9rem;">Section 24(b): Home Loan Interest</h4>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
@@ -204,7 +191,6 @@ permalink: /tax-calculator/
         </div>
     </div>
 
-    <!-- Section 80EEA - Visible based on Logic -->
     <div id="card-80eea" class="post-card" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--calc-card); border-left: 4px solid #4ade80;">
         <h4 style="margin: 0; color: #4ade80; font-size: 0.9rem;">Section 80EEA: Additional Interest</h4>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
@@ -213,7 +199,6 @@ permalink: /tax-calculator/
         </div>
     </div>
 
-    <!-- Section 80EE - Visible based on Logic -->
     <div id="card-80ee" class="post-card" style="display: none; margin-bottom: 20px; padding: 20px; background: var(--calc-card); border-left: 4px solid #f472b6;">
         <h4 style="margin: 0; color: #f472b6; font-size: 0.9rem;">Section 80EE: Additional Interest</h4>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
@@ -222,9 +207,7 @@ permalink: /tax-calculator/
         </div>
     </div>
 </div>
-
-        <!-- RIGHT COLUMN: RESULTS -->
-        <div style="flex: 1 1 300px;">
+</div> <div style="flex: 1 1 300px;">
             <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
@@ -253,10 +236,7 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div> 
-    </div> 
-
-    <!-- MOBILE BAR -->
-    <div id="mobile-tax-bar">
+    </div> <div id="mobile-tax-bar">
         <div style="text-align: center;">
             <div style="font-size: 0.6rem; color: #94a3b8;">OLD</div>
             <div id="float-old-tax" class="tax-val">₹ 0</div>
