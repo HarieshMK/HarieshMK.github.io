@@ -20,7 +20,7 @@ permalink: /tax-calculator/
         </div>
     </div>
 
-    <div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: flex-start;">
+    <div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: stretch; position: relative;">
         <div style="flex: 1 1 550px;">
 
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
@@ -208,35 +208,35 @@ permalink: /tax-calculator/
     </div>
 </div>
 </div> 
-<div style="flex: 1 1 300px; position: relative;">
-            <div class="post-card" style="position: -webkit-sticky; position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card); z-index: 10;">
-                <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
-                    <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
-                        <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">OLD REGIME</div>
-                        <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
-                    </div>
-                    <div id="new-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
-                        <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">NEW REGIME</div>
-                        <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
-                    </div>
-                </div>
-
-                <button onclick="calculateAll()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;">Calculate Tax</button>
-                <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8;">Save to Profile</button>
-                
-                <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--calc-text-main);">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left;">
-                                <th>Component</th><th>New</th><th>Old</th>
-                            </tr>
-                        </thead>
-                        <tbody id="comparison-table-body"></tbody>
-                    </table>
-                </div>
+<div style="flex: 1 1 300px; min-width: 300px; position: relative;">
+    <div class="post-card" style="position: -webkit-sticky; position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card); z-index: 10; align-self: flex-start;">
+        <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
+            <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
+                <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">OLD REGIME</div>
+                <div id="old-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
             </div>
-        </div> 
+            <div id="new-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
+                <div style="font-size: 0.75rem; color: var(--calc-text-muted); margin-bottom: 5px;">NEW REGIME</div>
+                <div id="new-regime-tax" style="font-size: 1.8rem; font-weight: bold; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</div>
+            </div>
+        </div>
+
+        <button onclick="calculateAll()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;">Calculate Tax</button>
+        <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8;">Save to Profile</button>
+        
+        <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--calc-text-main);">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left;">
+                        <th>Component</th><th>New</th><th>Old</th>
+                    </tr>
+                </thead>
+                <tbody id="comparison-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
     </div> <div id="mobile-tax-bar">
         <div style="text-align: center;">
             <div style="font-size: 0.6rem; color: #94a3b8;">OLD</div>
