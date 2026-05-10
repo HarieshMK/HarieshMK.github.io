@@ -207,8 +207,9 @@ permalink: /tax-calculator/
         </div>
     </div>
 </div>
-</div> <div style="flex: 1 1 300px;">
-            <div class="post-card" style="position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card);">
+</div> 
+<div style="flex: 1 1 300px; position: relative;">
+            <div class="post-card" style="position: -webkit-sticky; position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card); z-index: 10;">
                 <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
                     <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
