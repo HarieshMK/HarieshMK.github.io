@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.16 - Merged Script Logic
+ * VERSION: 3.16 - Merged Script Logic (Restored with Schema Fixes)
  */
 
 const ELIGIBILITY_RULES = {
@@ -138,7 +138,7 @@ const TaxController = {
         
         if(wizard) wizard.style.display = hasLoan ? 'block' : 'none';
         if(deductions) deductions.style.display = hasLoan ? 'block' : 'none';
-        TaxController.calculateAll(); // Added "TaxController." prefix
+        TaxController.calculateAll();
     },
     
     handleLoanStatusChange() {
@@ -153,7 +153,7 @@ const TaxController = {
             if(msg) msg.style.display = 'none';
             if(fields) fields.style.display = 'block';
         }
-        TaxController.calculateAll(); // Added "TaxController." prefix
+        TaxController.calculateAll();
     },
     
     handleSave: async () => {
@@ -166,7 +166,6 @@ const TaxController = {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             if(status) status.innerText = "Connecting to database...";
 
-            // This assumes saveTaxData is defined globally in your supabase-logic.js
             if (typeof window.saveTaxData === 'function') {
                 await window.saveTaxData(selectedYear);
                 TaxController.isDirty = false;
@@ -230,18 +229,14 @@ const TaxController = {
     calculateAll: () => {
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
 
-        // 1. Gather Basic Inputs
         const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
         const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
         const isMetro = document.getElementById('is-metro')?.value === 'true';
         const fy = document.getElementById('fy-selector')?.value || '2024-25';
     
-        // 2. Update dynamic UI (EPF rows) based on Basic Salary
         TaxController.manageStatutoryRows(basic);
 
-        // 3. Home Loan Logic
-        const hasHome = document.getElementById('has-home-loan')?.checked;
         const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
         const sanctionDate = new Date(document.getElementById('loan-sanction-date')?.value);
         const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
@@ -253,7 +248,7 @@ const TaxController = {
         let dExtra = 0;
         let lExtra = "No Extra Deduction";
     
-        if (hasHome && homeLoanInterest > 200000 && !isNaN(sanctionDate.getTime())) {
+        if (hasLoan && homeLoanInterest > 200000 && !isNaN(sanctionDate.getTime())) {
             if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
                 sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
                 propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
@@ -277,7 +272,6 @@ const TaxController = {
             }
         }
         
-        // Update UI for 80EE/EEA
         const extraBox = document.getElementById('extra-loan-logic-container');
         if (extraBox) {
             extraBox.style.display = dExtra > 0 ? 'block' : 'none';
@@ -287,7 +281,6 @@ const TaxController = {
             if(valEl) valEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
         }
 
-        // 4. Gather Totals for Perks and Deductions
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
         
         const perksArr = Array.from(document.querySelectorAll('.perk-row')).map(row => ({
@@ -298,19 +291,20 @@ const TaxController = {
         const perksTotal = perksArr.reduce((s, p) => s + p.amount, 0);
         const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
 
-        // Calculate Final Gross
         const gross = basic + hraRec + perksTotal + otherIncome;
 
         const deductionsObj = {
             section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
             healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
+            healthParents: parseFloat(document.getElementById('80d-parents')?.value) || 0,
+            parentsSenior: document.getElementById('parents-senior')?.checked || false,
+            npsExtra: parseFloat(document.getElementById('nps-80ccd-1b')?.value) || 0,
             homeLoanInterest: homeLoanInterest,
             extraLoanInterest: dExtra,
             occupancy: occupancy,
             exemptHRA: hraResult.actualExemption
         };
 
-        // 5. Run Calculation Engines
         try {
             const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
             const newReg = FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
@@ -343,7 +337,6 @@ const TaxController = {
             return;
         }
 
-        // 1. Get the authenticated user
         const { data: authRecord, error: authError } = await supabase.auth.getUser();
         const user = authRecord?.user;
 
@@ -351,14 +344,10 @@ const TaxController = {
             console.log("DEBUG: No logged-in user found.");
             return;
         }
-        console.log("DEBUG: Logged in user ID:", user.id);
 
-        // 2. Get the selected Financial Year
         const fySelector = document.getElementById('fy-selector');
         const fy = fySelector ? fySelector.value : '2024-25';
-        console.log("DEBUG: Searching for FY:", fy);
 
-        // 3. Fetch data
         const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
             .eq('user_id', user.id)
@@ -371,53 +360,70 @@ const TaxController = {
         }
 
         if (!data || !data.calculator_inputs) {
-            console.warn("DEBUG: ZERO rows found in DB for this User/FY combo.");
+            console.warn("DEBUG: No data found for this FY.");
             return;
         }
 
         const i = data.calculator_inputs;
-        console.log("DEBUG: Success! Data received:", i);
+        console.log("DEBUG: Standardizing mapping for data:", i);
         
-        // 4. Map saved values to UI IDs
+        // 1. Basic Income & HRA
         if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
         if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hra || "";
         if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rent || "";
         if(document.getElementById('is-metro')) document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
         if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
         
-        // Home Loan Fields
+        // 2. Home Loan Fields (Standardized keys: homeInterest, isUnderConstruction)
         if(document.getElementById('has-home-loan')) {
-            document.getElementById('has-home-loan').checked = i.hasHomeLoan || false;
+            document.getElementById('has-home-loan').checked = (i.homeInterest > 0 || i.isUnderConstruction);
             TaxController.toggleLoanWizard(); 
         }
-        if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeLoanInterest || "";
+        if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeInterest || "";
         if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
         if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = i.propertyValue || "";
         
-        // Section 80D
+        if (i.isUnderConstruction !== undefined) {
+            const radio = document.querySelector(`input[name="possession"][value="${i.isUnderConstruction ? 'under-construction' : 'completed'}"]`);
+            if (radio) {
+                radio.checked = true;
+                TaxController.handleLoanStatusChange();
+            }
+        }
+        // Restore Occupancy status
+        if (i.occupancy) {
+            const occRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancy}"]`);
+            if (occRadio) occRadio.checked = true;
+        }
+        
+        // 3. Section 80D & NPS (Standardized keys: healthSelf, healthParents, npsExtra)
         if(document.getElementById('80d-self')) document.getElementById('80d-self').value = i.healthSelf || "";
+        if(document.getElementById('80d-parents')) document.getElementById('80d-parents').value = i.healthParents || "";
+        if(document.getElementById('parents-senior')) document.getElementById('parents-senior').checked = i.parentsSenior || false;
+        if(document.getElementById('nps-80ccd-1b')) document.getElementById('nps-80ccd-1b').value = i.npsExtra || "";
 
-        // Restore Dynamic Rows (Perks & 80C)
+        // 4. Restore Perks (Mapping 'value' to the row's input)
         if (i.perks && i.perks.length > 0) {
             const pContainer = document.getElementById('perks-rows-container');
             if (pContainer) {
                 pContainer.innerHTML = "";
-                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.amount));
+                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.value));
             }
         }
-        if (i.investments80C && i.investments80C.length > 0) {
+
+        // 5. Restore 80C (Mapping 'deductions80C' to the rows)
+        if (i.deductions80C && i.deductions80C.length > 0) {
             const cContainer = document.getElementById('80c-rows-container');
             if (cContainer) {
                 cContainer.innerHTML = "";
-                i.investments80C.forEach(inv => TaxController.add80CRow(inv.type, inv.amount));
+                i.deductions80C.forEach(inv => TaxController.add80CRow(inv.type, inv.amount));
             }
         }
         
-        // Trigger a final calculation to update the UI totals
         TaxController.calculateAll();
     }
 };
-        
+
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
 window.add80CRow = TaxController.add80CRow;
