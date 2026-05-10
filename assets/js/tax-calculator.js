@@ -228,7 +228,7 @@ const TaxController = {
 
     calculateAll: () => {
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
-
+    
         const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
         const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
@@ -282,16 +282,18 @@ const TaxController = {
         }
 
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
-        
-        const perksArr = Array.from(document.querySelectorAll('.perk-row')).map(row => ({
-            type: row.querySelector('.perk-type').value,
-            amount: parseFloat(row.querySelector('.perk-amount').value) || 0
-        }));
+    
+            // Gather Perks
+            const perkRows = document.querySelectorAll('.perk-row');
+            const perksArr = Array.from(perkRows).map(row => ({
+                type: row.querySelector('.perk-type').value,
+                amount: parseFloat(row.querySelector('.perk-amount').value) || 0,
+                element: row.querySelector('.perk-eligible') // Store reference to update UI
+            }));
 
         const perksTotal = perksArr.reduce((s, p) => s + p.amount, 0);
         const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
-
-        const gross = basic + hraRec + perksTotal + otherIncome;
+        const gross = basic + hraRec + otherIncome;
 
         const deductionsObj = {
             section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
@@ -299,15 +301,21 @@ const TaxController = {
             healthParents: parseFloat(document.getElementById('80d-parents')?.value) || 0,
             parentsSenior: document.getElementById('parents-senior')?.checked || false,
             npsExtra: parseFloat(document.getElementById('nps-80ccd-1b')?.value) || 0,
-            homeLoanInterest: homeLoanInterest,
-            extraLoanInterest: dExtra,
-            occupancy: occupancy,
+            homeLoanInterest: parseFloat(document.getElementById('loan-interest')?.value) || 0,
+            extraLoanInterest: 0, // This would be your EE/EEA calculation result
+            occupancy: document.querySelector('input[name="occupancy"]:checked')?.value || 'self-occupied',
             exemptHRA: hraResult.actualExemption
         };
 
         try {
             const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
             const newReg = FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
+            newReg.perkBreakdown.forEach((item, index) => {
+                if (perksArr[index] && perksArr[index].element) {
+                    perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
+                }
+            });
+    
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax);
         } catch (err) {
             console.error("Calculation Engine Error:", err);
