@@ -92,5 +92,11 @@ window.TAX_CONFIG = {
             "Books & Periodicals": { maxExempt: Infinity }
         }
     },
+    
+    // Carry over 2026-27 logic to 2027-28
+    "2027-28": null, // Placeholder to be filled below
     cessRate: 0.04
 };
+
+// Map the future year to the current logic
+window.TAX_CONFIG["2027-28"] = window.TAX_CONFIG["2026-27"];
