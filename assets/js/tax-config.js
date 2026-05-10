@@ -1,4 +1,4 @@
-const TAX_CONFIG = {
+window.TAX_CONFIG = {
     // FY 2026-27: Current Year (Budget 2026)
     "2026-27": {
         newRegime: {
