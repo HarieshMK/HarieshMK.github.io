@@ -280,55 +280,61 @@ const TaxController = {
     
         TaxController.manageStatutoryRows(basic);
     
-        // --- HOME LOAN LOGIC START (Wizard Edition) ---
+        // --- HOME LOAN LOGIC START (Revised Gate Logic) ---
         const hasLoan = document.getElementById('has-home-loan')?.checked;
-        const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
-        const homeLoanPrincipal = parseFloat(document.getElementById('loan-principal')?.value) || 0;
-        const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
-        const isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
         
-        // New variables for the Wizard
-        const isFirstTimeBuyer = document.getElementById('is-first-buyer')?.checked; 
-        const loanAmt = parseFloat(document.getElementById('original-loan-amt')?.value) || 0; 
-        const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0; 
-
+        // Initialize calculation variables at 0
+        let homeLoanInterest = 0;
+        let homeLoanPrincipal = 0;
         let dExtra = 0;
         let extraSection = null;
+        let isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
+        let eligible24b = 0;
 
-        // 1. Run the Visibility Wizard (Shows/Hides fields based on date)
+        // Run Visibility Wizard (UI layout only)
         TaxController.handleDateBranching();
         
-        // 2. Sync Principal to 80C table visually
-        TaxController.syncPrincipalTo80C(hasLoan ? homeLoanPrincipal : 0);
+        // Logic Gate: Only process inputs if the checkbox is checked
+        if (hasLoan) {
+            homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
+            homeLoanPrincipal = parseFloat(document.getElementById('loan-principal')?.value) || 0;
+            const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
+            const isFirstTimeBuyer = document.getElementById('is-first-buyer')?.checked; 
+            const loanAmt = parseFloat(document.getElementById('original-loan-amt')?.value) || 0; 
+            const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0; 
 
-        // 3. Logic Gate for 80EE/EEA
-        // Conditions: Has Loan + Self-Occupied + Interest > 2L + 1st Buyer + Valid Date
-        if (hasLoan && isSelfOccupied && homeLoanInterest > 200000 && isFirstTimeBuyer && sanctionDateVal) {
-            const sanctionDate = new Date(sanctionDateVal);
+            // 80EE/80EEA Eligibility Logic
+            if (isSelfOccupied && homeLoanInterest > 200000 && isFirstTimeBuyer && sanctionDateVal) {
+                const sanctionDate = new Date(sanctionDateVal);
 
-            // 80EEA Branch (Stamp Duty Value based)
-            if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
-                sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
-                propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
-                
-                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit);
-                extraSection = 'card-80eea';
-            } 
-            // 80EE Branch (Property Value + Loan Amount based)
-            else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
-                     sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
-                     propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit &&
-                     loanAmt > 0 && loanAmt <= ELIGIBILITY_RULES.sec80EE.loanLimit) {
-                
-                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
-                extraSection = 'card-80ee';
+                if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
+                    sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
+                    propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
+                    
+                    dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit);
+                    extraSection = 'card-80eea';
+                } 
+                else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+                         sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
+                         propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit &&
+                         loanAmt > 0 && loanAmt <= ELIGIBILITY_RULES.sec80EE.loanLimit) {
+                    
+                    dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
+                    extraSection = 'card-80ee';
+                }
             }
+
+            // Calculate Section 24b
+            eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
         }
 
-        // Update UI Cards visibility and values
+        // --- UI UPDATES (Run always to reflect state) ---
+        
+        // Sync Principal to 80C table (will remove row if hasLoan is false)
+        TaxController.syncPrincipalTo80C(hasLoan ? homeLoanPrincipal : 0);
+
         const cardEEA = document.getElementById('card-80eea');
         const cardEE = document.getElementById('card-80ee');
-        
         if(cardEEA) cardEEA.style.display = (extraSection === 'card-80eea') ? 'block' : 'none';
         if(cardEE) cardEE.style.display = (extraSection === 'card-80ee') ? 'block' : 'none';
 
@@ -338,8 +344,6 @@ const TaxController = {
             if(displayEl) displayEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
         }
 
-        // Update Section 24b Display
-        const eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
         const display24b = document.getElementById('display-24b-value');
         if(display24b) display24b.innerText = `₹ ${Math.round(eligible24b).toLocaleString('en-IN')}`;
         // --- HOME LOAN LOGIC END ---
@@ -359,19 +363,18 @@ const TaxController = {
     
         // Build Deductions Object
         const deductionsObj = {
-            // Collect all 80C rows PLUS the Principal from the Home Loan assistant
-            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0) + (hasLoan ? homeLoanPrincipal : 0),
+            // This now safely uses homeLoanPrincipal only if hasLoan is true
+            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
             healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
             healthParents: parseFloat(document.getElementById('80d-parents')?.value) || 0,
             parentsSenior: document.getElementById('parents-senior')?.checked || false,
             npsExtra: parseFloat(document.getElementById('nps-80ccd-1b')?.value) || 0,
-            homeLoanInterest: homeLoanInterest,
-            extraLoanInterest: dExtra, // Pass the 80EE/EEA calculated value here
+            homeLoanInterest: homeLoanInterest, // Is 0 if checkbox is off
+            extraLoanInterest: dExtra, // Is 0 if checkbox is off
             occupancy: isSelfOccupied ? 'self' : 'rented',
             exemptHRA: hraResult.actualExemption
         };
     
-        // Update 80C total display in UI
         const total80CDisplay = document.getElementById('display-80c-total');
         if(total80CDisplay) {
             const total80C = Math.min(deductionsObj.section80C, 150000);
