@@ -107,7 +107,7 @@ permalink: /tax-calculator/
                 </div>
             </div>
 
-            <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
+<div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
     <div id="home-loan-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="TaxController.setupToggle('home-loan-header','home-loan-content', 'home-loan-icon')">
         <h3 style="margin: 0; color: var(--calc-text-main);">
             <i class="fas fa-home" style="margin-right: 10px; color: #38bdf8;"></i>Home Loan Assistant
@@ -127,7 +127,7 @@ permalink: /tax-calculator/
         <div id="home-loan-wizard" style="display: none;">
             <div style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid var(--calc-input-border);">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--calc-text-main);">
-                    <input type="checkbox" id="is-first-home" onchange="calculateAll()" style="width: 16px; height: 16px;"> 
+                    <input type="checkbox" id="is-first-buyer" onchange="calculateAll()" style="width: 16px; height: 16px;"> 
                     Is this your first home? (Required for 80EE/80EEA)
                 </label>
             </div>
@@ -150,18 +150,18 @@ permalink: /tax-calculator/
             </div>
 
             <div id="under-construction-msg" style="display: none; color: #fbbf24; font-size: 0.8rem; padding: 12px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; border-left: 3px solid #fbbf24; margin-bottom: 15px;">
-                <i class="fas fa-info-circle"></i> You cannot get tax benefits as of now. Once your house is constructed, you can claim the interest in 5 equal installments.
+                <i class="fas fa-info-circle"></i> Interest claimable in 5 installments post-construction.
             </div>
 
             <div id="completed-loan-fields">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div>
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Total Principal Paid</label>
-                        <input type="number" id="loan-principal" class="dynamic-input" placeholder="e.g. 150000" style="width: 100%;" oninput="calculateAll()">
+                        <input type="number" id="loan-principal" class="dynamic-input" style="width: 100%;" oninput="calculateAll()">
                     </div>
                     <div>
                         <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Total Interest Paid</label>
-                        <input type="number" id="loan-interest" class="dynamic-input" placeholder="e.g. 240000" style="width: 100%;" oninput="calculateAll()">
+                        <input type="number" id="loan-interest" class="dynamic-input" style="width: 100%;" oninput="calculateAll()">
                     </div>
                 </div>
 
@@ -175,6 +175,14 @@ permalink: /tax-calculator/
                             <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Stamp Duty Value</label>
                             <input type="number" id="property-stamp-value" class="dynamic-input" placeholder="₹" style="width: 100%;" oninput="calculateAll()">
                         </div>
+                    </div>
+                    
+                    <div id="branch-80ee-fields" style="display:none; margin-top:10px;">
+                        <label style="font-size: 0.8rem; color: #f472b6;">Original Loan Amount (Sanctioned)</label>
+                        <input type="number" id="original-loan-amt" class="dynamic-input" style="width: 100%; border-color: #f472b6 !important;" oninput="calculateAll()">
+                    </div>
+                    <div id="branch-80eea-fields" style="display:none; margin-top:10px;">
+                        <p style="font-size: 0.75rem; color: #4ade80;"><i class="fas fa-check-circle"></i> Eligible for 80EEA based on date.</p>
                     </div>
                 </div>
             </div>
