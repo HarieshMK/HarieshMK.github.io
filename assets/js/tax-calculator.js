@@ -34,6 +34,24 @@ const TaxController = {
                 return message;
             }
         });
+        // Add this inside the init function of your TaxController
+        const viewDetailsBtn = document.getElementById('view-details-btn');
+        if (viewDetailsBtn) {
+            viewDetailsBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevents any default form submission
+                const summarySection = document.getElementById('detailed-tax-summary');
+                if (summarySection) {
+                    summarySection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start' 
+                    });
+                    
+                    // Optional: Briefly highlight the section so the user sees it
+                    summarySection.classList.add('highlight-section');
+                    setTimeout(() => summarySection.classList.remove('highlight-section'), 2000);
+                }
+            });
+        }
 
         const checkDependencies = setInterval(async () => {
             if (window.FinanceEngine && window.TAX_CONFIG) {
@@ -311,7 +329,7 @@ const TaxController = {
                     sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
                     propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
                     
-                    dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit);
+                    dExtra = Math.max(0, Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit));
                     extraSection = 'card-80eea';
                 } 
                 else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
@@ -319,7 +337,7 @@ const TaxController = {
                          propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit &&
                          loanAmt > 0 && loanAmt <= ELIGIBILITY_RULES.sec80EE.loanLimit) {
                     
-                    dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
+                    dExtra = Math.max(0, Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit));
                     extraSection = 'card-80ee';
                 }
             }
@@ -349,6 +367,11 @@ const TaxController = {
         // --- HOME LOAN LOGIC END ---
     
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
+        // NEW: Update HRA Display in the UI
+        const hraDisplay = document.getElementById('display-hra-value');
+        if (hraDisplay) {
+            hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
+        }
     
         // Gather Perks
         const perkRows = document.querySelectorAll('.perk-row');
@@ -391,7 +414,9 @@ const TaxController = {
                 }
             });
     
-            TaxController.updateSummaryUI(newReg.tax, oldReg.tax);
+            // UPDATE THIS LINE to pass oldReg and newReg objects
+            TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg); 
+            
         } catch (err) {
             console.error("Calculation Engine Error:", err);
         }
@@ -406,11 +431,31 @@ const TaxController = {
         else if (epfRow) epfRow.querySelector('.row-amount-80c').value = epfAmt;
     },
 
-    updateSummaryUI: (newTax, oldTax) => {
+    updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails) => {
+        // 1. Update the Main Comparison Cards
         const nEl = document.getElementById('new-regime-tax');
         const oEl = document.getElementById('old-regime-tax');
         if(nEl) nEl.innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
         if(oEl) oEl.innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
+
+        // 2. Update the Detailed Table (Using MD File IDs)
+        // Adjust these IDs if they differ slightly in your Markdown
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = `₹ ${Math.round(val).toLocaleString('en-IN')}`;
+        };
+
+        if (oldRegDetails && newRegDetails) {
+            // Gross & Income
+            setVal('summary-gross-salary', oldRegDetails.grossSalary);
+            setVal('summary-taxable-old', oldRegDetails.taxableIncome);
+            setVal('summary-taxable-new', newRegDetails.taxableIncome);
+
+            // Deductions
+            setVal('summary-80c-deduction', oldRegDetails.deductions?.section80C || 0);
+            setVal('summary-hra-deduction', oldRegDetails.exemptions?.hra || 0);
+            setVal('summary-standard-deduction', 50000); // Standard
+        }
     },
 
     loadUserData: async () => {
