@@ -5,12 +5,17 @@
 
 const ELIGIBILITY_RULES = {
     sec80EE: {
-        start: new Date('2016-04-01'), end: new Date('2017-03-31'),
-        loanLimit: 3500000, propertyLimit: 5000000, deductionLimit: 50000
+        start: new Date('2016-04-01'), 
+        end: new Date('2017-03-31'),
+        loanLimit: 3500000, 
+        propertyLimit: 5000000, 
+        deductionLimit: 50000
     },
     sec80EEA: {
-        start: new Date('2019-04-01'), end: new Date('2022-03-31'),
-        propertyLimit: 4500000, deductionLimit: 150000
+        start: new Date('2019-04-01'), 
+        end: new Date('2022-03-31'),
+        propertyLimit: 4500000, 
+        deductionLimit: 150000
     }
 };
 
@@ -155,6 +160,44 @@ const TaxController = {
         }
         TaxController.calculateAll();
     },
+
+    handleDateBranching: () => {
+        const dateVal = document.getElementById('loan-sanction-date')?.value;
+        const branchEE = document.getElementById('branch-80ee-fields');   
+        const branchEEA = document.getElementById('branch-80eea-fields'); 
+
+        if (!branchEE || !branchEEA) return;
+
+        // Reset visibility by default
+        branchEE.style.display = 'none';
+        branchEEA.style.display = 'none';
+
+        if (!dateVal) return;
+        const sanctionDate = new Date(dateVal);
+
+        if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && sanctionDate <= ELIGIBILITY_RULES.sec80EE.end) {
+            branchEE.style.display = 'block';
+        } else if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end) {
+            branchEEA.style.display = 'block';
+        }
+    },
+
+    syncPrincipalTo80C: (amount) => {
+        const container = document.getElementById('80c-rows-container');
+        if (!container) return;
+
+        let principalRow = container.querySelector('.row-80c-statutory-hl-principal');
+        
+        if (amount > 0) {
+            if (!principalRow) {
+                TaxController.add80CRow("Home Loan Principal", amount, true, "row-80c-statutory-hl-principal");
+            } else {
+                principalRow.querySelector('.row-amount-80c').value = amount;
+            }
+        } else if (principalRow) {
+            principalRow.remove();
+        }
+    },
     
     handleSave: async () => {
         const btn = document.getElementById('save-btn');
@@ -200,7 +243,7 @@ const TaxController = {
             </select>
             <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" value="${amount}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
             ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' : 
-            `<button type="button" onclick="this.parentElement.remove(); calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}
+            `<button type="button" onclick="this.parentElement.remove(); TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}
         `;
         container.appendChild(row);
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
@@ -237,50 +280,64 @@ const TaxController = {
     
         TaxController.manageStatutoryRows(basic);
     
-        // --- HOME LOAN LOGIC START ---
+        // --- HOME LOAN LOGIC START (Wizard Edition) ---
+        const hasLoan = document.getElementById('has-home-loan')?.checked;
         const homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
         const homeLoanPrincipal = parseFloat(document.getElementById('loan-principal')?.value) || 0;
         const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
-        const sanctionDate = sanctionDateVal ? new Date(sanctionDateVal) : null;
-        const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0;
         const isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
-        const hasLoan = document.getElementById('has-home-loan')?.checked;
-    
+        
+        // New variables for the Wizard
+        const isFirstTimeBuyer = document.getElementById('is-first-buyer')?.checked; 
+        const loanAmt = parseFloat(document.getElementById('original-loan-amt')?.value) || 0; 
+        const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0; 
+
         let dExtra = 0;
-        let extraSection = null; // To track which UI card to show (EE or EEA)
-    
-        // We only show 80EE/EEA if the property is Self-Occupied
-            if (hasLoan && isSelfOccupied && homeLoanInterest > 0 && sanctionDate && !isNaN(sanctionDate.getTime())) {
+        let extraSection = null;
+
+        // 1. Run the Visibility Wizard (Shows/Hides fields based on date)
+        TaxController.handleDateBranching();
+        
+        // 2. Sync Principal to 80C table visually
+        TaxController.syncPrincipalTo80C(hasLoan ? homeLoanPrincipal : 0);
+
+        // 3. Logic Gate for 80EE/EEA
+        // Conditions: Has Loan + Self-Occupied + Interest > 2L + 1st Buyer + Valid Date
+        if (hasLoan && isSelfOccupied && homeLoanInterest > 200000 && isFirstTimeBuyer && sanctionDateVal) {
+            const sanctionDate = new Date(sanctionDateVal);
+
+            // 80EEA Branch (Stamp Duty Value based)
+            if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
+                sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
+                propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
                 
-                // Calculate 80EEA
-                if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
-                    sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
-                    propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
-                    
-                    // Only trigger if interest exceeds the 2L cap of Section 24b
-                    dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EEA.deductionLimit);
-                    extraSection = 'card-80eea';
-                    document.getElementById('display-80eea-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
-                } 
-                // Calculate 80EE
-                else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
-                         sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
-                         propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
-                    
-                    dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EE.deductionLimit);
-                    extraSection = 'card-80ee';
-                    document.getElementById('display-80ee-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
-                }
-            } else {
-                // If rented or no loan, reset extra deduction
-                dExtra = 0;
-                extraSection = null;
+                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit);
+                extraSection = 'card-80eea';
+            } 
+            // 80EE Branch (Property Value + Loan Amount based)
+            else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+                     sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
+                     propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit &&
+                     loanAmt > 0 && loanAmt <= ELIGIBILITY_RULES.sec80EE.loanLimit) {
+                
+                dExtra = Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit);
+                extraSection = 'card-80ee';
             }
-    
-        // Toggle Extra Logic UI Cards
-        document.getElementById('card-80eea').style.display = (extraSection === 'card-80eea' && dExtra > 0) ? 'block' : 'none';
-        document.getElementById('card-80ee').style.display = (extraSection === 'card-80ee' && dExtra > 0) ? 'block' : 'none';
-    
+        }
+
+        // Update UI Cards visibility and values
+        const cardEEA = document.getElementById('card-80eea');
+        const cardEE = document.getElementById('card-80ee');
+        
+        if(cardEEA) cardEEA.style.display = (extraSection === 'card-80eea') ? 'block' : 'none';
+        if(cardEE) cardEE.style.display = (extraSection === 'card-80ee') ? 'block' : 'none';
+
+        if (extraSection) {
+            const displayId = extraSection === 'card-80eea' ? 'display-80eea-value' : 'display-80ee-value';
+            const displayEl = document.getElementById(displayId);
+            if(displayEl) displayEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
+        }
+
         // Update Section 24b Display
         const eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
         const display24b = document.getElementById('display-24b-value');
@@ -404,6 +461,7 @@ const TaxController = {
         }
         if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeInterest || "";
         if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
+        if(document.getElementById('loan-principal')) document.getElementById('loan-principal').value = i.loanPrincipal || "";
         if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = i.propertyValue || "";
         
         if (i.isUnderConstruction !== undefined) {
