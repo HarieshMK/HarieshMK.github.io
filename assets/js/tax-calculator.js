@@ -249,26 +249,33 @@ const TaxController = {
         let dExtra = 0;
         let extraSection = null; // To track which UI card to show (EE or EEA)
     
-        if (hasLoan && homeLoanInterest > 0 && sanctionDate && !isNaN(sanctionDate.getTime())) {
-            // Calculate 80EEA
-            if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
-                sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
-                propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
+        // We only show 80EE/EEA if the property is Self-Occupied
+            if (hasLoan && isSelfOccupied && homeLoanInterest > 0 && sanctionDate && !isNaN(sanctionDate.getTime())) {
                 
-                dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EEA.deductionLimit);
-                extraSection = 'card-80eea';
-                document.getElementById('display-80eea-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
-            } 
-            // Calculate 80EE
-            else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
-                     sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
-                     propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
-                
-                dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EE.deductionLimit);
-                extraSection = 'card-80ee';
-                document.getElementById('display-80ee-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
+                // Calculate 80EEA
+                if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && 
+                    sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end && 
+                    propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
+                    
+                    // Only trigger if interest exceeds the 2L cap of Section 24b
+                    dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EEA.deductionLimit);
+                    extraSection = 'card-80eea';
+                    document.getElementById('display-80eea-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
+                } 
+                // Calculate 80EE
+                else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && 
+                         sanctionDate <= ELIGIBILITY_RULES.sec80EE.end && 
+                         propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit) {
+                    
+                    dExtra = Math.min(Math.max(0, homeLoanInterest - 200000), ELIGIBILITY_RULES.sec80EE.deductionLimit);
+                    extraSection = 'card-80ee';
+                    document.getElementById('display-80ee-value').innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
+                }
+            } else {
+                // If rented or no loan, reset extra deduction
+                dExtra = 0;
+                extraSection = null;
             }
-        }
     
         // Toggle Extra Logic UI Cards
         document.getElementById('card-80eea').style.display = (extraSection === 'card-80eea' && dExtra > 0) ? 'block' : 'none';
