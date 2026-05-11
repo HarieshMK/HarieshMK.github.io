@@ -249,22 +249,31 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <button onclick="calculateAll()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;">Calculate Tax</button>
+        <button onclick="scrollToResults()" class="btn" style="width: 100%; margin-top: 25px; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: #38bdf8; color: #0f172a;">View Detailed Breakdown</button>
         <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8;">Save to Profile</button>
-        
-        <div id="detailed-comparison-container" style="margin-top: 25px; display: none;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--calc-text-main);">
-                <thead>
-                    <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left;">
-                        <th>Component</th><th>New</th><th>Old</th>
-                    </tr>
-                </thead>
-                <tbody id="comparison-table-body"></tbody>
-            </table>
-        </div>
+       
     </div>
 </div>
-    </div> <div id="mobile-tax-bar">
+    </div> 
+    <div id="tax-breakdown-section" class="post-card" style="margin-top: 30px; padding: 25px; background: var(--calc-card); border-top: 4px solid var(--calc-accent); clear: both;">
+    <h3 style="margin-top: 0; color: var(--calc-text-main); text-align: center;">
+        <i class="fas fa-list-ul" style="margin-right: 10px; color: var(--calc-accent);"></i> Detailed Comparison Summary
+    </h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: var(--calc-text-main); min-width: 400px;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left; font-size: 0.9rem; background: rgba(0,0,0,0.05);">
+                    <th style="padding: 12px;">Tax Component</th>
+                    <th style="padding: 12px; text-align: right;">Old Regime</th>
+                    <th style="padding: 12px; text-align: right;">New Regime</th>
+                </tr>
+            </thead>
+            <tbody id="main-comparison-table" style="font-size: 0.95rem;">
+                </tbody>
+        </table>
+    </div>
+</div>
+    <div id="mobile-tax-bar">
         <div style="text-align: center;">
             <div style="font-size: 0.6rem; color: #94a3b8;">OLD</div>
             <div id="float-old-tax" class="tax-val">₹ 0</div>
