@@ -111,7 +111,7 @@ FinanceEngine.TaxEngine = {
         const metroFactor = isMetro ? 0.5 : 0.4;
         const limit1 = hraReceived;
         const limit2 = basic * metroFactor;
-        const limit3 = Math.max(0, (rentPaid * 12) - (basic * 0.1));
+        const limit3 = Math.max(0, rentPaid - (basic * 0.1));
         return { 
             actualExemption: Math.min(limit1, limit2, limit3), 
             maxPossibleExemption: Math.min(limit2, limit3), 
