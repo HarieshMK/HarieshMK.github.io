@@ -269,7 +269,50 @@ permalink: /tax-calculator/
                 </tr>
             </thead>
             <tbody id="main-comparison-table" style="font-size: 0.95rem;">
-                </tbody>
+                <tr style="border-bottom: 1px solid var(--calc-input-border);">
+                    <td style="padding: 12px;">Gross Salary</td>
+                    <td id="summary-gross-salary" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-gross-salary-new" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                </tr>
+                
+                <tr style="border-bottom: 1px solid var(--calc-input-border);">
+                    <td style="padding: 12px;">Standard Deduction</td>
+                    <td id="summary-standard-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-standard-deduction-new" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--calc-input-border);">
+                    <td style="padding: 12px;">Section 80C Deductions</td>
+                    <td id="summary-80c-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--calc-input-border);">
+                    <td style="padding: 12px;">HRA Exemption</td>
+                    <td id="summary-hra-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--calc-input-border);">
+                    <td style="padding: 12px;">Section 80D (Health Insurance)</td>
+                    <td id="summary-80d-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--calc-input-border);">
+                    <td style="padding: 12px;">Home Loan Interest (Sec 24b)</td>
+                    <td id="summary-24b-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
+                </tr>
+            
+                <tr style="border-bottom: 2px solid var(--calc-input-border); background: rgba(56, 189, 248, 0.05); font-weight: bold;">
+                    <td style="padding: 12px;">Taxable Net Income</td>
+                    <td id="summary-taxable-old" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-taxable-new" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                </tr>
+            
+                <tr style="font-weight: bold; background: rgba(74, 222, 128, 0.05);">
+                    <td style="padding: 12px;">Net Tax Payable (incl. Cess)</td>
+                    <td id="summary-total-tax-old" style="padding: 12px; text-align: right; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-total-tax-new" style="padding: 12px; text-align: right; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>
