@@ -494,12 +494,14 @@ const TaxController = {
         const i = data.calculator_inputs;
         console.log("DEBUG: Standardizing mapping for data:", i);
         
+        // 1. Basic Income & HRA
         if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
         if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hra || "";
         if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rent || "";
         if(document.getElementById('is-metro')) document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
         if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
         
+        // 2. Home Loan Fields
         if(document.getElementById('has-home-loan')) {
             document.getElementById('has-home-loan').checked = (i.homeInterest > 0 || i.isUnderConstruction);
             TaxController.toggleLoanWizard(); 
@@ -521,6 +523,21 @@ const TaxController = {
             if (occRadio) occRadio.checked = true;
         }
         
+        // 3. Section 80D & NPS (CRITICAL FIX: Explicitly forcing events)
+        if(document.getElementById('80d-self')) {
+            document.getElementById('80d-self').value = i.healthSelf !== undefined ? i.healthSelf : "";
+        }
+        if(document.getElementById('80d-parents')) {
+            document.getElementById('80d-parents').value = i.healthParents !== undefined ? i.healthParents : "";
+        }
+        if(document.getElementById('parents-senior')) {
+            document.getElementById('parents-senior').checked = i.parentsSenior || false;
+        }
+        if(document.getElementById('nps-80ccd-1b')) {
+            document.getElementById('nps-80ccd-1b').value = i.npsExtra || "";
+        }
+
+        // 4. Restore Perks
         if (i.perks && i.perks.length > 0) {
             const pContainer = document.getElementById('perks-rows-container');
             if (pContainer) {
@@ -529,6 +546,7 @@ const TaxController = {
             }
         }
 
+        // 5. Restore 80C
         if (i.deductions80C && i.deductions80C.length > 0) {
             const cContainer = document.getElementById('80c-rows-container');
             if (cContainer) {
@@ -537,9 +555,9 @@ const TaxController = {
             }
         }
         
+        // Force the browser to evaluate the inputs right now
         TaxController.calculateAll();
     }
-};
 
 // GLOBAL FIXED WINDOW ROUTING LINK FOR THE MARKDOWN BUTTON
 window.scrollToResults = function() {
