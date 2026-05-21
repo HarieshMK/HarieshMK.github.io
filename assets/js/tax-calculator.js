@@ -415,7 +415,7 @@ const TaxController = {
             });
     
             // UPDATE THIS LINE to pass oldReg and newReg objects
-            TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg); 
+            TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
             
         } catch (err) {
             console.error("Calculation Engine Error:", err);
@@ -431,32 +431,47 @@ const TaxController = {
         else if (epfRow) epfRow.querySelector('.row-amount-80c').value = epfAmt;
     },
 
-    updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails) => {
-        // 1. Update the Main Comparison Cards
-        const nEl = document.getElementById('new-regime-tax');
-        const oEl = document.getElementById('old-regime-tax');
-        if(nEl) nEl.innerText = `₹ ${Math.round(newTax).toLocaleString('en-IN')}`;
-        if(oEl) oEl.innerText = `₹ ${Math.round(oldTax).toLocaleString('en-IN')}`;
-
-        // 2. Update the Detailed Table (Using MD File IDs)
-        // Adjust these IDs if they differ slightly in your Markdown
-        const setVal = (id, val) => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = `₹ ${Math.round(val).toLocaleString('en-IN')}`;
-        };
-
-        if (oldRegDetails && newRegDetails) {
-            // Gross & Income
-            setVal('summary-gross-salary', oldRegDetails.grossSalary);
-            setVal('summary-taxable-old', oldRegDetails.taxableIncome);
-            setVal('summary-taxable-new', newRegDetails.taxableIncome);
-
-            // Deductions
-            setVal('summary-80c-deduction', oldRegDetails.deductions?.section80C || 0);
-            setVal('summary-hra-deduction', oldRegDetails.exemptions?.hra || 0);
-            setVal('summary-standard-deduction', 50000); // Standard
-        }
-    },
+    updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails, grossSalary) => {
+            // 1. Update the Main Comparison Cards
+            const nEl = document.getElementById('new-regime-tax');
+            const oEl = document.getElementById('old-regime-tax');
+            if(nEl) nEl.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`;
+            if(oEl) oEl.innerText = `₹ ${Math.round(oldTax || 0).toLocaleString('en-IN')}`;
+    
+            // Helper function to safely round and display values in the DOM
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if(el) {
+                    const safeVal = isNaN(val) || val === undefined || val === null ? 0 : val;
+                    el.innerText = `₹ ${Math.round(safeVal).toLocaleString('en-IN')}`;
+                }
+            };
+    
+            if (oldRegDetails && newRegDetails) {
+                // Gross & Taxable Income Mappings matching FinanceEngine schemas
+                setVal('summary-gross-salary', grossSalary || 0);
+                setVal('summary-taxable-old', oldRegDetails.netTaxable);
+                setVal('summary-taxable-new', newRegDetails.netTaxable);
+    
+                // Deductions extracted directly from engine components
+                const applied80C = oldRegDetails.appliedDeductions?.section80C || 0;
+                const applied80D = oldRegDetails.appliedDeductions?.section80D || 0;
+                const applied24b = oldRegDetails.appliedDeductions?.homeInterest || 0;
+                
+                // Extract HRA exemption safely from the global collection or individual components
+                const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
+                const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
+                const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
+                const isMetro = document.getElementById('is-metro')?.value === 'true';
+                const calculatedHRA = window.FinanceEngine?.TaxEngine?.calculateExemptHRA(basic, hraRec, rentPaid, isMetro)?.actualExemption || 0;
+    
+                setVal('summary-80c-deduction', applied80C);
+                setVal('summary-hra-deduction', calculatedHRA);
+                setVal('summary-80d-deduction', applied80D);
+                setVal('summary-home-loan-interest', applied24b);
+                setVal('summary-standard-deduction', 50000); // Baseline default standard deduction rule
+            }
+        },
 
     loadUserData: async () => {
         console.log("DEBUG: loadUserData started");
