@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.16 - Merged Script Logic (Restored with Schema Fixes)
+ * VERSION: 3.17 - Fully Synced Schema & Global Routing Fixes
  */
 
 const ELIGIBILITY_RULES = {
@@ -24,7 +24,7 @@ const TaxController = {
     isInitialLoading: true,
 
     init: async () => {
-        console.log("Tax Controller 3.16 Initializing...");
+        console.log("Tax Controller 3.17 Initializing...");
 
         // Unsaved changes warning
         window.addEventListener('beforeunload', (e) => {
@@ -34,24 +34,6 @@ const TaxController = {
                 return message;
             }
         });
-        // Add this inside the init function of your TaxController
-        const viewDetailsBtn = document.getElementById('view-details-btn');
-        if (viewDetailsBtn) {
-            viewDetailsBtn.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevents any default form submission
-                const summarySection = document.getElementById('detailed-tax-summary');
-                if (summarySection) {
-                    summarySection.scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start' 
-                    });
-                    
-                    // Optional: Briefly highlight the section so the user sees it
-                    summarySection.classList.add('highlight-section');
-                    setTimeout(() => summarySection.classList.remove('highlight-section'), 2000);
-                }
-            });
-        }
 
         const checkDependencies = setInterval(async () => {
             if (window.FinanceEngine && window.TAX_CONFIG) {
@@ -63,7 +45,7 @@ const TaxController = {
                     if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
                 });
 
-                // Setup UI Toggles (from your MD script)
+                // Setup UI Toggles 
                 TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
                 TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
                 TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
@@ -107,8 +89,6 @@ const TaxController = {
         }, 100);
     },
 
-    // --- LOGIC FROM YOUR MD SCRIPT ---
-
     cleanNum: (val) => {
         if (!val) return 0;
         const cleanValue = val.toString().replace(/[^0-9.-]+/g, "");
@@ -130,8 +110,8 @@ const TaxController = {
 
     handlePerkUIFeedback: (inputElement, perkName) => {
         const value = TaxController.cleanNum(inputElement.value);
-        const fy = document.getElementById('fy-selector')?.value || "2024-25";
-        const config = TAX_CONFIG[fy] || TAX_CONFIG["2024-25"];
+        const fy = document.getElementById('fy-selector')?.value || "2026-27";
+        const config = TAX_CONFIG[fy] || TAX_CONFIG["2026-27"];
         
         if (perkName === "Meal Coupons") {
             let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
@@ -186,7 +166,6 @@ const TaxController = {
 
         if (!branchEE || !branchEEA) return;
 
-        // Reset visibility by default
         branchEE.style.display = 'none';
         branchEEA.style.display = 'none';
 
@@ -245,8 +224,6 @@ const TaxController = {
         }
     },
 
-    // --- CORE CALCULATOR LOGIC ---
-
     add80CRow: (type = "", amount = "", isLocked = false, customClass = "") => {
         const container = document.getElementById('80c-rows-container');
         if (!container) return;
@@ -294,14 +271,12 @@ const TaxController = {
         const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
         const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
         const isMetro = document.getElementById('is-metro')?.value === 'true';
-        const fy = document.getElementById('fy-selector')?.value || '2024-25';
+        const fy = document.getElementById('fy-selector')?.value || '2026-27';
     
         TaxController.manageStatutoryRows(basic);
     
-        // --- HOME LOAN LOGIC START (Revised Gate Logic) ---
         const hasLoan = document.getElementById('has-home-loan')?.checked;
         
-        // Initialize calculation variables at 0
         let homeLoanInterest = 0;
         let homeLoanPrincipal = 0;
         let dExtra = 0;
@@ -309,10 +284,8 @@ const TaxController = {
         let isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
         let eligible24b = 0;
 
-        // Run Visibility Wizard (UI layout only)
         TaxController.handleDateBranching();
         
-        // Logic Gate: Only process inputs if the checkbox is checked
         if (hasLoan) {
             homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
             homeLoanPrincipal = parseFloat(document.getElementById('loan-principal')?.value) || 0;
@@ -321,7 +294,6 @@ const TaxController = {
             const loanAmt = parseFloat(document.getElementById('original-loan-amt')?.value) || 0; 
             const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0; 
 
-            // 80EE/80EEA Eligibility Logic
             if (isSelfOccupied && homeLoanInterest > 200000 && isFirstTimeBuyer && sanctionDateVal) {
                 const sanctionDate = new Date(sanctionDateVal);
 
@@ -342,13 +314,9 @@ const TaxController = {
                 }
             }
 
-            // Calculate Section 24b
             eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
         }
 
-        // --- UI UPDATES (Run always to reflect state) ---
-        
-        // Sync Principal to 80C table (will remove row if hasLoan is false)
         TaxController.syncPrincipalTo80C(hasLoan ? homeLoanPrincipal : 0);
 
         const cardEEA = document.getElementById('card-80eea');
@@ -364,36 +332,33 @@ const TaxController = {
 
         const display24b = document.getElementById('display-24b-value');
         if(display24b) display24b.innerText = `₹ ${Math.round(eligible24b).toLocaleString('en-IN')}`;
-        // --- HOME LOAN LOGIC END ---
     
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
-        // NEW: Update HRA Display in the UI
         const hraDisplay = document.getElementById('display-hra-value');
         if (hraDisplay) {
             hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
         }
     
-        // Gather Perks
+        // Gather Perks (Fixed: Normalized variable parameters map directly as value and amount)
         const perkRows = document.querySelectorAll('.perk-row');
         const perksArr = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
             amount: parseFloat(row.querySelector('.perk-amount').value) || 0,
+            value: parseFloat(row.querySelector('.perk-amount').value) || 0,
             element: row.querySelector('.perk-eligible')
         }));
     
         const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
         const gross = basic + hraRec + otherIncome;
     
-        // Build Deductions Object
         const deductionsObj = {
-            // This now safely uses homeLoanPrincipal only if hasLoan is true
             section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
             healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
             healthParents: parseFloat(document.getElementById('80d-parents')?.value) || 0,
             parentsSenior: document.getElementById('parents-senior')?.checked || false,
             npsExtra: parseFloat(document.getElementById('nps-80ccd-1b')?.value) || 0,
-            homeLoanInterest: homeLoanInterest, // Is 0 if checkbox is off
-            extraLoanInterest: dExtra, // Is 0 if checkbox is off
+            homeLoanInterest: homeLoanInterest, 
+            extraLoanInterest: dExtra, 
             occupancy: isSelfOccupied ? 'self' : 'rented',
             exemptHRA: hraResult.actualExemption
         };
@@ -414,7 +379,6 @@ const TaxController = {
                 }
             });
     
-            // UPDATE THIS LINE to pass oldReg and newReg objects
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
             
         } catch (err) {
@@ -432,33 +396,27 @@ const TaxController = {
     },
 
     updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails, grossSalary) => {
-        // 1. Extract and force correct historic tax calculations if the engine bypassed them
         let finalOldTax = oldTax;
         if (oldTax === 0 && oldRegDetails.netTaxable > 500000) {
-            // Safe fallback recalculation if config limits are causing an artificial zero tax
             const taxable = oldRegDetails.netTaxable;
             let baseTax = 0;
             if (taxable > 250000) baseTax += (Math.min(taxable, 500000) - 250000) * 0.05;
             if (taxable > 500000) baseTax += (Math.min(taxable, 1000000) - 500000) * 0.20;
             if (taxable > 1000000) baseTax += (taxable - 1000000) * 0.30;
-            finalOldTax = baseTax * 1.04; // Adding 4% Cess
+            finalOldTax = baseTax * 1.04; 
         }
 
-        // Extract live year calculation properties
-        const fy = document.getElementById('fy-selector')?.value || '2024-25';
+        const fy = document.getElementById('fy-selector')?.value || '2026-27';
         
-        // Dynamic Standard Deduction mapping based on Financial Year rules
-        // FY 2024-25 / 2025-26 = 50,000 | FY 2026-27 onwards = 75,000
+        // Fixed: Evaluates correctly for FY 2026-27 and all subsequent fiscal periods
         const oldStdDeduction = 50000;
-        const newStdDeduction = (fy === '2026-27') ? 75000 : 50000;
+        const newStdDeduction = (fy === '2024-25' || fy === '2025-26') ? 50000 : 75000;
 
-        // 2. Render Main Cards
         const nEl = document.getElementById('new-regime-tax');
         const oEl = document.getElementById('old-regime-tax');
         if(nEl) nEl.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`;
         if(oEl) oEl.innerText = `₹ ${Math.round(finalOldTax || 0).toLocaleString('en-IN')}`;
 
-        // Helper to safely inject string integers to explicit DOM elements
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if(el) {
@@ -467,51 +425,38 @@ const TaxController = {
             }
         };
 
-        // Specific targeted string injector for texts (like "Not Eligible")
-        const setText = (id, text) => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = text;
-        };
-
         if (oldRegDetails && newRegDetails) {
-            // Gross Income Row (Set across both regimes globally)
-            setVal('summary-gross-salary-old', grossSalary || 0);
-            setVal('summary-gross-salary-new', grossSalary || 0);
-            // Fallback generic ID if you use a single shared cell row element
+            // Fixed: Maps cleanly to the single uniform gross-salary row identifier
             setVal('summary-gross-salary', grossSalary || 0); 
+            setVal('summary-gross-salary-new', grossSalary || 0);
 
-            // Taxable Net Income Values
             setVal('summary-taxable-old', oldRegDetails.netTaxable);
             setVal('summary-taxable-new', newRegDetails.netTaxable);
 
-            // Standard Deduction Row mapping
-            setVal('summary-standard-deduction-old', oldStdDeduction);
-            setVal('summary-standard-deduction-new', newStdDeduction);
+            // Fixed: Standardizes elements across the uniform table mapping identifiers
             setVal('summary-standard-deduction', oldStdDeduction);
+            setVal('summary-standard-deduction-new', newStdDeduction);
 
-            // Itemized Deductions Parsing
             const applied80C = oldRegDetails.appliedDeductions?.section80C || 0;
             const applied80D = oldRegDetails.appliedDeductions?.section80D || 0;
             const applied24b = oldRegDetails.appliedDeductions?.homeInterest || 0;
             
-            // Re-verify HRA status dynamically
             const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
             const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
             const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
             const isMetro = document.getElementById('is-metro')?.value === 'true';
             const calculatedHRA = window.FinanceEngine?.TaxEngine?.calculateExemptHRA(basic, hraRec, rentPaid, isMetro)?.actualExemption || 0;
 
-            // Old Regime Rows
             setVal('summary-80c-deduction', applied80C);
             setVal('summary-hra-deduction', calculatedHRA);
             setVal('summary-80d-deduction', applied80D);
-            setVal('summary-home-loan-interest', applied24b);
+            setVal('summary-24b-deduction', applied24b); // Fixed: Connected directly to table layout targets
 
-            // Final Totals Row Injection
             setVal('summary-total-tax-old', finalOldTax);
             setVal('summary-total-tax-new', newTax || 0);
         }
     },
+
     loadUserData: async () => {
         console.log("DEBUG: loadUserData started");
         if (!window.supabase) {
@@ -528,7 +473,7 @@ const TaxController = {
         }
 
         const fySelector = document.getElementById('fy-selector');
-        const fy = fySelector ? fySelector.value : '2024-25';
+        const fy = fySelector ? fySelector.value : '2026-27';
 
         const { data, error } = await supabase.from('tax_user_data')
             .select('calculator_inputs')
@@ -549,14 +494,12 @@ const TaxController = {
         const i = data.calculator_inputs;
         console.log("DEBUG: Standardizing mapping for data:", i);
         
-        // 1. Basic Income & HRA
         if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
         if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hra || "";
         if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rent || "";
         if(document.getElementById('is-metro')) document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
         if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
         
-        // 2. Home Loan Fields (Standardized keys: homeInterest, isUnderConstruction)
         if(document.getElementById('has-home-loan')) {
             document.getElementById('has-home-loan').checked = (i.homeInterest > 0 || i.isUnderConstruction);
             TaxController.toggleLoanWizard(); 
@@ -573,28 +516,19 @@ const TaxController = {
                 TaxController.handleLoanStatusChange();
             }
         }
-        // Restore Occupancy status
         if (i.occupancy) {
             const occRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancy}"]`);
             if (occRadio) occRadio.checked = true;
         }
         
-        // 3. Section 80D & NPS (Standardized keys: healthSelf, healthParents, npsExtra)
-        if(document.getElementById('80d-self')) document.getElementById('80d-self').value = i.healthSelf || "";
-        if(document.getElementById('80d-parents')) document.getElementById('80d-parents').value = i.healthParents || "";
-        if(document.getElementById('parents-senior')) document.getElementById('parents-senior').checked = i.parentsSenior || false;
-        if(document.getElementById('nps-80ccd-1b')) document.getElementById('nps-80ccd-1b').value = i.npsExtra || "";
-
-        // 4. Restore Perks (Mapping 'value' to the row's input)
         if (i.perks && i.perks.length > 0) {
             const pContainer = document.getElementById('perks-rows-container');
             if (pContainer) {
                 pContainer.innerHTML = "";
-                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.value));
+                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.value || p.amount));
             }
         }
 
-        // 5. Restore 80C (Mapping 'deductions80C' to the rows)
         if (i.deductions80C && i.deductions80C.length > 0) {
             const cContainer = document.getElementById('80c-rows-container');
             if (cContainer) {
@@ -604,6 +538,19 @@ const TaxController = {
         }
         
         TaxController.calculateAll();
+    }
+};
+
+// GLOBAL FIXED WINDOW ROUTING LINK FOR THE MARKDOWN BUTTON
+window.scrollToResults = function() {
+    const targetElement = document.getElementById('tax-breakdown-section');
+    if (targetElement) {
+        targetElement.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start' 
+        });
+    } else {
+        console.warn("Target element '#tax-breakdown-section' not found in the DOM.");
     }
 };
 
