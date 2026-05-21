@@ -67,6 +67,47 @@ const TaxController = {
                     }
                 });
 
+                // New FY Selector Event Listener to fetch data on selection changes
+                const appFySelector = document.getElementById('fy-selector');
+                if (appFySelector) {
+                    appFySelector.addEventListener('change', async () => {
+                        console.log(`FY Dropdown changed to: ${appFySelector.value}. Fetching fresh data...`);
+                        
+                        TaxController.isInitialLoading = true;
+                
+                        // Clear layout tables so old years don't blend over
+                        const pContainer = document.getElementById('perks-rows-container');
+                        const cContainer = document.getElementById('80c-rows-container');
+                        if (pContainer) pContainer.innerHTML = "";
+                        if (cContainer) cContainer.innerHTML = "";
+                
+                        // Reset inputs if the target year has no saved profiles
+                        const fieldsToClear = ['basic-salary', 'hra-received', 'rent-paid', 'other-income', 'loan-interest', 'loan-principal', '80d-self', '80d-parents', 'nps-80ccd-1b'];
+                        fieldsToClear.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = "";
+                        });
+                        
+                        const seniorCheck = document.getElementById('parents-senior');
+                        if (seniorCheck) seniorCheck.checked = false;
+                
+                        // Fetch fresh information matching the selection choice
+                        await TaxController.loadUserData();
+                
+                        // Standard placeholders if profile didn't find database rows
+                        if (pContainer && pContainer.children.length === 0) {
+                            TaxController.addPerkRow("Professional Tax", 2500);
+                        }
+                        if (cContainer && cContainer.children.length === 0) {
+                            TaxController.add80CRow();
+                        }
+                
+                        TaxController.isInitialLoading = false;
+                        TaxController.calculateAll();
+                        setTimeout(() => { TaxController.isDirty = false; }, 200);
+                    });
+                }
+
                 // Load data from Supabase
                 await TaxController.loadUserData();
 
