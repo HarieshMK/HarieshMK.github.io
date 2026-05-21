@@ -432,47 +432,86 @@ const TaxController = {
     },
 
     updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails, grossSalary) => {
-            // 1. Update the Main Comparison Cards
-            const nEl = document.getElementById('new-regime-tax');
-            const oEl = document.getElementById('old-regime-tax');
-            if(nEl) nEl.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`;
-            if(oEl) oEl.innerText = `₹ ${Math.round(oldTax || 0).toLocaleString('en-IN')}`;
-    
-            // Helper function to safely round and display values in the DOM
-            const setVal = (id, val) => {
-                const el = document.getElementById(id);
-                if(el) {
-                    const safeVal = isNaN(val) || val === undefined || val === null ? 0 : val;
-                    el.innerText = `₹ ${Math.round(safeVal).toLocaleString('en-IN')}`;
-                }
-            };
-    
-            if (oldRegDetails && newRegDetails) {
-                // Gross & Taxable Income Mappings matching FinanceEngine schemas
-                setVal('summary-gross-salary', grossSalary || 0);
-                setVal('summary-taxable-old', oldRegDetails.netTaxable);
-                setVal('summary-taxable-new', newRegDetails.netTaxable);
-    
-                // Deductions extracted directly from engine components
-                const applied80C = oldRegDetails.appliedDeductions?.section80C || 0;
-                const applied80D = oldRegDetails.appliedDeductions?.section80D || 0;
-                const applied24b = oldRegDetails.appliedDeductions?.homeInterest || 0;
-                
-                // Extract HRA exemption safely from the global collection or individual components
-                const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
-                const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
-                const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
-                const isMetro = document.getElementById('is-metro')?.value === 'true';
-                const calculatedHRA = window.FinanceEngine?.TaxEngine?.calculateExemptHRA(basic, hraRec, rentPaid, isMetro)?.actualExemption || 0;
-    
-                setVal('summary-80c-deduction', applied80C);
-                setVal('summary-hra-deduction', calculatedHRA);
-                setVal('summary-80d-deduction', applied80D);
-                setVal('summary-home-loan-interest', applied24b);
-                setVal('summary-standard-deduction', 50000); // Baseline default standard deduction rule
-            }
-        },
+        // 1. Extract and force correct historic tax calculations if the engine bypassed them
+        let finalOldTax = oldTax;
+        if (oldTax === 0 && oldRegDetails.netTaxable > 500000) {
+            // Safe fallback recalculation if config limits are causing an artificial zero tax
+            const taxable = oldRegDetails.netTaxable;
+            let baseTax = 0;
+            if (taxable > 250000) baseTax += (Math.min(taxable, 500000) - 250000) * 0.05;
+            if (taxable > 500000) baseTax += (Math.min(taxable, 1000000) - 500000) * 0.20;
+            if (taxable > 1000000) baseTax += (taxable - 1000000) * 0.30;
+            finalOldTax = baseTax * 1.04; // Adding 4% Cess
+        }
 
+        // Extract live year calculation properties
+        const fy = document.getElementById('fy-selector')?.value || '2024-25';
+        
+        // Dynamic Standard Deduction mapping based on Financial Year rules
+        // FY 2024-25 / 2025-26 = 50,000 | FY 2026-27 onwards = 75,000
+        const oldStdDeduction = 50000;
+        const newStdDeduction = (fy === '2026-27') ? 75000 : 50000;
+
+        // 2. Render Main Cards
+        const nEl = document.getElementById('new-regime-tax');
+        const oEl = document.getElementById('old-regime-tax');
+        if(nEl) nEl.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`;
+        if(oEl) oEl.innerText = `₹ ${Math.round(finalOldTax || 0).toLocaleString('en-IN')}`;
+
+        // Helper to safely inject string integers to explicit DOM elements
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if(el) {
+                const safeVal = isNaN(val) || val === undefined || val === null ? 0 : val;
+                el.innerText = `₹ ${Math.round(safeVal).toLocaleString('en-IN')}`;
+            }
+        };
+
+        // Specific targeted string injector for texts (like "Not Eligible")
+        const setText = (id, text) => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = text;
+        };
+
+        if (oldRegDetails && newRegDetails) {
+            // Gross Income Row (Set across both regimes globally)
+            setVal('summary-gross-salary-old', grossSalary || 0);
+            setVal('summary-gross-salary-new', grossSalary || 0);
+            // Fallback generic ID if you use a single shared cell row element
+            setVal('summary-gross-salary', grossSalary || 0); 
+
+            // Taxable Net Income Values
+            setVal('summary-taxable-old', oldRegDetails.netTaxable);
+            setVal('summary-taxable-new', newRegDetails.netTaxable);
+
+            // Standard Deduction Row mapping
+            setVal('summary-standard-deduction-old', oldStdDeduction);
+            setVal('summary-standard-deduction-new', newStdDeduction);
+            setVal('summary-standard-deduction', oldStdDeduction);
+
+            // Itemized Deductions Parsing
+            const applied80C = oldRegDetails.appliedDeductions?.section80C || 0;
+            const applied80D = oldRegDetails.appliedDeductions?.section80D || 0;
+            const applied24b = oldRegDetails.appliedDeductions?.homeInterest || 0;
+            
+            // Re-verify HRA status dynamically
+            const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
+            const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
+            const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
+            const isMetro = document.getElementById('is-metro')?.value === 'true';
+            const calculatedHRA = window.FinanceEngine?.TaxEngine?.calculateExemptHRA(basic, hraRec, rentPaid, isMetro)?.actualExemption || 0;
+
+            // Old Regime Rows
+            setVal('summary-80c-deduction', applied80C);
+            setVal('summary-hra-deduction', calculatedHRA);
+            setVal('summary-80d-deduction', applied80D);
+            setVal('summary-home-loan-interest', applied24b);
+
+            // Final Totals Row Injection
+            setVal('summary-total-tax-old', finalOldTax);
+            setVal('summary-total-tax-new', newTax || 0);
+        }
+    },
     loadUserData: async () => {
         console.log("DEBUG: loadUserData started");
         if (!window.supabase) {
