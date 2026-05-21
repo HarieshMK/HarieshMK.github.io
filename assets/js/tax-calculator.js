@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.17 - Fully Synced Schema & Global Routing Fixes
+ * VERSION: 3.18 - Fixed Structural Syntax Syntax Closures
  */
 
 const ELIGIBILITY_RULES = {
@@ -24,7 +24,7 @@ const TaxController = {
     isInitialLoading: true,
 
     init: async () => {
-        console.log("Tax Controller 3.17 Initializing...");
+        console.log("Tax Controller 3.18 Initializing...");
 
         // Unsaved changes warning
         window.addEventListener('beforeunload', (e) => {
@@ -339,7 +339,7 @@ const TaxController = {
             hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
         }
     
-        // Gather Perks (Fixed: Normalized variable parameters map directly as value and amount)
+        // Gather Perks
         const perkRows = document.querySelectorAll('.perk-row');
         const perksArr = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
@@ -408,7 +408,6 @@ const TaxController = {
 
         const fy = document.getElementById('fy-selector')?.value || '2026-27';
         
-        // Fixed: Evaluates correctly for FY 2026-27 and all subsequent fiscal periods
         const oldStdDeduction = 50000;
         const newStdDeduction = (fy === '2024-25' || fy === '2025-26') ? 50000 : 75000;
 
@@ -426,14 +425,12 @@ const TaxController = {
         };
 
         if (oldRegDetails && newRegDetails) {
-            // Fixed: Maps cleanly to the single uniform gross-salary row identifier
             setVal('summary-gross-salary', grossSalary || 0); 
             setVal('summary-gross-salary-new', grossSalary || 0);
 
             setVal('summary-taxable-old', oldRegDetails.netTaxable);
             setVal('summary-taxable-new', newRegDetails.netTaxable);
 
-            // Fixed: Standardizes elements across the uniform table mapping identifiers
             setVal('summary-standard-deduction', oldStdDeduction);
             setVal('summary-standard-deduction-new', newStdDeduction);
 
@@ -450,7 +447,7 @@ const TaxController = {
             setVal('summary-80c-deduction', applied80C);
             setVal('summary-hra-deduction', calculatedHRA);
             setVal('summary-80d-deduction', applied80D);
-            setVal('summary-24b-deduction', applied24b); // Fixed: Connected directly to table layout targets
+            setVal('summary-24b-deduction', applied24b);
 
             setVal('summary-total-tax-old', finalOldTax);
             setVal('summary-total-tax-new', newTax || 0);
@@ -523,7 +520,7 @@ const TaxController = {
             if (occRadio) occRadio.checked = true;
         }
         
-        // 3. Section 80D & NPS (CRITICAL FIX: Explicitly forcing events)
+        // 3. Section 80D & NPS
         if(document.getElementById('80d-self')) {
             document.getElementById('80d-self').value = i.healthSelf !== undefined ? i.healthSelf : "";
         }
@@ -555,9 +552,9 @@ const TaxController = {
             }
         }
         
-        // Force the browser to evaluate the inputs right now
         TaxController.calculateAll();
-    }
+    } // <-- THIS WAS THE CRITICAL MISSING CLOSING BRACKET FOR THE FUNCTION
+}; // <-- THIS CLOSES THE TAXCONTROLLER OBJECT PERFECTLY
 
 // GLOBAL FIXED WINDOW ROUTING LINK FOR THE MARKDOWN BUTTON
 window.scrollToResults = function() {
