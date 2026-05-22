@@ -143,21 +143,29 @@ async function updateAuthUI(session) {
     }
 }
 
+// Add this tiny single line right ABOVE your window.supabase.auth.onAuthStateChange listener
+let isRedirecting = false;
+
 // =================================================================
-// UPDATED GLOBAL AUTH STATE MONITOR ENGINE & STORAGE INTERCEPTOR
+// LOCKED GLOBAL AUTH STATE MONITOR ENGINE & STORAGE INTERCEPTOR
 // =================================================================
 window.supabase.auth.onAuthStateChange((event, session) => {
     console.log("System Auth Event Fired:", event);
     updateAuthUI(session);
 
     if (event === "SIGNED_IN") {
+        // 1. If we are already processing a redirect from a previous fire, STOP immediately.
+        if (isRedirecting) {
+            console.log("🔒 Event blocked to prevent multi-fire hijacking.");
+            return;
+        }
+
         const destination = sessionStorage.getItem('auth_redirect_target');
 
         if (destination) {
+            // 2. Set the lock immediately so Fire #2, #3, and #4 get blocked
+            isRedirecting = true;
             console.log("🔥 Storage Interceptor found target:", destination);
-            
-            // Erase memory immediately to prevent redirect loops
-            sessionStorage.removeItem('auth_redirect_target');
             
             // Clean paths if they have accidental trailing slashes for GitHub pages
             let cleanDestination = destination;
@@ -165,6 +173,10 @@ window.supabase.auth.onAuthStateChange((event, session) => {
                 cleanDestination = cleanDestination.slice(0, -1);
             }
 
+            // 3. Clear memory *after* we are certain we are actively moving the browser
+            sessionStorage.removeItem('auth_redirect_target');
+
+            console.log("🚀 Redirecting browser to:", cleanDestination);
             window.location.replace(cleanDestination);
         }
     }
