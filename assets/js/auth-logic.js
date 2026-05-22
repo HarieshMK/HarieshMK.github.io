@@ -48,11 +48,11 @@ async function handleLogin(email, password) {
         return;
     }
     if (!email) {
-        showAuthMessage("Don't forget your email! How will we know it's you?");
+        showAuthMessage("We can't guess your e-mail bro. Please type your email.");
         return;
     }
     if (!password) {
-        showAuthMessage("Pssst... you forgot the password!");
+        showAuthMessage("Pssst... You don't want your account to be secure? Set a good password");
         return;
     }
 
