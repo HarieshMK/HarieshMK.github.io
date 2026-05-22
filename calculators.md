@@ -24,11 +24,18 @@ permalink: /calculators/
     </div>
   </a>
 
+  <a href="{{ '/tax-calculator' | relative_url }}" class="calc-card">
+    <div class="calc-icon">💸</div>
+    <div class="calc-content">
+      <h3>Tax Calculator</h3>
+      <p>Estimate your tax liability under the latest financial regimes and optimize your yearly savings profile.</p>
+    </div>
+  </a>
+
   <div class="calc-card" style="opacity: 0.7; cursor: default; border-style: dashed;">
     <div class="calc-icon" style="filter: grayscale(1);">⏳</div>
     <div class="calc-content">
       <h3>More Tools Coming</h3>
       <p>We are building Step-Up SIP, Home loan planner, Gold loan planner and more. Stay tuned for updates!</p>
     </div>
-
-</div>
+  </div> </div>
