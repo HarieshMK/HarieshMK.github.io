@@ -68,20 +68,20 @@ async function handleLogin(email, password) {
         } else {
             showAuthMessage("Login successful!", false);
             
-            // --- THE FIX STARTS HERE ---
+            // --- THE REDIRECT LOGIC ---
             const urlParams = new URLSearchParams(window.location.search);
-            const destination = urlParams.get('return_to') || '/'; // Go to return_to OR home
+            const destination = urlParams.get('return_to') || '/'; // Reads 'return_to' parameter from URL
             
             setTimeout(() => { 
                 window.location.href = destination; 
             }, 1000);
-            // --- THE FIX ENDS HERE ---
         }
     } catch (err) {
         console.error("Critical Auth Error:", err);
         showAuthMessage("Connection error. Check console.");
     }
 }
+
 // --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('btn-login');
@@ -106,9 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-// ==========================================
-// UNIFIED AUTH UI & PROFILE STATE CONTROLLER
-// ==========================================
+
+// =================================================================
+// UPDATE ONLY THIS LOWER PORTION OF YOUR AUTH-LOGIC.JS FILE
+// =================================================================
 
 async function updateAuthUI(session) {
     const authBtn = document.getElementById('auth-btn'); 
@@ -132,7 +133,16 @@ async function updateAuthUI(session) {
         if (authBtn) {
             authBtn.style.display = 'inline-block';
             authBtn.textContent = 'Sign In / Register';
-            authBtn.href = "/login";
+            
+            // --- CHANGE 1: Automatically attach the return path to the login button link ---
+            const currentPath = window.location.pathname;
+            
+            // Prevent recursive loop if they are already browsing the login or signup views
+            if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
+                authBtn.href = `/login/?return_to=${encodeURIComponent(currentPath)}`;
+            } else {
+                authBtn.href = "/login";
+            }
         }
         if (profileBox) profileBox.style.display = 'none';
     }
@@ -172,7 +182,10 @@ async function saveTaxData(taxPayload) {
     const { data: { session } } = await window.supabase.auth.getSession();
     
     if (!session) {
+        // --- CHANGE 2: Send them to the login screen with a return parameter if they attempt to save data while logged out ---
+        const currentPath = window.location.pathname;
         alert("Please log in to save your tax calculations to your profile!");
+        window.location.href = `/login/?return_to=${encodeURIComponent(currentPath)}`;
         return { error: "User not authenticated" };
     }
 
