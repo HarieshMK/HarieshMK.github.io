@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.20 - Fixed Syntax Closures & Restored Missing Logic Blocks
+ * VERSION: 3.21 - Fully Restored All Missing Bottom-Of-File Utilities & Global Bridges
  */
 
 const ELIGIBILITY_RULES = {
@@ -26,7 +26,6 @@ const TaxController = {
     init: async () => {
         console.log("Tax Controller Initializing...");
 
-        // Safety verification: If engines aren't loaded on the window yet, abort and retry when ready
         if (!window.FinanceEngine || !window.TAX_CONFIG) {
             console.warn("Tax engines missing. Re-routing initialization hook...");
             window.addEventListener('load', () => TaxController.init());
@@ -35,7 +34,6 @@ const TaxController = {
 
         console.log("Dependencies verified successfully. Initializing application logic components...");
 
-        // Unsaved changes warning handler
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) {
                 const message = "You have unsaved tax data. Are you sure you want to leave?";
@@ -44,18 +42,15 @@ const TaxController = {
             }
         });
 
-        // Set up numeric input optimization
         document.querySelectorAll('input[type="number"]').forEach(input => {
             if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
         });
 
-        // Setup UI Toggles 
         TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
         TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
         TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
         TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
 
-        // Global Input Listener (Dirty Tracking & Calculation)
         document.addEventListener('input', (e) => {
             if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox') {
                 TaxController.isDirty = true;
@@ -68,7 +63,6 @@ const TaxController = {
             }
         });
 
-        // FY Selector Dropdown change monitoring hook
         const appFySelector = document.getElementById('fy-selector');
         if (appFySelector) {
             appFySelector.addEventListener('change', async () => {
@@ -104,10 +98,8 @@ const TaxController = {
             });
         }
 
-        // Load data from Supabase initially
         await TaxController.loadUserData();
 
-        // Set Default Rows if empty
         const pContainer = document.getElementById('perks-rows-container');
         const cContainer = document.getElementById('80c-rows-container');
         if (pContainer && pContainer.children.length === 0) {
@@ -177,22 +169,6 @@ const TaxController = {
         if(deductions) deductions.style.display = hasLoan ? 'block' : 'none';
         TaxController.calculateAll();
     },
-    scrollToResults: () => {
-        const breakdownSection = document.getElementById('detailed-breakdown-section');
-        const breakdownToggleBtn = document.getElementById('view-breakdown-btn');
-        
-        if (breakdownSection) {
-            if (breakdownSection.style.display === 'none' || !breakdownSection.style.display) {
-                breakdownSection.style.display = 'block';
-                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Detailed Breakdown';
-                // Only now does it actually smooth scroll down to it
-                breakdownSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                breakdownSection.style.display = 'none';
-                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye"></i> View Detailed Breakdown';
-            }
-        }
-    },
     
     handleLoanStatusChange() {
         const status = document.querySelector('input[name="possession"]:checked')?.value;
@@ -243,6 +219,22 @@ const TaxController = {
             }
         } else if (principalRow) {
             principalRow.remove();
+        }
+    },
+
+    scrollToResults: () => {
+        const breakdownSection = document.getElementById('detailed-breakdown-section');
+        const breakdownToggleBtn = document.getElementById('view-breakdown-btn');
+        
+        if (breakdownSection) {
+            if (breakdownSection.style.display === 'none' || !breakdownSection.style.display) {
+                breakdownSection.style.display = 'block';
+                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Detailed Breakdown';
+                breakdownSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                breakdownSection.style.display = 'none';
+                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye"></i> View Detailed Breakdown';
+            }
         }
     },
     
@@ -389,7 +381,6 @@ const TaxController = {
             hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
         }
     
-        // Gather Perks
         const perkRows = document.querySelectorAll('.perk-row');
         const perksArr = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
@@ -550,7 +541,6 @@ const TaxController = {
                 }
             };
 
-            // 1. Basic Income & HRA
             setNumericValue('basic-salary', i.basic);
             setNumericValue('hra-received', i.hra);
             setNumericValue('rent-paid', i.rent);
@@ -560,7 +550,6 @@ const TaxController = {
                 document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
             }
             
-            // 2. Home Loan Fields
             if(document.getElementById('has-home-loan')) {
                 document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true);
                 TaxController.toggleLoanWizard(); 
@@ -585,7 +574,6 @@ const TaxController = {
                 if (occRadio) occRadio.checked = true;
             }
             
-            // 3. Section 80D & NPS
             setNumericValue('80d-self', i.healthSelf);
             setNumericValue('80d-parents', i.healthParents);
             setNumericValue('nps-80ccd-1b', i.npsExtra);
@@ -594,7 +582,6 @@ const TaxController = {
                 document.getElementById('parents-senior').checked = !!i.parentsSenior;
             }
 
-            // 4. Restore Perks
             const pContainer = document.getElementById('perks-rows-container');
             if (pContainer) {
                 pContainer.innerHTML = "";
@@ -603,7 +590,6 @@ const TaxController = {
                 }
             }
 
-            // 5. Restore 80C
             const cContainer = document.getElementById('80c-rows-container');
             if (cContainer) {
                 cContainer.innerHTML = "";
@@ -617,6 +603,32 @@ const TaxController = {
     }
 };
 
+// DYNAMIC INPUT/ERROR STYLE HOOKS
+if (!document.getElementById('tax-calculator-styles')) {
+    const style = document.createElement('style');
+    style.id = 'tax-calculator-styles';
+    style.innerHTML = `
+        .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; }
+        .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
+    `;
+    document.head.appendChild(style);
+}
+
+// BACKWARDS-COMPATIBLE UTILITY WRAPPERS
+function validateInputs() {
+    let isValid = true;
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        const val = parseFloat(input.value);
+        if (val < 0) {
+            input.classList.add('input-error');
+            isValid = false;
+        } else {
+            input.classList.remove('input-error');
+        }
+    });
+    return isValid;
+}
+
 // GLOBAL BRIDGES
 window.TaxController = TaxController;
 window.add80CRow = TaxController.add80CRow;
@@ -625,5 +637,6 @@ window.calculateAll = TaxController.calculateAll;
 window.handleSave = TaxController.handleSave;
 window.toggleLoanWizard = TaxController.toggleLoanWizard;
 window.scrollToResults = TaxController.scrollToResults;
+window.validateInputs = validateInputs;
 
 document.addEventListener('DOMContentLoaded', TaxController.init);
