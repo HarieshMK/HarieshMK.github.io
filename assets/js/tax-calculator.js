@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.18 - Fixed Structural Syntax Syntax Closures
+ * VERSION: 3.20 - Fixed Syntax Closures & Restored Missing Logic Blocks
  */
 
 const ELIGIBILITY_RULES = {
@@ -24,9 +24,18 @@ const TaxController = {
     isInitialLoading: true,
 
     init: async () => {
-        console.log("Tax Controller 3.18 Initializing...");
+        console.log("Tax Controller Initializing...");
 
-        // Unsaved changes warning
+        // Safety verification: If engines aren't loaded on the window yet, abort and retry when ready
+        if (!window.FinanceEngine || !window.TAX_CONFIG) {
+            console.warn("Tax engines missing. Re-routing initialization hook...");
+            window.addEventListener('load', () => TaxController.init());
+            return;
+        }
+
+        console.log("Dependencies verified successfully. Initializing application logic components...");
+
+        // Unsaved changes warning handler
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) {
                 const message = "You have unsaved tax data. Are you sure you want to leave?";
@@ -35,99 +44,83 @@ const TaxController = {
             }
         });
 
-        const checkDependencies = setInterval(async () => {
-            if (window.FinanceEngine && window.TAX_CONFIG) {
-                clearInterval(checkDependencies);
-                console.log("Dependencies found. Starting logic...");
+        // Set up numeric input optimization
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
+        });
 
-                // Set up numeric input optimization
-                document.querySelectorAll('input[type="number"]').forEach(input => {
-                    if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
-                });
+        // Setup UI Toggles 
+        TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
+        TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
+        TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
+        TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
 
-                // Setup UI Toggles 
-                TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
-                TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
-                TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
-                TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
-
-                // Global Input Listener (Dirty Tracking & Calculation)
-                document.addEventListener('input', (e) => {
-                    if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox') {
-                        TaxController.isDirty = true;
-                        
-                        // Handle Perk UI Feedback if needed
-                        const row = e.target.closest('.perk-row');
-                        if (row) {
-                            const perkSelect = row.querySelector('select');
-                            if (perkSelect) TaxController.handlePerkUIFeedback(e.target, perkSelect.value);
-                        }
-
-                        TaxController.calculateAll();
-                    }
-                });
-
-                // New FY Selector Event Listener to fetch data on selection changes
-                const appFySelector = document.getElementById('fy-selector');
-                if (appFySelector) {
-                    appFySelector.addEventListener('change', async () => {
-                        console.log(`FY Dropdown changed to: ${appFySelector.value}. Fetching fresh data...`);
-                        
-                        TaxController.isInitialLoading = true;
-                
-                        // Clear layout tables so old years don't blend over
-                        const pContainer = document.getElementById('perks-rows-container');
-                        const cContainer = document.getElementById('80c-rows-container');
-                        if (pContainer) pContainer.innerHTML = "";
-                        if (cContainer) cContainer.innerHTML = "";
-                
-                        // Reset inputs if the target year has no saved profiles
-                        const fieldsToClear = ['basic-salary', 'hra-received', 'rent-paid', 'other-income', 'loan-interest', 'loan-principal', '80d-self', '80d-parents', 'nps-80ccd-1b'];
-                        fieldsToClear.forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) el.value = "";
-                        });
-                        
-                        const seniorCheck = document.getElementById('parents-senior');
-                        if (seniorCheck) seniorCheck.checked = false;
-                
-                        // Fetch fresh information matching the selection choice
-                        await TaxController.loadUserData();
-                
-                        // Standard placeholders if profile didn't find database rows
-                        if (pContainer && pContainer.children.length === 0) {
-                            TaxController.addPerkRow("Professional Tax", 2500);
-                        }
-                        if (cContainer && cContainer.children.length === 0) {
-                            TaxController.add80CRow();
-                        }
-                
-                        TaxController.isInitialLoading = false;
-                        TaxController.calculateAll();
-                        setTimeout(() => { TaxController.isDirty = false; }, 200);
-                    });
+        // Global Input Listener (Dirty Tracking & Calculation)
+        document.addEventListener('input', (e) => {
+            if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox') {
+                TaxController.isDirty = true;
+                const row = e.target.closest('.perk-row');
+                if (row) {
+                    const perkSelect = row.querySelector('select');
+                    if (perkSelect) TaxController.handlePerkUIFeedback(e.target, perkSelect.value);
                 }
+                TaxController.calculateAll();
+            }
+        });
 
-                // Load data from Supabase
-                await TaxController.loadUserData();
+        // FY Selector Dropdown change monitoring hook
+        const appFySelector = document.getElementById('fy-selector');
+        if (appFySelector) {
+            appFySelector.addEventListener('change', async () => {
+                console.log(`FY Dropdown changed to: ${appFySelector.value}. Fetching fresh data...`);
+                TaxController.isInitialLoading = true;
 
-                // Set Default Rows if empty
                 const pContainer = document.getElementById('perks-rows-container');
                 const cContainer = document.getElementById('80c-rows-container');
+                if (pContainer) pContainer.innerHTML = "";
+                if (cContainer) cContainer.innerHTML = "";
+
+                const fieldsToClear = ['basic-salary', 'hra-received', 'rent-paid', 'other-income', 'loan-interest', 'loan-principal', '80d-self', '80d-parents', 'nps-80ccd-1b'];
+                fieldsToClear.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = "";
+                });
+                
+                const seniorCheck = document.getElementById('parents-senior');
+                if (seniorCheck) seniorCheck.checked = false;
+
+                await TaxController.loadUserData();
+
                 if (pContainer && pContainer.children.length === 0) {
                     TaxController.addPerkRow("Professional Tax", 2500);
                 }
-                if (cContainer && (cContainer.children.length === 0 || cContainer.querySelector('#empty-80c-msg'))) {
+                if (cContainer && cContainer.children.length === 0) {
                     TaxController.add80CRow();
                 }
 
                 TaxController.isInitialLoading = false;
                 TaxController.calculateAll();
+                setTimeout(() => { TaxController.isDirty = false; }, 200);
+            });
+        }
 
-                // Final reset of dirty state after initial load
-                setTimeout(() => { TaxController.isDirty = false; }, 500);
-            }
-        }, 100);
+        // Load data from Supabase initially
+        await TaxController.loadUserData();
+
+        // Set Default Rows if empty
+        const pContainer = document.getElementById('perks-rows-container');
+        const cContainer = document.getElementById('80c-rows-container');
+        if (pContainer && pContainer.children.length === 0) {
+            TaxController.addPerkRow("Professional Tax", 2500);
+        }
+        if (cContainer && (cContainer.children.length === 0 || cContainer.querySelector('#empty-80c-msg'))) {
+            TaxController.add80CRow();
+        }
+
+        TaxController.isInitialLoading = false;
+        TaxController.calculateAll();
+
+        setTimeout(() => { TaxController.isDirty = false; }, 500);
     },
 
     cleanNum: (val) => {
@@ -448,9 +441,9 @@ const TaxController = {
         }
 
         const fy = document.getElementById('fy-selector')?.value || '2026-27';
-        
+        const config = TAX_CONFIG[fy] || TAX_CONFIG["2026-27"];
         const oldStdDeduction = 50000;
-        const newStdDeduction = (fy === '2024-25' || fy === '2025-26') ? 50000 : 75000;
+        const newStdDeduction = config.stdDeduction !== undefined ? config.stdDeduction : 75000;
 
         const nEl = document.getElementById('new-regime-tax');
         const oEl = document.getElementById('old-regime-tax');
@@ -529,84 +522,82 @@ const TaxController = {
             return;
         }
 
-        const i = data.calculator_inputs;
-        console.log("DEBUG: Standardizing mapping for data:", i);
-        
-        // 1. Basic Income & HRA
-        if(document.getElementById('basic-salary')) document.getElementById('basic-salary').value = i.basic || "";
-        if(document.getElementById('hra-received')) document.getElementById('hra-received').value = i.hra || "";
-        if(document.getElementById('rent-paid')) document.getElementById('rent-paid').value = i.rent || "";
-        if(document.getElementById('is-metro')) document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
-        if(document.getElementById('other-income')) document.getElementById('other-income').value = i.otherIncome || "";
-        
-        // 2. Home Loan Fields
-        if(document.getElementById('has-home-loan')) {
-            document.getElementById('has-home-loan').checked = (i.homeInterest > 0 || i.isUnderConstruction);
-            TaxController.toggleLoanWizard(); 
-        }
-        if(document.getElementById('loan-interest')) document.getElementById('loan-interest').value = i.homeInterest || "";
-        if(document.getElementById('loan-sanction-date')) document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
-        if(document.getElementById('loan-principal')) document.getElementById('loan-principal').value = i.loanPrincipal || "";
-        if(document.getElementById('property-stamp-value')) document.getElementById('property-stamp-value').value = i.propertyValue || "";
-        
-        if (i.isUnderConstruction !== undefined) {
-            const radio = document.querySelector(`input[name="possession"][value="${i.isUnderConstruction ? 'under-construction' : 'completed'}"]`);
-            if (radio) {
-                radio.checked = true;
-                TaxController.handleLoanStatusChange();
-            }
-        }
-        if (i.occupancy) {
-            const occRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancy}"]`);
-            if (occRadio) occRadio.checked = true;
-        }
-        
-        // 3. Section 80D & NPS
-        if(document.getElementById('80d-self')) {
-            document.getElementById('80d-self').value = i.healthSelf !== undefined ? i.healthSelf : "";
-        }
-        if(document.getElementById('80d-parents')) {
-            document.getElementById('80d-parents').value = i.healthParents !== undefined ? i.healthParents : "";
-        }
-        if(document.getElementById('parents-senior')) {
-            document.getElementById('parents-senior').checked = i.parentsSenior || false;
-        }
-        if(document.getElementById('nps-80ccd-1b')) {
-            document.getElementById('nps-80ccd-1b').value = i.npsExtra || "";
-        }
+        try {
+            const i = data.calculator_inputs || {};
+            console.log("DEBUG: Standardizing mapping for data:", i);
+            
+            const setNumericValue = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const parsed = parseFloat(value);
+                    el.value = isNaN(parsed) ? "" : parsed;
+                }
+            };
 
-        // 4. Restore Perks
-        if (i.perks && i.perks.length > 0) {
+            // 1. Basic Income & HRA
+            setNumericValue('basic-salary', i.basic);
+            setNumericValue('hra-received', i.hra);
+            setNumericValue('rent-paid', i.rent);
+            setNumericValue('other-income', i.otherIncome);
+            
+            if(document.getElementById('is-metro')) {
+                document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
+            }
+            
+            // 2. Home Loan Fields
+            if(document.getElementById('has-home-loan')) {
+                document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true);
+                TaxController.toggleLoanWizard(); 
+            }
+            setNumericValue('loan-interest', i.homeInterest);
+            setNumericValue('loan-principal', i.loanPrincipal);
+            setNumericValue('property-stamp-value', i.propertyValue);
+            
+            if(document.getElementById('loan-sanction-date')) {
+                document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
+            }
+            
+            if (i.isUnderConstruction !== undefined) {
+                const radio = document.querySelector(`input[name="possession"][value="${i.isUnderConstruction ? 'under-construction' : 'completed'}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    TaxController.handleLoanStatusChange();
+                }
+            }
+            if (i.occupancy) {
+                const occRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancy}"]`);
+                if (occRadio) occRadio.checked = true;
+            }
+            
+            // 3. Section 80D & NPS
+            setNumericValue('80d-self', i.healthSelf);
+            setNumericValue('80d-parents', i.healthParents);
+            setNumericValue('nps-80ccd-1b', i.npsExtra);
+            
+            if(document.getElementById('parents-senior')) {
+                document.getElementById('parents-senior').checked = !!i.parentsSenior;
+            }
+
+            // 4. Restore Perks
             const pContainer = document.getElementById('perks-rows-container');
             if (pContainer) {
                 pContainer.innerHTML = "";
-                i.perks.forEach(p => TaxController.addPerkRow(p.type, p.value || p.amount));
+                if (i.perks && i.perks.length > 0) {
+                    i.perks.forEach(p => TaxController.addPerkRow(p.type, parseFloat(p.value || p.amount) || 0));
+                }
             }
-        }
 
-        // 5. Restore 80C
-        if (i.deductions80C && i.deductions80C.length > 0) {
+            // 5. Restore 80C
             const cContainer = document.getElementById('80c-rows-container');
             if (cContainer) {
                 cContainer.innerHTML = "";
-                i.deductions80C.forEach(inv => TaxController.add80CRow(inv.type, inv.amount));
+                if (i.deductions80C && i.deductions80C.length > 0) {
+                    i.deductions80C.forEach(inv => TaxController.add80CRow(inv.type, parseFloat(inv.amount) || 0));
+                }
             }
+        } catch (parseError) {
+            console.error("CRITICAL ERROR: Failed parsing user data safely:", parseError);
         }
-        
-        TaxController.calculateAll();
-    } // <-- THIS WAS THE CRITICAL MISSING CLOSING BRACKET FOR THE FUNCTION
-}; // <-- THIS CLOSES THE TAXCONTROLLER OBJECT PERFECTLY
-
-// GLOBAL FIXED WINDOW ROUTING LINK FOR THE MARKDOWN BUTTON
-window.scrollToResults = function() {
-    const targetElement = document.getElementById('tax-breakdown-section');
-    if (targetElement) {
-        targetElement.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start' 
-        });
-    } else {
-        console.warn("Target element '#tax-breakdown-section' not found in the DOM.");
     }
 };
 
