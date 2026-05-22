@@ -66,15 +66,28 @@ async function handleLogin(email, password) {
         if (error) {
             showAuthMessage(error.message);
         } else {
-            showAuthMessage("Login successful!", false);
+            showAuthMessage("Login successful! Redirecting...", false);
             
-            // --- THE REDIRECT LOGIC ---
+            // 1. Extract the parameters directly
             const urlParams = new URLSearchParams(window.location.search);
-            const destination = urlParams.get('return_to') || '/'; // Reads 'return_to' parameter from URL
+            let destination = urlParams.get('return_to'); 
             
-            setTimeout(() => { 
-                window.location.href = destination; 
-            }, 1000);
+            console.log("Captured Return Destination:", destination); // Debug log
+
+            if (destination) {
+                // Fix for absolute vs relative path setups on GitHub Pages
+                destination = decodeURIComponent(destination);
+                
+                // If it points to an index folder path, let's clean it or ensure compatibility
+                if (destination === '/tax-calculator/') {
+                    // Try targeting the direct filename if GitHub Pages is choking on the pretty URL trailing slash
+                    destination = '/tax-calculator'; 
+                }
+                
+                window.location.assign(destination);
+            } else {
+                window.location.assign('/');
+            }
         }
     } catch (err) {
         console.error("Critical Auth Error:", err);
