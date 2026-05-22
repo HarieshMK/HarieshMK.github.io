@@ -74,12 +74,29 @@ async function handleLogin(email, password) {
 
 // --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Target the actual Form elements instead of just the buttons
+    const loginForm = document.getElementById('login-form') || document.querySelector('form');
     const loginBtn = document.getElementById('btn-login');
     const signupBtn = document.getElementById('btn-signup');
 
+    // Robust Handler for the entire Login Form context
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // CRUCIAL: Stops the native HTML browser page reload!
+            
+            const emailField = document.getElementById('login-email');
+            const passField = document.getElementById('login-password');
+            
+            if (emailField && passField) {
+                handleLogin(emailField.value, passField.value);
+            }
+        });
+    }
+
+    // Fallback click listener for the button if it lives outside a form container
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent page reload
+            e.preventDefault();
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-password').value;
             handleLogin(email, pass);
@@ -88,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent page reload
+            e.preventDefault();
             const email = document.getElementById('signup-email').value;
             const pass = document.getElementById('signup-password').value;
             const name = document.getElementById('signup-name').value;
