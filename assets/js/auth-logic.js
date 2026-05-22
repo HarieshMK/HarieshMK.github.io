@@ -33,7 +33,6 @@ async function handleSignup(email, password, fullName) {
     if (error) {
         showAuthMessage(error.message);
     } else {
-        // If email confirmation is ON in Supabase, they see this:
         showAuthMessage("Account created! Check your email for a link.", false);
     }
 }
@@ -56,25 +55,22 @@ async function handleLogin(email, password) {
         return;
     }
 
-    // Now proceed with the actual call
-        try {
-                const { data, error } = await window.supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-        
-                if (error) {
-                    showAuthMessage(error.message);
-                } else {
-                    // We just show the success message here. 
-                    // The actual redirect happens IMMEDIATELY inside the onAuthStateChange listener!
-                    showAuthMessage("Login successful! Redirecting...", false);
-                }
-            } catch (err) {
-                console.error("Critical Auth Error:", err);
-                showAuthMessage("Connection error. Check console.");
-            }
+    try {
+        const { data, error } = await window.supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            showAuthMessage(error.message);
+        } else {
+            showAuthMessage("Login successful! Redirecting...", false);
         }
+    } catch (err) {
+        console.error("Critical Auth Error:", err);
+        showAuthMessage("Connection error. Check console.");
+    }
+}
 
 // --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -101,9 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// =================================================================
-// UPDATE ONLY THIS LOWER PORTION OF YOUR AUTH-LOGIC.JS FILE
-// =================================================================
+// ==========================================
+// UNIFIED AUTH UI & PROFILE STATE CONTROLLER
+// ==========================================
 
 async function updateAuthUI(session) {
     const authBtn = document.getElementById('auth-btn'); 
@@ -114,7 +110,6 @@ async function updateAuthUI(session) {
         const user = session.user;
         const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || "Member";
         
-        // Logged In State Controls
         if (authBtn) {
             authBtn.style.display = 'none';
             authBtn.textContent = `Hi, ${fullName}`;
@@ -123,51 +118,54 @@ async function updateAuthUI(session) {
         if (profileBox) profileBox.style.display = 'flex'; 
         if (nameDisplay) nameDisplay.textContent = `Hey, ${fullName}`;
     } else {
-        // Logged Out State Controls
         if (authBtn) {
             authBtn.style.display = 'inline-block';
             authBtn.textContent = 'Sign In / Register';
             
-            // --- CHANGE 1: Automatically attach the return path to the login button link ---
-            const currentPath = window.location.pathname;
+            // FIX: Remove direct link location so browser doesn't skip the click logic
+            authBtn.removeAttribute('href');
+            authBtn.style.cursor = 'pointer';
             
-            // Prevent recursive loop if they are already browsing the login or signup views
-            if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
-                authBtn.href = `/login/?return_to=${encodeURIComponent(currentPath)}`;
-            } else {
-                authBtn.href = "/login";
-            }
+            // Save current page path and navigate manually safely
+            authBtn.onclick = (e) => {
+                e.preventDefault();
+                const currentPath = window.location.pathname;
+                
+                if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
+                    sessionStorage.setItem('auth_redirect_target', currentPath);
+                    console.log("Saved redirection target safely to storage:", currentPath);
+                }
+                
+                window.location.href = "/login";
+            };
         }
         if (profileBox) profileBox.style.display = 'none';
     }
 }
 
 // =================================================================
-// UPDATED GLOBAL AUTH STATE MONITOR ENGINE & REDIRECT INTERCEPTOR
+// UPDATED GLOBAL AUTH STATE MONITOR ENGINE & STORAGE INTERCEPTOR
 // =================================================================
 window.supabase.auth.onAuthStateChange((event, session) => {
     console.log("System Auth Event Fired:", event);
-    
-    // Run your layout updates (Hide Sign-in button, show profile card)
     updateAuthUI(session);
 
-    // INTERCEPT SIGN IN RE-ROUTING GLOBALLY
     if (event === "SIGNED_IN") {
-        const urlParams = new URLSearchParams(window.location.search);
-        const destination = urlParams.get('return_to');
+        const destination = sessionStorage.getItem('auth_redirect_target');
 
         if (destination) {
-            console.log("🔥 Interceptor caught destination:", decodeURIComponent(destination));
+            console.log("🔥 Storage Interceptor found target:", destination);
             
-            // Clean up trailing slash issues for GitHub pages if present
-            let cleanDestination = decodeURIComponent(destination);
+            // Erase memory immediately to prevent redirect loops
+            sessionStorage.removeItem('auth_redirect_target');
+            
+            // Clean paths if they have accidental trailing slashes for GitHub pages
+            let cleanDestination = destination;
             if (cleanDestination.endsWith('/') && cleanDestination !== '/') {
-                // Strip the trailing slash just in case GitHub pages prefers it clean
                 cleanDestination = cleanDestination.slice(0, -1);
             }
 
-            // Fire them back immediately, bypassing any other scripts trying to force a home-route
-            window.location.href = cleanDestination;
+            window.location.replace(cleanDestination);
         }
     }
 });
@@ -196,14 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 async function saveTaxData(taxPayload) {
     console.log("DEBUG: saveTaxData triggered with payload:", taxPayload);
-    
     const { data: { session } } = await window.supabase.auth.getSession();
     
     if (!session) {
-        // --- CHANGE 2: Send them to the login screen with a return parameter if they attempt to save data while logged out ---
-        const currentPath = window.location.pathname;
         alert("Please log in to save your tax calculations to your profile!");
-        window.location.href = `/login/?return_to=${encodeURIComponent(currentPath)}`;
+        
+        sessionStorage.setItem('auth_redirect_target', window.location.pathname);
+        window.location.href = '/login';
         return { error: "User not authenticated" };
     }
 
