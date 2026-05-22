@@ -214,7 +214,6 @@ const TaxController = {
         } else {
             console.error("ERROR: Element #tax-breakdown-section not found in the HTML!");
         }
-    }
     },
     
     handleSave: async () => {
