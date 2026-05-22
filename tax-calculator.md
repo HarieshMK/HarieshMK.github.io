@@ -4,21 +4,26 @@ title: Income Tax Calculator (FY 2026-27)
 permalink: /tax-calculator/
 ---
 
-<div id="calculator-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
-        <div>
-            <h1 style="margin: 0; color: #38bdf8; font-family: 'Lora', serif;">💰 Income Tax Calculator</h1>
-            <p style="color: var(--calc-text-muted); margin: 5px 0 0 0;">Compare Old vs. New Tax Regime</p>
-        </div>
-        <div style="text-align: right;">
-            <label for="fy-selector" style="display: block; font-size: 0.7rem; color: var(--calc-text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Assessment Year</label>
-            <select id="fy-selector" class="dynamic-input" style="padding: 5px 12px; font-size: 0.9rem; min-width: 140px; cursor: pointer;" onchange="calculateAll()">
-                <option value="2027-28">FY 2027-28</option>
-                <option value="2026-27" selected>FY 2026-27</option>
-                <option value="2025-26">FY 2025-26</option>
-            </select>
-        </div>
+<!-- 1. The Main Outer Wrapper -->
+<div class="calculator-container">
+
+<!-- 2. Header and Financial Year Selector Group -->
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+    <div>
+        <h1 style="margin: 0;">💰 Income Tax Calculator</h1>
+        <p style="margin: 5px 0 0 0; font-size: 0.9rem;" class="post-date">Plan your investments and calculate your liability for FY 2026-27</p>
     </div>
+    <div>
+        <select id="fy-selector" class="calc-select" onchange="calculateAll()">
+            <option value="2026-27" selected>FY 2026-27 (AY 2027-28)</option>
+            <option value="2025-26">FY 2025-26 (AY 2026-27)</option>
+        </select>
+    </div>
+</div>
+
+<!-- 3. Two-Column Split Engine -->
+<!-- Left Column: Holds all input forms -->
+<div class="calc-inputs">
 
     <div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: stretch; position: relative;">
         <div style="flex: 1 1 550px;">
