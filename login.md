@@ -20,3 +20,51 @@ permalink: /login/
     <p style="margin-top: 20px; font-size: 0.9rem;">Don't have an account? <a href="/signup" style="color: #38bdf8;">Register here</a></p>
   </div>
 </div>
+
+<script>
+  // Wait for the DOM to completely load
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnLogin = document.getElementById('btn-login');
+    
+    if (btnLogin) {
+      btnLogin.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const authMsg = document.getElementById('auth-msg');
+        
+        // --- YOUR SUPABASE LOGIN CODE ---
+        // (Assuming you have initialized your supabase client instance as 'supabase')
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+          });
+
+          if (error) throw error;
+
+          // --- THE REDIRECT LOGIC ---
+          // 1. Look at the URL parameters of the login page
+          const urlParams = new URLSearchParams(window.location.search);
+          
+          // 2. Try to grab the 'redirect' parameter value
+          const redirectTo = urlParams.get('redirect');
+
+          if (redirectTo) {
+            // 3. If it exists, send them back to the page they were working on
+            window.location.href = decodeURIComponent(redirectTo);
+          } else {
+            // 4. Fallback: If no redirect value is found, send them to the default home page
+            window.location.href = '/';
+          }
+
+        } catch (error) {
+          if (authMsg) {
+            authMsg.textContent = error.message || "Invalid login credentials.";
+          }
+        }
+      });
+    }
+  });
+</script>
