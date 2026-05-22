@@ -57,43 +57,24 @@ async function handleLogin(email, password) {
     }
 
     // Now proceed with the actual call
-   try {
-        const { data, error } = await window.supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
-
-        if (error) {
-            showAuthMessage(error.message);
-        } else {
-            showAuthMessage("Login successful! Redirecting...", false);
-            
-            // 1. Extract the parameters directly
-            const urlParams = new URLSearchParams(window.location.search);
-            let destination = urlParams.get('return_to'); 
-            
-            console.log("Captured Return Destination:", destination); // Debug log
-
-            if (destination) {
-                // Fix for absolute vs relative path setups on GitHub Pages
-                destination = decodeURIComponent(destination);
-                
-                // If it points to an index folder path, let's clean it or ensure compatibility
-                if (destination === '/tax-calculator/') {
-                    // Try targeting the direct filename if GitHub Pages is choking on the pretty URL trailing slash
-                    destination = '/tax-calculator'; 
+        try {
+                const { data, error } = await window.supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+        
+                if (error) {
+                    showAuthMessage(error.message);
+                } else {
+                    // We just show the success message here. 
+                    // The actual redirect happens IMMEDIATELY inside the onAuthStateChange listener!
+                    showAuthMessage("Login successful! Redirecting...", false);
                 }
-                
-                window.location.assign(destination);
-            } else {
-                window.location.assign('/');
+            } catch (err) {
+                console.error("Critical Auth Error:", err);
+                showAuthMessage("Connection error. Check console.");
             }
         }
-    } catch (err) {
-        console.error("Critical Auth Error:", err);
-        showAuthMessage("Connection error. Check console.");
-    }
-}
 
 // --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -161,10 +142,34 @@ async function updateAuthUI(session) {
     }
 }
 
-// Global Auth State Monitor Engine
+// =================================================================
+// UPDATED GLOBAL AUTH STATE MONITOR ENGINE & REDIRECT INTERCEPTOR
+// =================================================================
 window.supabase.auth.onAuthStateChange((event, session) => {
     console.log("System Auth Event Fired:", event);
+    
+    // Run your layout updates (Hide Sign-in button, show profile card)
     updateAuthUI(session);
+
+    // INTERCEPT SIGN IN RE-ROUTING GLOBALLY
+    if (event === "SIGNED_IN") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const destination = urlParams.get('return_to');
+
+        if (destination) {
+            console.log("🔥 Interceptor caught destination:", decodeURIComponent(destination));
+            
+            // Clean up trailing slash issues for GitHub pages if present
+            let cleanDestination = decodeURIComponent(destination);
+            if (cleanDestination.endsWith('/') && cleanDestination !== '/') {
+                // Strip the trailing slash just in case GitHub pages prefers it clean
+                cleanDestination = cleanDestination.slice(0, -1);
+            }
+
+            // Fire them back immediately, bypassing any other scripts trying to force a home-route
+            window.location.href = cleanDestination;
+        }
+    }
 });
 
 // Runtime Initialization Hooks
