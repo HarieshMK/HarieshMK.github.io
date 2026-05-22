@@ -177,6 +177,22 @@ const TaxController = {
         if(deductions) deductions.style.display = hasLoan ? 'block' : 'none';
         TaxController.calculateAll();
     },
+    scrollToResults: () => {
+        const breakdownSection = document.getElementById('detailed-breakdown-section');
+        const breakdownToggleBtn = document.getElementById('view-breakdown-btn');
+        
+        if (breakdownSection) {
+            if (breakdownSection.style.display === 'none' || !breakdownSection.style.display) {
+                breakdownSection.style.display = 'block';
+                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Detailed Breakdown';
+                // Only now does it actually smooth scroll down to it
+                breakdownSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                breakdownSection.style.display = 'none';
+                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye"></i> View Detailed Breakdown';
+            }
+        }
+    },
     
     handleLoanStatusChange() {
         const status = document.querySelector('input[name="possession"]:checked')?.value;
@@ -608,5 +624,6 @@ window.addPerkRow = TaxController.addPerkRow;
 window.calculateAll = TaxController.calculateAll;
 window.handleSave = TaxController.handleSave;
 window.toggleLoanWizard = TaxController.toggleLoanWizard;
+window.scrollToResults = TaxController.scrollToResults;
 
 document.addEventListener('DOMContentLoaded', TaxController.init);
