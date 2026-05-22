@@ -20,7 +20,7 @@ const TaxController = {
 
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) {
-                const message = "You have unsaved tax data. Are you sure you want to leave?";
+                const message = "Your data is unsaved. Are you sure you want to leave?";
                 e.returnValue = message;
                 return message;
             }
@@ -228,6 +228,51 @@ const TaxController = {
         const selectedYear = document.getElementById('fy-selector').value;
 
         try {
+            // Check if Supabase and Auth are available
+            if (!window.supabase) {
+                console.error("Supabase not detected.");
+                return;
+            }
+
+            // Verify if the user is actually logged in
+            const { data: authRecord } = await supabase.auth.getUser();
+            const user = authRecord?.user;
+
+            // IF NOT LOGGED IN: Show the funny, high-conversion prompt sequence
+            if (!user) {
+                const firstChoice = confirm(
+                    "Wait, who are you? 🕵️‍♂️\n\n" +
+                    "We love your tax-saving ambition, but we can't save your data into thin air! You need a free account to secure this progress.\n\n" +
+                    "Click 'OK' to secure your tax profile now!\n" +
+                    "Click 'Cancel' if you prefer manually re-typing all of this later."
+                );
+
+                if (firstChoice) {
+                    // User clicked OK -> Send them to the login page
+                    window.location.href = "https://harieshmk.github.io/login/";
+                } else {
+                    // User clicked Cancel (No) -> Hit them with the hilarious guilt-trip follow-up
+                    const secondChoice = confirm(
+                        "Oh No! Your beautifully optimized tax plan is crying in a corner now. 😢\n\n" +
+                        "Are you absolutely sure you want to miss out on free automatic tracking and lose all your inputs?"
+                    );
+                    
+                    if (secondChoice) {
+                        // They doubled down on No -> Give them one last funny visual nudge on the save button itself
+                        if (status) status.innerText = "⚠️ Progress unsaved. Your tax data is living on the edge!";
+                        btn.innerHTML = `<i class="fas fa-heart-broken"></i> Unsaved Profile`;
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
+                        }, 5000);
+                    } else {
+                        // The guilt trip worked! They changed their mind and want to log in
+                        window.location.href = "https://harieshmk.github.io/login/";
+                    }
+                }
+                return; // Stop the save process since there's no user profile to write to
+            }
+
+            // IF LOGGED IN: Run the original saving logic completely untouched
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             if(status) status.innerText = "Connecting to database...";
