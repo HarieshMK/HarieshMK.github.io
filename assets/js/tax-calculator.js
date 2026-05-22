@@ -227,18 +227,22 @@ const TaxController = {
         const status = document.getElementById('save-status');
         const selectedYear = document.getElementById('fy-selector').value;
 
+        // Clear any previous status styling right away
+        if (status) {
+            status.style.color = "";
+            status.innerText = "";
+        }
+
         try {
-            // Check if Supabase and Auth are available
             if (!window.supabase) {
-                console.error("Supabase not detected.");
-                return;
+                throw new Error("Supabase Database connection client could not be detected on the page template.");
             }
 
-            // Verify if the user is actually logged in
+            // Verify if the user is logged in
             const { data: authRecord } = await supabase.auth.getUser();
             const user = authRecord?.user;
 
-            // IF NOT LOGGED IN: Show the funny, high-conversion prompt sequence
+            // IF NOT LOGGED IN: Prompt sequence
             if (!user) {
                 const firstChoice = confirm(
                     "Wait, who are you? 🕵️‍♂️\n\n" +
@@ -248,50 +252,67 @@ const TaxController = {
                 );
 
                 if (firstChoice) {
-                    // User clicked OK -> Send them to the login page
                     window.location.href = "https://harieshmk.github.io/login/";
                 } else {
-                    // User clicked Cancel (No) -> Hit them with the hilarious guilt-trip follow-up
                     const secondChoice = confirm(
                         "Oh No! Your beautifully optimized tax plan is crying in a corner now. 😢\n\n" +
-                        "Are you absolutely sure you want to miss out on free automatic tracking and lose all your inputs?"
+                        "Are you absolutely sure you want to miss out on free tracking and lose all your inputs?"
                     );
                     
                     if (secondChoice) {
-                        // They doubled down on No -> Give them one last funny visual nudge on the save button itself
-                        if (status) status.innerText = "⚠️ Progress unsaved. Your tax data is living on the edge!";
+                        if (status) {
+                            status.style.color = "#d97706"; // Amber amber warning color
+                            status.innerText = "⚠️ Progress unsaved. Your tax data is living on the edge!";
+                        }
                         btn.innerHTML = `<i class="fas fa-heart-broken"></i> Unsaved Profile`;
                         setTimeout(() => {
                             btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
                         }, 5000);
                     } else {
-                        // The guilt trip worked! They changed their mind and want to log in
                         window.location.href = "https://harieshmk.github.io/login/";
                     }
                 }
-                return; // Stop the save process since there's no user profile to write to
+                return; 
             }
 
-            // IF LOGGED IN: Run the original saving logic completely untouched
+            // IF LOGGED IN: Start explicit save workflow
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            if(status) status.innerText = "Connecting to database...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving to Cloud...';
+            if (status) status.innerText = "Connecting securely to data systems...";
 
-            if (typeof window.saveTaxData === 'function') {
-                await window.saveTaxData(selectedYear);
-                TaxController.isDirty = false;
-                btn.innerHTML = `<i class="fas fa-check-circle"></i> Saved!`;
-                if(status) status.innerText = `Data for ${selectedYear} synced successfully.`;
+            if (typeof window.saveTaxData !== 'function') {
+                throw new Error("The backend logic coordinator 'window.saveTaxData' is missing or failed to initialize.");
             }
 
+            // Await the database save operation directly
+            await window.saveTaxData(selectedYear);
+            
+            // SUCCESS STAGE
+            TaxController.isDirty = false;
+            btn.innerHTML = `<i class="fas fa-check-circle"></i> Profile Synced!`;
+            
+            if (status) {
+                status.style.color = "#22c55e"; // Vibrant Green text
+                status.innerText = `🎉 Success! Your data for FY ${selectedYear} is saved. You can visit this site anytime and access your data securely.`;
+            }
+
+            // Reset button to normal status after 4 seconds but KEEP the green success text visible
             setTimeout(() => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
-            }, 3000);
+            }, 4000);
+
         } catch (error) {
-            console.error(error);
+            // FAILURE STAGE: Intercepts whatever broke and prints it on the screen
+            console.error("CRITICAL DATA SYNC ERROR:", error);
+            
             btn.disabled = false;
-            btn.innerHTML = 'Try Again';
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sync Failed';
+            
+            if (status) {
+                status.style.color = "#ef4444"; // Error Red text
+                status.innerText = `❌ Save Failed! Error Details: ${error.message || error || "Unknown system intercept anomaly."}`;
+            }
         }
     },
 
