@@ -277,27 +277,27 @@ permalink: /tax-calculator/
                 
                 <tr style="border-bottom: 1px solid var(--calc-input-border);">
                     <td style="padding: 12px;">Standard Deduction</td>
-                    <td id="summary-standard-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
-                    <td id="summary-standard-deduction-new" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-standard-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-standard-deduction-new" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--calc-input-border);">
                     <td style="padding: 12px;">Section 80C Deductions</td>
-                    <td id="summary-80c-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-80c-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--calc-input-border);">
                     <td style="padding: 12px;">HRA Exemption</td>
-                    <td id="summary-hra-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-hra-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--calc-input-border);">
                     <td style="padding: 12px;">Section 80D (Health Insurance)</td>
-                    <td id="summary-80d-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-80d-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
                 </tr>
                 <tr style="border-bottom: 1px solid var(--calc-input-border);">
                     <td style="padding: 12px;">Home Loan Interest (Sec 24b)</td>
-                    <td id="summary-24b-deduction" style="padding: 12px; text-align: right; color: #ef4444; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
+                    <td id="summary-24b-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
                 </tr>
             
