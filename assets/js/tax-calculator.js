@@ -206,20 +206,15 @@ const TaxController = {
         }
     },
 
-    scrollToResults: () => {
-        const breakdownSection = document.getElementById('detailed-breakdown-section');
-        const breakdownToggleBtn = document.getElementById('view-breakdown-btn');
-        
-        if (breakdownSection) {
-            if (breakdownSection.style.display === 'none' || !breakdownSection.style.display) {
-                breakdownSection.style.display = 'block';
-                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Detailed Breakdown';
-                breakdownSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                breakdownSection.style.display = 'none';
-                if (breakdownToggleBtn) breakdownToggleBtn.innerHTML = '<i class="fas fa-eye"></i> View Detailed Breakdown';
-            }
+    scrollToResults() {
+        console.log("DEBUG: scrollToResults triggered!");
+        const target = document.getElementById('tax-breakdown-section');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            console.error("ERROR: Element #tax-breakdown-section not found in the HTML!");
         }
+    }
     },
     
     handleSave: async () => {
