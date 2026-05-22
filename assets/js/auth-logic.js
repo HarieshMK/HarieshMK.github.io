@@ -74,7 +74,7 @@ async function handleLogin(email, password) {
 
 // --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Target the actual Form elements instead of just the buttons
+    // Target the actual Form elements instead of just the buttons
     const loginForm = document.getElementById('login-form') || document.querySelector('form');
     const loginBtn = document.getElementById('btn-login');
     const signupBtn = document.getElementById('btn-signup');
@@ -117,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // UNIFIED AUTH UI & PROFILE STATE CONTROLLER
 // ==========================================
-
 async function updateAuthUI(session) {
     const authBtn = document.getElementById('auth-btn'); 
     const profileBox = document.getElementById('user-profile-box'); 
@@ -139,53 +138,53 @@ async function updateAuthUI(session) {
             authBtn.style.display = 'inline-block';
             authBtn.textContent = 'Sign In / Register';
             
-            // FIX: Remove direct link location so browser doesn't skip the click logic
-            authBtn.removeAttribute('href');
-            authBtn.style.cursor = 'pointer';
+            // Clean up old click overrides completely
+            authBtn.onclick = null;
+            authBtn.removeAttribute('onclick');
             
-            // Save current page path and navigate manually safely
-            authBtn.onclick = (e) => {
-                e.preventDefault();
-                const currentPath = window.location.pathname;
-                
-                if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
-                    sessionStorage.setItem('auth_redirect_target', currentPath);
-                    console.log("Saved redirection target safely to storage:", currentPath);
-                }
-                
-                window.location.href = "/login";
-            };
+            // Explicitly grab the active path from the URL bar
+            const currentPath = window.location.pathname; 
+            
+            // Forcefully stitch the string together
+            if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
+                authBtn.href = `/login/?return_to=${encodeURIComponent(currentPath)}`;
+            } else {
+                authBtn.href = "/login/";
+            }
         }
         if (profileBox) profileBox.style.display = 'none';
     }
 }
 
-// Add this tiny single line right ABOVE your window.supabase.auth.onAuthStateChange listener
+// Global execution state tracking variable
 let isRedirecting = false;
 
 // =================================================================
-// LOCKED GLOBAL AUTH STATE MONITOR ENGINE & STORAGE INTERCEPTOR
+// LOCKED GLOBAL AUTH STATE MONITOR ENGINE (PRODUCTION READY)
 // =================================================================
 window.supabase.auth.onAuthStateChange((event, session) => {
-    console.log("=== DIAGNOSTIC START ===");
-    console.log("Current Event Fired:", event);
-    console.log("What is physically in the URL bar right now:", window.location.href);
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const destination = urlParams.get('return_to');
-    console.log("Value extracted from 'return_to':", destination);
-    console.log("=== DIAGNOSTIC END ===");
-
+    console.log("System Auth Event Fired:", event);
     updateAuthUI(session);
 
     if (event === "SIGNED_IN") {
+        // 1. If we are already processing a redirect from a previous loop fire, STOP immediately.
+        if (isRedirecting) {
+            console.log("🔒 Event blocked to prevent multi-fire hijacking.");
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const destination = urlParams.get('return_to');
+
         if (destination) {
+            // 2. Set the execution lock open immediately
+            isRedirecting = true;
+            
             let cleanDestination = decodeURIComponent(destination);
+            console.log("🎯 Dynamic redirect target captured! Moving to:", cleanDestination);
+            
+            // Instantly shift page views safely
             window.location.assign(cleanDestination);
-        } else {
-            console.log("❌ No return_to found. Forcing a hard test redirect to tax-calculator!");
-            // FORCE TEST: If the URL parameter fails, manually force it to test your router pathing
-            window.location.assign("/tax-calculator/");
         }
     }
 });
@@ -219,8 +218,9 @@ async function saveTaxData(taxPayload) {
     if (!session) {
         alert("Please log in to save your tax calculations to your profile!");
         
-        sessionStorage.setItem('auth_redirect_target', window.location.pathname);
-        window.location.href = '/login';
+        // STABLE FIX: Send them to the login stream using URL variables instead of blocked sessionStorage
+        const currentPath = window.location.pathname;
+        window.location.href = `/login/?return_to=${encodeURIComponent(currentPath)}`;
         return { error: "User not authenticated" };
     }
 
