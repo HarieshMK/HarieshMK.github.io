@@ -100,3 +100,20 @@ window.TAX_CONFIG = {
 
 // Map the future year to the current logic
 window.TAX_CONFIG["2027-28"] = window.TAX_CONFIG["2026-27"];
+
+// HISTORICAL LEGACY HOME LOAN RULES (STATIC)
+window.ELIGIBILITY_RULES = {
+    sec80EE: {
+        start: new Date('2016-04-01'), 
+        end: new Date('2017-03-31'),
+        loanLimit: 3500000, 
+        propertyLimit: 5000000, 
+        deductionLimit: 50000
+    },
+    sec80EEA: {
+        start: new Date('2019-04-01'), 
+        end: new Date('2022-03-31'),
+        propertyLimit: 4500000, 
+        deductionLimit: 150000
+    }
+};
