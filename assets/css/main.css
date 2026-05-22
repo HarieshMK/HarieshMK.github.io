@@ -2,7 +2,7 @@
    PHASE 1: THE COLOR BRAIN (Variables)
    ================================================================ */
 :root {
-  /* Backgrounds */\
+  /* Backgrounds */
    --bg-main: #f8fafc;       /* Outer background */
    --bg-container: #ffffff;  /* Main content area & cards */
    --bg-offset: #f1f5f9;     /* Inputs & calculator results */
@@ -285,6 +285,30 @@ header .tagline { color: #64748b; font-size: 1.1rem; font-style: italic; margin:
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);   border-color: var(--brand-primary); }
 
 .post-card-link:hover .post-title {  color: var(--brand-primary);}
+/* RESTORED: Blog Card Inner Text Styles */
+.post-date, span.post-date { 
+  font-size: 0.82rem !important; 
+  font-style: italic !important; 
+  color: var(--text-muted) !important; 
+  display: block !important; 
+  margin-bottom: 8px !important; 
+}
+
+.post-card p, .home-card p { 
+  font-style: normal !important; 
+  font-size: 0.95rem !important; 
+  color: var(--text-secondary) !important; 
+}
+
+/* RESTORED: Header link default color */
+header h1 a { color: var(--text-primary); }
+
+/* RESTORED: Multi-item Title hover updates */
+.post-card-link:hover .post-title, 
+.post-card-link:hover h2, 
+.folder-card:hover .folder-name { 
+  color: var(--brand-primary) !important; 
+}
  
 /* ===== 4. FOOTER SECTION ===== */
 footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
@@ -324,6 +348,36 @@ footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
 #cusdis_thread iframe { border: none !important; width: 100% !important; min-height: 350px; }
 .dark-theme #theme-toggle { background: rgba(255, 255, 255, 0.1) !important; border-color: rgba(255, 255, 255, 0.2) !important; backdrop-filter: blur(8px); }
 .dark-theme .nav-list li a.active { background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #ffffff !important; }
+/* RESTORED: Dark Mode Explicit Component Adjustments */
+.dark-theme .folder-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-theme .folder-name, 
+.dark-theme .category-title { 
+  color: #ffffff !important; 
+}
+
+.dark-theme .folder-count { 
+  color: #94a3b8 !important; 
+}
+
+.dark-theme .nav-link { 
+  background: rgba(30, 41, 59, 0.7) !important; 
+  backdrop-filter: blur(8px); 
+  border-color: rgba(255, 255, 255, 0.1) !important; 
+}
+
+/* Elevate card background slightly on hover in dark mode */
+.dark-theme .post-card-link:hover .post-card, 
+.dark-theme .post-card:hover, 
+.dark-theme .home-card:hover, 
+.dark-theme .folder-card:hover {
+  background: #232f46 !important; 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important; 
+  border-color: var(--brand-primary) !important;
+}
 
 /* Fix for Blog Page Folders in Dark Mode */
 .dark-theme .category-header { border-bottom-color: rgba(255, 255, 255, 0.1) !important; }
@@ -338,6 +392,7 @@ footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; }
 .dark-theme .comments p {
   color: #ffffff !important;
 }
+.dark-theme .view-all-link { color: var(--brand-primary) !important; }
  
 /* ===== 8. GLOBAL LINK RESET ===== */
 a:not(.nav-list li a):not(.post-card-link):not(.nav-link) { color: #0f172a; text-decoration: none; transition: color 0.3s ease; }
