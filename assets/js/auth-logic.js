@@ -106,3 +106,95 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+// ==========================================
+// UNIFIED AUTH UI & PROFILE STATE CONTROLLER
+// ==========================================
+
+async function updateAuthUI(session) {
+    const authBtn = document.getElementById('auth-btn'); 
+    const profileBox = document.getElementById('user-profile-box'); 
+    const nameDisplay = document.getElementById('user-display-name'); 
+
+    if (session) {
+        const user = session.user;
+        const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || "Member";
+        
+        // Logged In State Controls
+        if (authBtn) {
+            authBtn.style.display = 'none';
+            authBtn.textContent = `Hi, ${fullName}`;
+            authBtn.href = "/dashboard";
+        }
+        if (profileBox) profileBox.style.display = 'flex'; 
+        if (nameDisplay) nameDisplay.textContent = `Hey, ${fullName}`;
+    } else {
+        // Logged Out State Controls
+        if (authBtn) {
+            authBtn.style.display = 'inline-block';
+            authBtn.textContent = 'Sign In / Register';
+            authBtn.href = "/login";
+        }
+        if (profileBox) profileBox.style.display = 'none';
+    }
+}
+
+// Global Auth State Monitor Engine
+window.supabase.auth.onAuthStateChange((event, session) => {
+    console.log("System Auth Event Fired:", event);
+    updateAuthUI(session);
+});
+
+// Runtime Initialization Hooks
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    // Immediate Initial Load Status Check
+    window.supabase.auth.getSession().then(({ data }) => {
+        updateAuthUI(data.session);
+    });
+
+    // Log Out Interaction Handler
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await window.supabase.auth.signOut();
+            window.location.href = '/'; 
+        });
+    }
+});
+
+// ==========================================
+// TAX CALCULATOR BACKEND DATA COORDINATOR
+// ==========================================
+async function saveTaxData(taxPayload) {
+    console.log("DEBUG: saveTaxData triggered with payload:", taxPayload);
+    
+    const { data: { session } } = await window.supabase.auth.getSession();
+    
+    if (!session) {
+        alert("Please log in to save your tax calculations to your profile!");
+        return { error: "User not authenticated" };
+    }
+
+    const user = session.user;
+
+    const { data, error } = await window.supabase
+        .from('user_tax_records')
+        .upsert({
+            user_id: user.id,
+            financial_year: taxPayload.financial_year || "2026-27",
+            tax_data: taxPayload,
+            updated_at: new Date().toISOString()
+        }, { on_conflict: 'user_id, financial_year' });
+
+    if (error) {
+        console.error("Supabase Save Error:", error.message);
+        return { error: error.message };
+    }
+
+    console.log("Tax data saved successfully to Supabase profile!");
+    return { success: true, data: data };
+}
+
+// Global Bridge Export
+window.saveTaxData = saveTaxData;
