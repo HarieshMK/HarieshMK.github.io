@@ -5,16 +5,17 @@ permalink: /tax-calculator/
 ---
 
 <!-- 1. The Main Outer Wrapper -->
-<div class="calculator-container">
+<div id="calculator-container" class="calculator-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
 
 <!-- 2. Header and Financial Year Selector Group -->
-<div style="width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+<div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
     <div>
-        <h1 style="margin: 0;">💰 Income Tax Calculator</h1>
-        <p style="margin: 5px 0 0 0; font-size: 0.9rem;" class="post-date">Plan your investments and calculate your liability for FY 2026-27</p>
+        <h1 style="margin: 0; color: #38bdf8; font-family: 'Lora', serif;">💰 Income Tax Calculator</h1>
+        <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #94a3b8;">Plan your investments and calculate your liability for FY 2026-27</p>
     </div>
     <div>
-        <select id="fy-selector" class="calc-select" onchange="calculateAll()">
+        <label for="fy-selector" style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; font-weight: 700; text-transform: uppercase;">Assessment Year</label>
+        <select id="fy-selector" class="calc-select" onchange="calculateAll()" style="padding: 8px 12px; background: #1e293b; border: 2px solid #334155; color: #38bdf8; border-radius: 8px; font-weight: 700; outline: none;">
             <option value="2026-27" selected>FY 2026-27 (AY 2027-28)</option>
             <option value="2025-26">FY 2025-26 (AY 2026-27)</option>
         </select>
@@ -22,46 +23,68 @@ permalink: /tax-calculator/
 </div>
 
 <!-- 3. Two-Column Split Engine -->
-<!-- Left Column: Holds all input forms -->
-<div class="calc-inputs">
+<div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: stretch; position: relative;">
+    <!-- Left Column: Holds all input forms -->
+    <div class="calc-inputs" style="flex: 1 1 550px;">
 
-    <div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: stretch; position: relative;">
-        <div style="flex: 1 1 550px;">
+<!-- 4. Annual Salary Details Module -->
+<div class="post-card">
+<h3 style="margin-top: 0; margin-bottom: 20px; color: #38bdf8; font-family: 'Lora', serif; border-bottom: 1px solid #334155; padding-bottom: 10px;">🏢 Annual Salary Details</h3>
 
-            <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
-                <h3 style="margin-top: 0; color: var(--calc-text-main);">
-                    <i class="fas fa-wallet" style="margin-right: 10px; color: #4ade80;"></i>Annual Salary Details
-                </h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Basic Salary</label>
-                        <input type="number" id="basic-salary" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal" oninput="calculateAll()">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual HRA Received</label>
-                        <input type="number" id="hra-received" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal" oninput="calculateAll()">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Annual Rent Paid</label>
-                        <input type="number" id="rent-paid" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal" oninput="calculateAll()">
-                        <div id="hra-eligible-display" style="font-size: 0.7rem; color: #4ade80; margin-top: 4px; font-weight: bold;"></div>
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Living in Metro?</label>
-                        <select id="is-metro" class="dynamic-input" style="width: 100%;" onchange="calculateAll()">
-                            <option value="false">Non-Metro</option>
-                            <option value="true">Metro (Delhi, Mumbai, Kol, Chn)</option>
-                        </select>
-                        <div id="hra-warning" style="display: none; color: #f87171; font-size: 0.75rem; margin-top: 8px; padding: 8px; background: rgba(248, 113, 113, 0.1); border-radius: 6px; border-left: 3px solid #f87171;">
-                        <i class="fas fa-exclamation-triangle"></i> Note: You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.
-                    </div>
-                    </div>
-                </div>
-                <div style="margin-top: 15px;">
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Other Taxable Allowances / Bonus</label>
-                    <input type="number" id="other-income" class="dynamic-input" placeholder="₹" style="width: 100%;" inputmode="decimal" oninput="calculateAll()">
-                </div>
-            </div>
+<div class="calc-form-grid">
+<!-- Basic Salary -->
+<div class="calc-field-group">
+    <div class="label-row">
+        <label for="basic-salary">Basic Salary (Annual):</label>
+        <input type="number" id="basic-salary" value="1200000" oninput="calculateAll()">
+    </div>
+    <span id="basic-salary-readable" class="input-readable">₹12,00,000</span>
+</div>
+
+<!-- HRA Received -->
+<div class="calc-field-group">
+    <div class="label-row">
+        <label for="hra-received">HRA Received (Annual):</label>
+        <input type="number" id="hra-received" value="500000" oninput="calculateAll()">
+    </div>
+    <span id="hra-received-readable" class="input-readable">₹5,00,000</span>
+</div>
+
+<!-- Actual Rent Paid -->
+<div class="calc-field-group">
+    <div class="label-row">
+        <label for="rent-paid">Actual Rent Paid (Annual):</label>
+        <input type="number" id="rent-paid" value="240000" oninput="calculateAll()">
+    </div>
+    <span id="rent-paid-readable" class="input-readable">₹2,40,000</span>
+</div>
+
+<!-- Metro Location Selector -->
+<div class="calc-field-group">
+    <div class="label-row">
+        <label for="is-metro">City of Residence:</label>
+        <select id="is-metro" class="calc-select" onchange="calculateAll()" style="width: 120px; padding: 8px 12px; border-radius: 10px; font-weight: 700; background: var(--bg-container); border: 2px solid var(--border-base); color: var(--brand-primary);">
+            <option value="yes">Metro</option>
+            <option value="no" selected>Non-Metro</option>
+        </select>
+    </div>
+</div>
+</div>
+
+<!-- Live HRA Exemption Calculation Warning Banner -->
+<div id="hra-warning" class="calc-warning-banner" style="display: none; color: #f87171; background: rgba(248, 113, 113, 0.1); padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem; border-left: 4px solid #f87171;"></div>
+
+<!-- Legal Compliance Notice (Claims Validation) -->
+<div style="font-size: 0.75rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 6px; margin-top: 15px; border-left: 3px solid #fbbf24;">
+<i class="fas fa-exclamation-triangle"></i> Note: You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.
+</div>
+
+<!-- Other Taxable Allowances / Bonus -->
+<div style="margin-top: 15px;">
+<label style="font-size: 0.8rem; color: var(--calc-text-muted);">Other Taxable Allowances / Bonus</label>
+<input type="number" id="other-income" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal" oninput="calculateAll()">
+</div>
+</div>
 
             <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
                 <h3 style="margin-top: 0; color: var(--calc-text-main);"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
