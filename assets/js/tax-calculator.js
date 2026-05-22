@@ -684,9 +684,10 @@ window.TaxController = TaxController;
 window.add80CRow = TaxController.add80CRow;
 window.addPerkRow = TaxController.addPerkRow;
 window.calculateAll = TaxController.calculateAll;
-window.handleSave = TaxController.handleSave;
+window.handleSave = () => TaxController.handleSave();
 window.toggleLoanWizard = TaxController.toggleLoanWizard;
-window.scrollToResults = TaxController.scrollToResults;
+window.scrollToResults = () => TaxController.scrollToResults();
 window.validateInputs = validateInputs;
+
 
 document.addEventListener('DOMContentLoaded', TaxController.init);
