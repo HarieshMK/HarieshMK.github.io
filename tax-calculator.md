@@ -261,6 +261,7 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div> 
+    </div>
         
 <div style="flex: 1 1 300px; min-width: 300px; position: relative;">
     <div class="post-card" style="position: -webkit-sticky; position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card); z-index: 10; align-self: flex-start;">
