@@ -502,5 +502,4 @@ permalink: /tax-calculator/
         margin-bottom: 25px !important;
     }
 
-    .hidden { display: none !important; }
 </style>
