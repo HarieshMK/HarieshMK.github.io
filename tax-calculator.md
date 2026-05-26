@@ -7,13 +7,12 @@ permalink: /tax-calculator/
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
     <h2 style="margin: 0; font-family: 'Lora', serif; font-size: 1.6rem;"><i class="fas fa-wallet" style="margin-right: 12px; color: var(--brand-primary);"></i>Income Tax Calculator</h2>
     <div style="min-width: 240px;">
-        <select id="fy-selector" class="calc-select" onchange="calculateAll()" style="color: var(--brand-primary); width: 100%; padding: 10px 14px; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-base); background: var(--bg-offset);">
+        <select id="fy-selector" class="calc-select" style="color: var(--brand-primary); width: 100%; padding: 10px 14px; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-base); background: var(--bg-offset);">
             <option value="2026-27" selected>FY 2026-27</option>
             <option value="2025-26">FY 2025-26</option> 
         </select>
     </div>
 </div>
-
 
 <div class="calculator-container unique-tax-calc">
 
@@ -27,22 +26,22 @@ permalink: /tax-calculator/
                 <div class="calc-grid-layout">
                     <div class="calc-custom-row">
                         <label for="basic-salary">Basic Salary (Annual)</label>
-                        <input type="text" id="basic-salary" value="12,00,000" oninput="formatIndianInput(this); calculateAll();">
+                        <input type="text" id="basic-salary" value="12,00,000">
                     </div>
 
                     <div class="calc-custom-row">
                         <label for="hra-received">HRA Received (Annual)</label>
-                        <input type="text" id="hra-received" value="5,00,000" oninput="formatIndianInput(this); calculateAll();">
+                        <input type="text" id="hra-received" value="5,00,000">
                     </div>
 
                     <div class="calc-custom-row">
                         <label for="rent-paid">Actual Rent Paid (Annual)</label>
-                        <input type="text" id="rent-paid" value="3,60,000" oninput="formatIndianInput(this); calculateAll();">
+                        <input type="text" id="rent-paid" value="3,60,000">
                     </div>
 
                     <div class="calc-custom-row">
                         <label for="is-metro">City of Residence</label>
-                        <select id="is-metro" class="calc-select" onchange="calculateAll()">
+                        <select id="is-metro" class="calc-select">
                             <option value="true" selected>Metro</option>
                             <option value="false">Non-Metro</option>
                         </select>
@@ -57,7 +56,7 @@ permalink: /tax-calculator/
 
                 <div class="calc-custom-row single-row-span">
                     <label for="other-income">Other Income / Allowances / Bonus</label>
-                    <input type="text" id="other-income" placeholder="₹ Enter Total Amount" oninput="formatIndianInput(this); calculateAll();">
+                    <input type="text" id="other-income" placeholder="₹ Enter Total Amount">
                 </div>
             </div>
         </div>
@@ -71,14 +70,14 @@ permalink: /tax-calculator/
                     <p style="margin: 0;"><i class="fas fa-info-circle" style="color: #3b82f6; margin-right: 8px;"></i> <strong>Important Note:</strong> Only add perks here if they are already included in your <strong>Other Income</strong> above.</p>
                 </div>
                 <div id="perks-rows-container"></div>
-                <button type="button" onclick="addPerkRow()" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;">
+                <button type="button" id="add-perk-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;">
                     <i class="fas fa-plus-circle"></i> Add Benefit/Perk
                 </button>
             </div>
         </div>
 
         <div class="post-card calculation-card collapsible-section-box">
-            <div id="80c-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('80c-header', '80c-content', '80c-icon')">
+            <div id="80c-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-coins" style="margin-right: 10px; color: var(--brand-primary);"></i>Section 80C Deductions</span>
                 <i id="80c-icon" class="fas fa-chevron-up toggle-chevron-arrow"></i>
             </div>
@@ -86,7 +85,7 @@ permalink: /tax-calculator/
                 <div id="80c-rows-container">
                     <p id="empty-80c-msg" style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; text-align: center; margin: 20px 0;">No entries added yet.</p>
                 </div>
-                <button type="button" onclick="add80CRow()" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;">
+                <button type="button" id="add-80c-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;">
                     <i class="fas fa-plus-circle"></i> Add Entry
                 </button>
                 <div style="margin-top: 15px; text-align: right; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
@@ -96,7 +95,7 @@ permalink: /tax-calculator/
         </div>
 
         <div class="post-card calculation-card collapsible-section-box">
-            <div id="80d-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('80d-header', '80d-content', '80d-icon')">
+            <div id="80d-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: var(--color-danger);"></i>Section 80D: Health Insurance</span>
                 <i id="80d-icon" class="fas fa-chevron-down toggle-chevron-arrow"></i>
             </div>
@@ -104,21 +103,21 @@ permalink: /tax-calculator/
                 <div class="calc-grid-layout">
                     <div class="calc-custom-row">
                         <label for="80d-self">Self, Spouse & Children</label>
-                        <input type="text" id="80d-self" placeholder="Max ₹25,000" oninput="formatIndianInput(this); calculateAll();">
+                        <input type="text" id="80d-self" placeholder="Max ₹25,000">
                     </div>
                     <div class="calc-custom-row">
                         <label for="80d-parents">Parents Premium</label>
-                        <input type="text" id="80d-parents" placeholder="Max ₹25,000" oninput="formatIndianInput(this); calculateAll();">
+                        <input type="text" id="80d-parents" placeholder="Max ₹25,000">
                     </div>
                 </div>
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem; margin-top: 15px; font-weight: 600;">
-                    <input type="checkbox" id="parents-senior" onchange="calculateAll()" style="width: 16px; height: 16px; cursor: pointer;"> Parents are Senior Citizens (60+)
+                    <input type="checkbox" id="parents-senior" style="width: 16px; height: 16px; cursor: pointer;"> Parents are Senior Citizens (60+)
                 </label>
             </div>
         </div>
 
         <div class="post-card calculation-card collapsible-section-box">
-            <div id="home-loan-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('home-loan-header','home-loan-content', 'home-loan-icon')">
+            <div id="home-loan-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-home" style="margin-right: 10px; color: var(--brand-primary);"></i>Home Loan Assistant</span>
                 <i id="home-loan-icon" class="fas fa-chevron-down toggle-chevron-arrow"></i>
             </div>
@@ -127,14 +126,14 @@ permalink: /tax-calculator/
                 <div style="background: rgba(14, 165, 233, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--brand-primary); margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
                         <label style="font-size: 0.9rem; color: var(--text-primary); font-weight: 700; cursor: pointer;" for="has-home-loan">Do you have an active Home Loan?</label>
-                        <input type="checkbox" id="has-home-loan" onchange="TaxController.toggleLoanWizard()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <input type="checkbox" id="has-home-loan" style="width: 18px; height: 18px; cursor: pointer;">
                     </div>
                 </div>
 
                 <div id="home-loan-wizard" style="display: none;">
                     <div style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-base);">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem; font-weight: 600;">
-                            <input type="checkbox" id="is-first-buyer" onchange="calculateAll()" style="width: 16px; height: 16px;"> 
+                            <input type="checkbox" id="is-first-buyer" style="width: 16px; height: 16px;"> 
                             Is this your first home? (Required for 80EE/80EEA)
                         </label>
                     </div>
@@ -143,15 +142,15 @@ permalink: /tax-calculator/
                         <div>
                             <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px; font-weight: 700;">Possession Status</label>
                             <div style="display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-primary);">
-                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="possession" value="completed" onchange="TaxController.handleLoanStatusChange()" checked style="cursor: pointer;"> Fully Constructed</label>
-                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="possession" value="under-construction" onchange="TaxController.handleLoanStatusChange()" style="cursor: pointer;"> Under Construction</label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="possession" value="completed" checked style="cursor: pointer;"> Fully Constructed</label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="possession" value="under-construction" style="cursor: pointer;"> Under Construction</label>
                             </div>
                         </div>
                         <div>
                             <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px; font-weight: 700;">Occupancy Status</label>
                             <div style="display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-primary);">
-                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="occupancy" value="self" onchange="calculateAll()" checked style="cursor: pointer;"> Self-Occupied</label>
-                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="occupancy" value="rented" onchange="calculateAll()" style="cursor: pointer;"> Rented-out</label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="occupancy" value="self" checked style="cursor: pointer;"> Self-Occupied</label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><input type="radio" name="occupancy" value="rented" style="cursor: pointer;"> Rented-out</label>
                             </div>
                         </div>
                     </div>
@@ -164,11 +163,11 @@ permalink: /tax-calculator/
                         <div class="calc-grid-layout" style="margin-bottom: 20px;">
                             <div class="calc-custom-row">
                                 <label for="loan-principal">Total Principal Paid</label>
-                                <input type="text" id="loan-principal" oninput="formatIndianInput(this); calculateAll();">
+                                <input type="text" id="loan-principal">
                             </div>
                             <div class="calc-custom-row">
                                 <label for="loan-interest">Total Interest Paid</label>
-                                <input type="text" id="loan-interest" oninput="formatIndianInput(this); calculateAll();">
+                                <input type="text" id="loan-interest">
                             </div>
                         </div>
 
@@ -176,17 +175,17 @@ permalink: /tax-calculator/
                             <div class="calc-grid-layout">
                                 <div class="calc-custom-row">
                                     <label for="loan-sanction-date">Sanction Date</label>
-                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%;" onchange="calculateAll()">
+                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%;">
                                 </div>
                                 <div class="calc-custom-row">
                                     <label for="property-stamp-value">Stamp Duty Value</label>
-                                    <input type="text" id="property-stamp-value" placeholder="₹" oninput="formatIndianInput(this); calculateAll();">
+                                    <input type="text" id="property-stamp-value" placeholder="₹">
                                 </div>
                             </div>
                             
                             <div id="branch-80ee-fields" class="calc-custom-row single-row-span" style="display:none; margin-top:15px;">
                                 <label for="original-loan-amt" style="color: var(--color-danger);">Sanctioned Loan Amount</label>
-                                <input type="text" id="original-loan-amt" oninput="formatIndianInput(this); calculateAll();">
+                                <input type="text" id="original-loan-amt">
                             </div>
                             <div id="branch-80eea-fields" style="display:none; margin-top:15px; text-align: center;">
                                 <p style="font-size: 0.85rem; color: var(--color-success); margin: 0; font-weight: 600;"><i class="fas fa-check-circle"></i> Eligible for 80EEA Affordable Housing Deduction.</p>
@@ -199,7 +198,7 @@ permalink: /tax-calculator/
 
         <div id="conditional-deductions" style="display: none; margin-top: 20px;">
             <div class="post-card collapsible-section-box" style="border: 2px solid var(--brand-primary);">
-                <div id="benefits-summary-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('benefits-summary-header', 'benefits-summary-content', 'benefits-summary-icon')">
+                <div id="benefits-summary-header" class="calc-collapse-trigger">
                     <span class="heading-title-text"><i class="fas fa-chart-line" style="margin-right: 10px; color: var(--color-success);"></i>Home Loan Tax Benefits</span>
                     <i id="benefits-summary-icon" class="fas fa-chevron-up toggle-chevron-arrow"></i>
                 </div>
@@ -246,8 +245,8 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <button onclick="scrollToResults()" style="width: 100%; margin-top: 25px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: var(--brand-primary); color: var(--text-on-brand); font-size: 0.95rem;">View Detailed Breakdown</button>
-        <button id="save-btn" onclick="handleSave()" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 10px; background: transparent; color: var(--brand-primary); font-size: 0.9rem;">Save to Profile</button>
+        <button id="view-breakdown-btn" style="width: 100%; margin-top: 25px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px; background: var(--brand-primary); color: var(--text-on-brand); font-size: 0.95rem;">View Detailed Breakdown</button>
+        <button id="save-btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 10px; background: transparent; color: var(--brand-primary); font-size: 0.9rem;">Save to Profile</button>
     </div>
 
 </div>
@@ -326,7 +325,7 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-    // Real-time Indian Number Formatter Functionality
+    // Pure Indian Number Formatter Functionality
     function formatIndianInput(el) {
         let val = el.value.replace(/[^0-9.]/g, '');
         if (!val) { el.value = ''; return; }
@@ -334,7 +333,6 @@ permalink: /tax-calculator/
         let parts = val.split('.');
         let num = parts[0];
         
-        // Formats down down cleanly using Indian placement rules
         if(num.length > 3) {
             let lastThree = num.substring(num.length - 3);
             let otherBits = num.substring(0, num.length - 3);
@@ -344,14 +342,12 @@ permalink: /tax-calculator/
         el.value = parts.length > 1 ? num + '.' + parts[1].substring(0, 2) : num;
     }
 
-    // Intercepts finance calculations cleanly to strip formatting commas
     function parseCleanValue(id) {
         const el = document.getElementById(id);
         if(!el) return 0;
         return parseFloat(el.value.replace(/,/g, '')) || 0;
     }
 
-    // Helper to format text elements cleanly 
     function formatIndianNumber(num) {
         let x = Math.round(num).toString();
         let lastThree = x.substring(x.length - 3);
@@ -359,6 +355,85 @@ permalink: /tax-calculator/
         if(otherBits != '') lastThree = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + ',' + lastThree;
         return '₹ ' + lastThree;
     }
+
+    // Modern Event Attachment to clear Jekyll pipeline compilation blocks safely
+    document.addEventListener("DOMContentLoaded", function() {
+        const setupCalcInput = (id) => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('input', function() {
+                    formatIndianInput(this);
+                    if(typeof calculateAll === 'function') calculateAll();
+                });
+            }
+        };
+
+        const setupCalcChange = (id) => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('change', function() {
+                    if(typeof calculateAll === 'function') calculateAll();
+                });
+            }
+        };
+
+        // Bind standard layout components
+        ['basic-salary', 'hra-received', 'rent-paid', 'other-income', '80d-self', '80d-parents', 'loan-principal', 'loan-interest', 'property-stamp-value', 'original-loan-amt'].forEach(setupCalcInput);
+        ['fy-selector', 'is-metro', 'parents-senior', 'loan-sanction-date'].forEach(setupCalcChange);
+
+        // Accordion triggers binding safely post-load
+        const bindToggle = (headerId, contentId, iconId) => {
+            const header = document.getElementById(headerId);
+            if(header) {
+                header.addEventListener('click', function() {
+                    if(window.TaxController && typeof window.TaxController.setupToggle === 'function') {
+                        window.TaxController.setupToggle(headerId, contentId, iconId);
+                    }
+                });
+            }
+        };
+
+        bindToggle('80c-header', '80c-content', '80c-icon');
+        bindToggle('80d-header', '80d-content', '80d-icon');
+        bindToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
+        bindToggle('benefits-summary-header', 'benefits-summary-content', 'benefits-summary-icon');
+
+        // Dynamic element trigger setup
+        const addPerkBtn = document.getElementById('add-perk-btn');
+        if(addPerkBtn) addPerkBtn.addEventListener('click', function() { if(typeof addPerkRow === 'function') addPerkRow(); });
+
+        const add80cBtn = document.getElementById('add-80c-btn');
+        if(add80cBtn) add80cBtn.addEventListener('click', function() { if(typeof add80CRow === 'function') add80CRow(); });
+
+        const homeLoanCheck = document.getElementById('has-home-loan');
+        if(homeLoanCheck) {
+            homeLoanCheck.addEventListener('change', function() {
+                if(window.TaxController && typeof window.TaxController.toggleLoanWizard === 'function') {
+                    window.TaxController.toggleLoanWizard();
+                }
+            });
+        }
+
+        const possessionRadios = document.querySelectorAll('input[name="possession"]');
+        possessionRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if(window.TaxController && typeof window.TaxController.handleLoanStatusChange === 'function') {
+                    window.TaxController.handleLoanStatusChange();
+                }
+            });
+        });
+
+        const occupancyRadios = document.querySelectorAll('input[name="occupancy"]');
+        occupancyRadios.forEach(radio => {
+            radio.addEventListener('change', function() { if(typeof calculateAll === 'function') calculateAll(); });
+        });
+
+        const viewBreakdownBtn = document.getElementById('view-breakdown-btn');
+        if(viewBreakdownBtn) viewBreakdownBtn.addEventListener('click', function() { if(typeof scrollToResults === 'function') scrollToResults(); });
+
+        const saveBtn = document.getElementById('save-btn');
+        if(saveBtn) saveBtn.addEventListener('click', function() { if(typeof handleSave === 'function') handleSave(); });
+    });
 </script>
 
 <style>
@@ -417,7 +492,6 @@ permalink: /tax-calculator/
         letter-spacing: 0.05em;
     }
 
-    /* Standardizes style classes inside custom script rows dynamically generated */
     .unique-tax-calc input[type="text"],
     .unique-tax-calc input[type="number"],
     .unique-tax-calc .calc-select,
@@ -446,7 +520,6 @@ permalink: /tax-calculator/
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1) !important;
     }
 
-    /* Dynamic Form Generation Layout alignment fixes */
     #perks-rows-container > div,
     #80c-rows-container > div {
         display: grid !important;
@@ -505,4 +578,3 @@ permalink: /tax-calculator/
 
     .hidden { display: none !important; }
 </style>
-
