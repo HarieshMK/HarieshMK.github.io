@@ -4,38 +4,32 @@ title: Income Tax Calculator (FY 2026-27)
 permalink: /tax-calculator/
 ---
 
-<div class="calculator-container">
+<div class="calculator-container unique-tax-calc">
 
     <div class="calc-inputs">
         
-        <div class="post-card" style="padding: 25px; margin-bottom: 25px;">
-            <h3 style="margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid var(--border-base); padding-bottom: 10px;">🏢 Annual Salary Details</h3>
+        <div class="post-card calculation-card">
+            <h3>🏢 Annual Salary Details</h3>
 
-            <div class="input-group">
-                <div class="label-row">
-                    <label for="basic-salary">Basic Salary (Annual):</label>
+            <div class="calc-grid-layout">
+                <div class="calc-custom-row">
+                    <label for="basic-salary">Basic Salary (Annual)</label>
                     <input type="number" id="basic-salary" value="1200000" oninput="calculateAll()">
                 </div>
-            </div>
 
-            <div class="input-group">
-                <div class="label-row">
-                    <label for="hra-received">HRA Received (Annual):</label>
+                <div class="calc-custom-row">
+                    <label for="hra-received">HRA Received (Annual)</label>
                     <input type="number" id="hra-received" value="500000" oninput="calculateAll()">
                 </div>
-            </div>
 
-            <div class="input-group">
-                <div class="label-row">
-                    <label for="rent-paid">Actual Rent Paid (Annual):</label>
+                <div class="calc-custom-row">
+                    <label for="rent-paid">Actual Rent Paid (Annual)</label>
                     <input type="number" id="rent-paid" value="360000" oninput="calculateAll()">
                 </div>
-            </div>
 
-            <div class="input-group">
-                <div class="label-row">
-                    <label for="is-metro">City of Residence:</label>
-                    <select id="is-metro" class="calc-select" onchange="calculateAll()" style="width: 120px; padding: 8px 12px; font-weight: 700;">
+                <div class="calc-custom-row">
+                    <label for="is-metro">City of Residence</label>
+                    <select id="is-metro" class="calc-select" onchange="calculateAll()">
                         <option value="true" selected>Metro</option>
                         <option value="false">Non-Metro</option>
                     </select>
@@ -44,19 +38,17 @@ permalink: /tax-calculator/
 
             <div id="hra-warning" class="calc-warning-banner" style="display: none;"></div>
 
-            <div class="calc-disclaimer" style="margin-top: 20px; padding: 15px;">
-                <p style="margin: 0; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Note: You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
+            <div class="calc-disclaimer">
+                <p><i class="fas fa-exclamation-triangle"></i> Note: You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
             </div>
 
-            <div class="input-group" style="margin-top: 25px; margin-bottom: 0;">
-                <div class="label-row">
-                    <label for="other-income">Other Income / Allowances / Bonus:</label>
-                    <input type="number" id="other-income" placeholder="₹ Total" inputmode="decimal" oninput="calculateAll()">
-                </div>
+            <div class="calc-custom-row single-row-span">
+                <label for="other-income">Other Income / Allowances / Bonus</label>
+                <input type="number" id="other-income" placeholder="₹ Enter Total Amount" inputmode="decimal" oninput="calculateAll()">
             </div>
         </div>
 
-        <div class="post-card" style="padding: 25px; margin-bottom: 25px;">
+        <div class="post-card calculation-card">
             <h3 style="margin-top: 0;"><i class="fas fa-gift" style="margin-right: 10px; color: var(--brand-primary);"></i>Perks & Flexi-Benefits</h3>
             <div class="calc-disclaimer" style="margin-bottom: 15px; padding: 12px;">
                 <p style="margin: 0; font-weight: 500;"><i class="fas fa-info-circle"></i> <strong>Note:</strong> Only add perks here if they are already included in your <strong>Other Income</strong> above.</p>
@@ -67,7 +59,7 @@ permalink: /tax-calculator/
             </button>
         </div>
 
-        <div class="post-card" style="padding: 25px; margin-bottom: 25px;">
+        <div class="post-card calculation-card">
             <div id="80c-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('80c-header', '80c-content', '80c-icon')">
                 <span style="font-family: 'Lora', serif;"><i class="fas fa-coins" style="margin-right: 10px; color: var(--brand-primary);"></i>Section 80C Deductions</span>
                 <i id="80c-icon" class="fas fa-chevron-up" style="transition: transform 0.3s; color: var(--text-muted);"></i>
@@ -85,31 +77,29 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <div class="post-card" style="padding: 25px; margin-bottom: 25px;">
+        <div class="post-card calculation-card">
             <div id="80d-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('80d-header', '80d-content', '80d-icon')">
                 <span style="font-family: 'Lora', serif;"><i class="fas fa-hand-holding-medical" style="margin-right: 10px; color: var(--color-danger);"></i>Section 80D: Health Insurance</span>
                 <i id="80d-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--text-muted);"></i>
             </div>
             <div id="80d-content" style="display: none; margin-top: 20px; border-top: 1px solid var(--border-base); padding-top: 15px;">
-                <div class="input-group">
-                    <div class="label-row">
-                        <label for="80d-self">Self, Spouse & Children:</label>
+                <div class="calc-grid-layout">
+                    <div class="calc-custom-row">
+                        <label for="80d-self">Self, Spouse & Children</label>
                         <input type="number" id="80d-self" placeholder="Max ₹25,000" oninput="calculateAll()">
                     </div>
-                </div>
-                <div class="input-group">
-                    <div class="label-row">
-                        <label for="80d-parents">Parents Premium:</label>
+                    <div class="calc-custom-row">
+                        <label for="80d-parents">Parents Premium</label>
                         <input type="number" id="80d-parents" placeholder="Max ₹25,000" oninput="calculateAll()">
                     </div>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px; font-weight: 600;">
-                        <input type="checkbox" id="parents-senior" onchange="calculateAll()" style="width: 16px; height: 16px; cursor: pointer;"> Parents are Senior Citizens (60+)
-                    </label>
                 </div>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem; margin-top: 15px; font-weight: 600;">
+                    <input type="checkbox" id="parents-senior" onchange="calculateAll()" style="width: 16px; height: 16px; cursor: pointer;"> Parents are Senior Citizens (60+)
+                </label>
             </div>
         </div>
 
-        <div class="post-card" style="padding: 25px; margin-bottom: 25px;">
+        <div class="post-card calculation-card">
             <div id="home-loan-header" class="calc-collapse-trigger" onclick="TaxController.setupToggle('home-loan-header','home-loan-content', 'home-loan-icon')">
                 <span style="font-family: 'Lora', serif;"><i class="fas fa-home" style="margin-right: 10px; color: var(--brand-primary);"></i>Home Loan Assistant</span>
                 <i id="home-loan-icon" class="fas fa-chevron-down" style="transition: transform 0.3s; color: var(--text-muted);"></i>
@@ -153,38 +143,32 @@ permalink: /tax-calculator/
                     </div>
 
                     <div id="completed-loan-fields">
-                        <div class="input-group">
-                            <div class="label-row">
-                                <label for="loan-principal">Total Principal Paid:</label>
+                        <div class="calc-grid-layout" style="margin-bottom: 20px;">
+                            <div class="calc-custom-row">
+                                <label for="loan-principal">Total Principal Paid</label>
                                 <input type="number" id="loan-principal" oninput="calculateAll()">
                             </div>
-                        </div>
-                        <div class="input-group">
-                            <div class="label-row">
-                                <label for="loan-interest">Total Interest Paid:</label>
+                            <div class="calc-custom-row">
+                                <label for="loan-interest">Total Interest Paid</label>
                                 <input type="number" id="loan-interest" oninput="calculateAll()">
                             </div>
                         </div>
 
-                        <div style="background: var(--bg-offset); padding: 15px; border-radius: 10px; border: 1px solid var(--border-base); margin-top: 20px;">
-                            <div class="input-group">
-                                <div class="label-row">
-                                    <label for="loan-sanction-date">Sanction Date:</label>
-                                    <input type="date" id="loan-sanction-date" class="calc-select" style="padding:6px 10px; font-size:0.85rem; width: 140px;" onchange="calculateAll()">
+                        <div style="background: var(--bg-offset); padding: 20px; border-radius: 12px; border: 1px solid var(--border-base);">
+                            <div class="calc-grid-layout">
+                                <div class="calc-custom-row">
+                                    <label for="loan-sanction-date">Sanction Date</label>
+                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%;" onchange="calculateAll()">
                                 </div>
-                            </div>
-                            <div class="input-group" style="margin-bottom:0;">
-                                <div class="label-row">
-                                    <label for="property-stamp-value">Stamp Duty Value:</label>
+                                <div class="calc-custom-row">
+                                    <label for="property-stamp-value">Stamp Duty Value</label>
                                     <input type="number" id="property-stamp-value" placeholder="₹" oninput="calculateAll()">
                                 </div>
                             </div>
                             
-                            <div id="branch-80ee-fields" class="input-group" style="display:none; margin-top:15px; margin-bottom:0;">
-                                <div class="label-row">
-                                    <label for="original-loan-amt" style="color: var(--color-danger);">Sanctioned Loan Amount:</label>
-                                    <input type="number" id="original-loan-amt" oninput="calculateAll()">
-                                </div>
+                            <div id="branch-80ee-fields" class="calc-custom-row single-row-span" style="display:none; margin-top:15px;">
+                                <label for="original-loan-amt" style="color: var(--color-danger);">Sanctioned Loan Amount</label>
+                                <input type="number" id="original-loan-amt" oninput="calculateAll()">
                             </div>
                             <div id="branch-80eea-fields" style="display:none; margin-top:15px; text-align: center;">
                                 <p style="font-size: 0.85rem; color: var(--color-success); margin: 0; font-weight: 600;"><i class="fas fa-check-circle"></i> Eligible for 80EEA Affordable Housing Deduction.</p>
@@ -234,7 +218,7 @@ permalink: /tax-calculator/
     <div class="calc-results sticky-score-panel">
         <div style="margin-bottom: 25px; width: 100%;">
             <label for="fy-selector" style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Assessment Year</label>
-            <select id="fy-selector" class="calc-select" onchange="calculateAll()" style="color: var(--brand-primary); width: 100%;">
+            <select id="fy-selector" class="calc-select" onchange="calculateAll()" style="color: var(--brand-primary); width: 100% !important; padding: 10px 14px !important;">
                 <option value="2026-27" selected>FY 2026-27 (AY 2027-28)</option>
                 <option value="2025-26">FY 2025-26 (AY 2026-27)</option>
             </select>
@@ -330,6 +314,74 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <style>
+    /* 1. Target fields inside our custom dashboard container to break out of main.css constraints */
+    .unique-tax-calc .calc-grid-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* 2. Style input rows to stretch vertically and look modern, spacious, and premium */
+    .unique-tax-calc .calc-custom-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .unique-tax-calc .calc-custom-row label {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* 3. Force inputs to break out of the squeezed 120px main.css restriction */
+    .unique-tax-calc .calc-custom-row input[type="number"],
+    .unique-tax-calc .calc-custom-row select {
+        width: 100% !important;
+        box-sizing: border-box;
+        padding: 12px 16px !important;
+        border-radius: 12px !important;
+        font-size: 1rem !important;
+        height: 48px !important;
+        background: var(--bg-offset) !important;
+        border: 2px solid var(--border-base) !important;
+        color: var(--text-primary) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .unique-tax-calc .calc-custom-row input[type="number"]:focus,
+    .unique-tax-calc .calc-custom-row select:focus {
+        outline: none !important;
+        border-color: var(--brand-primary) !important;
+        background: var(--bg-container) !important;
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1) !important;
+    }
+
+    /* 4. Let specific wide elements (like other income) span full-width smoothly */
+    .unique-tax-calc .single-row-span {
+        grid-column: 1 / -1;
+        margin-top: 10px;
+    }
+
+    /* 5. Tweak internal padding of cards for a premium feel */
+    .unique-tax-calc .calculation-card {
+        padding: 30px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .unique-tax-calc .calculation-card h3 {
+        margin-top: 0;
+        margin-bottom: 25px;
+        border-bottom: 1px solid var(--border-base);
+        padding-bottom: 12px;
+        font-size: 1.3rem;
+    }
+
+    /* Functional helper animations */
     .hidden { display: none !important; }
     #hra-warning { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn {
