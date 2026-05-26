@@ -4,10 +4,10 @@ title: Income Tax Calculator (FY 2026-27)
 permalink: /tax-calculator/
 ---
 
-<!-- 1. The Main Outer Wrapper -->
+<!-- Main Outer Wrapper -->
 <div id="calculator-container" class="calculator-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
 
-<!-- 2. Header and Financial Year Selector Group -->
+<!-- Header and Financial Year Selector Group -->
 <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
     <div>
         <h1 style="margin: 0; color: #38bdf8; font-family: 'Lora', serif;">💰 Income Tax Calculator</h1>
@@ -22,13 +22,13 @@ permalink: /tax-calculator/
     </div>
 </div>
 
-<!-- 3. Two-Column Split Engine -->
-<div style="display: flex; flex-wrap: wrap; gap: 25px; align-items: stretch; position: relative; margin-bottom: 30px;">
+<!-- Two-Column Flex Grid: Restricts side-by-side layout strictly to Inputs vs Sticky Sidebar -->
+<div class="calc-main-row" style="display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 30px; width: 100%;">
     
-    <!-- Left Column: Holds all input forms -->
-    <div class="calc-inputs" style="flex: 1 1 550px;">
+    <!-- Left Column: Input Forms (Takes up flexible left space) -->
+    <div class="calc-inputs" style="flex: 1 1 650px; max-width: 100%;">
 
-        <!-- 4. Annual Salary Details Module -->
+        <!-- Annual Salary Details Module -->
         <div class="post-card">
             <h3 style="margin-top: 0; margin-bottom: 20px; color: #38bdf8; font-family: 'Lora', serif; border-bottom: 1px solid #334155; padding-bottom: 10px;">🏢 Annual Salary Details</h3>
 
@@ -72,21 +72,15 @@ permalink: /tax-calculator/
             <!-- Live HRA Exemption Calculation Warning Banner -->
             <div id="hra-warning" class="calc-warning-banner" style="display: none; color: #f87171; background: rgba(248, 113, 113, 0.1); padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem; border-left: 4px solid #f87171;"></div>
 
-            <!-- Legal Compliance Notice (Claims Validation) -->
+            <!-- Legal Compliance Notice -->
             <div style="font-size: 0.75rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 6px; margin-top: 15px; border-left: 3px solid #fbbf24;">
                 <i class="fas fa-exclamation-triangle"></i> Note: You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.
             </div>
 
-            <!-- Restored original engine IDs to fix the calculation discrepancy -->
-            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Other Allowances</label>
-                    <input type="number" id="other-allowances" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal" oninput="calculateAll()">
-                </div>
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--calc-text-muted);">Bonus / Variable Pay</label>
-                    <input type="number" id="bonus" class="dynamic-input" placeholder="₹" style="width: 100%; margin-top: 5px;" inputmode="decimal" oninput="calculateAll()">
-                </div>
+            <!-- RESTORED ORIGINAL INPUT: Single box with original engine ID layout -->
+            <div style="margin-top: 20px;">
+                <label for="other-income" style="font-size: 0.85rem; color: var(--calc-text-muted); display: block; font-weight: bold; margin-bottom: 5px;">Other Income / Allowances / Bonus</label>
+                <input type="number" id="other-income" class="dynamic-input" placeholder="₹ Enter total other income" style="width: 100%;" inputmode="decimal" oninput="calculateAll()">
             </div>
         </div>
 
@@ -94,7 +88,7 @@ permalink: /tax-calculator/
         <div class="post-card" style="margin-bottom: 20px; padding: 25px; background: var(--calc-card);">
             <h3 style="margin-top: 0; color: var(--calc-text-main);"><i class="fas fa-gift" style="margin-right: 10px; color: #a855f7;"></i>Perks & Flexi-Benefits</h3>
             <div style="font-size: 0.75rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #fbbf24;">
-                <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Only add perks here if they are already included in your <strong>Other Allowances</strong> above.
+                <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Only add perks here if they are already included in your <strong>Other Income</strong> above.
             </div>
             <div id="perks-rows-container"></div>
             <button type="button" onclick="addPerkRow()" style="background: none; border: 1px dashed #a855f7; color: #a855f7; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; margin-top: 10px;"> 
@@ -271,9 +265,9 @@ permalink: /tax-calculator/
         </div> 
     </div>
         
-    <!-- Right Column: Sticky Quick Tax Display Summary -->
-    <div style="flex: 1 1 300px; min-width: 300px; position: relative;">
-        <div class="post-card" style="position: -webkit-sticky; position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card); z-index: 10; align-self: flex-start;">
+    <!-- Right Column: Sticky Quick Tax Display Summary Panel -->
+    <div class="calc-sidebar" style="flex: 1 1 300px; min-width: 300px;">
+        <div class="post-card" style="position: -webkit-sticky; position: sticky; top: 20px; border: 1px solid #38bdf8; padding: 25px; background: var(--calc-card); z-index: 10;">
             <h3 style="margin-top: 0; text-align: center; color: var(--calc-text-main);">Tax Liability</h3>
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
                 <div id="old-regime-box" style="text-align: center; padding: 20px; background: var(--calc-input-bg); border-radius: 12px; border: 1px solid var(--calc-input-border);">
@@ -290,15 +284,15 @@ permalink: /tax-calculator/
             <button id="save-btn" onclick="handleSave()" class="btn" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 1px solid #38bdf8; border-radius: 10px; background: transparent; color: #38bdf8;">Save to Profile</button>
         </div>
     </div>
-</div> <!-- Replaced the closing div here to clear the flex container properly! -->
+</div> <!-- .calc-main-row flex row ends here cleanly out of the layout flow -->
 
-<!-- Bottom Layout Area: Fully-stretched structural comparison row -->
-<div id="tax-breakdown-section" class="post-card" style="padding: 25px; background: var(--calc-card); border-top: 4px solid var(--calc-accent); clear: both;">
+<!-- Bottom Layout Area: Placed outside the row blocks to safely stretch 100% width across the DOM -->
+<div id="tax-breakdown-section" class="post-card" style="padding: 25px; background: var(--calc-card); border-top: 4px solid var(--calc-accent); width: 100%; clear: both; box-sizing: border-box;">
     <h3 style="margin-top: 0; color: var(--calc-text-main); text-align: center;">
         <i class="fas fa-list-ul" style="margin-right: 10px; color: var(--calc-accent);"></i> Detailed Comparison Summary
     </h3>
     <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: var(--calc-text-main); min-width: 400px;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: var(--calc-text-main); min-width: 100%;">
             <thead>
                 <tr style="border-bottom: 2px solid var(--calc-input-border); text-align: left; font-size: 0.9rem; background: rgba(0,0,0,0.05);">
                     <th style="padding: 12px;">Tax Component</th>
@@ -312,7 +306,6 @@ permalink: /tax-calculator/
                     <td id="summary-gross-salary" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td id="summary-gross-salary-new" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                 </tr>
-                
                 <tr style="border-bottom: 1px solid var(--calc-input-border);">
                     <td style="padding: 12px;">Standard Deduction</td>
                     <td id="summary-standard-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
@@ -338,13 +331,11 @@ permalink: /tax-calculator/
                     <td id="summary-24b-deduction" style="padding: 12px; text-align: right; color: #22c55e; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td style="padding: 12px; text-align: right; color: var(--calc-text-muted);">Not Eligible</td>
                 </tr>
-                
                 <tr style="border-bottom: 2px solid var(--calc-input-border); background: rgba(56, 189, 248, 0.05); font-weight: bold;">
                     <td style="padding: 12px;">Taxable Net Income</td>
                     <td id="summary-taxable-old" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                     <td id="summary-taxable-new" style="padding: 12px; text-align: right; font-family: 'JetBrains Mono', monospace;">₹ 0</td>
                 </tr>
-                
                 <tr style="font-weight: bold; background: rgba(74, 222, 128, 0.05);">
                     <td style="padding: 12px;">Net Tax Payable (incl. Cess)</td>
                     <td id="summary-total-tax-old" style="padding: 12px; text-align: right; color: var(--calc-text-main); font-family: 'JetBrains Mono', monospace;">₹ 0</td>
