@@ -61,9 +61,9 @@ permalink: /tax-calculator/
                 <div class="calc-field-group">
                     <div class="label-row">
                         <label for="is-metro">City of Residence:</label>
-                        <select id="is-metro" onchange="calculateAll()">
-                            <option value="yes" selected>Metro</option>
-                            <option value="no">Non-Metro</option>
+                        <select id="is-metro" onchange="calculateAll()" style="width: 120px; padding: 8px 12px; border-radius: 10px; font-weight: 700; background: var(--calc-input-bg); border: 2px solid var(--calc-input-border); color: var(--calc-text-main);">
+                            <option value="true" selected>Metro</option>
+                            <option value="false">Non-Metro</option>
                         </select>
                     </div>
                 </div>
