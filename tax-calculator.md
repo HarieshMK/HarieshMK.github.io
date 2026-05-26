@@ -9,7 +9,7 @@ permalink: /tax-calculator/
     <div style="min-width: 240px;">
         <select id="fy-selector" class="calc-select" onchange="calculateAll()" style="color: var(--brand-primary); width: 100%; padding: 10px 14px; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-base); background: var(--bg-offset);">
             <option value="2026-27" selected>FY 2026-27</option>
-            <option value="2025-26">FY 2025-26</option>
+            <option value="2025-26">FY 2025-26</option> 
         </select>
     </div>
 </div>
