@@ -175,7 +175,7 @@ permalink: /tax-calculator/
                             <div class="calc-grid-layout">
                                 <div class="calc-custom-row">
                                     <label for="loan-sanction-date">Sanction Date</label>
-                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%;">
+                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%; text-align: left !important;">
                                 </div>
                                 <div class="calc-custom-row">
                                     <label for="property-stamp-value">Stamp Duty Value</label>
@@ -325,7 +325,6 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-    // Pure Indian Number Formatter Functionality
     function formatIndianInput(el) {
         let val = el.value.replace(/[^0-9.]/g, '');
         if (!val) { el.value = ''; return; }
@@ -356,7 +355,6 @@ permalink: /tax-calculator/
         return '₹ ' + lastThree;
     }
 
-    // Modern Event Attachment to clear Jekyll pipeline compilation blocks safely
     document.addEventListener("DOMContentLoaded", function() {
         const setupCalcInput = (id) => {
             const el = document.getElementById(id);
@@ -377,11 +375,9 @@ permalink: /tax-calculator/
             }
         };
 
-        // Bind standard layout components
         ['basic-salary', 'hra-received', 'rent-paid', 'other-income', '80d-self', '80d-parents', 'loan-principal', 'loan-interest', 'property-stamp-value', 'original-loan-amt'].forEach(setupCalcInput);
         ['fy-selector', 'is-metro', 'parents-senior', 'loan-sanction-date'].forEach(setupCalcChange);
 
-        // Accordion triggers binding safely post-load
         const bindToggle = (headerId, contentId, iconId) => {
             const header = document.getElementById(headerId);
             if(header) {
@@ -398,7 +394,6 @@ permalink: /tax-calculator/
         bindToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
         bindToggle('benefits-summary-header', 'benefits-summary-content', 'benefits-summary-icon');
 
-        // Dynamic element trigger setup
         const addPerkBtn = document.getElementById('add-perk-btn');
         if(addPerkBtn) addPerkBtn.addEventListener('click', function() { if(typeof addPerkRow === 'function') addPerkRow(); });
 
@@ -437,7 +432,6 @@ permalink: /tax-calculator/
 </script>
 
 <style>
-    /* 1. Resetting Collapsible Header Layout to match normal container card flows */
     .unique-tax-calc .collapsible-section-box {
         padding: 0 !important;
         overflow: hidden;
@@ -470,7 +464,6 @@ permalink: /tax-calculator/
         color: var(--text-muted);
     }
 
-    /* 2. Style Inputs & Select Rows for Perks/80C dynamically created child components */
     .unique-tax-calc .calc-grid-layout {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -492,6 +485,7 @@ permalink: /tax-calculator/
         letter-spacing: 0.05em;
     }
 
+    /* Target inputs strictly to lock dark backgrounds, text right-alignment, and override browser user-agents */
     .unique-tax-calc input[type="text"],
     .unique-tax-calc input[type="number"],
     .unique-tax-calc .calc-select,
@@ -509,27 +503,49 @@ permalink: /tax-calculator/
         border: 2px solid var(--border-base) !important;
         color: var(--text-primary) !important;
         font-family: 'JetBrains Mono', monospace !important;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        text-align: right !important; /* Forces uniform corporate right alignment */
     }
 
+    /* Date field text alignment fix */
+    .unique-tax-calc input[type="date"] {
+        text-align: left !important;
+    }
+
+    /* Strict execution to prevent browser override to white themes upon select focus */
     .unique-tax-calc input:focus, 
-    .unique-tax-calc select:focus {
+    .unique-tax-calc select:focus,
+    .unique-tax-calc input:active,
+    .unique-tax-calc select:active,
+    .unique-tax-calc input:-webkit-autofill,
+    .unique-tax-calc input:-webkit-autofill:hover,
+    .unique-tax-calc input:-webkit-autofill:focus {
         outline: none !important;
         border-color: var(--brand-primary) !important;
+        background-color: var(--bg-container) !important;
         background: var(--bg-container) !important;
+        -webkit-text-fill-color: var(--text-primary) !important;
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1) !important;
+        transition: background-color 5000s ease-in-out 0s;
     }
 
+    /* Style corrections for dynamic child item nodes */
     #perks-rows-container > div,
     #80c-rows-container > div {
         display: grid !important;
-        grid-template-columns: 1fr 1fr auto !important;
+        grid-template-columns: 1.2fr 1fr auto !important; /* Expands left selector to drop artifacts cleanly */
         gap: 15px !important;
         align-items: center !important;
         margin-bottom: 12px !important;
     }
 
-    /* 3. Dark Mode Notice/Banner Container Refinements */
+    /* Cleaner appearance for native selectors inside dark fields */
+    .unique-tax-calc select.calc-select {
+        text-align: left !important;
+        text-align-last: left !important;
+        padding-right: 30px !important;
+    }
+
     .unique-tax-calc .dark-mode-notice-box {
         background: #1e293b !important;
         border: 1px solid #334155 !important;
@@ -547,7 +563,6 @@ permalink: /tax-calculator/
         line-height: 1.5;
     }
 
-    /* 4. Section 80EEA Alignment Fixes to mirror layout matching Section 24b */
     .unique-tax-calc .benefit-flex-row {
         margin-bottom: 15px;
         padding: 15px 20px;
@@ -570,12 +585,4 @@ permalink: /tax-calculator/
         grid-column: 1 / -1;
         margin-top: 10px;
     }
-
-    .unique-tax-calc .calculation-card {
-        padding: 25px !important;
-        margin-bottom: 25px !important;
-    }
-
-    .hidden { display: none !important; }
 </style>
-
