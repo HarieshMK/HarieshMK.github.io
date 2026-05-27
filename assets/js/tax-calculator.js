@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.21 - Fully Restored All Missing Bottom-Of-File Utilities & Global Bridges
+ * VERSION: 3.22 - Optimized for Indian Currency Parsing, Rightaligned Layouts, and Checked HRA Validation
  */
 
 const TaxController = {
@@ -26,9 +26,8 @@ const TaxController = {
             }
         });
 
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            if (!input.hasAttribute('inputmode')) input.setAttribute('inputmode', 'decimal');
-        });
+        // Initialize masking on existing fields and attach formatting listeners
+        TaxController.applyCurrencyFormattingListeners();
 
         TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
         TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
@@ -77,6 +76,7 @@ const TaxController = {
                 }
 
                 TaxController.isInitialLoading = false;
+                TaxController.applyCurrencyFormattingListeners();
                 TaxController.calculateAll();
                 setTimeout(() => { TaxController.isDirty = false; }, 200);
             });
@@ -94,15 +94,58 @@ const TaxController = {
         }
 
         TaxController.isInitialLoading = false;
+        TaxController.applyCurrencyFormattingListeners();
         TaxController.calculateAll();
 
         setTimeout(() => { TaxController.isDirty = false; }, 500);
     },
 
     cleanNum: (val) => {
-        if (!val) return 0;
-        const cleanValue = val.toString().replace(/[^0-9.-]+/g, "");
+        if (val === undefined || val === null || val === '') return 0;
+        // Strip out commas completely before running evaluation loops to protect calculations
+        const cleanValue = val.toString().replace(/,/g, "").replace(/[^0-9.-]+/g, "");
         return parseFloat(cleanValue) || 0;
+    },
+
+    formatIndianCurrency: (valueString) => {
+        let value = valueString.replace(/,/g, '');
+        if (!value) return '';
+        let parts = value.split('.');
+        let lastThree = parts[0].substring(parts[0].length - 3);
+        let otherBits = parts[0].substring(0, parts[0].length - 3);
+        if (otherBits !== '') lastThree = ',' + lastThree;
+        let formatted = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        if (parts.length > 1) formatted += '.' + parts[1];
+        return formatted;
+    },
+
+    applyCurrencyFormattingListeners: () => {
+        // Targets all standard input elements and sets input type to text safely to support commas
+        const targets = document.querySelectorAll('#basic-salary, #hra-received, #rent-paid, #other-income, #loan-interest, #loan-principal, #80d-self, #80d-parents, #nps-80ccd-1b, #original-loan-amt, #property-stamp-value, .perk-amount, .row-amount-80c');
+        
+        targets.forEach(input => {
+            if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
+                input.classList.add('currency-mapped');
+                input.setAttribute('type', 'text');
+                input.setAttribute('inputmode', 'decimal');
+
+                // If loaded data already populated a raw digit value, format it right away
+                if (input.value) {
+                    input.value = TaxController.formatIndianCurrency(input.value);
+                }
+
+                input.addEventListener('input', function() {
+                    let selectionStart = this.selectionStart;
+                    let oldLength = this.value.length;
+                    
+                    let formatted = TaxController.formatIndianCurrency(this.value);
+                    this.value = formatted;
+                    
+                    let newLength = this.value.length;
+                    this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
+                });
+            }
+        });
     },
 
     setupToggle: (headerId, contentId, iconId) => {
@@ -199,7 +242,8 @@ const TaxController = {
             if (!principalRow) {
                 TaxController.add80CRow("Home Loan Principal", amount, true, "row-80c-statutory-hl-principal");
             } else {
-                principalRow.querySelector('.row-amount-80c').value = amount;
+                const targetInput = principalRow.querySelector('.row-amount-80c');
+                targetInput.value = TaxController.formatIndianCurrency(amount.toString());
             }
         } else if (principalRow) {
             principalRow.remove();
@@ -221,7 +265,6 @@ const TaxController = {
         const status = document.getElementById('save-status');
         const selectedYear = document.getElementById('fy-selector').value;
 
-        // Clear any previous status styling right away
         if (status) {
             status.style.color = "";
             status.innerText = "";
@@ -232,11 +275,9 @@ const TaxController = {
                 throw new Error("Supabase Database connection client could not be detected on the page template.");
             }
 
-            // Verify if the user is logged in
             const { data: authRecord } = await supabase.auth.getUser();
             const user = authRecord?.user;
 
-            // IF NOT LOGGED IN: Prompt sequence
             if (!user) {
                 const firstChoice = confirm(
                     "Wait, who are you? 🕵️‍♂️\n\n" +
@@ -255,7 +296,7 @@ const TaxController = {
                     
                     if (secondChoice) {
                         if (status) {
-                            status.style.color = "#d97706"; // Amber amber warning color
+                            status.style.color = "#d97706";
                             status.innerText = "⚠️ Progress unsaved. Your tax data is living on the edge!";
                         }
                         btn.innerHTML = `<i class="fas fa-heart-broken"></i> Unsaved Profile`;
@@ -269,7 +310,6 @@ const TaxController = {
                 return; 
             }
 
-            // IF LOGGED IN: Start explicit save workflow
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving to Cloud...';
             if (status) status.innerText = "Connecting securely to data systems...";
@@ -278,33 +318,27 @@ const TaxController = {
                 throw new Error("The backend logic coordinator 'window.saveTaxData' is missing or failed to initialize.");
             }
 
-            // Await the database save operation directly
             await window.saveTaxData(selectedYear);
             
-            // SUCCESS STAGE
             TaxController.isDirty = false;
             btn.innerHTML = `<i class="fas fa-check-circle"></i> Profile Synced!`;
             
             if (status) {
-                status.style.color = "#22c55e"; // Vibrant Green text
+                status.style.color = "#22c55e";
                 status.innerText = `🎉 Success! Your data for FY ${selectedYear} is saved. You can visit this site anytime and access your data securely.`;
             }
 
-            // Reset button to normal status after 4 seconds but KEEP the green success text visible
             setTimeout(() => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save to Profile';
             }, 4000);
 
         } catch (error) {
-            // FAILURE STAGE: Intercepts whatever broke and prints it on the screen
             console.error("CRITICAL DATA SYNC ERROR:", error);
-            
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sync Failed';
-            
             if (status) {
-                status.style.color = "#ef4444"; // Error Red text
+                status.style.color = "#ef4444";
                 status.innerText = `❌ Save Failed! Error Details: ${error.message || error || "Unknown system intercept anomaly."}`;
             }
         }
@@ -317,16 +351,21 @@ const TaxController = {
         row.className = (isLocked ? "row-80c-statutory " : "row-80c-manual ") + (customClass || "");
         row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
         const options = ["ELSS Funds", "PPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed FD (5yr)", "Life Insurance"];
+        
+        let displayAmt = amount !== "" ? TaxController.formatIndianCurrency(amount.toString()) : "";
+
         row.innerHTML = `
             <select class="row-select-80c dynamic-input" style="flex: 2; ${isLocked ? 'background-color: #f3f4f6;' : ''}" ${isLocked ? 'disabled' : ''}>
                 <option value="${type}" selected>${type || 'Select Investment'}</option>
                 ${!isLocked ? options.map(opt => `<option value="${opt}">${opt}</option>`).join('') : ''}
             </select>
-            <input type="number" class="row-amount-80c dynamic-input" placeholder="Amount" value="${amount}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
+            <input type="text" inputmode="decimal" class="row-amount-80c dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
             ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' : 
             `<button type="button" onclick="this.parentElement.remove(); TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}
         `;
         container.appendChild(row);
+        
+        TaxController.applyCurrencyFormattingListeners();
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
     },
 
@@ -337,25 +376,30 @@ const TaxController = {
         row.className = "perk-row";
         row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
+        
+        let displayVal = value !== "" ? TaxController.formatIndianCurrency(value.toString()) : "";
+
         row.innerHTML = `
             <select class="perk-type dynamic-input">
                 <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
                 ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>
-            <input type="number" class="perk-amount dynamic-input" placeholder="Amt" value="${value}" style="text-align: right;">
+            <input type="text" inputmode="decimal" class="perk-amount dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right;">
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem;">₹ 0</div>
             <button type="button" onclick="this.parentElement.remove(); TaxController.calculateAll();" style="color:#ef4444; background:none; border:none;"><i class="fas fa-trash"></i></button>
         `;
         container.appendChild(row);
+
+        TaxController.applyCurrencyFormattingListeners();
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
     },
 
     calculateAll: () => {
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
     
-        const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
-        const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
-        const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
+        const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
+        const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
+        const rentPaid = TaxController.cleanNum(document.getElementById('rent-paid')?.value);
         const isMetro = document.getElementById('is-metro')?.value === 'true';
         const fy = document.getElementById('fy-selector')?.value || '2026-27';
     
@@ -373,12 +417,12 @@ const TaxController = {
         TaxController.handleDateBranching();
         
         if (hasLoan) {
-            homeLoanInterest = parseFloat(document.getElementById('loan-interest')?.value) || 0;
-            homeLoanPrincipal = parseFloat(document.getElementById('loan-principal')?.value) || 0;
+            homeLoanInterest = TaxController.cleanNum(document.getElementById('loan-interest')?.value);
+            homeLoanPrincipal = TaxController.cleanNum(document.getElementById('loan-principal')?.value);
             const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
             const isFirstTimeBuyer = document.getElementById('is-first-buyer')?.checked; 
-            const loanAmt = parseFloat(document.getElementById('original-loan-amt')?.value) || 0; 
-            const propVal = parseFloat(document.getElementById('property-stamp-value')?.value) || 0; 
+            const loanAmt = TaxController.cleanNum(document.getElementById('original-loan-amt')?.value); 
+            const propVal = TaxController.cleanNum(document.getElementById('property-stamp-value')?.value); 
 
             if (isSelfOccupied && homeLoanInterest > 200000 && isFirstTimeBuyer && sanctionDateVal) {
                 const sanctionDate = new Date(sanctionDateVal);
@@ -416,8 +460,27 @@ const TaxController = {
             if(displayEl) displayEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
         }
 
+        // ISSUE 4 FIX: Outputs clean structural layout wrapper matching right-aligned column styles
         const display24b = document.getElementById('display-24b-value');
-        if(display24b) display24b.innerText = `₹ ${Math.round(eligible24b).toLocaleString('en-IN')}`;
+        if(display24b) {
+            display24b.innerHTML = `
+                <div class="section-24b-result-container">
+                    <span class="section-24b-label">Section 24(b) - Interest on Home Loan</span>
+                    <span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span>
+                </div>
+            `;
+        }
+
+        // ISSUE 5 FIX: Notice checks if user has explicitly turned on home loan wrapper AND checked self-occupied status
+        const warningBox = document.getElementById('hra-homeloan-warning');
+        if (warningBox) {
+            const hasHraInputs = (basic > 0 && hraRec > 0);
+            if (hasHraInputs && hasLoan && isSelfOccupied) {
+                warningBox.style.display = 'block';
+            } else {
+                warningBox.style.display = 'none';
+            }
+        }
     
         const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
         const hraDisplay = document.getElementById('display-hra-value');
@@ -428,20 +491,20 @@ const TaxController = {
         const perkRows = document.querySelectorAll('.perk-row');
         const perksArr = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
-            amount: parseFloat(row.querySelector('.perk-amount').value) || 0,
-            value: parseFloat(row.querySelector('.perk-amount').value) || 0,
+            amount: TaxController.cleanNum(row.querySelector('.perk-amount').value),
+            value: TaxController.cleanNum(row.querySelector('.perk-amount').value),
             element: row.querySelector('.perk-eligible')
         }));
     
-        const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
+        const otherIncome = TaxController.cleanNum(document.getElementById('other-income')?.value);
         const gross = basic + hraRec + otherIncome;
     
         const deductionsObj = {
-            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + (parseFloat(e.value) || 0), 0),
-            healthSelf: parseFloat(document.getElementById('80d-self')?.value) || 0,
-            healthParents: parseFloat(document.getElementById('80d-parents')?.value) || 0,
+            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + TaxController.cleanNum(e.value), 0),
+            healthSelf: TaxController.cleanNum(document.getElementById('80d-self')?.value),
+            healthParents: TaxController.cleanNum(document.getElementById('80d-parents')?.value),
             parentsSenior: document.getElementById('parents-senior')?.checked || false,
-            npsExtra: parseFloat(document.getElementById('nps-80ccd-1b')?.value) || 0,
+            npsExtra: TaxController.cleanNum(document.getElementById('nps-80ccd-1b')?.value),
             homeLoanInterest: homeLoanInterest, 
             extraLoanInterest: dExtra, 
             occupancy: isSelfOccupied ? 'self' : 'rented',
@@ -476,8 +539,11 @@ const TaxController = {
         if (!container) return;
         let epfRow = container.querySelector('.row-80c-statutory-epf');
         const epfAmt = Math.round(basic * 0.12);
-        if (basic > 0 && !epfRow) TaxController.add80CRow("Employee PF", epfAmt, true, "row-80c-statutory-epf");
-        else if (epfRow) epfRow.querySelector('.row-amount-80c').value = epfAmt;
+        if (basic > 0 && !epfRow) {
+            TaxController.add80CRow("Employee PF", epfAmt, true, "row-80c-statutory-epf");
+        } else if (epfRow) {
+            epfRow.querySelector('.row-amount-80c').value = TaxController.formatIndianCurrency(epfAmt.toString());
+        }
     },
 
     updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails, grossSalary) => {
@@ -523,9 +589,9 @@ const TaxController = {
             const applied80D = oldRegDetails.appliedDeductions?.section80D || 0;
             const applied24b = oldRegDetails.appliedDeductions?.homeInterest || 0;
             
-            const rentPaid = parseFloat(document.getElementById('rent-paid')?.value) || 0;
-            const basic = parseFloat(document.getElementById('basic-salary')?.value) || 0;
-            const hraRec = parseFloat(document.getElementById('hra-received')?.value) || 0;
+            const rentPaid = TaxController.cleanNum(document.getElementById('rent-paid')?.value);
+            const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
+            const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
             const isMetro = document.getElementById('is-metro')?.value === 'true';
             const calculatedHRA = window.FinanceEngine?.TaxEngine?.calculateExemptHRA(basic, hraRec, rentPaid, isMetro)?.actualExemption || 0;
 
@@ -581,7 +647,7 @@ const TaxController = {
                 const el = document.getElementById(id);
                 if (el) {
                     const parsed = parseFloat(value);
-                    el.value = isNaN(parsed) ? "" : parsed;
+                    el.value = isNaN(parsed) ? "" : TaxController.formatIndianCurrency(parsed.toString());
                 }
             };
 
@@ -651,7 +717,7 @@ const TaxController = {
 let errorStyle = document.getElementById('tax-calculator-error-styles');
 if (!errorStyle) {
     errorStyle = document.createElement('style');
-    errorStyle.id = 'tax-calculator-error-styles'; // Changing the ID so it never clashes with your premium block!
+    errorStyle.id = 'tax-calculator-error-styles';
     errorStyle.innerHTML = `
         .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; }
         .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
@@ -662,8 +728,8 @@ if (!errorStyle) {
 // BACKWARDS-COMPATIBLE UTILITY WRAPPERS
 function validateInputs() {
     let isValid = true;
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-        const val = parseFloat(input.value);
+    document.querySelectorAll('.currency-mapped').forEach(input => {
+        const val = TaxController.cleanNum(input.value);
         if (val < 0) {
             input.classList.add('input-error');
             isValid = false;
