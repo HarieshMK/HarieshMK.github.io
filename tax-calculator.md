@@ -175,7 +175,7 @@ permalink: /tax-calculator/
                             <div class="calc-grid-layout">
                                 <div class="calc-custom-row">
                                     <label for="loan-sanction-date">Sanction Date</label>
-                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%; text-align: left !important;">
+                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size:0.85rem; width: 100%;">
                                 </div>
                                 <div class="calc-custom-row">
                                     <label for="property-stamp-value">Stamp Duty Value</label>
@@ -433,22 +433,22 @@ permalink: /tax-calculator/
 
 <style>
     .unique-tax-calc .collapsible-section-box {
-        padding: 0 !important;
+        padding: 0;
         overflow: hidden;
     }
 
     .unique-tax-calc .calc-collapse-trigger {
-        padding: 20px 25px !important;
-        background: transparent !important;
+        padding: 20px 25px;
+        background: transparent;
         display: flex;
         justify-content: space-between;
         align-items: center;
         cursor: pointer;
-        border: none !important;
+        border: none;
     }
 
     .unique-tax-calc .collapsible-content-wrapper {
-        padding: 5px 25px 25px 25px !important;
+        padding: 5px 25px 25px 25px;
         border-top: 1px solid var(--border-base);
     }
 
@@ -485,7 +485,7 @@ permalink: /tax-calculator/
         letter-spacing: 0.05em;
     }
 
-    /* Target inputs strictly to lock dark backgrounds, text right-alignment, and override browser user-agents */
+    /* Core Input and Select Styling Rules */
     .unique-tax-calc input[type="text"],
     .unique-tax-calc input[type="number"],
     .unique-tax-calc .calc-select,
@@ -493,26 +493,30 @@ permalink: /tax-calculator/
     #perks-rows-container select,
     #80c-rows-container input,
     #80c-rows-container select {
-        width: 100% !important;
+        width: 100%;
         box-sizing: border-box;
-        padding: 12px 16px !important;
-        border-radius: 8px !important;
-        font-size: 1rem !important;
-        height: 48px !important;
-        background: var(--bg-offset) !important;
-        border: 2px solid var(--border-base) !important;
-        color: var(--text-primary) !important;
-        font-family: 'JetBrains Mono', monospace !important;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 1rem;
+        height: 48px;
+        background: var(--bg-offset);
+        border: 2px solid var(--border-base);
+        color: var(--text-primary);
+        font-family: 'JetBrains Mono', monospace;
         transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-        text-align: right !important; /* Forces uniform corporate right alignment */
+        text-align: right; 
     }
 
-    /* Date field text alignment fix */
-    .unique-tax-calc input[type="date"] {
-        text-align: left !important;
+    /* Keep native text alignment rules clean for dropdown selectors and dates */
+    .unique-tax-calc select,
+    .unique-tax-calc input[type="date"],
+    #perks-rows-container select,
+    #80c-rows-container select {
+        text-align: left;
+        text-align-last: left;
     }
 
-    /* Strict execution to prevent browser override to white themes upon select focus */
+    /* Strict Focus States */
     .unique-tax-calc input:focus, 
     .unique-tax-calc select:focus,
     .unique-tax-calc input:active,
@@ -520,69 +524,38 @@ permalink: /tax-calculator/
     .unique-tax-calc input:-webkit-autofill,
     .unique-tax-calc input:-webkit-autofill:hover,
     .unique-tax-calc input:-webkit-autofill:focus {
-        outline: none !important;
-        border-color: var(--brand-primary) !important;
-        background-color: var(--bg-container) !important;
-        background: var(--bg-container) !important;
-        -webkit-text-fill-color: var(--text-primary) !important;
-        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1) !important;
-        transition: background-color 5000s ease-in-out 0s;
+        outline: none;
+        border-color: var(--brand-primary);
+        background-color: var(--bg-container);
+        background: var(--bg-container);
+        -webkit-text-fill-color: var(--text-primary);
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
     }
 
-    /* Style corrections for dynamic child item nodes */
+    /* Child Nodes Layout Settings */
     #perks-rows-container > div,
     #80c-rows-container > div {
-        display: grid !important;
-        grid-template-columns: 1.2fr 1fr auto !important; /* Expands left selector to drop artifacts cleanly */
-        gap: 15px !important;
-        align-items: center !important;
-        margin-bottom: 12px !important;
-    }
-
-    /* Cleaner appearance for native selectors inside dark fields */
-    .unique-tax-calc select.calc-select {
-        text-align: left !important;
-        text-align-last: left !important;
-        padding-right: 30px !important;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr auto; 
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 12px;
     }
 
     .unique-tax-calc .dark-mode-notice-box {
-        background: #1e293b !important;
-        border: 1px solid #334155 !important;
-        border-left: 4px solid var(--brand-primary) !important;
-        padding: 15px 20px !important;
-        border-radius: 8px !important;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-left: 4px solid var(--brand-primary);
+        padding: 15px 20px;
+        border-radius: 8px;
         margin-top: 15px;
         margin-bottom: 25px;
     }
 
     .unique-tax-calc .dark-mode-notice-box p,
     .unique-tax-calc .dark-mode-notice-box strong {
-        color: #f8fafc !important;
-        font-size: 0.9rem !important;
+        color: #f8fafc;
+        font-size: 0.9rem;
         line-height: 1.5;
-    }
-
-    .unique-tax-calc .benefit-flex-row {
-        margin-bottom: 15px;
-        padding: 15px 20px;
-        background: var(--bg-offset);
-        border-radius: 10px;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-    }
-
-    .unique-tax-calc .benefit-value-text {
-        font-weight: bold;
-        font-size: 1.1rem;
-        font-family: 'JetBrains Mono', monospace;
-        color: var(--text-primary);
-        text-align: right;
-    }
-
-    .unique-tax-calc .single-row-span {
-        grid-column: 1 / -1;
-        margin-top: 10px;
     }
 </style>
