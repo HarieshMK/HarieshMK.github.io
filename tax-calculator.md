@@ -433,7 +433,7 @@ permalink: /tax-calculator/
 
 <style>
     /* ==========================================================================
-       1. KEEPING YOUR STRUCTURAL LAYOUTS (Do Not Delete)
+       1. STRUCTURAL LAYOUTS (Kept Intact!)
        ========================================================================== */
     .unique-tax-calc .collapsible-section-box {
         padding: 0;
@@ -515,77 +515,63 @@ permalink: /tax-calculator/
     }
 
     /* ==========================================================================
-       2. NEW PREMIUM INPUT & SELECT BOX STYLING (The Upgrade)
+       2. OPTIMIZED PREMIUM INPUTS (Targets standard & dynamic fields seamlessly)
        ========================================================================== */
     .unique-tax-calc input[type="text"],
     .unique-tax-calc input[type="number"],
-    .unique-tax-calc .calc-select,
-    .unique-tax-calc input[type="date"],
-    #perks-rows-container input,
-    #perks-rows-container select,
-    #80c-rows-container input,
-    #80c-rows-container select,
-    #perks-rows-container div input,
-    #perks-rows-container div select,
-    #80c-rows-container div input,
-    #80c-rows-container div select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 20px;
-        border-radius: 14px; /* Premium capsule look */
-        font-size: 1.1rem;
-        height: 50px;
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 700;
-        transition: all 0.25s ease-in-out;
-        text-align: left; /* Aligns left cleanly like your target goal */
+    .unique-tax-calc select,
+    .unique-tax-calc .dynamic-input,
+    .perk-row input,
+    .perk-row select,
+    .row-80c-manual select,
+    .row-80c-manual input,
+    .row-80c-statutory input {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 20px !important;
+        border-radius: 14px !important;
+        font-size: 1.1rem !important;
+        height: 50px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 700 !important;
+        transition: all 0.25s ease-in-out !important;
+        text-align: left !important;
     }
 
-    /* --- DARK MODE SPECIFIC --- */
+    /* --- DARK THEME SYSTEM CONTRAST --- */
     .dark-theme .unique-tax-calc input[type="text"],
     .dark-theme .unique-tax-calc input[type="number"],
-    .dark-theme .unique-tax-calc .calc-select,
-    .dark-theme .unique-tax-calc input[type="date"],
-    .dark-theme #perks-rows-container input,
-    .dark-theme #perks-rows-container select,
-    .dark-theme #80c-rows-container input,
-    .dark-theme #80c-rows-container select,
-    .dark-theme #perks-rows-container div input,
-    .dark-theme #perks-rows-container div select,
-    .dark-theme #80c-rows-container div input,
-    .dark-theme #80c-rows-container div select {
-        background-color: #0b1329 !important; /* Premium deep navy */
+    .dark-theme .unique-tax-calc select,
+    .dark-theme .dynamic-input,
+    .dark-theme .perk-row input,
+    .dark-theme .perk-row select,
+    .dark-theme .row-80c-manual select,
+    .dark-theme .row-80c-manual input {
+        background-color: #0b1329 !important;
         border: 1.5px solid #1e293b !important;
-        color: #38bdf8 !important; /* Vibrant bright blue text */
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important; /* Deep inner depth shadow */
+        color: #38bdf8 !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
     }
 
-    /* --- LIGHT MODE SPECIFIC --- */
+    /* --- LIGHT THEME SYSTEM CONTRAST --- */
     html:not(.dark-theme) .unique-tax-calc input[type="text"],
     html:not(.dark-theme) .unique-tax-calc input[type="number"],
-    html:not(.dark-theme) .unique-tax-calc .calc-select,
-    html:not(.dark-theme) .unique-tax-calc input[type="date"],
-    html:not(.dark-theme) #perks-rows-container input,
-    html:not(.dark-theme) #perks-rows-container select,
-    html:not(.dark-theme) #80c-rows-container input,
-    html:not(.dark-theme) #80c-rows-container select,
-    html:not(.dark-theme) #perks-rows-container div input,
-    html:not(.dark-theme) #perks-rows-container div select,
-    html:not(.dark-theme) #80c-rows-container div input,
-    html:not(.dark-theme) #80c-rows-container div select {
+    html:not(.dark-theme) .unique-tax-calc select,
+    html:not(.dark-theme) .dynamic-input,
+    html:not(.dark-theme) .perk-row input,
+    html:not(.dark-theme) .perk-row select,
+    html:not(.dark-theme) .row-80c-manual select,
+    html:not(.dark-theme) .row-80c-manual input {
         background-color: #ffffff !important;
         border: 1.5px solid #e2e8f0 !important;
-        color: #0284c7 !important; /* Sharp oceanic blue text */
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06) !important; /* Subtle inner depth shadow */
+        color: #0284c7 !important;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06) !important;
     }
 
-    /* Premium Glow Focus Ring */
+    /* --- ACTIVE GLOW FOCUS RING --- */
     .unique-tax-calc input:focus, 
     .unique-tax-calc select:focus,
-    #perks-rows-container div input:focus,
-    #perks-rows-container div select:focus,
-    #80c-rows-container div input:focus,
-    #80c-rows-container div select:focus {
+    .dynamic-input:focus {
         outline: none !important;
         border-color: #0ea5e9 !important;
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
