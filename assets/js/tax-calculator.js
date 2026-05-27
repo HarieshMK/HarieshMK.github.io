@@ -647,15 +647,16 @@ const TaxController = {
     }
 };
 
-// DYNAMIC INPUT/ERROR STYLE HOOKS
-if (!document.getElementById('tax-calculator-styles')) {
-    const style = document.createElement('style');
-    style.id = 'tax-calculator-styles';
-    style.innerHTML = `
+// DYNAMIC INPUT/ERROR STYLE HOOKS - CLEAN IMPLEMENTATION
+let errorStyle = document.getElementById('tax-calculator-error-styles');
+if (!errorStyle) {
+    errorStyle = document.createElement('style');
+    errorStyle.id = 'tax-calculator-error-styles'; // Changing the ID so it never clashes with your premium block!
+    errorStyle.innerHTML = `
         .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; }
         .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
     `;
-    document.head.appendChild(style);
+    document.head.appendChild(errorStyle);
 }
 
 // BACKWARDS-COMPATIBLE UTILITY WRAPPERS
