@@ -485,7 +485,7 @@ permalink: /tax-calculator/
         letter-spacing: 0.05em;
     }
 
-    /* Core Input and Select Styling Rules */
+    /* Target inputs/selectors anywhere inside the calculator OR its dynamic container baskets */
     .unique-tax-calc input[type="text"],
     .unique-tax-calc input[type="number"],
     .unique-tax-calc .calc-select,
@@ -507,23 +507,36 @@ permalink: /tax-calculator/
         text-align: right; 
     }
 
-    /* Keep native text alignment rules clean for dropdown selectors and dates */
+    /* Target inner inputs created by JS deeper inside wrapper rows */
+    #perks-rows-container div input,
+    #perks-rows-container div select,
+    #80c-rows-container div input,
+    #80c-rows-container div select {
+        background: var(--bg-offset);
+        border: 2px solid var(--border-base);
+        color: var(--text-primary);
+        text-align: right;
+    }
+
+    /* Keep selectors and dates left-aligned cleanly */
     .unique-tax-calc select,
     .unique-tax-calc input[type="date"],
     #perks-rows-container select,
-    #80c-rows-container select {
+    #perks-rows-container div select,
+    #80c-rows-container select,
+    #80c-rows-container div select {
         text-align: left;
         text-align-last: left;
     }
 
-    /* Strict Focus States */
+    /* Focus and Autofill rules targeting both root and deep elements */
     .unique-tax-calc input:focus, 
     .unique-tax-calc select:focus,
-    .unique-tax-calc input:active,
-    .unique-tax-calc select:active,
-    .unique-tax-calc input:-webkit-autofill,
-    .unique-tax-calc input:-webkit-autofill:hover,
-    .unique-tax-calc input:-webkit-autofill:focus {
+    #perks-rows-container div input:focus,
+    #perks-rows-container div select:focus,
+    #80c-rows-container div input:focus,
+    #80c-rows-container div select:focus,
+    .unique-tax-calc input:-webkit-autofill {
         outline: none;
         border-color: var(--brand-primary);
         background-color: var(--bg-container);
@@ -532,7 +545,7 @@ permalink: /tax-calculator/
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
     }
 
-    /* Child Nodes Layout Settings */
+    /* Row Layout Rules */
     #perks-rows-container > div,
     #80c-rows-container > div {
         display: grid;
