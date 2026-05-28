@@ -1,6 +1,6 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.23 - Optimized for Indian Currency Parsing, Rightaligned Layouts, and Checked HRA Validation
+ * VERSION: 3.22 - Optimized for Indian Currency Parsing, Rightaligned Layouts, and Checked HRA Validation
  */
 
 const TaxController = {
@@ -162,11 +162,8 @@ const TaxController = {
                             let formatted = TaxController.formatIndianCurrency(this.value);
                             this.value = formatted;
                             
-                            if (this === document.activeElement && typeof this.setSelectionRange === 'function') {
-                                let newLength = this.value.length;
-                                let targetOffset = selectionStart + (newLength - oldLength);
-                                this.setSelectionRange(targetOffset, targetOffset);
-                            };
+                            let newLength = this.value.length;
+                            this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
                         });
                     }
                 });
@@ -488,10 +485,15 @@ const TaxController = {
             if(displayEl) displayEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
         }
 
-        //  THE CLEAN INTERACTION: Update only the text context securely
+        // ISSUE 4 FIX: Outputs clean structural layout wrapper matching right-aligned column styles
         const display24b = document.getElementById('display-24b-value');
         if(display24b) {
-            display24b.innerText = `₹ ${Math.round(eligible24b).toLocaleString('en-IN')}`;
+            display24b.innerHTML = `
+                <div class="section-24b-result-container">
+                    <span class="section-24b-label">Section 24(b) - Interest on Home Loan</span>
+                    <span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span>
+                </div>
+            `;
         }
 
         // ISSUE 5 FIX: Notice checks if user has explicitly turned on home loan wrapper AND checked self-occupied status
@@ -674,75 +676,54 @@ const TaxController = {
                 }
             };
 
-            // Standard Numeric Mappings
-            setNumericValue('basic-salary', i.basicSalary);
-            setNumericValue('hra-received', i.hraReceived);
-            setNumericValue('rent-paid', i.rentPaid);
+            setNumericValue('basic-salary', i.basic);
+            setNumericValue('hra-received', i.hra);
+            setNumericValue('rent-paid', i.rent);
             setNumericValue('other-income', i.otherIncome);
+            
+            if(document.getElementById('is-metro')) {
+                document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false";
+            }
+            
+            if(document.getElementById('has-home-loan')) {
+                document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true);
+                TaxController.toggleLoanWizard(); 
+            }
+            setNumericValue('loan-interest', i.homeInterest);
+            setNumericValue('loan-principal', i.loanPrincipal);
+            setNumericValue('property-stamp-value', i.propertyValue);
+            
+            if(document.getElementById('loan-sanction-date')) {
+                document.getElementById('loan-sanction-date').value = i.sanctionDate || "";
+            }
+            
+            if (i.isUnderConstruction !== undefined) {
+                const radio = document.querySelector(`input[name="possession"][value="${i.isUnderConstruction ? 'under-construction' : 'completed'}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    TaxController.handleLoanStatusChange();
+                }
+            }
+            if (i.occupancy) {
+                const occRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancy}"]`);
+                if (occRadio) occRadio.checked = true;
+            }
+            
             setNumericValue('80d-self', i.healthSelf);
             setNumericValue('80d-parents', i.healthParents);
             setNumericValue('nps-80ccd-1b', i.npsExtra);
-
-            // Select Dropdown elements
-            const metroSelect = document.getElementById('is-metro');
-            if (metroSelect) metroSelect.value = i.isMetro ? 'true' : 'false';
-
-            // Checkboxes
-            const seniorCheck = document.getElementById('parents-senior');
-            if (seniorCheck) seniorCheck.checked = !!i.parentsSenior;
-
-            const loanCheck = document.getElementById('has-home-loan');
-            if (loanCheck) {
-                loanCheck.checked = !!i.hasHomeLoan;
-                TaxController.toggleLoanWizard();
+            
+            if(document.getElementById('parents-senior')) {
+                document.getElementById('parents-senior').checked = !!i.parentsSenior;
             }
 
-            // Home Loan Wizard Branch Processing
-            if (i.hasHomeLoan) {
-                setNumericValue('loan-interest', i.homeLoanInterest);
-                setNumericValue('loan-principal', i.homeLoanPrincipal);
-
-                const possessionRadio = document.querySelector(`input[name="possession"][value="${i.possessionStatus || 'completed'}"]`);
-                if (possessionRadio) {
-                    possessionRadio.checked = true;
-                    TaxController.handleLoanStatusChange();
-                }
-
-                const occupancyRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancyType || 'self'}"]`);
-                if (occupancyRadio) occupancyRadio.checked = true;
-
-                const dateInput = document.getElementById('loan-sanction-date');
-                if (dateInput) dateInput.value = i.loanSanctionDate || "";
-
-                const buyerCheck = document.getElementById('is-first-buyer');
-                if (buyerCheck) buyerCheck.checked = !!i.isFirstTimeBuyer;
-
-                setNumericValue('original-loan-amt', i.originalLoanAmt);
-                setNumericValue('property-stamp-value', i.propertyStampValue);
-            }
-
-            // Rebuild Manual Dynamic 80C Rows
-            const cContainer = document.getElementById('80c-rows-container');
-            if (cContainer && Array.isArray(i.manual80C)) {
-                cContainer.innerHTML = ""; // Empty fallback rows to avoid duplication
-                i.manual80C.forEach(item => {
-                    TaxController.add80CRow(item.type, item.amount, false);
-                });
-            }
-
-            // Rebuild Dynamic Corporate Perk Rows
             const pContainer = document.getElementById('perks-rows-container');
-            if (pContainer && Array.isArray(i.perksArray)) {
+            if (pContainer) {
                 pContainer.innerHTML = "";
-                i.perksArray.forEach(perk => {
-                    if (perk.type) TaxController.addPerkRow(perk.type, perk.amount);
-                });
+                if (i.perks && i.perks.length > 0) {
+                    i.perks.forEach(p => TaxController.addPerkRow(p.type, parseFloat(p.value || p.amount) || 0));
+                }
             }
-
-        } catch (innerError) {
-            console.error("DEBUG: UI State Restoration Exception Encountered:", innerError);
-        }
-    }
 
             const cContainer = document.getElementById('80c-rows-container');
             if (cContainer) {
