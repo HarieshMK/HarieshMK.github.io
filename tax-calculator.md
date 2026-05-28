@@ -227,7 +227,7 @@ permalink: /tax-calculator/
                         <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 80EEA</h4>
                         <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(16, 185, 129, 0.15); color: var(--color-success); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">Affordable Housing</span>
                     </div>
-                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Additional Interest Deduction for First-Time Home Buyers</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Additional Interest Deduction </p>
                 </div>
                 <div id="display-80eea-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--color-success); text-align: right; margin-left: auto; white-space: normal; max-width: 50%; word-break: break-word; line-height: 1.3;">₹ 0</div>
             </div>
