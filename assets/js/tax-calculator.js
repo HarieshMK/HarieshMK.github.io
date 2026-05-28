@@ -482,26 +482,28 @@ const TaxController = {
         if(cardEE) cardEE.style.display = (extraSection === 'card-80ee') ? 'block' : 'none';
 
        if (extraSection) {
-    const displayId = extraSection === 'card-80eea' ? 'display-80eea-value' : 'display-80ee-value';
-    const displayEl = document.getElementById(displayId);
-    if(displayEl) {
-        // Match the exact wrapper structure used by Section 24(b)
-        displayEl.innerHTML = `
-            <div class="section-24b-result-container">
-                <span class="section-24b-amount-display">₹ ${Math.round(dExtra).toLocaleString('en-IN')}</span>
-            </div>
-        `;
-    }
-}
-
-const display24b = document.getElementById('display-24b-value');
-if(display24b) {
-    display24b.innerHTML = `
-        <div class="section-24b-result-container">
-            <span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span>
-        </div>
-    `;
-}
+            // Convert to lowercase and check if it contains '80eea'
+            const is80eea = extraSection.toLowerCase().includes('80eea');
+            const displayId = is80eea ? 'display-80eea-value' : 'display-80ee-value';
+            
+            const displayEl = document.getElementById(displayId);
+            if (displayEl) {
+                displayEl.innerHTML = `
+                    <div class="section-24b-result-container">
+                        <span class="section-24b-amount-display">₹ ${Math.round(dExtra).toLocaleString('en-IN')}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        const display24b = document.getElementById('display-24b-value');
+        if (display24b) {
+            display24b.innerHTML = `
+                <div class="section-24b-result-container">
+                    <span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span>
+                </div>
+            `;
+        }
 
         const warningBox = document.getElementById('hra-homeloan-warning');
         if (warningBox) {
