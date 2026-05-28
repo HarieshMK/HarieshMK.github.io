@@ -1,7 +1,13 @@
 /**
  * Controller for the Tax Calculator UI
- * VERSION: 3.22 - Optimized for Indian Currency Parsing, Rightaligned Layouts, and Checked HRA Validation
+ * VERSION: 3.23 - Fixed Numeric ID Query Selectors, Global Configuration References, and Layout Adjustments
  */
+
+// Global Eligibility Check Fallbacks to protect date execution paths
+const ELIGIBILITY_RULES = window.ELIGIBILITY_RULES || {
+    sec80EE: { start: new Date('2016-04-01'), end: new Date('2017-03-31'), propertyLimit: 5000000, loanLimit: 3500000, deductionLimit: 50000 },
+    sec80EEA: { start: new Date('2019-04-01'), end: new Date('2022-03-31'), propertyLimit: 4500000, deductionLimit: 150000 }
+};
 
 const TaxController = {
     isDirty: false,
@@ -102,7 +108,6 @@ const TaxController = {
 
     cleanNum: (val) => {
         if (val === undefined || val === null || val === '') return 0;
-        // Strip out commas completely before running evaluation loops to protect calculations
         const cleanValue = val.toString().replace(/,/g, "").replace(/[^0-9.-]+/g, "");
         return parseFloat(cleanValue) || 0;
     },
@@ -119,8 +124,7 @@ const TaxController = {
         return formatted;
     },
 
-   applyCurrencyFormattingListeners: () => {
-        // Defined as strictly isolated string items to completely bypass comma string parsing
+    applyCurrencyFormattingListeners: () => {
         const selectors = [
             '#basic-salary', 
             '#hra-received', 
@@ -128,8 +132,8 @@ const TaxController = {
             '#other-income', 
             '#loan-interest', 
             '#loan-principal', 
-            '#80d-self', 
-            '#80d-parents', 
+            '[id="80d-self"]',      // Fixed syntax error using safe attribute matches
+            '[id="80d-parents"]',   // Fixed syntax error using safe attribute matches
             '#nps-80ccd-1b', 
             '#original-loan-amt', 
             '#property-stamp-value', 
@@ -137,9 +141,7 @@ const TaxController = {
             '.row-amount-80c'
         ];
         
-        // Loop over each individual selector safely to find elements independently
         selectors.forEach(selector => {
-            // Strip out non-ASCII hidden control/zero-width characters and trim standard whitespace
             const cleanSelector = selector.replace(/[^\x20-\x7E]/g, '').trim();
             
             try {
@@ -189,9 +191,9 @@ const TaxController = {
     handlePerkUIFeedback: (inputElement, perkName) => {
         const value = TaxController.cleanNum(inputElement.value);
         const fy = document.getElementById('fy-selector')?.value || "2026-27";
-        const config = TAX_CONFIG[fy] || TAX_CONFIG["2026-27"];
+        const config = window.TAX_CONFIG[fy] || window.TAX_CONFIG["2026-27"];
         
-        if (perkName === "Meal Coupons") {
+        if (perkName === "Meal Coupons" && config?.perkRules?.["Meal Coupons"]) {
             let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
             if (!warningDiv) {
                 warningDiv = document.createElement('div');
@@ -213,7 +215,7 @@ const TaxController = {
     },
 
     toggleLoanWizard() {
-        const hasLoan = document.getElementById('has-home-loan').checked;
+        const hasLoan = document.getElementById('has-home-loan')?.checked;
         const wizard = document.getElementById('home-loan-wizard');
         const deductions = document.getElementById('conditional-deductions');
         
@@ -268,7 +270,7 @@ const TaxController = {
                 TaxController.add80CRow("Home Loan Principal", amount, true, "row-80c-statutory-hl-principal");
             } else {
                 const targetInput = principalRow.querySelector('.row-amount-80c');
-                targetInput.value = TaxController.formatIndianCurrency(amount.toString());
+                if (targetInput) targetInput.value = TaxController.formatIndianCurrency(amount.toString());
             }
         } else if (principalRow) {
             principalRow.remove();
@@ -288,7 +290,7 @@ const TaxController = {
     handleSave: async () => {
         const btn = document.getElementById('save-btn');
         const status = document.getElementById('save-status');
-        const selectedYear = document.getElementById('fy-selector').value;
+        const selectedYear = document.getElementById('fy-selector')?.value || '2026-27';
 
         if (status) {
             status.style.color = "";
@@ -485,7 +487,6 @@ const TaxController = {
             if(displayEl) displayEl.innerText = `₹ ${Math.round(dExtra).toLocaleString('en-IN')}`;
         }
 
-        // ISSUE 4 FIX: Outputs clean structural layout wrapper matching right-aligned column styles
         const display24b = document.getElementById('display-24b-value');
         if(display24b) {
             display24b.innerHTML = `
@@ -495,7 +496,6 @@ const TaxController = {
             `;
         }
 
-        // ISSUE 5 FIX: Notice checks if user has explicitly turned on home loan wrapper AND checked self-occupied status
         const warningBox = document.getElementById('hra-homeloan-warning');
         if (warningBox) {
             const hasHraInputs = (basic > 0 && hraRec > 0);
@@ -506,12 +506,12 @@ const TaxController = {
             }
         }
     
-        const hraResult = FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro);
+        const hraResult = window.FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro) || { actualExemption: 0 };
         const hraDisplay = document.getElementById('display-hra-value');
         if (hraDisplay) {
             hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
         }
-    
+
         const perkRows = document.querySelectorAll('.perk-row');
         const perksArr = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
@@ -542,14 +542,16 @@ const TaxController = {
         }
     
         try {
-            const oldReg = FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
-            const newReg = FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
+            const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
+            const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
             
-            newReg.perkBreakdown.forEach((item, index) => {
-                if (perksArr[index] && perksArr[index].element) {
-                    perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
-                }
-            });
+            if (newReg?.perkBreakdown) {
+                newReg.perkBreakdown.forEach((item, index) => {
+                    if (perksArr[index] && perksArr[index].element) {
+                        perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
+                    }
+                });
+            }
     
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
             
@@ -566,13 +568,14 @@ const TaxController = {
         if (basic > 0 && !epfRow) {
             TaxController.add80CRow("Employee PF", epfAmt, true, "row-80c-statutory-epf");
         } else if (epfRow) {
-            epfRow.querySelector('.row-amount-80c').value = TaxController.formatIndianCurrency(epfAmt.toString());
+            const targetInput = epfRow.querySelector('.row-amount-80c');
+            if (targetInput) targetInput.value = TaxController.formatIndianCurrency(epfAmt.toString());
         }
     },
 
     updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails, grossSalary) => {
         let finalOldTax = oldTax;
-        if (oldTax === 0 && oldRegDetails.netTaxable > 500000) {
+        if (oldTax === 0 && oldRegDetails?.netTaxable > 500000) {
             const taxable = oldRegDetails.netTaxable;
             let baseTax = 0;
             if (taxable > 250000) baseTax += (Math.min(taxable, 500000) - 250000) * 0.05;
@@ -582,9 +585,9 @@ const TaxController = {
         }
 
         const fy = document.getElementById('fy-selector')?.value || '2026-27';
-        const config = TAX_CONFIG[fy] || TAX_CONFIG["2026-27"];
+        const config = window.TAX_CONFIG[fy] || window.TAX_CONFIG["2026-27"];
         const oldStdDeduction = 50000;
-        const newStdDeduction = config.stdDeduction !== undefined ? config.stdDeduction : 75000;
+        const newStdDeduction = config?.stdDeduction !== undefined ? config.stdDeduction : 75000;
 
         const nEl = document.getElementById('new-regime-tax');
         const oEl = document.getElementById('old-regime-tax');
@@ -773,6 +776,5 @@ window.handleSave = () => TaxController.handleSave();
 window.toggleLoanWizard = TaxController.toggleLoanWizard;
 window.scrollToResults = () => TaxController.scrollToResults();
 window.validateInputs = validateInputs;
-
 
 document.addEventListener('DOMContentLoaded', TaxController.init);
