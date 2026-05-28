@@ -209,38 +209,38 @@ permalink: /tax-calculator/
 
         <div id="benefits-summary-content" class="collapsible-content-wrapper" style="display: flex; flex-direction: column; gap: 14px; padding: 25px; border-top: 1px solid var(--border-base);">
             
-            <div id="card-24b" class="benefit-flex-row" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--brand-primary); box-sizing: border-box; width: 100%; min-height: 80px; gap: 20px;">
-    <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1;">
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 24(b)</h4>
-            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">Home Loan Interest</span>
-        </div>
-        <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Deduction for Interest on Home Loan </p>
-    </div>
-    <div id="display-24b-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #38bdf8; text-align: right; margin-left: auto; white-space: nowrap; max-width: 50%; line-height: 1.3;">₹ 0</div>
-</div>
+            <div id="card-24b" class="benefit-flex-row" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--brand-primary); box-sizing: border-box; width: 100%; min-height: 80px; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 24(b)</h4>
+                        <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">Home Loan Interest</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">Deduction for Interest on Home Loan </p>
+                </div>
+                <div id="display-24b-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #38bdf8; text-align: right; margin-left: auto; white-space: nowrap; flex-shrink: 0;">₹ 0</div>
+            </div>
 
-<div id="card-80eea" class="benefit-flex-row" style="display: none; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--color-success); box-sizing: border-box; width: 100%; min-height: 80px; gap: 20px;">
-    <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1;">
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 80EEA</h4>
-            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(16, 185, 129, 0.15); color: var(--color-success); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">Affordable Housing</span>
-        </div>
-        <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Additional Interest Deduction </p>
-    </div>
-    <div id="display-80eea-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--color-success); text-align: right; margin-left: auto; white-space: nowrap; max-width: 50%; line-height: 1.3;">₹ 0</div>
-</div>
+            <div id="card-80eea" class="benefit-flex-row" style="display: none; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--color-success); box-sizing: border-box; width: 100%; min-height: 80px; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 80EEA</h4>
+                        <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(16, 185, 129, 0.15); color: var(--color-success); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">Affordable Housing</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">Additional Interest Deduction </p>
+                </div>
+                <div id="display-80eea-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--color-success); text-align: right; margin-left: auto; white-space: nowrap; flex-shrink: 0;">₹ 0</div>
+            </div>
 
-<div id="card-80ee" class="benefit-flex-row" style="display: none; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--color-danger); box-sizing: border-box; width: 100%; min-height: 80px; gap: 20px;">
-    <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1;">
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 80EE</h4>
-            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(239, 68, 68, 0.15); color: var(--color-danger); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">First Time Buyer</span>
-        </div>
-        <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Early Scheme Interest Benefit for Legacy Loans</p>
-    </div>
-    <div id="display-80ee-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--color-danger); text-align: right; margin-left: auto; white-space: nowrap; max-width: 50%; line-height: 1.3;">₹ 0</div>
-</div>
+            <div id="card-80ee" class="benefit-flex-row" style="display: none; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--color-danger); box-sizing: border-box; width: 100%; min-height: 80px; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 80EE</h4>
+                        <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(239, 68, 68, 0.15); color: var(--color-danger); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">First Time Buyer</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">Early Scheme Interest Benefit for Legacy Loans</p>
+                </div>
+                <div id="display-80ee-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--color-danger); text-align: right; margin-left: auto; white-space: nowrap; flex-shrink: 0;">₹ 0</div>
+            </div>
 
         </div>
     </div>
