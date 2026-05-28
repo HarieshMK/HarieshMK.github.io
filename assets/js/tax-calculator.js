@@ -139,32 +139,37 @@ const TaxController = {
         
         // Loop over each individual selector safely to find elements independently
         selectors.forEach(selector => {
-            // Trim whitespace cleanly just in case a hidden character is sitting in the editor text
-            const cleanSelector = selector.trim();
-            const elements = document.querySelectorAll(cleanSelector);
+            // Strip out non-ASCII hidden control/zero-width characters and trim standard whitespace
+            const cleanSelector = selector.replace(/[^\x20-\x7E]/g, '').trim();
             
-            elements.forEach(input => {
-                if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
-                    input.classList.add('currency-mapped');
-                    input.setAttribute('type', 'text');
-                    input.setAttribute('inputmode', 'decimal');
+            try {
+                const elements = document.querySelectorAll(cleanSelector);
+                
+                elements.forEach(input => {
+                    if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
+                        input.classList.add('currency-mapped');
+                        input.setAttribute('type', 'text');
+                        input.setAttribute('inputmode', 'decimal');
 
-                    if (input.value) {
-                        input.value = TaxController.formatIndianCurrency(input.value);
+                        if (input.value) {
+                            input.value = TaxController.formatIndianCurrency(input.value);
+                        }
+
+                        input.addEventListener('input', function() {
+                            let selectionStart = this.selectionStart;
+                            let oldLength = this.value.length;
+                            
+                            let formatted = TaxController.formatIndianCurrency(this.value);
+                            this.value = formatted;
+                            
+                            let newLength = this.value.length;
+                            this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
+                        });
                     }
-
-                    input.addEventListener('input', function() {
-                        let selectionStart = this.selectionStart;
-                        let oldLength = this.value.length;
-                        
-                        let formatted = TaxController.formatIndianCurrency(this.value);
-                        this.value = formatted;
-                        
-                        let newLength = this.value.length;
-                        this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
-                    });
-                }
-            });
+                });
+            } catch (selectorError) {
+                console.warn(`Bypassed structural query selector processing issue on: ${cleanSelector}`, selectorError);
+            }
         });
     },
 
