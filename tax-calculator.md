@@ -213,6 +213,7 @@ permalink: /tax-calculator/
                 <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1;">
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap;">Section 24(b)</h4>
+                        <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">Home Loan Interest</span>
                         
                     </div>
                     <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Deduction for Interest on Home Loan </p>
