@@ -119,40 +119,52 @@ const TaxController = {
         return formatted;
     },
 
-    applyCurrencyFormattingListeners: () => {
-        // Break selectors into a clean array to prevent hidden character encoding bugs
-        const selectorList = [
-            '#basic-salary', '#hra-received', '#rent-paid', '#other-income', 
-            '#loan-interest', '#loan-principal', '#80d-self', '#80d-parents', 
-            '#nps-80ccd-1b', '#original-loan-amt', '#property-stamp-value', 
-            '.perk-amount', '.row-amount-80c'
+   applyCurrencyFormattingListeners: () => {
+        // Defined as strictly isolated string items to completely bypass comma string parsing
+        const selectors = [
+            '#basic-salary', 
+            '#hra-received', 
+            '#rent-paid', 
+            '#other-income', 
+            '#loan-interest', 
+            '#loan-principal', 
+            '#80d-self', 
+            '#80d-parents', 
+            '#nps-80ccd-1b', 
+            '#original-loan-amt', 
+            '#property-stamp-value', 
+            '.perk-amount', 
+            '.row-amount-80c'
         ];
         
-        // Safely query all present elements by joining with normal commas
-        const targets = document.querySelectorAll(selectorList.join(', '));
-        
-        targets.forEach(input => {
-            if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
-                input.classList.add('currency-mapped');
-                input.setAttribute('type', 'text');
-                input.setAttribute('inputmode', 'decimal');
+        // Loop over each individual selector safely to find elements independently
+        selectors.forEach(selector => {
+            // Trim whitespace cleanly just in case a hidden character is sitting in the editor text
+            const cleanSelector = selector.trim();
+            const elements = document.querySelectorAll(cleanSelector);
+            
+            elements.forEach(input => {
+                if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
+                    input.classList.add('currency-mapped');
+                    input.setAttribute('type', 'text');
+                    input.setAttribute('inputmode', 'decimal');
 
-                // If loaded data already populated a raw digit value, format it right away
-                if (input.value) {
-                    input.value = TaxController.formatIndianCurrency(input.value);
+                    if (input.value) {
+                        input.value = TaxController.formatIndianCurrency(input.value);
+                    }
+
+                    input.addEventListener('input', function() {
+                        let selectionStart = this.selectionStart;
+                        let oldLength = this.value.length;
+                        
+                        let formatted = TaxController.formatIndianCurrency(this.value);
+                        this.value = formatted;
+                        
+                        let newLength = this.value.length;
+                        this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
+                    });
                 }
-
-                input.addEventListener('input', function() {
-                    let selectionStart = this.selectionStart;
-                    let oldLength = this.value.length;
-                    
-                    let formatted = TaxController.formatIndianCurrency(this.value);
-                    this.value = formatted;
-                    
-                    let newLength = this.value.length;
-                    this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
-                });
-            }
+            });
         });
     },
 
