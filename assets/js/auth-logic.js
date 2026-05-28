@@ -232,6 +232,7 @@ async function saveTaxData(taxPayload) {
             user_id: user.id,
             financial_year: taxPayload.financial_year || "2026-27",
             tax_data: taxPayload,
+            calculator_inputs: taxPayload.calculator_inputs, // STITCH FIX: Maps perfectly to loadUserData target query parameter
             updated_at: new Date().toISOString()
         }, { on_conflict: 'user_id, financial_year' });
 
