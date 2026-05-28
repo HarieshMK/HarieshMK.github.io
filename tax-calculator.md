@@ -196,40 +196,55 @@ permalink: /tax-calculator/
             </div>
         </div>
 
-        <div id="conditional-deductions" style="display: none; margin-top: 20px;">
-            <div class="post-card collapsible-section-box" style="border: 2px solid var(--brand-primary);">
-                <div id="benefits-summary-header" class="calc-collapse-trigger">
-                    <span class="heading-title-text"><i class="fas fa-chart-line" style="margin-right: 10px; color: var(--color-success);"></i>Home Loan Tax Benefits</span>
+        <div id="conditional-deductions" style="display: none; margin-top: 25px;">
+            <div class="post-card collapsible-section-box" style="border: 1px solid var(--border-base); border-radius: 12px; background: var(--bg-container); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                
+                <div id="benefits-summary-header" class="calc-collapse-trigger" style="padding: 18px 25px; background: rgba(14, 165, 233, 0.03); border-bottom: 1px solid var(--border-base);">
+                    <span class="heading-title-text" style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                        <i class="fas fa-chart-line" style="color: var(--color-success); font-size: 1.1rem;"></i>
+                        Home Loan Tax Benefits Summary
+                    </span>
                     <i id="benefits-summary-icon" class="fas fa-chevron-up toggle-chevron-arrow"></i>
                 </div>
 
-                <div id="benefits-summary-content" class="collapsible-content-wrapper" style="display: block;">
-                    <div id="card-24b" class="benefit-flex-row" style="border-left: 4px solid var(--brand-primary);">
-                        <div>
-                            <h4 style="margin: 0; font-size: 0.95rem;">Section 24(b)</h4>
-                            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">Interest on Home Loan</p>
+                <div id="benefits-summary-content" class="collapsible-content-wrapper" style="display: flex; flex-direction: column; gap: 14px; padding: 25px;">
+                    
+                    <div id="card-24b" class="benefit-flex-row" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--brand-primary); transition: all 0.2s ease;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary);">Section 24(b)</h4>
+                                <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px;">Interest</span>
+                            </div>
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Deduction for Interest on Home Loan (Self-Occupied)</p>
                         </div>
-                        <span id="display-24b-value" class="benefit-value-text">₹ 0</span>
+                        <span id="display-24b-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; color: #38bdf8;">₹ 0</span>
                     </div>
 
-                    <div id="card-80eea" class="benefit-flex-row" style="display: none; border-left: 4px solid var(--color-success);">
-                        <div>
-                            <h4 style="margin: 0; font-size: 0.95rem;">Section 80EEA</h4>
-                            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">Affordable Housing Interest</p>
+                    <div id="card-80eea" class="benefit-flex-row" style="display: none; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--color-success); transition: all 0.2s ease;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary);">Section 80EEA</h4>
+                                <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(16, 185, 129, 0.15); color: var(--color-success); padding: 2px 6px; border-radius: 4px;">Affordable Housing</span>
+                            </div>
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Additional Interest Deduction for First-Time Home Buyers</p>
                         </div>
-                        <span id="display-80eea-value" class="benefit-value-text">₹ 0</span>
+                        <span id="display-80eea-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; color: var(--color-success);">₹ 0</span>
                     </div>
 
-                    <div id="card-80ee" class="benefit-flex-row" style="display: none; border-left: 4px solid var(--color-danger);">
-                        <div>
-                            <h4 style="margin: 0; font-size: 0.95rem;">Section 80EE</h4>
-                            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">First Time Home Buyer</p>
+                    <div id="card-80ee" class="benefit-flex-row" style="display: none; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; border-left: 4px solid var(--color-danger); transition: all 0.2s ease;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary);">Section 80EE</h4>
+                                <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(239, 68, 68, 0.15); color: var(--color-danger); padding: 2px 6px; border-radius: 4px;">First Time Buyer</span>
+                            </div>
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Early Scheme Interest Benefit for Legacy Loans</p>
                         </div>
-                        <span id="display-80ee-value" class="benefit-value-text">₹ 0</span>
+                        <span id="display-80ee-value" class="benefit-value-text" style="font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; color: var(--color-danger);">₹ 0</span>
                     </div>
+
                 </div>
             </div>
-        </div> 
+        </div>
     </div>
         
     <div class="calc-results sticky-score-panel">
