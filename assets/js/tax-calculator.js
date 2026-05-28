@@ -345,7 +345,23 @@ const TaxController = {
                 throw new Error("The backend logic coordinator 'window.saveTaxData' is missing or failed to initialize.");
             }
 
-            await window.saveTaxData(selectedYear);
+            // 🌟 FIX: Build the structured data object matching your database schema expectations
+            const structuredPayload = {
+                financial_year: selectedYear,
+                basic_salary: TaxController.cleanNum(document.getElementById('basic-salary')?.value),
+                hra_received: TaxController.cleanNum(document.getElementById('hra-received')?.value),
+                rent_paid: TaxController.cleanNum(document.getElementById('rent-paid')?.value),
+                other_income: TaxController.cleanNum(document.getElementById('other-income')?.value),
+                loan_interest: TaxController.cleanNum(document.getElementById('loan-interest')?.value),
+                loan_principal: TaxController.cleanNum(document.getElementById('loan-principal')?.value)
+            };
+
+            // Pass the object payload instead of the plain year string
+            const response = await window.saveTaxData(structuredPayload);
+            
+            if (response && response.error) {
+                throw new Error(response.error);
+            }
             
             TaxController.isDirty = false;
             btn.innerHTML = `<i class="fas fa-check-circle"></i> Profile Synced!`;
