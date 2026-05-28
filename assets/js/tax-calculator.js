@@ -120,8 +120,16 @@ const TaxController = {
     },
 
     applyCurrencyFormattingListeners: () => {
-        // Targets all standard input elements and sets input type to text safely to support commas
-        const targets = document.querySelectorAll('#basic-salary, #hra-received, #rent-paid, #other-income, #loan-interest, #loan-principal, #80d-self, #80d-parents, #nps-80ccd-1b, #original-loan-amt, #property-stamp-value, .perk-amount, .row-amount-80c');
+        // Break selectors into a clean array to prevent hidden character encoding bugs
+        const selectorList = [
+            '#basic-salary', '#hra-received', '#rent-paid', '#other-income', 
+            '#loan-interest', '#loan-principal', '#80d-self', '#80d-parents', 
+            '#nps-80ccd-1b', '#original-loan-amt', '#property-stamp-value', 
+            '.perk-amount', '.row-amount-80c'
+        ];
+        
+        // Safely query all present elements by joining with normal commas
+        const targets = document.querySelectorAll(selectorList.join(', '));
         
         targets.forEach(input => {
             if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
