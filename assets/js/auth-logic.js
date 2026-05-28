@@ -227,7 +227,7 @@ async function saveTaxData(taxPayload) {
     const user = session.user;
 
     const { data, error } = await window.supabase
-        .from('user_tax_records')
+        .from('tax_user_data')
         .upsert({
             user_id: user.id,
             financial_year: taxPayload.financial_year || "2026-27",
