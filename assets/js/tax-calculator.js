@@ -490,7 +490,6 @@ const TaxController = {
         if(display24b) {
             display24b.innerHTML = `
                 <div class="section-24b-result-container">
-                    <span class="section-24b-label">Section 24(b) - Interest on Home Loan</span>
                     <span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span>
                 </div>
             `;
