@@ -482,20 +482,28 @@ const TaxController = {
         if(cardEE) cardEE.style.display = (extraSection === 'card-80ee') ? 'block' : 'none';
 
        if (extraSection) {
-            // Convert to lowercase and check if it contains '80eea'
-            const is80eea = extraSection.toLowerCase().includes('80eea');
-            const displayId = is80eea ? 'display-80eea-value' : 'display-80ee-value';
-            
-            const displayEl = document.getElementById(displayId);
-            if (displayEl) {
-                displayEl.innerHTML = `
-                    <div class="section-24b-result-container">
-                        <span class="section-24b-amount-display">₹ ${Math.round(dExtra).toLocaleString('en-IN')}</span>
-                    </div>
-                `;
+            // 1. Correctly map the incoming string to the exact DOM ID
+            let displayId = '';
+            if (extraSection === 'card-80eea' || extraSection === '80eea') {
+                displayId = 'display-80eea-value';
+            } else if (extraSection === 'card-80ee' || extraSection === '80ee') {
+                displayId = 'display-80ee-value';
+            }
+        
+            // 2. Inject the styled HTML block into the resolved element
+            if (displayId) {
+                const displayEl = document.getElementById(displayId);
+                if (displayEl) {
+                    displayEl.innerHTML = `
+                        <div class="section-24b-result-container">
+                            <span class="section-24b-amount-display">₹ ${Math.round(dExtra).toLocaleString('en-IN')}</span>
+                        </div>
+                    `;
+                }
             }
         }
         
+        // 3. Keep Section 24b working perfectly alongside them
         const display24b = document.getElementById('display-24b-value');
         if (display24b) {
             display24b.innerHTML = `
