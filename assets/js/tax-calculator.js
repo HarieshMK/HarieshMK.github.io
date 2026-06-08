@@ -538,8 +538,16 @@ const TaxController = {
 
             if (newReg?.perkBreakdown) {
                 newReg.perkBreakdown.forEach((item, index) => {
+                    // --- TARGETED DEBUGGING SPY ---
+                    console.log(`🕵️‍♂️ Perk Breakdown Index [${index}]:`, item);
+                    
                     if (perksArr[index]?.element) {
-                        perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
+                        if (isNaN(item.eligible) || item.eligible === undefined) {
+                            console.error(`🚨 CRITICAL: item.eligible is NaN for perk type: ${perksArr[index].type}. Raw breakdown item:`, item);
+                            perksArr[index].element.innerText = "₹ 0"; // Fallback safety catch
+                        } else {
+                            perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
+                        }
                     }
                 });
             }
