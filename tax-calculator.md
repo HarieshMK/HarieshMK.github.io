@@ -363,7 +363,9 @@ permalink: /tax-calculator/
     }
 
     function formatIndianNumber(num) {
-        let x = Math.round(num).toString();
+        let parsedNum = parseFloat(num);
+        if (isNaN(parsedNum)) return '₹ 0';
+        let x = Math.round(parsedNum).toString();
         let lastThree = x.substring(x.length - 3);
         let otherBits = x.substring(0, x.length - 3);
         if(otherBits != '') lastThree = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + ',' + lastThree;
@@ -410,10 +412,22 @@ permalink: /tax-calculator/
         bindToggle('benefits-summary-header', 'benefits-summary-content', 'benefits-summary-icon');
 
         const addPerkBtn = document.getElementById('add-perk-btn');
-        if(addPerkBtn) addPerkBtn.addEventListener('click', function() { if(typeof addPerkRow === 'function') addPerkRow(); });
-
-        const add80cBtn = document.getElementById('add-80c-btn');
-        if(add80cBtn) add80cBtn.addEventListener('click', function() { if(typeof add80CRow === 'function') add80CRow(); });
+            if(addPerkBtn) {
+                addPerkBtn.addEventListener('click', function() { 
+                    if(window.TaxController && typeof window.TaxController.addPerkRow === 'function') {
+                        window.TaxController.addPerkRow(); 
+                    }
+                });
+            }
+            
+            const add80cBtn = document.getElementById('add-80c-btn');
+            if(add80cBtn) {
+                add80cBtn.addEventListener('click', function() { 
+                    if(window.TaxController && typeof window.TaxController.add80CRow === 'function') {
+                        window.TaxController.add80CRow(); 
+                    }
+                });
+            }
 
         const homeLoanCheck = document.getElementById('has-home-loan');
         if(homeLoanCheck) {
