@@ -732,7 +732,10 @@ const TaxController = {
 
             if (pContainer) {
                 if (i.perks && i.perks.length > 0) {
-                    i.perks.forEach(p => TaxController.addPerkRow(p.type, parseFloat(p.value || p.amount) || 0));
+                    i.perks.forEach(p => {
+                        const cleanVal = Math.round(parseFloat(p.value || p.amount)) || 0;
+                        TaxController.addPerkRow(p.type, cleanVal);
+                    });
                 } else {
                     TaxController.addPerkRow("Professional Tax", 2500);
                 }
@@ -740,7 +743,10 @@ const TaxController = {
 
             if (cContainer) {
                 if (i.deductions80C && i.deductions80C.length > 0) {
-                    i.deductions80C.forEach(inv => TaxController.add80CRow(inv.type, parseFloat(inv.amount) || 0));
+                    i.deductions80C.forEach(inv => {
+                        const cleanInv = Math.round(parseFloat(inv.amount)) || 0;
+                        TaxController.add80CRow(inv.type, cleanInv);
+                    });
                 } else {
                     TaxController.add80CRow();
                 }
