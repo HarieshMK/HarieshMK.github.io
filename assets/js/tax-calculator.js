@@ -732,8 +732,14 @@ const TaxController = {
 
             if (pContainer) {
                 if (i.perks && i.perks.length > 0) {
-                    i.perks.forEach(p => {
+                    i.perks.forEach((p, index) => {
+                        // SPY LOGS
+                        console.log(`🕵️‍♂️ Perk Row [${index}] Raw Object:`, p);
+                        console.log(`🕵️‍♂️ Perk Row [${index}] Extracted Value:`, p.value || p.amount);
+            
                         const cleanVal = Math.round(parseFloat(p.value || p.amount)) || 0;
+                        console.log(`🕵️‍♂️ Perk Row [${index}] After Math.round:`, cleanVal);
+            
                         TaxController.addPerkRow(p.type, cleanVal);
                     });
                 } else {
