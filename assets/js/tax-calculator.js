@@ -404,7 +404,7 @@ const TaxController = {
         row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
 
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
-        let displayVal = value !== "" ? TaxController.formatIndianCurrency(value.toString()) : "";
+        let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString().replace(/[^0-9.]/g, '')) : "";
 
         row.innerHTML = `
             <select class="perk-type dynamic-input">
@@ -732,14 +732,8 @@ const TaxController = {
 
             if (pContainer) {
                 if (i.perks && i.perks.length > 0) {
-                    i.perks.forEach((p, index) => {
-                        // SPY LOGS
-                        console.log(`🕵️‍♂️ Perk Row [${index}] Raw Object:`, p);
-                        console.log(`🕵️‍♂️ Perk Row [${index}] Extracted Value:`, p.value || p.amount);
-            
+                    i.perks.forEach(p => {
                         const cleanVal = Math.round(parseFloat(p.value || p.amount)) || 0;
-                        console.log(`🕵️‍♂️ Perk Row [${index}] After Math.round:`, cleanVal);
-            
                         TaxController.addPerkRow(p.type, cleanVal);
                     });
                 } else {
