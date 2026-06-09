@@ -335,8 +335,9 @@ const TaxController = {
                         amount: TaxController.cleanNum(row.querySelector('.perk-amount').value)
                     })),
                     // FIXED: Dynamic structural row mapping protection hook
+                    // FIX: Changed selector from .row-type-80c to .row-select-80c
                     deductions80C: Array.from(document.querySelectorAll('[id="80c-rows-container"] > div')).map(row => {
-                        const typeEl = row.querySelector('.row-type-80c');
+                        const typeEl = row.querySelector('.row-select-80c'); 
                         const amtEl = row.querySelector('.row-amount-80c');
                         return {
                             type: typeEl ? typeEl.value : "Investment",
