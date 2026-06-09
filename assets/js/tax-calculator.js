@@ -806,6 +806,21 @@ const TaxController = {
                     TaxController.add80CRow();
                 }
             }
+            // --- FIX: Force UI Sync after data load ---
+            // 1. Re-calculate everything with the fresh data
+            setTimeout(() => {
+                TaxController.calculateAll();
+
+                const hasLoan = document.getElementById('has-home-loan')?.checked;
+                const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
+                const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
+                const isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
+                
+                const warningBox = document.getElementById('hra-homeloan-warning');
+                if (warningBox) {
+                    warningBox.style.display = (basic > 0 && hraRec > 0 && hasLoan && isSelfOccupied) ? 'block' : 'none';
+                }
+            }, 50); // 50ms is usually enough to clear the paint queue
         } catch (parseError) {
             console.error("CRITICAL ERROR: Failed parsing user data safely:", parseError);
         }
