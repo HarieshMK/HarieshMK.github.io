@@ -227,14 +227,13 @@ async function saveTaxData(taxPayload) {
     const user = session.user;
 
     const { data, error } = await window.supabase
-        .from('tax_user_data')
-        .upsert({
-            user_id: user.id,
-            financial_year: taxPayload.financial_year || "2026-27",
-            tax_data: taxPayload,
-            calculator_inputs: taxPayload.calculator_inputs, // STITCH FIX: Maps perfectly to loadUserData target query parameter
-            updated_at: new Date().toISOString()
-        }, { on_conflict: 'user_id, financial_year' });
+    .from('tax_user_data')
+    .upsert({
+        user_id: user.id,
+        financial_year: taxPayload.financial_year || "2026-27",
+        calculator_inputs: taxPayload.calculator_inputs, 
+        updated_at: new Date().toISOString()
+    }, { on_conflict: 'user_id, financial_year' });
 
     if (error) {
         console.error("🚨 CRITICAL SUPABASE SAVE ERROR OBJECT:", error); // <-- Add this
