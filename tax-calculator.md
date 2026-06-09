@@ -563,8 +563,8 @@ permalink: /tax-calculator/
     }
 
     .unique-tax-calc .dark-mode-notice-box {
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: var(--bg-offset); /* Adapts to light/dark */
+        border: 1px solid var(--border-base);
         border-left: 4px solid var(--brand-primary);
         padding: 15px 20px;
         border-radius: 8px;
@@ -574,7 +574,7 @@ permalink: /tax-calculator/
 
     .unique-tax-calc .dark-mode-notice-box p,
     .unique-tax-calc .dark-mode-notice-box strong {
-        color: #f8fafc;
+        color: var(--text-primary); /* Adapts to light/dark */
         font-size: 0.9rem;
         line-height: 1.5;
     }
