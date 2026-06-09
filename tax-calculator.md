@@ -642,9 +642,12 @@ permalink: /tax-calculator/
   /* ==========================================================================
    3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
    ========================================================================== */
+/* Apply this to the parent container of the cards */
 .unique-tax-calc .sidebar-stacked-layout {
-    display: flex;
-    flex-direction: column;
+    background-color: #0b1329 !important;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #1e293b;
 }
 
 .unique-tax-calc .sidebar-panel-header-accent {
@@ -685,6 +688,17 @@ permalink: /tax-calculator/
     /* 🟢 FORCED UNIFORM DEPTH BACKGROUND */
     background-color: var(--bg-container); 
     border: 1.5px solid var(--border-base);
+}
+    /* 1. More specific override to kill the grey */
+.unique-tax-calc .sidebar-stacked-rows-container .regime-row-card {
+    background-color: #0b1329 !important; /* Force this deep blue */
+    border: 1.5px solid #1e293b !important;
+}
+
+/* 2. Remove any legacy overrides */
+.unique-tax-calc .regime-row-card {
+    /* Ensure no residual 'background' properties exist elsewhere */
+    background: #0b1329 !important; 
 }
 
 /* Theme Variant Matching Left Controls */
