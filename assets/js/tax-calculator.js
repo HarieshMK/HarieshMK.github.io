@@ -332,7 +332,7 @@ const TaxController = {
                     parentsSenior: document.getElementById('parents-senior')?.checked || false,
                     perks: Array.from(document.querySelectorAll('.perk-row')).map(row => ({
                         type: row.querySelector('.perk-type').value,
-                        value: TaxController.cleanNum(row.querySelector('.perk-amount').value)
+                        amount: TaxController.cleanNum(row.querySelector('.perk-amount').value)
                     })),
                     deductions80C: Array.from(document.querySelectorAll('#80c-rows-container .row-80c-manual')).map(row => ({
                         type: row.querySelector('.row-select-80c').value,
@@ -507,7 +507,7 @@ const TaxController = {
         const perkRows = document.querySelectorAll('.perk-row');
         const perksArr = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
-            value: TaxController.cleanNum(row.querySelector('.perk-amount').value),
+            amount: TaxController.cleanNum(row.querySelector('.perk-amount').value), // <-- Changed 'value' to 'amount'
             element: row.querySelector('.perk-eligible')
         }));
 
