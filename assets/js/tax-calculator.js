@@ -741,7 +741,7 @@ const TaxController = {
             if (pContainer) {
                 if (i.perks && i.perks.length > 0) {
                     i.perks.forEach(p => {
-                        const cleanVal = Math.round(parseFloat(p.value || p.amount)) || 0;
+                        const cleanVal = parseFloat(p.amount || p.value) || 0;
                         TaxController.addPerkRow(p.type, cleanVal);
                     });
                 } else {
