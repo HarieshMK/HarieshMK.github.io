@@ -410,7 +410,6 @@ permalink: /tax-calculator/
     <div class="sidebar-stacked-rows-container">
         <div id="old-regime-card" class="regime-row-card">
             <div class="regime-meta-info">
-                <i class="fas fa-history regime-icon-dim"></i>
                 <span class="regime-row-title">Old Regime</span>
             </div>
             <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
@@ -418,7 +417,6 @@ permalink: /tax-calculator/
         
         <div id="new-regime-card" class="regime-row-card">
             <div class="regime-meta-info">
-                <i class="fas fa-sparkles regime-icon-dim"></i>
                 <span class="regime-row-title">New Regime</span>
             </div>
             <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
@@ -678,12 +676,15 @@ permalink: /tax-calculator/
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    padding: 16px 20px;
+    align-items: center; /* 🟢 CENTER ALIGNED */
+    padding: 20px;
     border-radius: 14px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s ease;
     box-sizing: border-box;
     width: 100%;
+    /* 🟢 FORCED UNIFORM DEPTH BACKGROUND */
+    background-color: var(--bg-container); 
+    border: 1.5px solid var(--border-base);
 }
 
 /* Theme Variant Matching Left Controls */
@@ -702,8 +703,8 @@ html:not(.dark-theme) .unique-tax-calc .regime-row-card {
 .unique-tax-calc .regime-meta-info {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: 0; /* Removing gaps for better centering */
+    margin-bottom: 8px;
 }
 
 .unique-tax-calc .regime-icon-dim {
@@ -716,16 +717,15 @@ html:not(.dark-theme) .unique-tax-calc .regime-row-card {
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em; /* Slight increase for a more modern look */
     color: var(--text-muted);
-    transition: color 0.2s ease;
 }
 
 .unique-tax-calc .regime-row-value {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1.7rem;
+    font-size: 2rem; /* Slightly larger for impact */
     font-weight: 700;
-    transition: color 0.2s ease;
+    color: var(--text-primary);
 }
 
 /* Base Inactive Colors matching Left Controlled Fields */
@@ -740,9 +740,10 @@ html:not(.dark-theme) .unique-tax-calc .regime-row-value {
    REACTIVE ENGINE OVERRIDES (Maintains high-contrast winner/loser states)
    ========================================================================== */
 .unique-tax-calc .regime-row-card.regime-winner {
+    transform: scale(1.02);
     border-color: var(--color-success) !important;
-    background-color: rgba(16, 185, 129, 0.06) !important;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15) !important;
+    background-color: rgba(16, 185, 129, 0.04) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
 .unique-tax-calc .regime-row-card.regime-winner .regime-row-title,
 .unique-tax-calc .regime-row-card.regime-winner .regime-row-value,
@@ -751,8 +752,8 @@ html:not(.dark-theme) .unique-tax-calc .regime-row-value {
 }
 
 .unique-tax-calc .regime-row-card.regime-loser {
-    opacity: 0.45;
-    filter: grayscale(30%);
+    transform: scale(0.98);
+    opacity: 0.6;
 }
 .unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
     color: var(--text-muted) !important;
