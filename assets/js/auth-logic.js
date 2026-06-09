@@ -237,7 +237,8 @@ async function saveTaxData(taxPayload) {
         }, { on_conflict: 'user_id, financial_year' });
 
     if (error) {
-        console.error("Supabase Save Error:", error.message);
+        console.error("🚨 CRITICAL SUPABASE SAVE ERROR OBJECT:", error); // <-- Add this
+        alert("Supabase Error: " + error.message); // <-- Force a popup alert
         return { error: error.message };
     }
 
