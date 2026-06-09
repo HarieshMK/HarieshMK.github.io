@@ -639,15 +639,15 @@ permalink: /tax-calculator/
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     }
 
-  /* ==========================================================================
+/* ==========================================================================
    3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
    ========================================================================== */
-/* Apply this to the parent container of the cards */
+
+/* The parent sidebar container - set to transparent to integrate with page */
 .unique-tax-calc .sidebar-stacked-layout {
-    background-color: #0b1329 !important;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #1e293b;
+    background: transparent !important;
+    padding: 0;
+    border: none;
 }
 
 .unique-tax-calc .sidebar-panel-header-accent {
@@ -675,100 +675,75 @@ permalink: /tax-calculator/
     width: 100%;
 }
 
+/* Individual Regime Cards */
 .unique-tax-calc .regime-row-card {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center; /* 🟢 CENTER ALIGNED */
-    padding: 20px;
-    border-radius: 14px;
-    transition: all 0.25s ease;
+    align-items: center;
+    padding: 24px 20px;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-sizing: border-box;
     width: 100%;
-    /* 🟢 FORCED UNIFORM DEPTH BACKGROUND */
-    background-color: var(--bg-container); 
-    border: 1.5px solid var(--border-base);
-}
-    /* 1. More specific override to kill the grey */
-.unique-tax-calc .sidebar-stacked-rows-container .regime-row-card {
-    background-color: #0b1329 !important; /* Force this deep blue */
-    border: 1.5px solid #1e293b !important;
 }
 
-/* 2. Remove any legacy overrides */
-.unique-tax-calc .regime-row-card {
-    /* Ensure no residual 'background' properties exist elsewhere */
-    background: #0b1329 !important; 
-}
-
-/* Theme Variant Matching Left Controls */
+/* Dark Theme specific depth */
 .dark-theme .unique-tax-calc .regime-row-card {
     background-color: #0b1329 !important;
     border: 1.5px solid #1e293b !important;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* Light Theme specific depth */
 html:not(.dark-theme) .unique-tax-calc .regime-row-card {
     background-color: #ffffff !important;
     border: 1.5px solid #e2e8f0 !important;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06) !important;
-}
-
-.unique-tax-calc .regime-meta-info {
-    display: flex;
-    align-items: center;
-    gap: 0; /* Removing gaps for better centering */
-    margin-bottom: 8px;
-}
-
-.unique-tax-calc .regime-icon-dim {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    opacity: 0.7;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
 }
 
 .unique-tax-calc .regime-row-title {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.1em; /* Slight increase for a more modern look */
+    letter-spacing: 0.15em;
     color: var(--text-muted);
+    margin-bottom: 8px;
 }
 
 .unique-tax-calc .regime-row-value {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 2rem; /* Slightly larger for impact */
+    font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
+    transition: color 0.2s ease;
 }
 
-/* Base Inactive Colors matching Left Controlled Fields */
-.dark-theme .unique-tax-calc .regime-row-value {
-    color: #38bdf8 !important;
-}
-html:not(.dark-theme) .unique-tax-calc .regime-row-value {
-    color: #0284c7 !important;
-}
+/* Theme-aware value colors */
+.dark-theme .unique-tax-calc .regime-row-value { color: #38bdf8 !important; }
+html:not(.dark-theme) .unique-tax-calc .regime-row-value { color: #0284c7 !important; }
 
 /* ==========================================================================
-   REACTIVE ENGINE OVERRIDES (Maintains high-contrast winner/loser states)
+   REACTIVE ENGINE OVERRIDES
    ========================================================================== */
 .unique-tax-calc .regime-row-card.regime-winner {
     transform: scale(1.02);
     border-color: var(--color-success) !important;
-    background-color: rgba(16, 185, 129, 0.04) !important;
+    background-color: rgba(16, 185, 129, 0.05) !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
+
 .unique-tax-calc .regime-row-card.regime-winner .regime-row-title,
-.unique-tax-calc .regime-row-card.regime-winner .regime-row-value,
-.unique-tax-calc .regime-row-card.regime-winner .regime-icon-dim {
+.unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
     color: var(--color-success) !important;
 }
 
 .unique-tax-calc .regime-row-card.regime-loser {
     transform: scale(0.98);
     opacity: 0.6;
+    filter: grayscale(20%);
 }
+
 .unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
     color: var(--text-muted) !important;
 }
