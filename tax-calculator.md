@@ -640,15 +640,15 @@ permalink: /tax-calculator/
     }
 
 /* ==========================================================================
-   3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
+   3. DYNAMIC PREMIUM SIDEBAR (THEME-AWARE)
    ========================================================================== */
 
-/* The parent sidebar container - set to transparent to integrate with page */
+/* The sidebar layout container */
 .unique-tax-calc .sidebar-stacked-layout {
-    background: #0b1329 !important; /* Unified with input panels */
+    background: var(--bg-card) !important;
     padding: 24px;
     border-radius: 16px;
-    border: 1.5px solid #1e293b !important;
+    border: 1px solid var(--border-base) !important;
 }
 
 .unique-tax-calc .sidebar-panel-header-accent {
@@ -683,26 +683,14 @@ permalink: /tax-calculator/
     justify-content: center;
     align-items: center;
     padding: 24px 20px;
-    border-radius: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-sizing: border-box;
-    width: 100%;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-base) !important;
+    background-color: var(--bg-body) !important; 
+    transition: all 0.3s ease;
 }
 
-/* Dark Theme specific depth */
-.dark-theme .unique-tax-calc .regime-row-card {
-    background-color: #0b1329 !important;
-    border: 1.5px solid #1e293b !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Light Theme specific depth */
-html:not(.dark-theme) .unique-tax-calc .regime-row-card {
-    background-color: #ffffff !important;
-    border: 1.5px solid #e2e8f0 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-}
-
+/* Titles and Values */
 .unique-tax-calc .regime-row-title {
     font-size: 0.75rem;
     font-weight: 800;
@@ -717,37 +705,29 @@ html:not(.dark-theme) .unique-tax-calc .regime-row-card {
     font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
-    transition: color 0.2s ease;
 }
 
-/* Theme-aware value colors */
-.dark-theme .unique-tax-calc .regime-row-value { color: #38bdf8 !important; }
-html:not(.dark-theme) .unique-tax-calc .regime-row-value { color: #0284c7 !important; }
-
 /* ==========================================================================
-   REACTIVE ENGINE OVERRIDES
+   REACTIVE ENGINE (WINNER/LOSER STATES)
    ========================================================================== */
 .unique-tax-calc .regime-row-card.regime-winner {
     transform: scale(1.02);
     border-color: var(--color-success) !important;
-    background-color: rgba(16, 185, 129, 0.04) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    background-color: rgba(16, 185, 129, 0.05) !important;
 }
 
-.unique-tax-calc .regime-row-card.regime-winner .regime-row-title,
 .unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
     color: var(--color-success) !important;
 }
 
 .unique-tax-calc .regime-row-card.regime-loser {
     transform: scale(1);
-    opacity: 1; /* Keep it fully visible */
-    filter: none;
-    border-color: #1e293b !important; /* Keep the original border color */
+    opacity: 1;
+    border-color: var(--border-base) !important;
 }
 
 .unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
-    color: #64748b !important; /* Muted grey instead of vibrant blue/success */
+    color: var(--text-muted) !important;
 }
 
     /* ==========================================================================
