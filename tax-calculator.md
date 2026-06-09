@@ -497,6 +497,10 @@ permalink: /tax-calculator/
 </div>
 
 <style>
+
+    .content-hidden {
+    display: none !important;
+}
     /* ==========================================================================
        1. STRUCTURAL LAYOUTS (100% Intact from Original Source)
        ========================================================================== */
