@@ -167,18 +167,22 @@ const TaxController = {
     },
 
     setupToggle: (headerId, contentId, iconId) => {
-        const header = document.getElementById(headerId);
-        const content = document.getElementById(contentId);
-        const icon = document.getElementById(iconId);
+    const header = document.getElementById(headerId);
+    const content = document.getElementById(contentId);
+    const icon = document.getElementById(iconId);
 
-        if (header && content && icon) {
-            header.addEventListener('click', () => {
-                const isHidden = content.style.display === 'none';
-                content.style.display = isHidden ? 'block' : 'none';
-                icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-            });
-        }
-    },
+    if (header && content && icon) {
+        header.addEventListener('click', () => {
+            // Check the actual computed style from CSS
+            const computedStyle = window.getComputedStyle(content);
+            const isHidden = computedStyle.display === 'none';
+            
+            // Toggle
+            content.style.display = isHidden ? 'block' : 'none';
+            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+    }
+},
 
     handlePerkUIFeedback: (inputElement, perkName) => {
         const value = TaxController.cleanNum(inputElement.value);
