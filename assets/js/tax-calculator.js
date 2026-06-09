@@ -379,32 +379,49 @@ const TaxController = {
     },
 
     add80CRow: (type = "", amount = "", isLocked = false, customClass = "") => {
-        const container = document.getElementById('80c-rows-container');
-        if (!container) return;
+    const container = document.getElementById('80c-rows-container');
+    if (!container) return;
 
-        const row = document.createElement('div');
-        row.className = (isLocked ? "row-80c-statutory " : "row-80c-manual ") + (customClass || "");
-        row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
+    // --- TRACK AND UPDATE PRE-EXISTING STATUTORY DUPLICATES ---
+    // If we are attempting to draw a locked row (like EPF) and it's already on-screen, simply update its value
+    if (isLocked && type) {
+        const existingRows = container.querySelectorAll('.row-80c-statutory select');
+        for (let sel of existingRows) {
+            if (sel.value === type) {
+                const amtInput = sel.parentElement.querySelector('.row-amount-80c');
+                if (amtInput) {
+                    amtInput.value = amount !== "" ? TaxController.formatIndianCurrency(amount.toString()) : "";
+                }
+                if (!TaxController.isInitialLoading) TaxController.calculateAll();
+                return; // Exit completely to prevent spawning a duplicate row container
+            }
+        }
+    }
 
-        const options = ["ELSS Funds", "PPF", "VPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed FD (5yr)", "Life Insurance"];
-        let displayAmt = amount !== "" ? TaxController.formatIndianCurrency(amount.toString()) : "";
+    const row = document.createElement('div');
+    row.className = (isLocked ? "row-80c-statutory " : "row-80c-manual ") + (customClass || "");
+    row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
 
-        row.innerHTML = `
-            <select class="row-select-80c dynamic-input" style="flex: 2; ${isLocked ? 'background-color: #f3f4f6;' : ''}" ${isLocked ? 'disabled' : ''}>
-                ${isLocked ? `<option value="${type}" selected>${type}</option>` : `
-                <option value="" disabled ${!type ? 'selected' : ''}>Select Investment</option>
-                ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}`}
-            </select>
-            <input type="text" inputmode="decimal" class="row-amount-80c dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
-            ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' :
-            `<button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}
-        `;
+    // PERFECT SYNC: These options now exactly match your InvestmentRegistry object keys
+    const options = ["ELSS", "PPF", "VPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fees", "5-Year Tax FD", "LIC plan"];
+    let displayAmt = amount !== "" ? TaxController.formatIndianCurrency(amount.toString()) : "";
 
-        container.appendChild(row);
+    row.innerHTML = `
+        <select class="row-select-80c dynamic-input" style="flex: 2; ${isLocked ? 'background-color: #f3f4f6;' : ''}" ${isLocked ? 'disabled' : ''}>
+            ${isLocked ? `<option value="${type}" selected>${type}</option>` : `
+            <option value="" disabled ${!type ? 'selected' : ''}>Select Investment</option>
+            ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}`}
+        </select>
+        <input type="text" inputmode="decimal" class="row-amount-80c dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
+        ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' :
+        `<button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}
+    `;
 
-        TaxController.applyCurrencyFormattingListeners();
-        if (!TaxController.isInitialLoading) TaxController.calculateAll();
-    },
+    container.appendChild(row);
+
+    TaxController.applyCurrencyFormattingListeners();
+    if (!TaxController.isInitialLoading) TaxController.calculateAll();
+},
 
     addPerkRow: (type = "", value = "") => {
         const container = document.getElementById('perks-rows-container');
