@@ -334,10 +334,10 @@ const TaxController = {
                         type: row.querySelector('.perk-type').value,
                         amount: TaxController.cleanNum(row.querySelector('.perk-amount').value)
                     })),
-                    deductions80C: Array.from(document.querySelectorAll('#80c-rows-container .row-80c-manual')).map(row => ({
-                        type: row.querySelector('.row-select-80c').value,
-                        amount: TaxController.cleanNum(row.querySelector('.row-amount-80c').value)
-                    }))
+                    deductions80C: Array.from(document.querySelectorAll('#80c-rows-container > div')).map(row => ({
+                        type: row.querySelector('.row-type-80c')?.value || "Investment",
+                        amount: TaxController.cleanNum(row.querySelector('.row-amount-80c')?.value)
+                    })),
                 }
             };
 
