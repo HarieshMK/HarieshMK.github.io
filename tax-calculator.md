@@ -44,23 +44,27 @@ permalink: /tax-calculator/
 
     // Dynamic UI styling rule applier for the winner/loser system
     function updateRegimeHighlights() {
-        const oldTax = parseCleanValue('old-regime-tax');
-        const newTax = parseCleanValue('new-regime-tax');
-        
         const oldCard = document.getElementById('old-regime-card');
         const newCard = document.getElementById('new-regime-card');
-        
         if (!oldCard || !newCard) return;
 
-        // Reset classes
-        oldCard.classList.remove('regime-winner', 'regime-loser');
-        newCard.classList.remove('regime-winner', 'regime-loser');
+        const getVal = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return 0;
+            const text = el.innerText || el.value || "0";
+            return parseFloat(text.replace(/[^0-9.-]+/g, "")) || 0;
+        };
 
-        // Only highlight if values aren't zero or identical
-        if (oldTax === 0 && newTax === 0) {
-            return;
-        }
+        const oldTax = getVal('old-regime-tax');
+        const newTax = getVal('new-regime-tax');
 
+        // Reset card classes safely
+        oldCard.className = 'regime-row-card';
+        newCard.className = 'regime-row-card';
+
+        if (oldTax === 0 && newTax === 0) return;
+
+        // Apply strict semantic classes
         if (oldTax < newTax) {
             oldCard.classList.add('regime-winner');
             newCard.classList.add('regime-loser');
@@ -111,6 +115,19 @@ permalink: /tax-calculator/
         bindToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
         bindToggle('benefits-summary-header', 'benefits-summary-content', 'benefits-summary-icon');
 
+        // Mutation Observer to safely listen for script updates
+        const sidebarObserver = new MutationObserver(() => {
+            updateRegimeHighlights();
+        });
+
+        const targetOld = document.getElementById('old-regime-tax');
+        const targetNew = document.getElementById('new-regime-tax');
+
+        if (targetOld && targetNew) {
+            sidebarObserver.observe(targetOld, { childList: true, characterData: true, subtree: true });
+            sidebarObserver.observe(targetNew, { childList: true, characterData: true, subtree: true });
+        }
+
         const addPerkBtn = document.getElementById('add-perk-btn');
         if(addPerkBtn) {
             addPerkBtn.addEventListener('click', function() { 
@@ -158,9 +175,9 @@ permalink: /tax-calculator/
         const saveBtn = document.getElementById('save-btn');
         if(saveBtn) saveBtn.addEventListener('click', function() { if(typeof handleSave === 'function') handleSave(); });
 
-        // Run highlight scan directly on load to initialize styles safely
+        // Run highlight scan directly on page boot
         setTimeout(updateRegimeHighlights, 300);
-    });
+    }); // <--- Correctly brackets all DOM element hooks inside safe zone now!
 </script>
 
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
@@ -617,82 +634,80 @@ permalink: /tax-calculator/
     }
 
     /* ==========================================================================
-       3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
-       ========================================================================== */
-    .sidebar-stacked-layout {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .sidebar-panel-heading {
-        margin-top: 0;
-        margin-bottom: 20px;
-        text-align: center;
-        font-family: 'Lora', serif;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
+   3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
+   ========================================================================== */
+.unique-tax-calc .sidebar-stacked-layout {
+    display: flex;
+    flex-direction: column;
+}
 
-    .sidebar-stacked-rows-container {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        width: 100%;
-    }
+.unique-tax-calc .sidebar-panel-heading {
+    margin-top: 0;
+    margin-bottom: 22px;
+    text-align: center;
+    font-family: 'Lora', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
 
-    .regime-row-card {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 16px 20px;
-        border-radius: 12px;
-        background: var(--bg-offset);
-        border: 1.5px solid var(--border-base);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-sizing: border-box;
-        width: 100%;
-    }
+.unique-tax-calc .sidebar-stacked-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
 
-    .regime-row-title {
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-        transition: color 0.3s ease;
-    }
+.unique-tax-calc .regime-row-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background-color: #0b1329; /* Deep depth background color matching left fields */
+    border: 1.5px solid var(--border-base);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    width: 100%;
+}
 
-    .regime-row-value {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        transition: color 0.3s ease;
-    }
+.unique-tax-calc .regime-row-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
 
-    /* Reactive Classes dynamically managed by JS */
-    .regime-row-card.regime-winner {
-        border-color: var(--color-success) !important;
-        background: rgba(16, 185, 129, 0.04) !important;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
-    }
-    .regime-row-card.regime-winner .regime-row-title {
-        color: var(--color-success) !important;
-    }
-    .regime-row-card.regime-winner .regime-row-value {
-        color: var(--color-success) !important;
-    }
+.unique-tax-calc .regime-row-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
 
-    .regime-row-card.regime-loser {
-        border-color: var(--border-base) !important;
-        opacity: 0.65;
-    }
-    .regime-row-card.regime-loser .regime-row-value {
-        color: var(--text-muted) !important;
-    }
+/* Reactive Classes dynamically managed by JS */
+.unique-tax-calc .regime-row-card.regime-winner {
+    border-color: var(--color-success) !important;
+    background-color: rgba(52, 211, 153, 0.04) !important;
+    box-shadow: 0 4px 20px rgba(52, 211, 153, 0.06);
+}
+.unique-tax-calc .regime-row-card.regime-winner .regime-row-title,
+.unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
+    color: var(--color-success) !important;
+}
+
+.unique-tax-calc .regime-row-card.regime-loser {
+    border-color: var(--border-base) !important;
+    opacity: 0.5;
+}
+.unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
+    color: var(--text-muted) !important;
+}
 
     /* ==========================================================================
        4. RESPONSIVE LAYER ADDITIONS (Fixes dynamic rows layout)
