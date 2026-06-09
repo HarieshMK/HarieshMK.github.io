@@ -546,7 +546,12 @@ const TaxController = {
                             console.error(`🚨 CRITICAL: item.eligible is NaN for perk type: ${perksArr[index].type}. Raw breakdown item:`, item);
                             perksArr[index].element.innerText = "₹ 0"; // Fallback safety catch
                         } else {
-                            perksArr[index].element.innerText = `₹ ${Math.round(item.eligible).toLocaleString('en-IN')}`;
+                            // Allow up to 2 decimal places for precise Indian currency rendering
+                        const formattedEligible = Number(item.eligible).toLocaleString('en-IN', {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 0
+                        });
+                        perksArr[index].element.innerText = `₹ ${formattedEligible}`;
                         }
                     }
                 });
