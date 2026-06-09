@@ -173,13 +173,16 @@ const TaxController = {
 
     if (header && content && icon) {
         header.addEventListener('click', () => {
-            // Check the actual computed style from CSS
-            const computedStyle = window.getComputedStyle(content);
-            const isHidden = computedStyle.display === 'none';
+            // Check if the class exists to determine state
+            const isHidden = content.classList.contains('content-hidden');
             
-            // Toggle
-            content.style.display = isHidden ? 'block' : 'none';
+            // Toggle the class
+            content.classList.toggle('content-hidden');
+            
+            // Toggle the icon rotation
             icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            
+            console.log("Toggle clicked. Is hidden now:", !isHidden);
         });
     }
 },
