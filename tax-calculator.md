@@ -42,6 +42,34 @@ permalink: /tax-calculator/
         return '₹ ' + lastThree;
     }
 
+    // Dynamic UI styling rule applier for the winner/loser system
+    function updateRegimeHighlights() {
+        const oldTax = parseCleanValue('old-regime-tax');
+        const newTax = parseCleanValue('new-regime-tax');
+        
+        const oldCard = document.getElementById('old-regime-card');
+        const newCard = document.getElementById('new-regime-card');
+        
+        if (!oldCard || !newCard) return;
+
+        // Reset classes
+        oldCard.classList.remove('regime-winner', 'regime-loser');
+        newCard.classList.remove('regime-winner', 'regime-loser');
+
+        // Only highlight if values aren't zero or identical
+        if (oldTax === 0 && newTax === 0) {
+            return;
+        }
+
+        if (oldTax < newTax) {
+            oldCard.classList.add('regime-winner');
+            newCard.classList.add('regime-loser');
+        } else if (newTax < oldTax) {
+            newCard.classList.add('regime-winner');
+            oldCard.classList.add('regime-loser');
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const setupCalcInput = (id) => {
             const el = document.getElementById(id);
@@ -49,6 +77,7 @@ permalink: /tax-calculator/
                 el.addEventListener('input', function() {
                     formatIndianInput(this);
                     if(typeof calculateAll === 'function') calculateAll();
+                    updateRegimeHighlights();
                 });
             }
         };
@@ -58,6 +87,7 @@ permalink: /tax-calculator/
             if(el) {
                 el.addEventListener('change', function() {
                     if(typeof calculateAll === 'function') calculateAll();
+                    updateRegimeHighlights();
                 });
             }
         };
@@ -127,6 +157,9 @@ permalink: /tax-calculator/
 
         const saveBtn = document.getElementById('save-btn');
         if(saveBtn) saveBtn.addEventListener('click', function() { if(typeof handleSave === 'function') handleSave(); });
+
+        // Run highlight scan directly on load to initialize styles safely
+        setTimeout(updateRegimeHighlights, 300);
     });
 </script>
 
@@ -349,19 +382,25 @@ permalink: /tax-calculator/
         </div>
     </div>
         
-    <div class="calc-results sticky-score-panel">
-        <h3 style="margin-top: 0; text-align: center;">Tax Liability</h3>
-        <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;">
-            <div class="regime-score-card">
-                <div class="regime-label">Old Regime</div>
-                <div id="old-regime-tax" class="regime-value" style="color: var(--text-primary);">₹ 0</div>
+    <!-- Sidebar Panel: Transformed to Stacked Up-and-Down Rows -->
+    <div class="calc-results sticky-score-panel sidebar-stacked-layout">
+        <h3 class="sidebar-panel-heading">Tax Liability</h3>
+        
+        <div class="sidebar-stacked-rows-container">
+            <!-- Old Regime Card (Row 1) -->
+            <div id="old-regime-card" class="regime-row-card">
+                <span class="regime-row-title">Old Regime</span>
+                <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
             </div>
-            <div class="regime-score-card">
-                <div class="regime-label">New Regime</div>
-                <div id="new-regime-tax" class="regime-value" style="color: var(--brand-primary);">₹ 0</div>
+            
+            <!-- New Regime Card (Row 2) -->
+            <div id="new-regime-card" class="regime-row-card">
+                <span class="regime-row-title">New Regime</span>
+                <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
             </div>
         </div>
-        <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 25px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px;">View Detailed Breakdown</button>
+
+        <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 20px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px;">View Detailed Breakdown</button>
         <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 10px; background: transparent; color: var(--brand-primary);">Save to Profile</button>
     </div>
 </div>
@@ -386,7 +425,7 @@ permalink: /tax-calculator/
                 <tr>
                     <td style="padding: 14px 12px;">Standard Deduction</td>
                     <td id="summary-standard-deduction" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
-                    <td id="summary-standard-deduction-new" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
+                    <td id="summary-standard-deduction-new" class="text-right tabular-nums" style="padding: 14px 12px;">₹ 0</td>
                 </tr>
                 <tr>
                     <td style="padding: 14px 12px;">Section 80C Deductions</td>
@@ -578,7 +617,85 @@ permalink: /tax-calculator/
     }
 
     /* ==========================================================================
-       3. RESPONSIVE LAYER ADDITIONS (Fixes dynamic rows without overrides)
+       3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
+       ========================================================================== */
+    .sidebar-stacked-layout {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar-panel-heading {
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        font-family: 'Lora', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .sidebar-stacked-rows-container {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+    }
+
+    .regime-row-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: var(--bg-offset);
+        border: 1.5px solid var(--border-base);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .regime-row-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        transition: color 0.3s ease;
+    }
+
+    .regime-row-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        transition: color 0.3s ease;
+    }
+
+    /* Reactive Classes dynamically managed by JS */
+    .regime-row-card.regime-winner {
+        border-color: var(--color-success) !important;
+        background: rgba(16, 185, 129, 0.04) !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+    }
+    .regime-row-card.regime-winner .regime-row-title {
+        color: var(--color-success) !important;
+    }
+    .regime-row-card.regime-winner .regime-row-value {
+        color: var(--color-success) !important;
+    }
+
+    .regime-row-card.regime-loser {
+        border-color: var(--border-base) !important;
+        opacity: 0.65;
+    }
+    .regime-row-card.regime-loser .regime-row-value {
+        color: var(--text-muted) !important;
+    }
+
+    /* ==========================================================================
+       4. RESPONSIVE LAYER ADDITIONS (Fixes dynamic rows layout)
        ========================================================================== */
     .benefit-flex-row {
         display: flex;
