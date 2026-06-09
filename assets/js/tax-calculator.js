@@ -334,12 +334,19 @@ const TaxController = {
                         type: row.querySelector('.perk-type').value,
                         amount: TaxController.cleanNum(row.querySelector('.perk-amount').value)
                     })),
-                    deductions80C: Array.from(document.querySelectorAll('#80c-rows-container > div')).map(row => ({
-                        type: row.querySelector('.row-type-80c')?.value || "Investment",
-                        amount: TaxController.cleanNum(row.querySelector('.row-amount-80c')?.value)
-                    })),
+                    // FIXED: Dynamic structural row mapping protection hook
+                    deductions80C: Array.from(document.querySelectorAll('#80c-rows-container > div')).map(row => {
+                        const typeEl = row.querySelector('.row-type-80c');
+                        const amtEl = row.querySelector('.row-amount-80c');
+                        return {
+                            type: typeEl ? typeEl.value : "Investment",
+                            amount: amtEl ? TaxController.cleanNum(amtEl.value) : 0
+                        };
+                    }),
                 }
             };
+
+            console.log("🚀 Payload fully structured, sending to database wrapper:", structuredPayload);
 
             const response = await window.saveTaxData(structuredPayload);
             if (response?.error) throw new Error(response.error);
@@ -358,6 +365,10 @@ const TaxController = {
             }, 4000);
 
         } catch (error) {
+            // CRITICAL ADDITION: Forces the browser console log to reveal the exact crash line details!
+            console.error("💥 CRITICAL ERROR CAPTURED INSIDE handleSave:", error);
+            console.error("Stack Trace Details:", error.stack);
+
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sync Failed';
             if (status) {
