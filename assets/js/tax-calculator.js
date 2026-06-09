@@ -386,7 +386,7 @@ const TaxController = {
         row.className = (isLocked ? "row-80c-statutory " : "row-80c-manual ") + (customClass || "");
         row.style = "display: flex; gap: 10px; margin-bottom: 12px; align-items: center;";
 
-        const options = ["ELSS Funds", "PPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed FD (5yr)", "Life Insurance"];
+        const options = ["ELSS Funds", "PPF", "VPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fee", "Fixed FD (5yr)", "Life Insurance"];
         let displayAmt = amount !== "" ? TaxController.formatIndianCurrency(amount.toString()) : "";
 
         row.innerHTML = `
