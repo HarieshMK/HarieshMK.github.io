@@ -335,15 +335,17 @@ const TaxController = {
                         amount: TaxController.cleanNum(row.querySelector('.perk-amount').value)
                     })),
                     // FIXED: Dynamic structural row mapping protection hook
-                    // FIX: Changed selector from .row-type-80c to .row-select-80c
-                    deductions80C: Array.from(document.querySelectorAll('[id="80c-rows-container"] > div')).map(row => {
-                        const typeEl = row.querySelector('.row-select-80c'); 
-                        const amtEl = row.querySelector('.row-amount-80c');
-                        return {
-                            type: typeEl ? typeEl.value : "Investment",
-                            amount: amtEl ? TaxController.cleanNum(amtEl.value) : 0
-                        };
-                    }),
+                    // Change this block in handleSave:
+                    deductions80C: Array.from(document.querySelectorAll('[id="80c-rows-container"] > div'))
+                        .filter(row => row.classList.contains('row-80c-manual')) // 🟢 ONLY save manual investments!
+                        .map(row => {
+                            const typeEl = row.querySelector('.row-select-80c'); 
+                            const amtEl = row.querySelector('.row-amount-80c');
+                            return {
+                                type: typeEl ? typeEl.value : "Investment",
+                                amount: amtEl ? TaxController.cleanNum(amtEl.value) : 0
+                            };
+                        }),
                 }
             };
 
@@ -783,9 +785,13 @@ const TaxController = {
                 }
             }
 
+            // Update this loop inside loadUserData:
             if (cContainer) {
                 if (i.deductions80C && i.deductions80C.length > 0) {
                     i.deductions80C.forEach(inv => {
+                        // 🟢 Skip loading if it's a statutory calculation type to prevent duplication
+                        if (inv.type === "Employee PF" || inv.type === "Home Loan Principal") return;
+            
                         const cleanInv = Math.round(parseFloat(inv.amount)) || 0;
                         TaxController.add80CRow(inv.type, cleanInv);
                     });
