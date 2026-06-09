@@ -233,7 +233,10 @@ async function saveTaxData(taxPayload) {
         financial_year: taxPayload.financial_year || "2026-27",
         calculator_inputs: taxPayload.calculator_inputs, 
         updated_at: new Date().toISOString()
-    }, { on_conflict: 'user_id, financial_year' });
+    }, { 
+        on_conflict: 'user_id,financial_year', // Crucial: Remove any spaces inside this string
+        ignoreDuplicates: false               // Forces an UPDATE overwrite if the row exists
+    });
 
     if (error) {
         console.error("🚨 CRITICAL SUPABASE SAVE ERROR OBJECT:", error); // <-- Add this
