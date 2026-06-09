@@ -146,13 +146,21 @@ FinanceEngine.TaxEngine = {
 
         let perkBreakdown = [];
         (perks || []).forEach(p => {
+            // Structural normalization: read either property fallback safely to 0
+            const itemAmount = p.amount !== undefined ? p.amount : (p.value !== undefined ? p.value : 0);
             let eligible = 0;
+        
             const rule = perksConfig[p.type];
             if (rule && (rule.regime === "both" || rule.regime === "new" || !rule.regime)) {
-                eligible = (p.type === "Corporate NPS") ? Math.min(p.amount, basicSalary * (rule.newLimit || 0.14)) : p.amount;
+                eligible = (p.type === "Corporate NPS") 
+                    ? Math.min(itemAmount, basicSalary * (rule.newLimit || 0.14)) 
+                    : itemAmount;
+            } else {
+                eligible = 0; // Explicitly enforce zero if not allowed under the New Regime
             }
+        
             totalExemptions += eligible;
-            perkBreakdown.push({ type: p.type, eligible });
+            perkBreakdown.push({ type: p.type, eligible: eligible });
         });
 
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
@@ -179,11 +187,17 @@ FinanceEngine.TaxEngine = {
         let other80C = deductions.section80C || 0;
 
         (perks || []).forEach(p => {
+            const itemAmount = p.amount !== undefined ? p.amount : (p.value !== undefined ? p.value : 0);
             const rule = perksConfig[p.type];
+        
             if (rule && (rule.regime === "both" || rule.regime === "old" || !rule.regime)) {
-                if (p.type === "Corporate NPS") totalExemptions += Math.min(p.amount, basicSalary * (rule.oldLimit || 0.10));
-                else if (p.type === "VPF") other80C += p.amount;
-                else totalExemptions += p.amount;
+                if (p.type === "Corporate NPS") {
+                    totalExemptions += Math.min(itemAmount, basicSalary * (rule.oldLimit || 0.10));
+                } else if (p.type === "VPF") {
+                    other80C += itemAmount;
+                } else {
+                    totalExemptions += itemAmount;
+                }
             }
         });
 
