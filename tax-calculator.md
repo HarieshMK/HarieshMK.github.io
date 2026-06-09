@@ -401,25 +401,33 @@ permalink: /tax-calculator/
         
     <!-- Sidebar Panel: Transformed to Stacked Up-and-Down Rows -->
     <div class="calc-results sticky-score-panel sidebar-stacked-layout">
-        <h3 class="sidebar-panel-heading">Tax Liability</h3>
-        
-        <div class="sidebar-stacked-rows-container">
-            <!-- Old Regime Card (Row 1) -->
-            <div id="old-regime-card" class="regime-row-card">
-                <span class="regime-row-title">Old Regime</span>
-                <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
-            </div>
-            
-            <!-- New Regime Card (Row 2) -->
-            <div id="new-regime-card" class="regime-row-card">
-                <span class="regime-row-title">New Regime</span>
-                <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
-            </div>
-        </div>
-
-        <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 20px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 10px;">View Detailed Breakdown</button>
-        <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 10px; background: transparent; color: var(--brand-primary);">Save to Profile</button>
+    <div class="sidebar-panel-header-accent">
+        <h3 class="sidebar-panel-heading">
+            <i class="fas fa-receipt" style="margin-right: 10px; color: #38bdf8; font-size: 1.1rem;"></i>Tax Liability
+        </h3>
     </div>
+    
+    <div class="sidebar-stacked-rows-container">
+        <div id="old-regime-card" class="regime-row-card">
+            <div class="regime-meta-info">
+                <i class="fas fa-history regime-icon-dim"></i>
+                <span class="regime-row-title">Old Regime</span>
+            </div>
+            <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
+        </div>
+        
+        <div id="new-regime-card" class="regime-row-card">
+            <div class="regime-meta-info">
+                <i class="fas fa-sparkles regime-icon-dim"></i>
+                <span class="regime-row-title">New Regime</span>
+            </div>
+            <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
+        </div>
+    </div>
+
+    <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
+    <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
+</div>
 </div>
 
 <div id="tax-breakdown-section" class="post-card breakdown-section-wrapper" style="padding: 25px; border-top: 4px solid var(--brand-primary); margin-top: 30px;">
@@ -633,7 +641,7 @@ permalink: /tax-calculator/
         box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* ==========================================================================
+  /* ==========================================================================
    3. PREMIUM SIDEBAR ROW STACKING & REACTIVE HIGHLIGHT ENGINE
    ========================================================================== */
 .unique-tax-calc .sidebar-stacked-layout {
@@ -641,14 +649,22 @@ permalink: /tax-calculator/
     flex-direction: column;
 }
 
+.unique-tax-calc .sidebar-panel-header-accent {
+    border-bottom: 1px solid var(--border-base);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
 .unique-tax-calc .sidebar-panel-heading {
-    margin-top: 0;
-    margin-bottom: 22px;
-    text-align: center;
+    margin: 0;
+    text-align: left;
     font-family: 'Lora', serif;
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-primary);
+    display: flex;
+    align-items: center;
 }
 
 .unique-tax-calc .sidebar-stacked-rows-container {
@@ -663,13 +679,37 @@ permalink: /tax-calculator/
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 18px 22px;
+    padding: 16px 20px;
     border-radius: 14px;
-    background-color: #0b1329; /* Deep depth background color matching left fields */
-    border: 1.5px solid var(--border-base);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-sizing: border-box;
     width: 100%;
+}
+
+/* Theme Variant Matching Left Controls */
+.dark-theme .unique-tax-calc .regime-row-card {
+    background-color: #0b1329 !important;
+    border: 1.5px solid #1e293b !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+html:not(.dark-theme) .unique-tax-calc .regime-row-card {
+    background-color: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+.unique-tax-calc .regime-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.unique-tax-calc .regime-icon-dim {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
 .unique-tax-calc .regime-row-title {
@@ -678,32 +718,41 @@ permalink: /tax-calculator/
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-muted);
-    margin-bottom: 8px;
     transition: color 0.2s ease;
 }
 
 .unique-tax-calc .regime-row-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.6rem;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.7rem;
     font-weight: 700;
-    color: var(--text-primary);
     transition: color 0.2s ease;
 }
 
-/* Reactive Classes dynamically managed by JS */
+/* Base Inactive Colors matching Left Controlled Fields */
+.dark-theme .unique-tax-calc .regime-row-value {
+    color: #38bdf8 !important;
+}
+html:not(.dark-theme) .unique-tax-calc .regime-row-value {
+    color: #0284c7 !important;
+}
+
+/* ==========================================================================
+   REACTIVE ENGINE OVERRIDES (Maintains high-contrast winner/loser states)
+   ========================================================================== */
 .unique-tax-calc .regime-row-card.regime-winner {
     border-color: var(--color-success) !important;
-    background-color: rgba(52, 211, 153, 0.04) !important;
-    box-shadow: 0 4px 20px rgba(52, 211, 153, 0.06);
+    background-color: rgba(16, 185, 129, 0.06) !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15) !important;
 }
 .unique-tax-calc .regime-row-card.regime-winner .regime-row-title,
-.unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
+.unique-tax-calc .regime-row-card.regime-winner .regime-row-value,
+.unique-tax-calc .regime-row-card.regime-winner .regime-icon-dim {
     color: var(--color-success) !important;
 }
 
 .unique-tax-calc .regime-row-card.regime-loser {
-    border-color: var(--border-base) !important;
-    opacity: 0.5;
+    opacity: 0.45;
+    filter: grayscale(30%);
 }
 .unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
     color: var(--text-muted) !important;
