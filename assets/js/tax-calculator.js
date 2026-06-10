@@ -537,11 +537,14 @@ const TaxController = {
         if (hraDisplay) hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
 
         const perkRows = document.querySelectorAll('.perk-row');
-        const perksArr = Array.from(perkRows).map(row => ({
+        const rawPerks = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
-            amount: TaxController.cleanNum(row.querySelector('.perk-amount').value), // <-- Changed 'value' to 'amount'
+            amount: TaxController.cleanNum(row.querySelector('.perk-amount').value),
             element: row.querySelector('.perk-eligible')
         }));
+
+// Process perks through the Engine
+const processedPerks = FinanceEngine.TaxEngine.processPerks(rawPerks, basic, fy);
 
         const otherIncome = TaxController.cleanNum(document.getElementById('other-income')?.value);
         const gross = basic + hraRec + otherIncome;
@@ -565,29 +568,22 @@ const TaxController = {
         }
 
         try {
-            const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, perksArr, basic);
-            const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, perksArr, deductionsObj, basic);
-
-            if (newReg?.perkBreakdown) {
-                newReg.perkBreakdown.forEach((item, index) => {
-                    // --- TARGETED DEBUGGING SPY ---
-                    console.log(`🕵️‍♂️ Perk Breakdown Index [${index}]:`, item);
-                    
-                    if (perksArr[index]?.element) {
-                        if (isNaN(item.eligible) || item.eligible === undefined) {
-                            console.error(`🚨 CRITICAL: item.eligible is NaN for perk type: ${perksArr[index].type}. Raw breakdown item:`, item);
-                            perksArr[index].element.innerText = "₹ 0"; // Fallback safety catch
-                        } else {
-                            // Allow up to 2 decimal places for precise Indian currency rendering
-                        const formattedEligible = Number(item.eligible).toLocaleString('en-IN', {
-                            maximumFractionDigits: 2,
-                            minimumFractionDigits: 0
-                        });
-                        perksArr[index].element.innerText = `₹ ${formattedEligible}`;
-                        }
-                    }
-                });
-            }
+            // Pass the pre-processed perks to the engine
+            const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, processedPerks, basic);
+            const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, basic);
+        
+            // Update the UI using the pre-calculated eligibility values
+            processedPerks.forEach((p, index) => {
+                const eligibleVal = (newReg.isNewRegime) ? p.eligibleNew : p.eligibleOld;
+                if (rawPerks[index]?.element) {
+                    rawPerks[index].element.innerText = `₹ ${Number(eligibleVal).toLocaleString('en-IN')}`;
+                }
+            });
+        
+            TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
+        } catch (err) {
+            console.error("Calculation Engine Error:", err);
+        }
 
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
         } catch (err) {
