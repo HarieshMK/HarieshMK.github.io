@@ -134,11 +134,32 @@ FinanceEngine.TaxEngine = {
         return tax;
     },
 
+calculateTax: (netTaxable, regimeType, selectedYear) => {
+    const yearData = TAX_CONFIG[selectedYear];
+    const config = yearData[regimeType === 'new' ? 'newRegime' : 'oldRegime'];
+    
+    // 1. Calculate base slab tax
+    let tax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+    
+    // 2. Apply Regime-specific Rebates/Marginal Relief
+    if (netTaxable <= config.rebateLimit) {
+        tax = 0;
+    } else if (regimeType === 'new') {
+        // Marginal Relief for New Regime
+        tax = Math.min(tax, netTaxable - config.rebateLimit);
+    }
+    
+    // 3. Apply Cess consistently
+    const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : 0.04;
+    return tax + (tax * cess);
+},
+
     calculateNewRegime: (selectedYear, grossIncome, perks, deductions = {}, basicSalary = 0) => {
         const yearData = TAX_CONFIG[selectedYear];
         const config = yearData.newRegime;
         const perksConfig = yearData.perkRules;
         let totalExemptions = config.stdDeduction;
+        console.log("DEBUG: New Regime Deductions:", deductions);
 
         if ((deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') && (deductions.homeLoanInterest > 0)) {
             totalExemptions += (deductions.homeLoanInterest || 0);
@@ -165,17 +186,10 @@ FinanceEngine.TaxEngine = {
 
         const netTaxable = Math.max(0, grossIncome - totalExemptions);
         
-        // Marginal Relief check for rebate
-        if (netTaxable <= config.rebateLimit) {
-            tax = 0; 
-        } else {
-            let taxBeforeRelief = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-            let excessIncome = netTaxable - config.rebateLimit;
-            tax = Math.min(taxBeforeRelief, excessIncome);
-        }
-
-        const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : 0.04;
-        return { tax: tax + (tax * cess), netTaxable, totalExemptions, perkBreakdown };
+        // Use the Unified Controller
+        const finalTax = FinanceEngine.TaxEngine.calculateTax(netTaxable, 'new', selectedYear);
+        
+        return { tax: finalTax, netTaxable, totalExemptions, perkBreakdown };
     },
 
     calculateOldRegime: (selectedYear, grossIncome, deductions, perks, basicSalary = 0) => {
@@ -218,11 +232,10 @@ FinanceEngine.TaxEngine = {
 
         const totalDeductions = totalExemptions + cappedOther80C + npsUsedIn80C + npsFor80CCD + interest24b + interest80EEA + totalCapped80D + (deductions.exemptHRA || 0);
         const netTaxable = Math.max(0, grossIncome - totalDeductions);
-        let tax = (netTaxable > config.rebateLimit) ? FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs) : 0;
-
-        const cess = yearData.cessRate !== undefined ? yearData.cessRate : 0.04;
+        // Use the Unified Controller
+        const finalTax = FinanceEngine.TaxEngine.calculateTax(netTaxable, 'old', selectedYear);
         return {
-            tax: tax + (tax * cess),
+            tax: finalTax,
             netTaxable,
             totalDeductions,
             appliedDeductions: { section80C: cappedOther80C, section80D: totalCapped80D, homeInterest: interest24b + interest80EEA }
