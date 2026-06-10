@@ -1,25 +1,45 @@
 const TaxController = {
     isDirty: false,
     isInitialLoading: true,
+    
+    // 3. THIS IS THE init() FUNCTION. It runs when the page loads.
     init: async () => {
         console.log("Tax Controller Initializing...");
-        if (!window.FinanceEngine || !window.TAX_CONFIG) { console.warn("Tax engines missing. Re-routing initialization hook..."); window.addEventListener('load', () => TaxController.init()); return; }
+        if (!window.FinanceEngine || !window.TAX_CONFIG) { 
+            console.warn("Tax engines missing. Re-routing initialization hook..."); 
+            window.addEventListener('load', () => TaxController.init()); 
+            return; 
+        }
         window.addEventListener('beforeunload', (e) => {
-            if (TaxController.isDirty) { const message = "Your data is unsaved. Are you sure you want to leave?"; e.returnValue = message; return message; }
+            if (TaxController.isDirty) { 
+                const message = "Your data is unsaved. Are you sure you want to leave?"; 
+                e.returnValue = message; 
+                return message; 
+            }
         });
-        TaxController.applyCurrencyFormattingListeners();
+
+        // OPTIMIZATION FIXED HERE: 
+        // We attached a single listener to the global document object.
+        // This watches all inputs, even new rows that are added later!
+        document.addEventListener('input', TaxController.handleDelegatedInput);
+
         TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
         TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
         TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
         TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
+        
         document.addEventListener('input', (e) => {
             if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox') {
                 TaxController.isDirty = true;
                 const row = e.target.closest('.perk-row');
-                if (row) { const perkSelect = row.querySelector('select'); if (perkSelect) { TaxController.handlePerkUIFeedback(e.target, perkSelect.value); } }
+                if (row) { 
+                    const perkSelect = row.querySelector('select'); 
+                    if (perkSelect) { TaxController.handlePerkUIFeedback(e.target, perkSelect.value); } 
+                }
                 TaxController.calculateAll();
             }
         });
+
         const appFySelector = document.getElementById('fy-selector');
         if (appFySelector) {
             appFySelector.addEventListener('change', async () => {
@@ -27,22 +47,22 @@ const TaxController = {
                 TaxController.isInitialLoading = true;
                 await TaxController.loadUserData();
                 TaxController.isInitialLoading = false;
-                TaxController.applyCurrencyFormattingListeners();
                 TaxController.calculateAll();
                 setTimeout(() => { TaxController.isDirty = false; }, 200);
             });
         }
         await TaxController.loadUserData();
         TaxController.isInitialLoading = false;
-        TaxController.applyCurrencyFormattingListeners();
         TaxController.calculateAll();
         setTimeout(() => { TaxController.isDirty = false; }, 500);
     },
+
     cleanNum: (val) => {
         if (val === undefined || val === null || val === '') return 0;
         const cleanValue = val.toString().replace(/,/g, "").replace(/[^0-9.-]+/g, "");
         return parseFloat(cleanValue) || 0;
     },
+
     formatIndianCurrency: (valueString) => {
         let value = valueString.replace(/,/g, '');
         if (!value) return '';
@@ -54,31 +74,27 @@ const TaxController = {
         if (parts.length > 1) { formatted += '.' + parts[1]; }
         return formatted;
     },
-    applyCurrencyFormattingListeners: () => {
-        const selectors = ['#basic-salary', '#hra-received', '#rent-paid', '#other-income', '#loan-interest', '#loan-principal', '[id="80d-self"]', '[id="80d-parents"]', '#nps-80ccd-1b', '#original-loan-amt', '#property-stamp-value', '.perk-amount', '.row-amount-80c'];
-        selectors.forEach(selector => {
-            const cleanSelector = selector.replace(/[^\x20-\x7E]/g, '').trim();
-            try {
-                const elements = document.querySelectorAll(cleanSelector);
-                elements.forEach(input => {
-                    if (input.tagName === 'INPUT' && !input.classList.contains('currency-mapped')) {
-                        input.classList.add('currency-mapped');
-                        input.setAttribute('type', 'text');
-                        input.setAttribute('inputmode', 'decimal');
-                        if (input.value) { input.value = TaxController.formatIndianCurrency(input.value); }
-                        input.addEventListener('input', function () {
-                            let selectionStart = this.selectionStart;
-                            let oldLength = this.value.length;
-                            let formatted = TaxController.formatIndianCurrency(this.value);
-                            this.value = formatted;
-                            let newLength = this.value.length;
-                            this.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
-                        });
-                    }
-                });
-            } catch (selectorError) { console.warn(`Bypassed structural query selector processing issue on: ${cleanSelector}`, selectorError); }
-        });
+
+    // 2. THIS IS THE NEW "handleDelegatedInput" FUNCTION
+    // It captures anytime a user inputs data, checks if it's a numeric field, and formats it instantly.
+    handleDelegatedInput: (e) => {
+        const target = e.target;
+        // This matches all your target IDs and classes automatically!
+        if (target.matches('#basic-salary, #hra-received, #rent-paid, #other-income, #loan-interest, #loan-principal, [id="80d-self"], [id="80d-parents"], #nps-80ccd-1b, #original-loan-amt, #property-stamp-value, .perk-amount, .row-amount-80c')) {
+            if (target.tagName === 'INPUT' && !target.classList.contains('currency-mapped')) {
+                target.classList.add('currency-mapped');
+                target.setAttribute('type', 'text');
+                target.setAttribute('inputmode', 'decimal');
+            }
+            let selectionStart = target.selectionStart;
+            let oldLength = target.value.length;
+            let formatted = TaxController.formatIndianCurrency(target.value);
+            target.value = formatted;
+            let newLength = target.value.length;
+            target.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
+        }
     },
+
     setupToggle: (headerId, contentId, iconId) => {
         const header = document.getElementById(headerId);
         const content = document.getElementById(contentId);
@@ -94,6 +110,7 @@ const TaxController = {
             };
         }
     },
+
     handlePerkUIFeedback: (inputElement, perkName) => {
         const value = TaxController.cleanNum(inputElement.value);
         const fy = document.getElementById('fy-selector')?.value || "2026-27";
@@ -106,6 +123,7 @@ const TaxController = {
         }
         if (perkName === "Fuel Allowance" || perkName === "Mobile Reimbursement") { inputElement.placeholder = "Enter amount as per bills"; }
     },
+
     toggleLoanWizard() {
         const hasLoan = document.getElementById('has-home-loan')?.checked;
         const wizard = document.getElementById('home-loan-wizard');
@@ -114,6 +132,7 @@ const TaxController = {
         if (deductions) deductions.style.display = hasLoan ? 'block' : 'none';
         TaxController.calculateAll();
     },
+
     handleLoanStatusChange() {
         const status = document.querySelector('input[name="possession"]:checked')?.value;
         const msg = document.getElementById('under-construction-msg');
@@ -121,6 +140,7 @@ const TaxController = {
         if (status === 'under-construction') { if (msg) msg.style.display = 'block'; if (fields) fields.style.display = 'none'; } else { if (msg) msg.style.display = 'none'; if (fields) fields.style.display = 'block'; }
         TaxController.calculateAll();
     },
+
     handleDateBranching: () => {
         const dateVal = document.getElementById('loan-sanction-date')?.value;
         const branchEE = document.getElementById('branch-80ee-fields');
@@ -132,6 +152,7 @@ const TaxController = {
         const sanctionDate = new Date(dateVal);
         if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && sanctionDate <= ELIGIBILITY_RULES.sec80EE.end) { branchEE.style.display = 'block'; } else if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end) { branchEEA.style.display = 'block'; }
     },
+
     syncPrincipalTo80C: (amount) => {
         const container = document.getElementById('80c-rows-container');
         if (!container) return;
@@ -143,10 +164,12 @@ const TaxController = {
             }
         } else if (principalRow) { principalRow.remove(); }
     },
+
     scrollToResults() {
         const target = document.getElementById('tax-breakdown-section');
         if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     },
+
     handleSave: async () => {
         const btn = document.getElementById('save-btn');
         const status = document.getElementById('save-status');
@@ -204,6 +227,9 @@ const TaxController = {
             if (status) { status.style.color = "#ef4444"; status.innerText = `❌ Save Failed: ${error.message || error}`; }
         }
     },
+
+    // 4. STEP 4 APPLIED IN THESE ROWS:
+    // Notice that class="... currency-mapped" was explicitly added into the HTML generation text below.
     add80CRow: (type = "", amount = "", isLocked = false, customClass = "") => {
         const container = document.getElementById('80c-rows-container');
         if (!container) return;
@@ -228,13 +254,13 @@ const TaxController = {
                 <option value="" disabled ${!type ? 'selected' : ''}>Select Investment</option>
                 ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}`}
             </select>
-            <input type="text" inputmode="decimal" class="row-amount-80c dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
+            <input type="text" inputmode="decimal" class="row-amount-80c currency-mapped dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
             ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' :
             `<button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}`;
         container.appendChild(row);
-        TaxController.applyCurrencyFormattingListeners();
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
     },
+
     addPerkRow: (type = "", value = "") => {
         const container = document.getElementById('perks-rows-container');
         if (!container) return;
@@ -248,13 +274,13 @@ const TaxController = {
                 <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
                 ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
             </select>
-            <input type="text" inputmode="decimal" class="perk-amount dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right;">
+            <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right;">
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem;">₹ 0</div>
             <button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none;"><i class="fas fa-trash"></i></button>`;
         container.appendChild(row);
-        TaxController.applyCurrencyFormattingListeners();
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
     },
+
     calculateAll: () => {
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
         const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
@@ -327,6 +353,7 @@ const TaxController = {
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
         } catch (err) { console.error("Calculation Engine Error:", err); }
     },
+
     manageStatutoryRows: (basic) => {
         const container = document.getElementById('80c-rows-container');
         if (!container) return;
@@ -337,6 +364,7 @@ const TaxController = {
             if (targetInput) targetInput.value = TaxController.formatIndianCurrency(epfAmt.toString());
         }
     },
+
     updateSummaryUI: (newTax, oldTax, oldRegDetails, newRegDetails, grossSalary) => {
         let finalOldTax = oldTax;
         if (oldTax === 0 && oldRegDetails?.netTaxable > 500000) {
@@ -382,6 +410,7 @@ const TaxController = {
             setVal('summary-total-tax-new', newTax || 0);
         }
     },
+
     loadUserData: async () => {
         const pContainer = document.getElementById('perks-rows-container');
         const cContainer = document.getElementById('80c-rows-container');
