@@ -89,23 +89,23 @@ FinanceEngine.TaxEngine = {
     },
 
     // NEW: Asset-specific Tax Logic
-        calculateCapitalTax: function(gain, years, taxTreatment, userSlab = 0) {
-            if (gain <= 0) return 0;
-            // taxTreatment would be "EQUITY" or "SLAB"
-            if (taxTreatment === "EQUITY") {
-                if (years < 1) {
-                    return gain * 0.20; // STCG
-                } else {
-                    const taxableGain = Math.max(0, gain - 125000);
-                    return taxableGain * 0.125; // LTCG
-                }
+    calculateCapitalTax: function(gain, years, taxTreatment, userSlab = 0) {
+        if (gain <= 0) return 0;
+        // taxTreatment would be "EQUITY" or "SLAB"
+        if (taxTreatment === "EQUITY") {
+            if (years < 1) {
+                return gain * 0.20; // STCG
+            } else {
+                const taxableGain = Math.max(0, gain - 125000);
+                return taxableGain * 0.125; // LTCG
             }
-            if (taxTreatment === "SLAB") {
-                return gain * (userSlab / 100); // Fixed Deposits, etc.
-            }
-        
-            return 0;
-        },
+        }
+        if (taxTreatment === "SLAB") {
+            return gain * (userSlab / 100); // Fixed Deposits, etc.
+        }
+    
+        return 0;
+    },
 
     calculateExemptHRA: (basic, hraReceived, rentPaid, isMetro) => {
         const metroFactor = isMetro ? 0.5 : 0.4;
@@ -134,25 +134,25 @@ FinanceEngine.TaxEngine = {
         return tax;
     },
 
-calculateTax: (netTaxable, regimeType, selectedYear) => {
-    const yearData = TAX_CONFIG[selectedYear];
-    const config = yearData[regimeType === 'new' ? 'newRegime' : 'oldRegime'];
-    
-    // 1. Calculate base slab tax
-    let tax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
-    
-    // 2. Apply Regime-specific Rebates/Marginal Relief
-    if (netTaxable <= config.rebateLimit) {
-        tax = 0;
-    } else if (regimeType === 'new') {
-        // Marginal Relief for New Regime
-        tax = Math.min(tax, netTaxable - config.rebateLimit);
-    }
-    
-    // 3. Apply Cess consistently
-    const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : 0.04;
-    return tax + (tax * cess);
-},
+    calculateTax: (netTaxable, regimeType, selectedYear) => {
+        const yearData = TAX_CONFIG[selectedYear];
+        const config = yearData[regimeType === 'new' ? 'newRegime' : 'oldRegime'];
+        
+        // 1. Calculate base slab tax
+        let tax = FinanceEngine.TaxEngine.calculateBaseSlabTax(netTaxable, config.slabs);
+        
+        // 2. Apply Regime-specific Rebates/Marginal Relief
+        if (netTaxable <= config.rebateLimit) {
+            tax = 0;
+        } else if (regimeType === 'new') {
+            // Marginal Relief for New Regime
+            tax = Math.min(tax, netTaxable - config.rebateLimit);
+        }
+        
+        // 3. Apply Cess consistently
+        const cess = (yearData.cessRate !== undefined) ? yearData.cessRate : 0.04;
+        return tax + (tax * cess);
+    },
 
     calculateNewRegime: (selectedYear, grossIncome, perks, deductions = {}, basicSalary = 0) => {
         const yearData = TAX_CONFIG[selectedYear];
@@ -240,8 +240,42 @@ calculateTax: (netTaxable, regimeType, selectedYear) => {
             totalDeductions,
             appliedDeductions: { section80C: cappedOther80C, section80D: totalCapped80D, homeInterest: interest24b + interest80EEA }
         };
-    } 
+    },
+
+    // processPerks is now nested here
+    processPerks: (rawPerks, basicSalary, selectedYear) => {
+        const yearData = TAX_CONFIG[selectedYear];
+        const perksConfig = yearData.perkRules;
+
+        return rawPerks.map(p => {
+            const itemAmount = p.amount || 0;
+            const rule = perksConfig[p.type];
+            
+            // We calculate eligibility here instead of inside the regime functions
+            let eligibleNew = 0;
+            let eligibleOld = 0;
+
+            if (rule) {
+                // Logic for New Regime
+                if (rule.regime === "both" || rule.regime === "new" || !rule.regime) {
+                    eligibleNew = (p.type === "Corporate NPS") 
+                        ? Math.min(itemAmount, basicSalary * (rule.newLimit || 0.14)) 
+                        : itemAmount;
+                }
+                
+                // Logic for Old Regime
+                if (rule.regime === "both" || rule.regime === "old" || !rule.regime) {
+                    eligibleOld = (p.type === "Corporate NPS") 
+                        ? Math.min(itemAmount, basicSalary * (rule.oldLimit || 0.10)) 
+                        : itemAmount;
+                }
+            }
+
+            return { type: p.type, amount: itemAmount, eligibleNew, eligibleOld };
+        });
+    }
 };
+
 // Add to FinanceEngine.TaxEngine
 FinanceEngine.TaxRules = {
     // Moved from tax-calculator.js: manageStatutoryRows
@@ -272,35 +306,3 @@ FinanceEngine.TaxRules = {
         return { dExtra, extraSection };
     }
 };
-// Add this to FinanceEngine.TaxEngine
-processPerks: (rawPerks, basicSalary, selectedYear) => {
-    const yearData = TAX_CONFIG[selectedYear];
-    const perksConfig = yearData.perkRules;
-
-    return rawPerks.map(p => {
-        const itemAmount = p.amount || 0;
-        const rule = perksConfig[p.type];
-        
-        // We calculate eligibility here instead of inside the regime functions
-        let eligibleNew = 0;
-        let eligibleOld = 0;
-
-        if (rule) {
-            // Logic for New Regime
-            if (rule.regime === "both" || rule.regime === "new" || !rule.regime) {
-                eligibleNew = (p.type === "Corporate NPS") 
-                    ? Math.min(itemAmount, basicSalary * (rule.newLimit || 0.14)) 
-                    : itemAmount;
-            }
-            
-            // Logic for Old Regime
-            if (rule.regime === "both" || rule.regime === "old" || !rule.regime) {
-                eligibleOld = (p.type === "Corporate NPS") 
-                    ? Math.min(itemAmount, basicSalary * (rule.oldLimit || 0.10)) 
-                    : itemAmount;
-            }
-        }
-
-        return { type: p.type, amount: itemAmount, eligibleNew, eligibleOld };
-    });
-}
