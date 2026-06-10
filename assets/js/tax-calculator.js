@@ -574,7 +574,7 @@ const TaxController = {
     } catch (err) {
         console.error("Calculation Engine Error:", err);
     }
-}
+},
 
     manageStatutoryRows: (basic) => {
         const container = document.getElementById('80c-rows-container');
