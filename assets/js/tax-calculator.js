@@ -172,8 +172,10 @@ const TaxController = {
     const icon = document.getElementById(iconId);
 
     if (header && content && icon) {
-        header.addEventListener('click', () => {
+       header.addEventListener('click', (e) => {
             // Check the current display state directly
+            // Inside your click listener:
+            console.log("TRACE: Click Event detected on element:", e.target.tagName, e.target.className);
             const isVisible = window.getComputedStyle(content).display !== 'none';
             
             // Toggle the class
@@ -389,6 +391,7 @@ const TaxController = {
     },
 
     add80CRow: (type = "", amount = "", isLocked = false, customClass = "") => {
+        console.log("TRACE: add80CRow called for type:", type);
     const container = document.getElementById('80c-rows-container');
     if (!container) return;
 
@@ -461,6 +464,7 @@ const TaxController = {
     },
 
     calculateAll: () => {
+        console.log("TRACE: calculateAll called by:", new Error().stack.split("\n")[2]);
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
 
         const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
