@@ -570,7 +570,7 @@ const processedPerks = FinanceEngine.TaxEngine.processPerks(rawPerks, basic, fy)
         try {
             // Pass the pre-processed perks to the engine
             const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, processedPerks, basic);
-            const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, basic);
+            const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, deductionsObj, basic);
         
             // Update the UI using the pre-calculated eligibility values
             processedPerks.forEach((p, index) => {
