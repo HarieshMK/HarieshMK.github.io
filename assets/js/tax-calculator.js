@@ -493,7 +493,6 @@ const TaxController = {
         homeLoanInterest = TaxController.cleanNum(document.getElementById('loan-interest')?.value);
         homeLoanPrincipal = TaxController.cleanNum(document.getElementById('loan-principal')?.value);
 
-        // --- REFACTORED LOGIC START ---
         const loanResult = FinanceEngine.TaxRules.getLoanTaxBenefits(
             document.getElementById('loan-sanction-date')?.value,
             TaxController.cleanNum(document.getElementById('property-stamp-value')?.value),
@@ -504,92 +503,78 @@ const TaxController = {
         dExtra = loanResult.dExtra;
         extraSection = loanResult.extraSection;
 
-            eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
+        eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
+    }
+
+    TaxController.syncPrincipalTo80C(hasLoan ? homeLoanPrincipal : 0);
+
+    const cardEEA = document.getElementById('card-80eea');
+    const cardEE = document.getElementById('card-80ee');
+    if (cardEEA) cardEEA.style.display = (extraSection === 'card-80eea') ? 'block' : 'none';
+    if (cardEE) cardEE.style.display = (extraSection === 'card-80ee') ? 'block' : 'none';
+
+    if (extraSection) {
+        let displayId = (extraSection === 'card-80eea') ? 'display-80eea-value' : 'display-80ee-value';
+        const displayEl = document.getElementById(displayId);
+        if (displayEl) {
+            displayEl.innerHTML = `<div class="section-24b-result-container"><span class="section-24b-amount-display">₹ ${Math.round(dExtra).toLocaleString('en-IN')}</span></div>`;
         }
+    }
 
-        TaxController.syncPrincipalTo80C(hasLoan ? homeLoanPrincipal : 0);
+    const display24b = document.getElementById('display-24b-value');
+    if (display24b) {
+        display24b.innerHTML = `<div class="section-24b-result-container"><span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span></div>`;
+    }
 
-        const cardEEA = document.getElementById('card-80eea');
-        const cardEE = document.getElementById('card-80ee');
-        if (cardEEA) cardEEA.style.display = (extraSection === 'card-80eea') ? 'block' : 'none';
-        if (cardEE) cardEE.style.display = (extraSection === 'card-80ee') ? 'block' : 'none';
+    const hraResult = window.FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro) || { actualExemption: 0 };
+    const hraDisplay = document.getElementById('display-hra-value');
+    if (hraDisplay) hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
 
-        if (extraSection) {
-            let displayId = (extraSection === 'card-80eea') ? 'display-80eea-value' : 'display-80ee-value';
-            const displayEl = document.getElementById(displayId);
-            if (displayEl) {
-                displayEl.innerHTML = `<div class="section-24b-result-container"><span class="section-24b-amount-display">₹ ${Math.round(dExtra).toLocaleString('en-IN')}</span></div>`;
+    const perkRows = document.querySelectorAll('.perk-row');
+    const rawPerks = Array.from(perkRows).map(row => ({
+        type: row.querySelector('.perk-type').value,
+        amount: TaxController.cleanNum(row.querySelector('.perk-amount').value),
+        element: row.querySelector('.perk-eligible')
+    }));
+
+    const processedPerks = FinanceEngine.TaxEngine.processPerks(rawPerks, basic, fy);
+    const otherIncome = TaxController.cleanNum(document.getElementById('other-income')?.value);
+    const gross = basic + hraRec + otherIncome;
+
+    const deductionsObj = {
+        section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + TaxController.cleanNum(e.value), 0),
+        healthSelf: TaxController.cleanNum(document.getElementById('80d-self')?.value),
+        healthParents: TaxController.cleanNum(document.getElementById('80d-parents')?.value),
+        parentsSenior: document.getElementById('parents-senior')?.checked || false,
+        npsExtra: TaxController.cleanNum(document.getElementById('nps-80ccd-1b')?.value),
+        homeLoanInterest: homeLoanInterest,
+        extraLoanInterest: dExtra,
+        occupancy: isSelfOccupied ? 'self' : 'rented',
+        exemptHRA: hraResult.actualExemption
+    };
+
+    const total80CDisplay = document.getElementById('display-80c-total');
+    if (total80CDisplay) {
+        const total80C = Math.min(deductionsObj.section80C, 150000);
+        total80CDisplay.innerText = `₹ ${total80C.toLocaleString('en-IN')}`;
+    }
+
+    try {
+        const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, processedPerks, basic);
+        const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, deductionsObj, basic);
+    
+        processedPerks.forEach((p, index) => {
+            const eligibleVal = p.eligibleNew; // Simplification: Ensure UI logic matches your new unified engine
+            if (rawPerks[index]?.element) {
+                rawPerks[index].element.innerText = `₹ ${Number(eligibleVal).toLocaleString('en-IN')}`;
             }
-        }
-
-        const display24b = document.getElementById('display-24b-value');
-        if (display24b) {
-            display24b.innerHTML = `<div class="section-24b-result-container"><span class="section-24b-amount-display">₹ ${Math.round(eligible24b).toLocaleString('en-IN')}</span></div>`;
-        }
-
-        const warningBox = document.getElementById('hra-homeloan-warning');
-        if (warningBox) {
-            warningBox.style.display = (basic > 0 && hraRec > 0 && hasLoan && isSelfOccupied) ? 'block' : 'none';
-        }
-
-        const hraResult = window.FinanceEngine.TaxEngine.calculateExemptHRA(basic, hraRec, rentPaid, isMetro) || { actualExemption: 0 };
-        const hraDisplay = document.getElementById('display-hra-value');
-        if (hraDisplay) hraDisplay.innerText = `₹ ${Math.round(hraResult.actualExemption).toLocaleString('en-IN')}`;
-
-        const perkRows = document.querySelectorAll('.perk-row');
-        const rawPerks = Array.from(perkRows).map(row => ({
-            type: row.querySelector('.perk-type').value,
-            amount: TaxController.cleanNum(row.querySelector('.perk-amount').value),
-            element: row.querySelector('.perk-eligible')
-        }));
-
-// Process perks through the Engine
-const processedPerks = FinanceEngine.TaxEngine.processPerks(rawPerks, basic, fy);
-
-        const otherIncome = TaxController.cleanNum(document.getElementById('other-income')?.value);
-        const gross = basic + hraRec + otherIncome;
-
-        const deductionsObj = {
-            section80C: Array.from(document.querySelectorAll('.row-amount-80c')).reduce((s, e) => s + TaxController.cleanNum(e.value), 0),
-            healthSelf: TaxController.cleanNum(document.getElementById('80d-self')?.value),
-            healthParents: TaxController.cleanNum(document.getElementById('80d-parents')?.value),
-            parentsSenior: document.getElementById('parents-senior')?.checked || false,
-            npsExtra: TaxController.cleanNum(document.getElementById('nps-80ccd-1b')?.value),
-            homeLoanInterest: homeLoanInterest,
-            extraLoanInterest: dExtra,
-            occupancy: isSelfOccupied ? 'self' : 'rented',
-            exemptHRA: hraResult.actualExemption
-        };
-
-        const total80CDisplay = document.getElementById('display-80c-total');
-        if (total80CDisplay) {
-            const total80C = Math.min(deductionsObj.section80C, 150000);
-            total80CDisplay.innerText = `₹ ${total80C.toLocaleString('en-IN')}`;
-        }
-
-        try {
-            // Pass the pre-processed perks to the engine
-            const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, processedPerks, basic);
-            const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, deductionsObj, basic);
-        
-            // Update the UI using the pre-calculated eligibility values
-            processedPerks.forEach((p, index) => {
-                const eligibleVal = (newReg.isNewRegime) ? p.eligibleNew : p.eligibleOld;
-                if (rawPerks[index]?.element) {
-                    rawPerks[index].element.innerText = `₹ ${Number(eligibleVal).toLocaleString('en-IN')}`;
-                }
-            });
-        
-            TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
-        } catch (err) {
-            console.error("Calculation Engine Error:", err);
-        }
-
-            TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
-        } catch (err) {
-            console.error("Calculation Engine Error:", err);
-        }
-    },
+        });
+    
+        TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
+    } catch (err) {
+        console.error("Calculation Engine Error:", err);
+    }
+}
 
     manageStatutoryRows: (basic) => {
         const container = document.getElementById('80c-rows-container');
