@@ -499,7 +499,7 @@ permalink: /tax-calculator/
 <style>
 
     .content-hidden {
-    display: none !important;
+    display: none;
 }
     /* ==========================================================================
        1. STRUCTURAL LAYOUTS (100% Intact from Original Source)
