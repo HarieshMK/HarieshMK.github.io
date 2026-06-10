@@ -259,3 +259,35 @@ FinanceEngine.TaxRules = {
         return { dExtra, extraSection };
     }
 };
+// Add this to FinanceEngine.TaxEngine
+processPerks: (rawPerks, basicSalary, selectedYear) => {
+    const yearData = TAX_CONFIG[selectedYear];
+    const perksConfig = yearData.perkRules;
+
+    return rawPerks.map(p => {
+        const itemAmount = p.amount || 0;
+        const rule = perksConfig[p.type];
+        
+        // We calculate eligibility here instead of inside the regime functions
+        let eligibleNew = 0;
+        let eligibleOld = 0;
+
+        if (rule) {
+            // Logic for New Regime
+            if (rule.regime === "both" || rule.regime === "new" || !rule.regime) {
+                eligibleNew = (p.type === "Corporate NPS") 
+                    ? Math.min(itemAmount, basicSalary * (rule.newLimit || 0.14)) 
+                    : itemAmount;
+            }
+            
+            // Logic for Old Regime
+            if (rule.regime === "both" || rule.regime === "old" || !rule.regime) {
+                eligibleOld = (p.type === "Corporate NPS") 
+                    ? Math.min(itemAmount, basicSalary * (rule.oldLimit || 0.10)) 
+                    : itemAmount;
+            }
+        }
+
+        return { type: p.type, amount: itemAmount, eligibleNew, eligibleOld };
+    });
+}
