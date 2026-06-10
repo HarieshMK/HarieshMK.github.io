@@ -2,23 +2,6 @@
  * Controller for the Tax Calculator UI
  * COMPLETE MERGED PRODUCTION BUILD - ALL ORIGINAL LINES RETAINED
  */
-
-const ELIGIBILITY_RULES = {
-    sec80EE: {
-        start: new Date('2016-04-01'),
-        end: new Date('2017-03-31'),
-        propertyLimit: 5000000,
-        loanLimit: 3500000,
-        deductionLimit: 50000
-    },
-    sec80EEA: {
-        start: new Date('2019-04-01'),
-        end: new Date('2022-03-31'),
-        propertyLimit: 4500000,
-        deductionLimit: 150000
-    }
-};
-
 const TaxController = {
     isDirty: false,
     isInitialLoading: true,
