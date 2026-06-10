@@ -229,3 +229,33 @@ FinanceEngine.TaxEngine = {
         };
     } 
 };
+// Add to FinanceEngine.TaxEngine
+FinanceEngine.TaxRules = {
+    // Moved from tax-calculator.js: manageStatutoryRows
+    calculateEPF: (basic) => Math.round(basic * 0.12),
+
+    // Moved from tax-calculator.js: 80EE/80EEA logic
+    getLoanTaxBenefits: (sanctionDateStr, propVal, loanAmt, interestPaid, isSelfOccupied) => {
+        const sanctionDate = new Date(sanctionDateStr);
+        const rules = window.ELIGIBILITY_RULES; // From tax-config.js
+        let extraSection = null;
+        let dExtra = 0;
+
+        if (isSelfOccupied && interestPaid > 200000) {
+            // Check 80EEA
+            if (sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end &&
+                propVal > 0 && propVal <= rules.sec80EEA.propertyLimit) {
+                dExtra = Math.min(interestPaid - 200000, rules.sec80EEA.deductionLimit);
+                extraSection = 'card-80eea';
+            } 
+            // Check 80EE
+            else if (sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end &&
+                     propVal > 0 && propVal <= rules.sec80EE.propertyLimit &&
+                     loanAmt > 0 && loanAmt <= rules.sec80EE.loanLimit) {
+                dExtra = Math.min(interestPaid - 200000, rules.sec80EE.deductionLimit);
+                extraSection = 'card-80ee';
+            }
+        }
+        return { dExtra, extraSection };
+    }
+};
