@@ -172,20 +172,17 @@ const TaxController = {
     const icon = document.getElementById(iconId);
 
     if (header && content && icon) {
-       header.addEventListener('click', (e) => {
-            // Check the current display state directly
-            // Inside your click listener:
-            console.log("TRACE: Click Event detected on element:", e.target.tagName, e.target.className);
-            const isVisible = window.getComputedStyle(content).display !== 'none';
+        // Remove the existing 'click' logic and use this:
+        header.onclick = (e) => {
+            e.stopPropagation(); // Stops the bubble
             
-            // Toggle the class
-            content.classList.toggle('content-hidden', isVisible);
+            // Toggle visibility classes
+            const isHidden = content.classList.contains('content-hidden');
+            content.classList.toggle('content-hidden', !isHidden);
             
-            // Toggle icon based on the *new* state
-            icon.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
-            
-            console.log("Toggle clicked. Is now hidden:", isVisible);
-        });
+            // Rotate icon
+            icon.style.transform = !isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
     }
 },
 
