@@ -468,55 +468,41 @@ const TaxController = {
     },
 
     calculateAll: () => {
-        console.log("TRACE: calculateAll called by:", new Error().stack.split("\n")[2]);
-        if (!window.FinanceEngine || !window.TAX_CONFIG) return;
+    console.log("TRACE: calculateAll called by:", new Error().stack.split("\n")[2]);
+    if (!window.FinanceEngine || !window.TAX_CONFIG) return;
 
-        const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
-        const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
-        const rentPaid = TaxController.cleanNum(document.getElementById('rent-paid')?.value);
-        const isMetro = document.getElementById('is-metro')?.value === 'true';
-        const fy = document.getElementById('fy-selector')?.value || '2026-27';
+    const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
+    const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
+    const rentPaid = TaxController.cleanNum(document.getElementById('rent-paid')?.value);
+    const isMetro = document.getElementById('is-metro')?.value === 'true';
+    const fy = document.getElementById('fy-selector')?.value || '2026-27';
 
-        TaxController.manageStatutoryRows(basic);
+    TaxController.manageStatutoryRows(basic);
 
-        const hasLoan = document.getElementById('has-home-loan')?.checked;
-        let homeLoanInterest = 0;
-        let homeLoanPrincipal = 0;
-        let dExtra = 0;
-        let extraSection = null;
-        let isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
-        let eligible24b = 0;
+    const hasLoan = document.getElementById('has-home-loan')?.checked;
+    let homeLoanInterest = 0;
+    let homeLoanPrincipal = 0;
+    let dExtra = 0;
+    let extraSection = null;
+    let isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
+    let eligible24b = 0;
 
-        TaxController.handleDateBranching();
+    TaxController.handleDateBranching();
 
-        if (hasLoan) {
-            homeLoanInterest = TaxController.cleanNum(document.getElementById('loan-interest')?.value);
-            homeLoanPrincipal = TaxController.cleanNum(document.getElementById('loan-principal')?.value);
+    if (hasLoan) {
+        homeLoanInterest = TaxController.cleanNum(document.getElementById('loan-interest')?.value);
+        homeLoanPrincipal = TaxController.cleanNum(document.getElementById('loan-principal')?.value);
 
-            const sanctionDateVal = document.getElementById('loan-sanction-date')?.value;
-            const isFirstTimeBuyer = document.getElementById('is-first-buyer')?.checked;
-            const loanAmt = TaxController.cleanNum(document.getElementById('original-loan-amt')?.value);
-            const propVal = TaxController.cleanNum(document.getElementById('property-stamp-value')?.value);
-
-            if (isSelfOccupied && homeLoanInterest > 200000 && isFirstTimeBuyer && sanctionDateVal) {
-                const sanctionDate = new Date(sanctionDateVal);
-
-                if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start &&
-                    sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end &&
-                    propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EEA.propertyLimit) {
-
-                    dExtra = Math.max(0, Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EEA.deductionLimit));
-                    extraSection = 'card-80eea';
-                }
-                else if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start &&
-                    sanctionDate <= ELIGIBILITY_RULES.sec80EE.end &&
-                    propVal > 0 && propVal <= ELIGIBILITY_RULES.sec80EE.propertyLimit &&
-                    loanAmt > 0 && loanAmt <= ELIGIBILITY_RULES.sec80EE.loanLimit) {
-
-                    dExtra = Math.max(0, Math.min(homeLoanInterest - 200000, ELIGIBILITY_RULES.sec80EE.deductionLimit));
-                    extraSection = 'card-80ee';
-                }
-            }
+        // --- REFACTORED LOGIC START ---
+        const loanResult = FinanceEngine.TaxRules.getLoanTaxBenefits(
+            document.getElementById('loan-sanction-date')?.value,
+            TaxController.cleanNum(document.getElementById('property-stamp-value')?.value),
+            TaxController.cleanNum(document.getElementById('original-loan-amt')?.value),
+            homeLoanInterest,
+            isSelfOccupied
+        );
+        dExtra = loanResult.dExtra;
+        extraSection = loanResult.extraSection;
 
             eligible24b = isSelfOccupied ? Math.min(homeLoanInterest, 200000) : homeLoanInterest;
         }
