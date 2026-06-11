@@ -74,6 +74,21 @@ permalink: /tax-calculator/
         }
     }
 
+    function checkHraLoanWarning() {
+        const rentPaid = parseCleanValue('rent-paid');
+        const homeLoanCheck = document.getElementById('has-home-loan');
+        const warningBox = document.getElementById('hra-loan-legal-warning');
+        
+        if (!warningBox) return;
+
+        // Strict AND Condition: Rent is entered AND the Home loan checkbox is checked
+        if (rentPaid > 0 && homeLoanCheck && homeLoanCheck.checked) {
+            warningBox.style.display = 'block';
+        } else {
+            warningBox.style.display = 'none';
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const setupCalcInput = (id) => {
             const el = document.getElementById(id);
@@ -81,6 +96,7 @@ permalink: /tax-calculator/
                 el.addEventListener('input', function() {
                     formatIndianInput(this);
                     if(typeof calculateAll === 'function') calculateAll();
+                    checkHraLoanWarning();
                     updateRegimeHighlights();
                 });
             }
@@ -152,6 +168,7 @@ permalink: /tax-calculator/
                 if(window.TaxController && typeof window.TaxController.toggleLoanWizard === 'function') {
                     window.TaxController.toggleLoanWizard();
                 }
+                checkHraLoanWarning();
             });
         }
 
@@ -175,9 +192,12 @@ permalink: /tax-calculator/
         const saveBtn = document.getElementById('save-btn');
         if(saveBtn) saveBtn.addEventListener('click', function() { if(typeof handleSave === 'function') handleSave(); });
 
-        // Run highlight scan directly on page boot
-        setTimeout(updateRegimeHighlights, 300);
-    }); // <--- Correctly brackets all DOM element hooks inside safe zone now!
+        // Run highlight and validation scans directly on page boot
+        setTimeout(() => {
+            updateRegimeHighlights();
+            checkHraLoanWarning();
+        }, 300);
+    });
 </script>
 
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
@@ -219,7 +239,7 @@ permalink: /tax-calculator/
                     </div>
                 </div>
                 <div id="hra-warning" class="calc-warning-banner" style="display: none;"></div>
-                <div class="dark-mode-notice-box">
+                <div id="hra-loan-legal-warning" class="dark-mode-notice-box" style="display: none;">
                     <p><i class="fas fa-exclamation-triangle" style="color: #eab308; margin-right: 8px;"></i> <strong>Note:</strong> You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
                 </div>
                 <div class="calc-custom-row single-row-span">
@@ -228,7 +248,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
         <div class="post-card calculation-card">
             <div class="section-card-header">
                 <h3><i class="fas fa-gift" style="margin-right: 8px; color: #ec4899;"></i> Perks & Flexi-Benefits</h3>
@@ -241,7 +260,6 @@ permalink: /tax-calculator/
                 <button type="button" id="add-perk-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Benefit/Perk</button>
             </div>
         </div>
-
         <div class="post-card calculation-card collapsible-section-box">
             <div id="80c-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-coins" style="margin-right: 8px; color: #eab308;"></i>Section 80C Deductions</span>
@@ -257,7 +275,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
         <div class="post-card calculation-card collapsible-section-box">
             <div id="80d-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-hand-holding-medical" style="margin-right: 8px; color: #10b981;"></i>Section 80D: Health Insurance</span>
@@ -279,7 +296,6 @@ permalink: /tax-calculator/
                 </label>
             </div>
         </div>
-
         <div class="post-card calculation-card collapsible-section-box">
             <div id="home-loan-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-home" style="margin-right: 8px; color: #6366f1;"></i>Home Loan Assistant</span>
@@ -292,14 +308,12 @@ permalink: /tax-calculator/
                         <input type="checkbox" id="has-home-loan" style="width: 18px; height: 18px; cursor: pointer;">
                     </div>
                 </div>
-
                 <div id="home-loan-wizard" style="display: none;">
                     <div style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-base);">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem; font-weight: 600;">
                             <input type="checkbox" id="is-first-buyer" style="width: 16px; height: 16px;"> Is this your first home? (Required for 80EE/80EEA)
                         </label>
                     </div>
-
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 20px;">
                         <div>
                             <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px; font-weight: 700;">Possession Status</label>
@@ -316,11 +330,9 @@ permalink: /tax-calculator/
                             </div>
                         </div>
                     </div>
-
                     <div id="under-construction-msg" class="calc-warning-banner" style="display: none; color: #b45309; background: #fffbeb; border-color: #f59e0b; margin-bottom: 15px;">
                         <i class="fas fa-info-circle"></i> Interest claimable in 5 installments post-construction.
                     </div>
-
                     <div id="completed-loan-fields">
                         <div class="calc-grid-layout" style="margin-bottom: 20px;">
                             <div class="calc-custom-row">
@@ -332,7 +344,6 @@ permalink: /tax-calculator/
                                 <input type="text" id="loan-interest">
                             </div>
                         </div>
-
                         <div style="background: var(--bg-offset); padding: 20px; border-radius: 12px; border: 1px solid var(--border-base);">
                             <div class="calc-grid-layout">
                                 <div class="calc-custom-row">
@@ -356,7 +367,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
         <div id="conditional-deductions" style="display: none; margin-top: 25px;">
             <div class="post-card collapsible-section-box" style="border: 1px solid var(--border-base); border-radius: 12px; background: var(--bg-container); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                 <div id="benefits-summary-header" class="calc-collapse-trigger" style="padding: 18px 25px; background: rgba(14,165,233,0.03); border-bottom: 1px solid var(--border-base);">
@@ -397,16 +407,14 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-    </div>
-        
+    </div>    
     <!-- Sidebar Panel: Transformed to Stacked Up-and-Down Rows -->
     <div class="calc-results sticky-score-panel sidebar-stacked-layout">
     <div class="sidebar-panel-header-accent">
         <h3 class="sidebar-panel-heading">
             <i class="fas fa-receipt" style="margin-right: 10px; color: #38bdf8; font-size: 1.1rem;"></i>Tax Liability
         </h3>
-    </div>
-    
+    </div>   
     <div class="sidebar-stacked-rows-container">
         <div id="old-regime-card" class="regime-row-card">
             <div class="regime-meta-info">
@@ -414,7 +422,6 @@ permalink: /tax-calculator/
             </div>
             <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
         </div>
-        
         <div id="new-regime-card" class="regime-row-card">
             <div class="regime-meta-info">
                 <span class="regime-row-title">New Regime</span>
@@ -422,12 +429,10 @@ permalink: /tax-calculator/
             <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
         </div>
     </div>
-
     <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
     <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
 </div>
 </div>
-
 <div id="tax-breakdown-section" class="post-card breakdown-section-wrapper" style="padding: 25px; border-top: 4px solid var(--brand-primary); margin-top: 30px;">
     <h3 style="margin-top: 0; text-align: center;"><i class="fas fa-list-ul" style="margin-right: 10px; color: var(--brand-primary);"></i>Detailed Comparison Summary</h3>
     <div class="table-wrapper">
