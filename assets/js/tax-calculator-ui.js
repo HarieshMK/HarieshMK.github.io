@@ -12,7 +12,7 @@ const TaxUI = {
         }
     },
 
-    // 2. Custom Select Interaction Layer (Handles Layout and Themes)
+    // 2. Custom Select Interaction Layer (Cleaned up to never block Add buttons)
     initCustomDropdowns() {
         document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
             const trigger = wrapper.querySelector('.custom-select-trigger');
@@ -21,7 +21,6 @@ const TaxUI = {
 
             if (!trigger) return;
 
-            // Toggle active selector dropdown panel
             trigger.onclick = (e) => {
                 e.stopPropagation();
                 document.querySelectorAll('.custom-select-wrapper').forEach(other => {
@@ -30,7 +29,6 @@ const TaxUI = {
                 wrapper.classList.toggle('open');
             };
 
-            // Option selection click tracking mapping
             wrapper.querySelectorAll('.custom-option').forEach(option => {
                 option.onclick = (e) => {
                     e.stopPropagation();
@@ -51,9 +49,11 @@ const TaxUI = {
             });
         });
 
-        // Close select layouts if clicked anywhere outside on the open window canvas
-        window.addEventListener('click', () => {
-            document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        // Safely close custom dropdowns without blocking standard DOM button actions
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-select-wrapper')) {
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+            }
         });
     },
 
@@ -119,7 +119,7 @@ const TaxUI = {
         }
     },
 
-    // 5. Tax Regime Dynamic Highlights (Winner / Loser Card States)
+    // 5. Tax Regime Dynamic Highlights
     updateRegimeHighlights() {
         const oldCard = document.getElementById('old-regime-card');
         const newCard = document.getElementById('new-regime-card');
@@ -258,32 +258,6 @@ document.addEventListener("DOMContentLoaded", function() {
         radio.addEventListener('change', TaxUI.handleLoanStatusChange);
     });
 
-    // Fix layouts dynamically when elements are added to containers (e.g. dynamic perk rows)
-    const dynamicObserver = new MutationObserver(() => {
-        document.querySelectorAll('.perk-row, [id*="-rows-container"] > div').forEach(row => {
-            // Re-apply explicit alignment logic to match grid rules perfectly
-            if (row.style.display !== 'grid') {
-                row.style.setProperty('display', 'grid', 'important');
-                row.style.setProperty('grid-template-columns', '1.62fr 1fr auto', 'important');
-                row.style.setProperty('align-items', 'center', 'important');
-                row.style.setProperty('gap', '15px', 'important');
-            }
-            
-            // Re-adjust inline trash bins alignment to prevent line breaking
-            const trashBtn = row.querySelector('.delete-perk-btn, .remove-btn, .fa-trash')?.parentElement || row.querySelector('button, i.fa-trash');
-            if (trashBtn) {
-                trashBtn.style.setProperty('margin', '0', 'important');
-                trashBtn.style.setProperty('display', 'inline-flex', 'important');
-                trashBtn.style.setProperty('align-items', 'center', 'important');
-            }
-        });
-    });
-
-    const containers = [document.getElementById('perks-rows-container'), document.getElementById('80c-rows-container')];
-    containers.forEach(container => {
-        if (container) dynamicObserver.observe(container, { childList: true, subtree: true });
-    });
-
     setTimeout(() => {
         TaxUI.updateRegimeHighlights();
         TaxUI.checkHraLoanWarning();
@@ -300,35 +274,55 @@ document.addEventListener("DOMContentLoaded", function() {
         .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
         .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
         
-        /* Force theme native elements to resolve white-out options across all engines */
+        /* 1. Force row components to align as a single structural line */
+        .perk-row, 
+        #perks-rows-container > div, 
+        #80c-rows-container > div {
+            display: grid !important;
+            grid-template-columns: 1.62fr 1fr auto !important;
+            align-items: center !important;
+            gap: 15px !important;
+            margin-bottom: 12px !important;
+            width: 100% !important;
+        }
+
+        /* Prevent trash containers or buttons from dropping down */
+        .perk-row button, 
+        #perks-rows-container .delete-perk-btn, 
+        #80c-rows-container .remove-btn {
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            grid-column: 3 / 4 !important;
+        }
+
+        /* 2. Absolute fix for native dropdown select element background & font appearance */
         .unique-tax-calc select, 
         #perks-rows-container select, 
         #80c-rows-container select {
-            background-color: var(--bg-body) !important;
-            color: var(--text-primary) !important;
+            background-color: #0f172a !important;   /* Hardcoded rich slate dark instead of relying on broken vars */
+            color: #f8fafc !important;              /* Force crisp near-white font text color */
             padding: 12px 15px !important;
-            border-radius: 14px !important;
+            border-radius: 12px !important;
             height: 50px !important;
-            border: 1.5px solid var(--border-base) !important;
+            border: 1.5px solid #334155 !important; /* Dark Slate border lines */
             font-family: 'JetBrains Mono', monospace !important;
             font-weight: 700 !important;
             appearance: none !important;
             -webkit-appearance: none !important;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394a3b8' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !important;
             background-repeat: no-repeat !important;
             background-position: calc(100% - 15px) center !important;
             padding-right: 40px !important;
         }
+
+        /* Force option lists to use matching dark backgrounds across all browser rendering engines */
         .unique-tax-calc select option, 
         #perks-rows-container select option, 
         #80c-rows-container select option {
-            background-color: var(--bg-card) !important;
-            color: var(--text-primary) !important;
-        }
-        .unique-tax-calc select:hover, 
-        #perks-rows-container select:hover, 
-        #80c-rows-container select:hover {
-            border-color: var(--brand-primary) !important;
+            background-color: #1e293b !important;   /* Rich card dark base color */
+            color: #f8fafc !important;              /* High visibility text */
         }
     `;
     document.head.appendChild(errorStyle);
