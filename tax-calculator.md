@@ -427,21 +427,18 @@ permalink: /tax-calculator/
 }
 
 /* FIX: Premium treatment for native dropdown options in both themes */
+.unique-tax-calc select,
+.perk-row select,
+.row-80c-manual select {
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+}
+
 .unique-tax-calc select option,
 .perk-row select option,
 .row-80c-manual select option {
-    background-color: var(--bg-card) !important;
-    color: var(--text-primary) !important;
-    font-family: 'JetBrains Mono', monospace !important;
-}
-
-/* Ensure focus states match the theme */
-.unique-tax-calc input:focus, 
-.unique-tax-calc select:focus,
-.dynamic-input:focus {
-    outline: none !important;
-    border-color: #0ea5e9 !important;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    color: #0f172a !important; /* Premium deep charcoal text color */
+    background-color: #ffffff !important; /* Force matching white background */
 }
 
 /* ==========================================================================
