@@ -1,8 +1,7 @@
 const TaxController = {
     isDirty: false,
     isInitialLoading: true,
-    
-    // 3. THIS IS THE init() FUNCTION. It runs when the page loads.
+
     init: async () => {
         console.log("Tax Controller Initializing...");
         if (!window.FinanceEngine || !window.TAX_CONFIG) { 
