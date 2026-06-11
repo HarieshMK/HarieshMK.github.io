@@ -398,7 +398,18 @@ const TaxController = {
             if (document.getElementById('parents-senior')) { document.getElementById('parents-senior').checked = !!i.parentsSenior; }
             if (pContainer) { if (i.perks && i.perks.length > 0) { i.perks.forEach(p => { const cleanVal = parseFloat(p.amount || p.value) || 0; TaxController.addPerkRow(p.type, cleanVal); }); } else { TaxController.addPerkRow("Professional Tax", 2500); } }
             if (cContainer) { if (i.deductions80C && i.deductions80C.length > 0) { i.deductions80C.forEach(inv => { if (inv.type === "Employee PF" || inv.type === "Home Loan Principal") return; const cleanInv = Math.round(parseFloat(inv.amount)) || 0; TaxController.add80CRow(inv.type, cleanInv); }); } else { TaxController.add80CRow(); } }
-            setTimeout(() => { TaxController.calculateAll(); }, 50);
+            setTimeout(() => {
+                ['fy-selector', 'is-metro'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                if (window.TaxUI && typeof window.TaxUI.syncCustomDropdowns === 'function') {
+                    window.TaxUI.syncCustomDropdowns();
+                }
+                TaxController.calculateAll();
+            }, 50);
         } catch (parseError) { console.error("CRITICAL ERROR: Failed parsing user data:", parseError); }
     }
 };
