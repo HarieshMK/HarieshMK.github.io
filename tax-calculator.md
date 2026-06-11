@@ -398,7 +398,7 @@ permalink: /tax-calculator/
         line-height: 1.5;
     }
 
-    /* ==========================================================================
+/* ==========================================================================
    2. PREMIUM FIELD INJECTIONS (THEME-AWARE)
    ========================================================================== */
 .unique-tax-calc input[type="text"],
@@ -425,6 +425,15 @@ permalink: /tax-calculator/
     background-color: var(--bg-body) !important;
     border: 1.5px solid var(--border-base) !important;
     color: var(--text-primary) !important;
+}
+
+/* FIX: Premium treatment for native dropdown options in both themes */
+.unique-tax-calc select option,
+.perk-row select option,
+.row-80c-manual select option {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    font-family: 'JetBrains Mono', monospace !important;
 }
 
 /* Ensure focus states match the theme */
