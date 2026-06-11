@@ -69,7 +69,7 @@ permalink: /tax-calculator/
                     </div>
                 </div>
                 <div id="hra-warning" class="calc-warning-banner" style="display: none;"></div>
-                <div id="hra-loan-legal-warning" class="dark-mode-notice-box" style="display: none;">
+                <div id="hra-loan-legal-warning" class="dark-mode-notice-box" style="display: none; margin-top: 15px;">
                     <p><i class="fas fa-exclamation-triangle" style="color: #eab308; margin-right: 8px;"></i> <strong>Note:</strong> You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
                 </div>
                 <div class="calc-custom-row single-row-span" style="margin-top: 15px;">
@@ -190,7 +190,7 @@ permalink: /tax-calculator/
                                 </div>
                             </div>
                             <div id="branch-80ee-fields" class="calc-custom-row single-row-span" style="display:none; margin-top: 15px;">
-                                <label for="original-loan-amt" style="color: var(--color-danger);">Sanctioned Loan Amount</label>
+                                <label for="original-loan-amt">Sanctioned Loan Amount</label>
                                 <input type="text" id="original-loan-amt">
                             </div>
                             <div id="branch-80eea-fields" style="display:none; margin-top: 15px; text-align: center;">
@@ -264,6 +264,9 @@ permalink: /tax-calculator/
                 <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
             </div>
         </div>
+
+        <div id="regime-recommendation-banner" class="dark-mode-notice-box" style="margin-top: 15px; text-align: center; font-weight: 600; display: none;"></div>
+
         <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
         <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
     </div>
@@ -288,7 +291,7 @@ permalink: /tax-calculator/
                 </tr>
                 <tr>
                     <td style="padding: 14px 12px;">Standard Deduction</td>
-                    <td id="summary-standard-deduction" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
+                    <td id="summary-standard-deduction-old" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
                     <td id="summary-standard-deduction-new" class="text-right tabular-nums" style="padding: 14px 12px;">₹ 0</td>
                 </tr>
                 <tr>
@@ -309,6 +312,16 @@ permalink: /tax-calculator/
                 <tr>
                     <td style="padding: 14px 12px;">Home Loan Interest (Sec 24b)</td>
                     <td id="summary-24b-deduction" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
+                    <td class="text-right text-muted tabular-nums" style="font-style: italic; padding: 14px 12px;">Not Eligible</td>
+                </tr>
+                <tr id="summary-row-80eea" style="display: none;">
+                    <td style="padding: 14px 12px;">Section 80EEA Deduction</td>
+                    <td id="summary-80eea-deduction" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
+                    <td class="text-right text-muted tabular-nums" style="font-style: italic; padding: 14px 12px;">Not Eligible</td>
+                </tr>
+                <tr id="summary-row-80ee" style="display: none;">
+                    <td style="padding: 14px 12px;">Section 80EE Deduction</td>
+                    <td id="summary-80ee-deduction" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
                     <td class="text-right text-muted tabular-nums" style="font-style: italic; padding: 14px 12px;">Not Eligible</td>
                 </tr>
                 <tr style="background: rgba(14, 165, 233, 0.04); font-weight: bold;">
