@@ -3,9 +3,6 @@ const TaxController = {
     isInitialLoading: true,
 
     init: async () => {
-        console.log("Tax Controller Initializing...");
-        
-        // Robust Polling Fallback if external engines load out of sync
         if (!window.FinanceEngine || !window.TAX_CONFIG) { 
             console.warn("Tax engines missing. Retrying initialization context..."); 
             const retryInterval = setInterval(async () => {
@@ -25,27 +22,23 @@ const TaxController = {
             }
         });
 
-        TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
-        TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
-        TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
-        TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
-        
-        // Consolidated Event Delegation System (Handles Input & Change patterns)
         const handleInteraction = (e) => {
             TaxController.handleDelegatedInput(e);
 
             if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox' || e.target.type === 'radio') {
                 TaxController.isDirty = true;
-                
-                // Specific Radio Trigger actions
-                if (e.target.name === 'possession') {
-                    TaxController.handleLoanStatusChange();
+
+                // Safely hand over presentation-state changes to the window UI object if ready
+                if (e.target.name === 'possession' && window.TaxUI) {
+                    window.TaxUI.handleLoanStatusChange();
                 }
 
                 const row = e.target.closest('.perk-row');
                 if (row) { 
                     const perkSelect = row.querySelector('select'); 
-                    if (perkSelect) { TaxController.handlePerkUIFeedback(e.target, perkSelect.value); } 
+                    if (perkSelect && window.TaxUI) { 
+                        window.TaxUI.handlePerkUIFeedback(e.target, perkSelect.value); 
+                    } 
                 }
                 TaxController.calculateAll();
             }
@@ -57,7 +50,6 @@ const TaxController = {
         const appFySelector = document.getElementById('fy-selector');
         if (appFySelector) {
             appFySelector.addEventListener('change', async () => {
-                console.log(`FY Dropdown changed to: ${appFySelector.value}. Fetching fresh data...`);
                 TaxController.isInitialLoading = true;
                 await TaxController.loadUserData();
                 TaxController.isInitialLoading = false;
@@ -89,73 +81,6 @@ const TaxController = {
         }
     },
 
-    setupToggle: (headerId, contentId, iconId) => {
-        const header = document.getElementById(headerId);
-        const content = document.getElementById(contentId);
-        const icon = document.getElementById(iconId);
-        if (header && content && icon) {
-            if (content.classList.contains('content-hidden')) { content.style.display = 'none'; }
-            header.onclick = (e) => {
-                e.stopPropagation();
-                const isHidden = (content.style.display === 'none');
-                content.style.display = isHidden ? 'block' : 'none';
-                icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-                content.classList.remove('content-hidden');
-            };
-        }
-    },
-
-    handlePerkUIFeedback: (inputElement, perkName) => {
-        const value = TaxController.cleanNum(inputElement.value);
-        const fy = document.getElementById('fy-selector')?.value || "2026-27";
-        const config = window.TAX_CONFIG[fy] || window.TAX_CONFIG["2026-27"];
-        if (perkName === "Meal Coupons" && config?.perkRules?.["Meal Coupons"]) {
-            let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
-            if (!warningDiv) { warningDiv = document.createElement('div'); warningDiv.className = 'perk-limit-warning'; inputElement.parentNode.appendChild(warningDiv); }
-            const limit = config.perkRules["Meal Coupons"].govtLimit;
-            if (value > limit) { warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Standard exempt limit is ₹${limit.toLocaleString('en-IN')}.`; warningDiv.style.display = 'block'; } else { warningDiv.style.display = 'none'; }
-        }
-        if (perkName === "Fuel Allowance" || perkName === "Mobile Reimbursement") { inputElement.placeholder = "Enter amount as per bills"; }
-    },
-
-    toggleLoanWizard() {
-        const hasLoan = document.getElementById('has-home-loan')?.checked;
-        const wizard = document.getElementById('home-loan-wizard');
-        const deductions = document.getElementById('conditional-deductions');
-        if (wizard) wizard.style.display = hasLoan ? 'block' : 'none';
-        if (deductions) deductions.style.display = hasLoan ? 'block' : 'none';
-        TaxController.calculateAll();
-    },
-
-    handleLoanStatusChange() {
-        const status = document.querySelector('input[name="possession"]:checked')?.value;
-        const msg = document.getElementById('under-construction-msg');
-        const fields = document.getElementById('completed-loan-fields');
-        if (status === 'under-construction') { if (msg) msg.style.display = 'block'; if (fields) fields.style.display = 'none'; } else { if (msg) msg.style.display = 'none'; if (fields) fields.style.display = 'block'; }
-        TaxController.calculateAll();
-    },
-
-    handleDateBranching: () => {
-        const dateVal = document.getElementById('loan-sanction-date')?.value;
-        const branchEE = document.getElementById('branch-80ee-fields');
-        const branchEEA = document.getElementById('branch-80eea-fields');
-        if (!branchEE || !branchEEA) return;
-        
-        branchEE.style.display = 'none';
-        branchEEA.style.display = 'none';
-
-        if (!dateVal || !window.ELIGIBILITY_RULES) return; 
-        
-        const sanctionDate = new Date(dateVal);
-        const rules = window.ELIGIBILITY_RULES;
-        
-        if (rules.sec80EE && sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end) { 
-            branchEE.style.display = 'block'; 
-        } else if (rules.sec80EEA && sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end) { 
-            branchEEA.style.display = 'block'; 
-        }
-    },
-
     syncPrincipalTo80C: (amount) => {
         const container = document.getElementById('80c-rows-container');
         if (!container) return;
@@ -166,11 +91,6 @@ const TaxController = {
                 if (targetInput) { targetInput.value = TaxController.formatIndianCurrency(amount.toString()); }
             }
         } else if (principalRow) { principalRow.remove(); }
-    },
-
-    scrollToResults() {
-        const target = document.getElementById('tax-breakdown-section');
-        if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     },
 
     handleSave: async () => {
@@ -306,7 +226,10 @@ const TaxController = {
         let extraSection = null;
         let isSelfOccupied = document.querySelector('input[name="occupancy"]:checked')?.value === 'self';
         let eligible24b = 0;
-        TaxController.handleDateBranching();
+
+        // Route date evaluation to UI layer
+        if (window.TaxUI) { window.TaxUI.handleDateBranching(); }
+
         if (hasLoan) {
             homeLoanInterest = TaxController.cleanNum(document.getElementById('loan-interest')?.value);
             homeLoanPrincipal = TaxController.cleanNum(document.getElementById('loan-principal')?.value);
@@ -361,6 +284,12 @@ const TaxController = {
             const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, deductionsObj, basic);
             processedPerks.forEach((p, index) => { const eligibleVal = p.eligibleNew; if (rawPerks[index]?.element) { rawPerks[index].element.innerText = `₹ ${Number(eligibleVal).toLocaleString('en-IN')}`; } });
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
+            
+            // Invoke display updates globally across layout layers
+            if (window.TaxUI) {
+                window.TaxUI.updateRegimeHighlights();
+                window.TaxUI.checkHraLoanWarning();
+            }
         } catch (err) { console.error("Calculation Engine Error:", err); }
     },
 
@@ -444,10 +373,10 @@ const TaxController = {
             };
             setNumericValue('basic-salary', i.basic); setNumericValue('hra-received', i.hra); setNumericValue('rent-paid', i.rent); setNumericValue('other-income', i.otherIncome);
             if (document.getElementById('is-metro')) { document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false"; }
-            if (document.getElementById('has-home-loan')) { document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true); TaxController.toggleLoanWizard(); }
+            if (document.getElementById('has-home-loan')) { document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true); if (window.TaxUI) window.TaxUI.toggleLoanWizard(); }
             setNumericValue('loan-interest', i.homeInterest); setNumericValue('loan-principal', i.loanPrincipal); setNumericValue('property-stamp-value', i.propertyValue);
             if (document.getElementById('loan-sanction-date')) { document.getElementById('loan-sanction-date').value = i.sanctionDate || ""; }
-            if (i.isUnderConstruction !== undefined) { const radio = document.querySelector(`input[name="possession"][value="${i.isUnderConstruction ? 'under-construction' : 'completed'}"]`); if (radio) { radio.checked = true; TaxController.handleLoanStatusChange(); } }
+            if (i.isUnderConstruction !== undefined) { const radio = document.querySelector(`input[name="possession"][value="${i.isUnderConstruction ? 'under-construction' : 'completed'}"]`); if (radio) { radio.checked = true; if (window.TaxUI) window.TaxUI.handleLoanStatusChange(); } }
             if (i.occupancy) { const occRadio = document.querySelector(`input[name="occupancy"][value="${i.occupancy}"]`); if (occRadio) occRadio.checked = true; }
             setNumericValue('80d-self', i.healthSelf); setNumericValue('80d-parents', i.healthParents); setNumericValue('nps-80ccd-1b', i.npsExtra);
             if (document.getElementById('parents-senior')) { document.getElementById('parents-senior').checked = !!i.parentsSenior; }
@@ -458,30 +387,10 @@ const TaxController = {
     }
 };
 
-let errorStyle = document.getElementById('tax-calculator-error-styles');
-if (!errorStyle) {
-    errorStyle = document.createElement('style');
-    errorStyle.id = 'tax-calculator-error-styles';
-    errorStyle.innerHTML = `.input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }`;
-    document.head.appendChild(errorStyle);
-}
-
-function validateInputs() {
-    let isValid = true;
-    document.querySelectorAll('.currency-mapped').forEach(input => {
-        const val = TaxController.cleanNum(input.value);
-        if (val < 0) { input.classList.add('input-error'); isValid = false; } else { input.classList.remove('input-error'); }
-    });
-    return isValid;
-}
-
 window.TaxController = TaxController;
 window.add80CRow = TaxController.add80CRow;
 window.addPerkRow = TaxController.addPerkRow;
 window.calculateAll = TaxController.calculateAll;
 window.handleSave = () => TaxController.handleSave();
-window.toggleLoanWizard = () => TaxController.toggleLoanWizard();
-window.scrollToResults = () => TaxController.scrollToResults();
-window.validateInputs = validateInputs;
 
 document.addEventListener('DOMContentLoaded', TaxController.init);
