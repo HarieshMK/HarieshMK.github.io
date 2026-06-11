@@ -10,39 +10,7 @@ permalink: /tax-calculator/
 <script src="/assets/js/tax-calculator.js"></script>
 
 <script>
-    function formatIndianInput(el) {
-        let val = el.value.replace(/[^0-9.]/g, '');
-        if (!val) { el.value = ''; return; }
-        
-        let parts = val.split('.');
-        let num = parts[0];
-        
-        if(num.length > 3) {
-            let lastThree = num.substring(num.length - 3);
-            let otherBits = num.substring(0, num.length - 3);
-            num = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree;
-        }
-        
-        el.value = parts.length > 1 ? num + '.' + parts[1].substring(0, 2) : num;
-    }
-
-    function parseCleanValue(id) {
-        const el = document.getElementById(id);
-        if(!el) return 0;
-        return parseFloat(el.value.replace(/,/g, '')) || 0;
-    }
-
-    function formatIndianNumber(num) {
-        let parsedNum = parseFloat(num);
-        if (isNaN(parsedNum)) return '₹ 0';
-        let x = Math.round(parsedNum).toString();
-        let lastThree = x.substring(x.length - 3);
-        let otherBits = x.substring(0, x.length - 3);
-        if(otherBits != '') lastThree = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + ',' + lastThree;
-        return '₹ ' + lastThree;
-    }
-
-    // Dynamic UI styling rule applier for the winner/loser system
+    // Pure Visual/Layout Controller for the Jekyll MD File context
     function updateRegimeHighlights() {
         const oldCard = document.getElementById('old-regime-card');
         const newCard = document.getElementById('new-regime-card');
@@ -51,20 +19,19 @@ permalink: /tax-calculator/
         const getVal = (id) => {
             const el = document.getElementById(id);
             if (!el) return 0;
-            const text = el.innerText || el.value || "0";
-            return parseFloat(text.replace(/[^0-9.-]+/g, "")) || 0;
+            return parseFloat(el.innerText.replace(/[^0-9.-]+/g, "")) || 0;
         };
 
         const oldTax = getVal('old-regime-tax');
         const newTax = getVal('new-regime-tax');
 
-        // Reset card classes safely
+        // Reset and clear card statuses safely
         oldCard.className = 'regime-row-card';
         newCard.className = 'regime-row-card';
 
         if (oldTax === 0 && newTax === 0) return;
 
-        // Apply strict semantic classes
+        // Apply visual context matching the dynamic state changes
         if (oldTax < newTax) {
             oldCard.classList.add('regime-winner');
             newCard.classList.add('regime-loser');
@@ -75,14 +42,16 @@ permalink: /tax-calculator/
     }
 
     function checkHraLoanWarning() {
-        const rentPaid = parseCleanValue('rent-paid');
+        const rentInput = document.getElementById('rent-paid');
         const homeLoanCheck = document.getElementById('has-home-loan');
         const warningBox = document.getElementById('hra-loan-legal-warning');
-        
         if (!warningBox) return;
 
-        // Strict AND Condition: Rent is entered AND the Home loan checkbox is checked
-        if (rentPaid > 0 && homeLoanCheck && homeLoanCheck.checked) {
+        const rentPaid = rentInput ? (parseFloat(rentInput.value.replace(/,/g, "")) || 0) : 0;
+        const loanChecked = homeLoanCheck ? homeLoanCheck.checked : false;
+
+        // Displays warning if tax filer claims HRA while actively declaring an active Home Loan
+        if (rentPaid > 0 && loanChecked) {
             warningBox.style.display = 'block';
         } else {
             warningBox.style.display = 'none';
@@ -90,113 +59,33 @@ permalink: /tax-calculator/
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const setupCalcInput = (id) => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.addEventListener('input', function() {
-                    formatIndianInput(this);
-                    if(typeof calculateAll === 'function') calculateAll();
-                    checkHraLoanWarning();
-                    updateRegimeHighlights();
-                });
-            }
-        };
-
-        const setupCalcChange = (id) => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.addEventListener('change', function() {
-                    if(typeof calculateAll === 'function') calculateAll();
-                    updateRegimeHighlights();
-                });
-            }
-        };
-
-        ['basic-salary', 'hra-received', 'rent-paid', 'other-income', '80d-self', '80d-parents', 'loan-principal', 'loan-interest', 'property-stamp-value', 'original-loan-amt'].forEach(setupCalcInput);
-        ['fy-selector', 'is-metro', 'parents-senior', 'loan-sanction-date'].forEach(setupCalcChange);
-
-        const bindToggle = (headerId, contentId, iconId) => {
-            const header = document.getElementById(headerId);
-            if(header) {
-                header.addEventListener('click', function() {
-                    if(window.TaxController && typeof window.TaxController.setupToggle === 'function') {
-                        window.TaxController.setupToggle(headerId, contentId, iconId);
-                    }
-                });
-            }
-        };
-
-        bindToggle('80c-header', '80c-content', '80c-icon');
-        bindToggle('80d-header', '80d-content', '80d-icon');
-        bindToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
-        bindToggle('benefits-summary-header', 'benefits-summary-content', 'benefits-summary-icon');
-
-        // Mutation Observer to safely listen for script updates
-        const sidebarObserver = new MutationObserver(() => {
-            updateRegimeHighlights();
-        });
-
+        // Monitor text changes to update the visual summary highlights
         const targetOld = document.getElementById('old-regime-tax');
         const targetNew = document.getElementById('new-regime-tax');
-
+        
         if (targetOld && targetNew) {
-            sidebarObserver.observe(targetOld, { childList: true, characterData: true, subtree: true });
-            sidebarObserver.observe(targetNew, { childList: true, characterData: true, subtree: true });
+            const layoutObserver = new MutationObserver(() => {
+                updateRegimeHighlights();
+            });
+            layoutObserver.observe(targetOld, { childList: true, characterData: true, subtree: true });
+            layoutObserver.observe(targetNew, { childList: true, characterData: true, subtree: true });
         }
 
-        const addPerkBtn = document.getElementById('add-perk-btn');
-        if(addPerkBtn) {
-            addPerkBtn.addEventListener('click', function() { 
-                if(window.TaxController && typeof window.TaxController.addPerkRow === 'function') {
-                    window.TaxController.addPerkRow(); 
-                }
-            });
-        }
-            
-        const add80cBtn = document.getElementById('add-80c-btn');
-        if(add80cBtn) {
-            add80cBtn.addEventListener('click', function() { 
-                if(window.TaxController && typeof window.TaxController.add80CRow === 'function') {
-                    window.TaxController.add80CRow(); 
-                }
-            });
-        }
-
-        const homeLoanCheck = document.getElementById('has-home-loan');
-        if(homeLoanCheck) {
-            homeLoanCheck.addEventListener('change', function() {
-                if(window.TaxController && typeof window.TaxController.toggleLoanWizard === 'function') {
-                    window.TaxController.toggleLoanWizard();
-                }
-                checkHraLoanWarning();
-            });
-        }
-
-        const possessionRadios = document.querySelectorAll('input[name="possession"]');
-        possessionRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if(window.TaxController && typeof window.TaxController.handleLoanStatusChange === 'function') {
-                    window.TaxController.handleLoanStatusChange();
-                }
-            });
+        // Global layout scanning hooks tied to form fields for prompt warning updates
+        document.addEventListener('input', function() {
+            checkHraLoanWarning();
+        });
+        document.addEventListener('change', function() {
+            checkHraLoanWarning();
+            // Let mutation handles complete rendering cycle smoothly
+            setTimeout(updateRegimeHighlights, 50); 
         });
 
-        const occupancyRadios = document.querySelectorAll('input[name="occupancy"]');
-        occupancyRadios.forEach(radio => {
-            radio.addEventListener('change', function() { if(typeof calculateAll === 'function') calculateAll(); });
-        });
-
-        const viewBreakdownBtn = document.getElementById('view-breakdown-btn');
-        if(viewBreakdownBtn) viewBreakdownBtn.addEventListener('click', function() { if(typeof scrollToResults === 'function') scrollToResults(); });
-
-        const saveBtn = document.getElementById('save-btn');
-        if(saveBtn) saveBtn.addEventListener('click', function() { if(typeof handleSave === 'function') handleSave(); });
-
-        // Run highlight and validation scans directly on page boot
+        // Warm up state visualization on boot sequence
         setTimeout(() => {
             updateRegimeHighlights();
             checkHraLoanWarning();
-        }, 300);
+        }, 400);
     });
 </script>
 
