@@ -12,13 +12,22 @@ permalink: /tax-calculator/
 
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
     <h2 class="calc-main-title" style="margin: 0; font-family: 'Lora', serif; font-size: 1.6rem;"><i class="fas fa-wallet" style="margin-right: 12px; color: var(--brand-primary);"></i>Income Tax Calculator</h2>
-    <div class="calc-fy-dropdown-container" style="min-width: 240px;">
-        <select id="fy-selector" class="calc-select">
+    <div class="calc-fy-dropdown-container" style="min-width: 240px; position: relative;">
+        <select id="fy-selector" class="calc-select" style="display: none !important;">
             <option value="2026-27" selected>FY 2026-27</option>
             <option value="2025-26">FY 2025-26</option> 
         </select>
-    </div>
-</div>
+        <div class="custom-select-wrapper" data-target="#fy-selector">
+            <div class="custom-select-trigger">
+                <span>FY 2026-27</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="custom-options-panel">
+                <div class="custom-option selected" data-value="2026-27">FY 2026-27</div>
+                <div class="custom-option" data-value="2025-26">FY 2025-26</div>
+            </div>
+        </div>
+    </div> </div>
 
 <div class="calculator-container unique-tax-calc">
     <div class="calc-inputs">
@@ -42,22 +51,32 @@ permalink: /tax-calculator/
                     </div>
                     <div class="calc-custom-row">
                         <label for="is-metro">City of Residence</label>
-                        <select id="is-metro" class="calc-select">
+                        <select id="is-metro" class="calc-select" style="display: none !important;">
                             <option value="true" selected>Metro</option>
                             <option value="false">Non-Metro</option>
                         </select>
+                        <div class="custom-select-wrapper" data-target="#is-metro">
+                            <div class="custom-select-trigger">
+                                <span>Metro</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-options-panel">
+                                <div class="custom-option selected" data-value="true">Metro</div>
+                                <div class="custom-option" data-value="false">Non-Metro</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div id="hra-warning" class="calc-warning-banner" style="display: none;"></div>
+                </div> <div id="hra-warning" class="calc-warning-banner" style="display: none;"></div>
                 <div id="hra-loan-legal-warning" class="dark-mode-notice-box" style="display: none;">
                     <p><i class="fas fa-exclamation-triangle" style="color: #eab308; margin-right: 8px;"></i> <strong>Note:</strong> You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
                 </div>
-                <div class="calc-custom-row single-row-span">
+                <div class="calc-custom-row single-row-span" style="margin-top: 15px;">
                     <label for="other-income">Other Income / Allowances / Bonus</label>
                     <input type="text" id="other-income" placeholder="₹ Enter Total Amount">
                 </div>
             </div>
         </div>
+
         <div class="post-card calculation-card">
             <div class="section-card-header">
                 <h3><i class="fas fa-gift" style="margin-right: 8px; color: #ec4899;"></i> Perks & Flexi-Benefits</h3>
@@ -70,6 +89,7 @@ permalink: /tax-calculator/
                 <button type="button" id="add-perk-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Benefit/Perk</button>
             </div>
         </div>
+
         <div class="post-card calculation-card collapsible-section-box">
             <div id="80c-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-coins" style="margin-right: 8px; color: #eab308;"></i>Section 80C Deductions</span>
@@ -85,6 +105,7 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
+
         <div class="post-card calculation-card collapsible-section-box">
             <div id="80d-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-hand-holding-medical" style="margin-right: 8px; color: #10b981;"></i>Section 80D: Health Insurance</span>
@@ -106,6 +127,7 @@ permalink: /tax-calculator/
                 </label>
             </div>
         </div>
+
         <div class="post-card calculation-card collapsible-section-box">
             <div id="home-loan-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-home" style="margin-right: 8px; color: #6366f1;"></i>Home Loan Assistant</span>
@@ -177,6 +199,7 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
+
         <div id="conditional-deductions" style="display: none; margin-top: 25px;">
             <div class="post-card collapsible-section-box" style="border: 1px solid var(--border-base); border-radius: 12px; background: var(--bg-container); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                 <div id="benefits-summary-header" class="calc-collapse-trigger" style="padding: 18px 25px; background: rgba(14,165,233,0.03); border-bottom: 1px solid var(--border-base);">
@@ -217,32 +240,31 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-    </div>    
-    <!-- Sidebar Panel: Transformed to Stacked Up-and-Down Rows -->
-    <div class="calc-results sticky-score-panel sidebar-stacked-layout">
-    <div class="sidebar-panel-header-accent">
-        <h3 class="sidebar-panel-heading">
-            <i class="fas fa-receipt" style="margin-right: 10px; color: #38bdf8; font-size: 1.1rem;"></i>Tax Liability
-        </h3>
-    </div>   
-    <div class="sidebar-stacked-rows-container">
-        <div id="old-regime-card" class="regime-row-card">
-            <div class="regime-meta-info">
-                <span class="regime-row-title">Old Regime</span>
+    </div> <div class="calc-results sticky-score-panel sidebar-stacked-layout">
+        <div class="sidebar-panel-header-accent">
+            <h3 class="sidebar-panel-heading">
+                <i class="fas fa-receipt" style="margin-right: 10px; color: #38bdf8; font-size: 1.1rem;"></i>Tax Liability
+            </h3>
+        </div>   
+        <div class="sidebar-stacked-rows-container">
+            <div id="old-regime-card" class="regime-row-card">
+                <div class="regime-meta-info">
+                    <span class="regime-row-title">Old Regime</span>
+                </div>
+                <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
             </div>
-            <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
-        </div>
-        <div id="new-regime-card" class="regime-row-card">
-            <div class="regime-meta-info">
-                <span class="regime-row-title">New Regime</span>
+            <div id="new-regime-card" class="regime-row-card">
+                <div class="regime-meta-info">
+                    <span class="regime-row-title">New Regime</span>
+                </div>
+                <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
             </div>
-            <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
         </div>
+        <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
+        <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
     </div>
-    <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
-    <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
 </div>
-</div>
+
 <div id="tax-breakdown-section" class="post-card breakdown-section-wrapper" style="padding: 25px; border-top: 4px solid var(--brand-primary); margin-top: 30px;">
     <h3 style="margin-top: 0; text-align: center;"><i class="fas fa-list-ul" style="margin-right: 10px; color: var(--brand-primary);"></i>Detailed Comparison Summary</h3>
     <div class="table-wrapper">
@@ -312,12 +334,8 @@ permalink: /tax-calculator/
 </div>
 
 <style>
-
-    .content-hidden {
-    display: none;
-}
     /* ==========================================================================
-       1. STRUCTURAL LAYOUTS (100% Intact from Original Source)
+       1. STRUCTURAL LAYOUTS & CONTAINERS
        ========================================================================== */
     .unique-tax-calc .collapsible-section-box {
         padding: 0;
@@ -382,7 +400,7 @@ permalink: /tax-calculator/
     }
 
     .unique-tax-calc .dark-mode-notice-box {
-        background: var(--bg-offset); /* Adapts to light/dark */
+        background: var(--bg-offset);
         border: 1px solid var(--border-base);
         border-left: 4px solid var(--brand-primary);
         padding: 15px 20px;
@@ -393,147 +411,228 @@ permalink: /tax-calculator/
 
     .unique-tax-calc .dark-mode-notice-box p,
     .unique-tax-calc .dark-mode-notice-box strong {
-        color: var(--text-primary); /* Adapts to light/dark */
+        color: var(--text-primary);
         font-size: 0.9rem;
         line-height: 1.5;
     }
 
-/* ==========================================================================
-   2. PREMIUM FIELD INJECTIONS (THEME-AWARE)
-   ========================================================================== */
-.unique-tax-calc input[type="text"],
-.unique-tax-calc input[type="number"],
-.unique-tax-calc select,
-.unique-tax-calc .dynamic-input,
-.perk-row input,
-.perk-row select,
-.row-80c-manual select,
-.row-80c-manual input,
-.row-80c-statutory input {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 12px 20px !important;
-    border-radius: 14px !important;
-    font-size: 1.1rem !important;
-    height: 50px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-weight: 700 !important;
-    transition: all 0.25s ease-in-out !important;
-    text-align: left !important;
-    background-color: var(--bg-body) !important;
-    border: 1.5px solid var(--border-base) !important;
-    color: var(--text-primary) !important;
-    color-scheme: dark; 
-}
+    /* ==========================================================================
+       2. PREMIUM FIELD INJECTIONS (THEME-AWARE)
+       ========================================================================== */
+    .unique-tax-calc input[type="text"],
+    .unique-tax-calc input[type="number"],
+    .unique-tax-calc select,
+    .unique-tax-calc .dynamic-input,
+    .perk-row input,
+    .perk-row select,
+    .row-80c-manual select,
+    .row-80c-manual input,
+    .row-80c-statutory input {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 20px !important;
+        border-radius: 14px !important;
+        font-size: 1.1rem !important;
+        height: 50px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 700 !important;
+        transition: all 0.25s ease-in-out !important;
+        text-align: left !important;
+        background-color: var(--bg-body) !important;
+        border: 1.5px solid var(--border-base) !important;
+        color: var(--text-primary) !important;
+    }
 
-/* FIX: Premium treatment for native dropdown options in both themes */
-.unique-tax-calc select,
-.perk-row select,
-.row-80c-manual select {
-    color-scheme: dark !important;
-}
+    /* Native select updates adapting smoothly across user light/dark themes */
+    .unique-tax-calc select,
+    .perk-row select,
+    .row-80c-manual select {
+        color-scheme: light dark !important;
+    }
 
-.unique-tax-calc select option,
-.perk-row select option,
-.row-80c-manual select option {
-    color: #0f172a !important; /* Premium deep charcoal text color */
-    background-color: #ffffff !important; /* Force matching white background */
-}
-
-
-/* ==========================================================================
-   3. DYNAMIC PREMIUM SIDEBAR (THEME-AWARE)
-   ========================================================================== */
-
-/* The sidebar layout container */
-.unique-tax-calc .sidebar-stacked-layout {
-    background: var(--bg-card) !important;
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid var(--border-base) !important;
-}
-
-.unique-tax-calc .sidebar-panel-header-accent {
-    border-bottom: 1px solid var(--border-base);
-    padding-bottom: 12px;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.unique-tax-calc .sidebar-panel-heading {
-    margin: 0;
-    text-align: left;
-    font-family: 'Lora', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-}
-
-.unique-tax-calc .sidebar-stacked-rows-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    width: 100%;
-}
-
-/* Individual Regime Cards */
-.unique-tax-calc .regime-row-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 24px 20px;
-    margin-bottom: 16px;
-    border-radius: 12px;
-    border: 1.5px solid var(--border-base) !important;
-    background-color: var(--bg-body) !important; 
-    transition: all 0.3s ease;
-}
-
-/* Titles and Values */
-.unique-tax-calc .regime-row-title {
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-}
-
-.unique-tax-calc .regime-row-value {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-/* ==========================================================================
-   REACTIVE ENGINE (WINNER/LOSER STATES)
-   ========================================================================== */
-.unique-tax-calc .regime-row-card.regime-winner {
-    transform: scale(1.02);
-    border-color: var(--color-success) !important;
-    background-color: rgba(16, 185, 129, 0.05) !important;
-}
-
-.unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
-    color: var(--color-success) !important;
-}
-
-.unique-tax-calc .regime-row-card.regime-loser {
-    transform: scale(1);
-    opacity: 1;
-    border-color: var(--border-base) !important;
-}
-
-.unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
-    color: var(--text-muted) !important;
-}
+    .unique-tax-calc select option,
+    .perk-row select option,
+    .row-80c-manual select option {
+        color: var(--text-primary) !important;
+        background-color: var(--bg-card) !important;
+    }
 
     /* ==========================================================================
-       4. RESPONSIVE LAYER ADDITIONS (Fixes dynamic rows layout)
+       3. DYNAMIC PREMIUM SIDEBAR & REGIME ENGINE
+       ========================================================================== */
+    .unique-tax-calc .sidebar-stacked-layout {
+        background: var(--bg-card) !important;
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid var(--border-base) !important;
+    }
+
+    .unique-tax-calc .sidebar-panel-header-accent {
+        border-bottom: 1px solid var(--border-base);
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .unique-tax-calc .sidebar-panel-heading {
+        margin: 0;
+        text-align: left;
+        font-family: 'Lora', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+    }
+
+    .unique-tax-calc .sidebar-stacked-rows-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+    }
+
+    .unique-tax-calc .regime-row-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 24px 20px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+        border: 1.5px solid var(--border-base) !important;
+        background-color: var(--bg-body) !important; 
+        transition: all 0.3s ease;
+    }
+
+    .unique-tax-calc .regime-row-title {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .unique-tax-calc .regime-row-value {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* WINNER/LOSER ENGINE STATES */
+    .unique-tax-calc .regime-row-card.regime-winner {
+        transform: scale(1.02);
+        border-color: var(--color-success) !important;
+        background-color: rgba(16, 185, 129, 0.05) !important;
+    }
+
+    .unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
+        color: var(--color-success) !important;
+    }
+
+    .unique-tax-calc .regime-row-card.regime-loser {
+        transform: scale(1);
+        opacity: 1;
+        border-color: var(--border-base) !important;
+    }
+
+    .unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
+        color: var(--text-muted) !important;
+    }
+
+    /* ==========================================================================
+       4. CUSTOM THEME-AWARE SELECT COMPONENT
+       ========================================================================== */
+    .custom-select-wrapper {
+        position: relative;
+        width: 100%;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        user-select: none;
+    }
+
+    .custom-select-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 50px;
+        padding: 12px 20px;
+        background-color: var(--bg-body) !important;
+        border: 1.5px solid var(--border-base) !important;
+        color: var(--text-primary) !important;
+        border-radius: 14px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .custom-select-trigger:hover {
+        border-color: var(--brand-primary) !important;
+    }
+
+    .custom-select-wrapper.open .custom-select-trigger {
+        border-color: var(--brand-primary) !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .custom-select-trigger i {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        transition: transform 0.25s ease;
+    }
+
+    .custom-select-wrapper.open .custom-select-trigger i {
+        transform: rotate(180deg);
+    }
+
+    .custom-options-panel {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        background-color: var(--bg-card) !important;
+        border: 1.5px solid var(--border-base) !important;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        z-index: 999;
+        overflow: hidden;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-select-wrapper.open .custom-options-panel {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .custom-option {
+        padding: 12px 20px;
+        color: var(--text-secondary) !important;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-align: left;
+    }
+
+    .custom-option:hover {
+        background-color: rgba(56, 189, 248, 0.08) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .custom-option.selected {
+        background-color: rgba(56, 189, 248, 0.15) !important;
+        color: var(--brand-primary) !important;
+    }
+
+    /* ==========================================================================
+       5. RESPONSIVE HOOKS & FLEX BLOCKS
        ========================================================================== */
     .benefit-flex-row {
         display: flex;
@@ -547,6 +646,7 @@ permalink: /tax-calculator/
         min-height: 80px;
         gap: 15px;
     }
+    
     .benefit-text-stack { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
     .benefit-badge-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .benefit-section-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
