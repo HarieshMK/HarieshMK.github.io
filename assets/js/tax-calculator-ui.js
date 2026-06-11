@@ -27,7 +27,52 @@ const TaxUI = {
         }
     },
 
-    // 3. Tax Regime Dynamic Highlights (Winner / Loser Card States)
+    // 3. Home Loan Interactive Form Wizards
+    toggleLoanWizard() {
+        const hasLoan = document.getElementById('has-home-loan')?.checked;
+        const wizard = document.getElementById('home-loan-wizard');
+        const deductions = document.getElementById('conditional-deductions');
+        if (wizard) wizard.style.display = hasLoan ? 'block' : 'none';
+        if (deductions) deductions.style.display = hasLoan ? 'block' : 'none';
+        if (window.TaxController) window.TaxController.calculateAll();
+    },
+
+    handleLoanStatusChange() {
+        const status = document.querySelector('input[name="possession"]:checked')?.value;
+        const msg = document.getElementById('under-construction-msg');
+        const fields = document.getElementById('completed-loan-fields');
+        if (status === 'under-construction') { 
+            if (msg) msg.style.display = 'block'; 
+            if (fields) fields.style.display = 'none'; 
+        } else { 
+            if (msg) msg.style.display = 'none'; 
+            if (fields) fields.style.display = 'block'; 
+        }
+        if (window.TaxController) window.TaxController.calculateAll();
+    },
+
+    handleDateBranching() {
+        const dateVal = document.getElementById('loan-sanction-date')?.value;
+        const branchEE = document.getElementById('branch-80ee-fields');
+        const branchEEA = document.getElementById('branch-80eea-fields');
+        if (!branchEE || !branchEEA) return;
+        
+        branchEE.style.display = 'none';
+        branchEEA.style.display = 'none';
+
+        if (!dateVal || !window.ELIGIBILITY_RULES) return; 
+        
+        const sanctionDate = new Date(dateVal);
+        const rules = window.ELIGIBILITY_RULES;
+        
+        if (rules.sec80EE && sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end) { 
+            branchEE.style.display = 'block'; 
+        } else if (rules.sec80EEA && sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end) { 
+            branchEEA.style.display = 'block'; 
+        }
+    },
+
+    // 4. Tax Regime Dynamic Highlights (Winner / Loser Card States)
     updateRegimeHighlights() {
         const oldCard = document.getElementById('old-regime-card');
         const newCard = document.getElementById('new-regime-card');
@@ -42,7 +87,6 @@ const TaxUI = {
         const oldTax = getVal('old-regime-tax');
         const newTax = getVal('new-regime-tax');
 
-        // Reset classes cleanly
         oldCard.className = 'regime-row-card';
         newCard.className = 'regime-row-card';
 
@@ -57,7 +101,7 @@ const TaxUI = {
         }
     },
 
-    // 4. Compliance Audits (HRA and Active Housing Loan Warnings)
+    // 5. Compliance Audits (HRA and Active Housing Loan Warnings)
     checkHraLoanWarning() {
         const rentInput = document.getElementById('rent-paid');
         const homeLoanCheck = document.getElementById('has-home-loan');
@@ -74,11 +118,25 @@ const TaxUI = {
         }
     },
 
-    // 5. Input Field Validations
+    // 6. Dynamic Form Warnings Feedback
+    handlePerkUIFeedback(inputElement, perkName) {
+        if (!window.TaxController) return;
+        const value = window.TaxController.cleanNum(inputElement.value);
+        const fy = document.getElementById('fy-selector')?.value || "2026-27";
+        const config = window.TAX_CONFIG[fy] || window.TAX_CONFIG["2026-27"];
+        if (perkName === "Meal Coupons" && config?.perkRules?.["Meal Coupons"]) {
+            let warningDiv = inputElement.parentNode.querySelector('.perk-limit-warning');
+            if (!warningDiv) { warningDiv = document.createElement('div'); warningDiv.className = 'perk-limit-warning'; inputElement.parentNode.appendChild(warningDiv); }
+            const limit = config.perkRules["Meal Coupons"].govtLimit;
+            if (value > limit) { warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Standard exempt limit is ₹${limit.toLocaleString('en-IN')}.`; warningDiv.style.display = 'block'; } else { warningDiv.style.display = 'none'; }
+        }
+        if (perkName === "Fuel Allowance" || perkName === "Mobile Reimbursement") { inputElement.placeholder = "Enter amount as per bills"; }
+    },
+
+    // 7. Input Field Validations
     validateInputs() {
         let isValid = true;
         document.querySelectorAll('.currency-mapped').forEach(input => {
-            // Safe reference to parent controller parsing utility if alive
             const cleanFn = window.TaxController?.cleanNum || ((v) => parseFloat(v.replace(/,/g, '')) || 0);
             const val = cleanFn(input.value);
             if (val < 0) { 
@@ -92,17 +150,24 @@ const TaxUI = {
     }
 };
 
-// Global mounting onto layout window context to remain available to buttons
+// Global mounting onto layout window context
+window.TaxUI = TaxUI;
 window.scrollToResults = TaxUI.scrollToResults;
 window.validateInputs = TaxUI.validateInputs;
+window.toggleLoanWizard = TaxUI.toggleLoanWizard;
 
 // Execute Initializations on DOM Load Completion Lifecycle
 document.addEventListener("DOMContentLoaded", function() {
-    // Warm up the structural section toggles
     TaxUI.setupToggle('80c-header', '80c-content', '80c-icon');
     TaxUI.setupToggle('80d-header', '80d-content', '80d-icon');
     TaxUI.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
     TaxUI.setupToggle('nps-header', 'nps-content', 'nps-icon');
+
+    // Attach explicit layout listener for the home loan primary checkbox element
+    const homeLoanCheck = document.getElementById('has-home-loan');
+    if (homeLoanCheck) {
+        homeLoanCheck.addEventListener('change', TaxUI.toggleLoanWizard);
+    }
 
     // Dynamic Mutation Monitors watching calculated tax element updates
     const targetOld = document.getElementById('old-regime-tax');
@@ -113,14 +178,12 @@ document.addEventListener("DOMContentLoaded", function() {
         layoutObserver.observe(targetNew, { childList: true, characterData: true, subtree: true });
     }
 
-    // Input monitoring scopes targeting operational indicators
     document.addEventListener('input', TaxUI.checkHraLoanWarning);
     document.addEventListener('change', function() {
         TaxUI.checkHraLoanWarning();
         setTimeout(TaxUI.updateRegimeHighlights, 50); 
     });
 
-    // Lazy boot execution sequence
     setTimeout(() => {
         TaxUI.updateRegimeHighlights();
         TaxUI.checkHraLoanWarning();
