@@ -4,11 +4,19 @@ const TaxController = {
 
     init: async () => {
         console.log("Tax Controller Initializing...");
+        
+        // Robust Polling Fallback if external engines load out of sync
         if (!window.FinanceEngine || !window.TAX_CONFIG) { 
-            console.warn("Tax engines missing. Re-routing initialization hook..."); 
-            window.addEventListener('load', () => TaxController.init()); 
+            console.warn("Tax engines missing. Retrying initialization context..."); 
+            const retryInterval = setInterval(async () => {
+                if (window.FinanceEngine && window.TAX_CONFIG) {
+                    clearInterval(retryInterval);
+                    await TaxController.init();
+                }
+            }, 100);
             return; 
         }
+
         window.addEventListener('beforeunload', (e) => {
             if (TaxController.isDirty) { 
                 const message = "Your data is unsaved. Are you sure you want to leave?"; 
@@ -22,11 +30,18 @@ const TaxController = {
         TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
         TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
         
-        document.addEventListener('input', (e) => {
+        // Consolidated Event Delegation System (Handles Input & Change patterns)
+        const handleInteraction = (e) => {
             TaxController.handleDelegatedInput(e);
 
-            if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox') {
+            if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox' || e.target.type === 'radio') {
                 TaxController.isDirty = true;
+                
+                // Specific Radio Trigger actions
+                if (e.target.name === 'possession') {
+                    TaxController.handleLoanStatusChange();
+                }
+
                 const row = e.target.closest('.perk-row');
                 if (row) { 
                     const perkSelect = row.querySelector('select'); 
@@ -34,7 +49,10 @@ const TaxController = {
                 }
                 TaxController.calculateAll();
             }
-        });
+        };
+
+        document.addEventListener('input', handleInteraction);
+        document.addEventListener('change', handleInteraction);
 
         const appFySelector = document.getElementById('fy-selector');
         if (appFySelector) {
@@ -47,6 +65,7 @@ const TaxController = {
                 setTimeout(() => { TaxController.isDirty = false; }, 200);
             });
         }
+
         await TaxController.loadUserData();
         TaxController.isInitialLoading = false;
         TaxController.calculateAll();
@@ -56,7 +75,6 @@ const TaxController = {
     cleanNum: (val) => window.FinanceEngine.Formatters.cleanNum(val),
     formatIndianCurrency: (valString) => window.FinanceEngine.Formatters.formatIndianCurrency(valString),
 
-    // It captures anytime a user inputs data, checks if it's a numeric field, and formats it instantly.
     handleDelegatedInput: (e) => {
         const target = e.target;
         if (target.matches('#basic-salary, #hra-received, #rent-paid, #other-income, #loan-interest, #loan-principal, [id="80d-self"], [id="80d-parents"], #nps-80ccd-1b, #original-loan-amt, #property-stamp-value, .perk-amount, .row-amount-80c')) {
@@ -118,25 +136,25 @@ const TaxController = {
     },
 
     handleDateBranching: () => {
-    const dateVal = document.getElementById('loan-sanction-date')?.value;
-    const branchEE = document.getElementById('branch-80ee-fields');
-    const branchEEA = document.getElementById('branch-80eea-fields');
-    if (!branchEE || !branchEEA) return;
-    
-    branchEE.style.display = 'none';
-    branchEEA.style.display = 'none';
+        const dateVal = document.getElementById('loan-sanction-date')?.value;
+        const branchEE = document.getElementById('branch-80ee-fields');
+        const branchEEA = document.getElementById('branch-80eea-fields');
+        if (!branchEE || !branchEEA) return;
+        
+        branchEE.style.display = 'none';
+        branchEEA.style.display = 'none';
 
-    if (!dateVal || !window.ELIGIBILITY_RULES) return; 
-    
-    const sanctionDate = new Date(dateVal);
-    const rules = window.ELIGIBILITY_RULES;
-    
-    if (rules.sec80EE && sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end) { 
-        branchEE.style.display = 'block'; 
-    } else if (rules.sec80EEA && sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end) { 
-        branchEEA.style.display = 'block'; 
-    }
-},
+        if (!dateVal || !window.ELIGIBILITY_RULES) return; 
+        
+        const sanctionDate = new Date(dateVal);
+        const rules = window.ELIGIBILITY_RULES;
+        
+        if (rules.sec80EE && sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end) { 
+            branchEE.style.display = 'block'; 
+        } else if (rules.sec80EEA && sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end) { 
+            branchEEA.style.display = 'block'; 
+        }
+    },
 
     syncPrincipalTo80C: (amount) => {
         const container = document.getElementById('80c-rows-container');
@@ -156,7 +174,6 @@ const TaxController = {
     },
 
     handleSave: async () => {
-        // 1. Validate numbers immediately before hitting backend pipelines
         if (typeof window.validateInputs === 'function' && !window.validateInputs()) {
             const status = document.getElementById('save-status');
             if (status) {
@@ -223,8 +240,6 @@ const TaxController = {
         }
     },
 
-    // 4. STEP 4 APPLIED IN THESE ROWS:
-    // Notice that class="... currency-mapped" was explicitly added into the HTML generation text below.
     add80CRow: (type = "", amount = "", isLocked = false, customClass = "") => {
         const container = document.getElementById('80c-rows-container');
         if (!container) return;
@@ -424,10 +439,9 @@ const TaxController = {
         try {
             const i = data.calculator_inputs || {};
             const setNumericValue = (id, value) => { 
-            const el = document.getElementById(id); 
-            if (el) { const parsed = TaxController.cleanNum(value); el.value = parsed === 0 ? "" : TaxController.formatIndianCurrency(parsed.toString()); 
-            } 
-        };
+                const el = document.getElementById(id); 
+                if (el) { const parsed = TaxController.cleanNum(value); el.value = parsed === 0 ? "" : TaxController.formatIndianCurrency(parsed.toString()); } 
+            };
             setNumericValue('basic-salary', i.basic); setNumericValue('hra-received', i.hra); setNumericValue('rent-paid', i.rent); setNumericValue('other-income', i.otherIncome);
             if (document.getElementById('is-metro')) { document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false"; }
             if (document.getElementById('has-home-loan')) { document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true); TaxController.toggleLoanWizard(); }
@@ -466,7 +480,7 @@ window.add80CRow = TaxController.add80CRow;
 window.addPerkRow = TaxController.addPerkRow;
 window.calculateAll = TaxController.calculateAll;
 window.handleSave = () => TaxController.handleSave();
-window.toggleLoanWizard = TaxController.toggleLoanWizard;
+window.toggleLoanWizard = () => TaxController.toggleLoanWizard();
 window.scrollToResults = () => TaxController.scrollToResults();
 window.validateInputs = validateInputs;
 
