@@ -47,6 +47,20 @@ const TaxController = {
         document.addEventListener('input', handleInteraction);
         document.addEventListener('change', handleInteraction);
 
+        // BIND CLICK BUTTONS VIA EVENT DELEGATION
+        document.addEventListener('click', (e) => {
+            // Check if the clicked element is the Add 80C Button
+            if (e.target.closest('#add-80c-btn') || e.target.id === 'add-80c-btn') {
+                e.preventDefault();
+                TaxController.add80CRow();
+            }
+            // Check if the clicked element is the Add Perk Button
+            if (e.target.closest('#add-perk-btn') || e.target.id === 'add-perk-btn') {
+                e.preventDefault();
+                TaxController.addPerkRow();
+            }
+        });
+
         const appFySelector = document.getElementById('fy-selector');
         if (appFySelector) {
             appFySelector.addEventListener('change', async () => {
@@ -179,12 +193,12 @@ const TaxController = {
         const options = ["ELSS", "PPF", "VPF", "Home Loan Principal", "SSY", "NSC", "Children Tuition Fees", "5-Year Tax FD", "LIC plan"];
         let displayAmt = amount !== "" ? TaxController.formatIndianCurrency(amount.toString()) : "";
         row.innerHTML = `
-            <select class="row-select-80c dynamic-input" style="flex: 2; ${isLocked ? 'background-color: #f3f4f6;' : ''}" ${isLocked ? 'disabled' : ''}>
-                ${isLocked ? `<option value="${type}" selected>${type}</option>` : `
-                <option value="" disabled ${!type ? 'selected' : ''}>Select Investment</option>
-                ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}`}
+            <select class="row-select-80c dynamic-input" style="flex: 2; background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155; ${isLocked ? 'background-color: #1e293b;' : ''}" ${isLocked ? 'disabled' : ''}>
+                ${isLocked ? `<option value="${type}" selected style="background-color: #1e293b; color: #f8fafc;">${type}</option>` : `
+                <option value="" disabled ${!type ? 'selected' : ''} style="background-color: #1e293b; color: #f8fafc;">Select Investment</option>
+                ${options.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''} style="background-color: #1e293b; color: #f8fafc;">${opt}</option>`).join('')}`}
             </select>
-            <input type="text" inputmode="decimal" class="row-amount-80c currency-mapped dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; ${isLocked ? 'background-color: #f3f4f6;' : ''}">
+            <input type="text" inputmode="decimal" class="row-amount-80c currency-mapped dynamic-input" placeholder="Amount" value="${displayAmt}" style="flex: 1; text-align: right; background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155; ${isLocked ? 'background-color: #1e293b;' : ''}">
             ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' :
             `<button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}`;
         container.appendChild(row);
@@ -201,11 +215,11 @@ const TaxController = {
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
         let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString()) : "";
         row.innerHTML = `
-            <select class="perk-type dynamic-input">
-                <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
-                ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
+            <select class="perk-type dynamic-input" style="background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155;">
+                <option value="" disabled ${!type ? 'selected' : ''} style="background-color: #1e293b; color: #f8fafc;">Select Perk</option>
+                ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''} style="background-color: #1e293b; color: #f8fafc;">${opt}</option>`).join('')}
             </select>
-            <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right;">
+            <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right; background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155;">
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem;">₹ 0</div>
             <button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none;"><i class="fas fa-trash"></i></button>`;
         container.appendChild(row);
