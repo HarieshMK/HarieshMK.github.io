@@ -12,8 +12,9 @@ const TaxUI = {
         }
     },
 
-    // 2. Custom Select Interaction Layer (Cleaned up to never block Add buttons)
+    // 2. Custom Select Interaction Layer (Updated to support both custom wrappers and native dynamic selects)
     initCustomDropdowns() {
+        // Handle custom styled dropdown wrappers (for static fields)
         document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
             const trigger = wrapper.querySelector('.custom-select-trigger');
             const targetSelectId = wrapper.getAttribute('data-target');
@@ -46,6 +47,19 @@ const TaxUI = {
                     }
                     wrapper.classList.remove('open');
                 };
+            });
+        });
+
+        // Safeguard: Force dark styles explicitly via JavaScript on any raw select element found in dynamic containers
+        document.querySelectorAll('#perks-rows-container select, #80c-rows-container select').forEach(dynamicSelect => {
+            dynamicSelect.style.backgroundColor = '#0f172a';
+            dynamicSelect.style.color = '#f8fafc';
+            dynamicSelect.style.border = '1.5px solid #334155';
+            
+            // Apply styles directly to the child options inside the dropdown list
+            dynamicSelect.querySelectorAll('option').forEach(opt => {
+                opt.style.backgroundColor = '#1e293b';
+                opt.style.color = '#f8fafc';
             });
         });
 
