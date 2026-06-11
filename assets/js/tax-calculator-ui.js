@@ -13,8 +13,8 @@ const TaxUI = {
     },
 
     // 2. Custom Select Interaction Layer (Updated to safely style dynamic container fields)
+    // 2. Custom Select Interaction Layer
     initCustomDropdowns() {
-        // Handle custom styled dropdown wrappers (for static fields)
         document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
             const trigger = wrapper.querySelector('.custom-select-trigger');
             const targetSelectId = wrapper.getAttribute('data-target');
@@ -49,6 +49,24 @@ const TaxUI = {
                 };
             });
         });
+    }, // <-- Ensure this comma is here
+
+    // NEW: Properly placed as its own method in TaxUI
+    syncCustomDropdowns: function() {
+        document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+            const targetSelectId = wrapper.getAttribute('data-target');
+            const nativeSelect = document.getElementById(targetSelectId);
+            const displaySpan = wrapper.querySelector('.custom-select-trigger span');
+            
+            if (nativeSelect && displaySpan) {
+                const selectedOption = nativeSelect.options[nativeSelect.selectedIndex];
+                if (selectedOption) {
+                    displaySpan.textContent = selectedOption.textContent;
+                }
+            }
+        });
+    }, // <-- Ensure this comma is here
+        
 
         // Safeguard Fix: Apply dark styles independently to each container to avoid query string crashes
         const styleSelectsInContainer = (containerId) => {
