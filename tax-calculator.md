@@ -420,11 +420,10 @@ permalink: /tax-calculator/
     font-weight: 700 !important;
     transition: all 0.25s ease-in-out !important;
     text-align: left !important;
-    
-    /* Dynamic Colors replacing hardcoded ones */
     background-color: var(--bg-body) !important;
     border: 1.5px solid var(--border-base) !important;
     color: var(--text-primary) !important;
+    color-scheme: dark; 
 }
 
 /* FIX: Premium treatment for native dropdown options in both themes */
