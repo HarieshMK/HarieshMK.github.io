@@ -188,6 +188,7 @@ const TaxController = {
             ${isLocked ? '<i class="fas fa-lock" style="color:#9ca3af; width:30px; text-align:center;"></i>' :
             `<button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; width:30px;"><i class="fas fa-trash"></i></button>`}`;
         container.appendChild(row);
+        if (window.initCustomDropdowns) window.initCustomDropdowns();
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
     },
 
@@ -208,6 +209,7 @@ const TaxController = {
             <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem;">₹ 0</div>
             <button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none;"><i class="fas fa-trash"></i></button>`;
         container.appendChild(row);
+        if (window.initCustomDropdowns) window.initCustomDropdowns();
         if (!TaxController.isInitialLoading) TaxController.calculateAll();
     },
 
