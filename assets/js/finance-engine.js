@@ -1,7 +1,3 @@
-/**
- * FinanceEngine: The core logic for all financial calculations.
- * This file is UI-agnostic (no DOM references).
- */
 var FinanceEngine = {
 
     calculateFutureValue: function(investmentAmount, lumpSum, annualRate, years, frequency = 'monthly') {
@@ -70,6 +66,46 @@ var FinanceEngine = {
         if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
         if (num >= 100000) return (num / 100000).toFixed(2) + " L";
         return Math.round(num).toLocaleString('en-IN');
+    }
+};
+
+/* =========================================================================
+   Universal Formatters & Data Sanitizers (Shared across all calculators)
+   ========================================================================= */
+FinanceEngine.Formatters = {
+    // 1. Cleans currency strings to pure float numbers safely
+    cleanNum: function(val) {
+        if (val === undefined || val === null || val === '') return 0;
+        const cleanValue = val.toString().replace(/,/g, "").replace(/[^0-9.-]+/g, "");
+        return parseFloat(cleanValue) || 0;
+    },
+
+    // 2. Core algorithm to apply Indian formatting style commas to numerical text
+    formatIndianCurrency: function(valueString) {
+        let value = valueString.toString().replace(/,/g, '');
+        if (!value) return '';
+        let parts = value.split('.');
+        let lastThree = parts[0].substring(parts[0].length - 3);
+        let otherBits = parts[0].substring(0, parts[0].length - 3);
+        if (otherBits !== '') lastThree = ',' + lastThree;
+        let formatted = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        if (parts.length > 1) { formatted += '.' + parts[1]; }
+        return formatted;
+    },
+
+    // 3. UI-Agnostic Mask Coordinator (Calculates clean text changes & shifts cursors safely)
+    applyCurrencyMask: function(currentValue, selectionStart) {
+        let oldLength = currentValue.length;
+        let formatted = this.formatIndianCurrency(currentValue);
+        let newLength = formatted.length;
+        
+        // Calculate where the cursor needs to step forward or backward based on added commas
+        let adjustedCursor = selectionStart + (newLength - oldLength);
+
+        return {
+            formattedValue: formatted,
+            newCursorPosition: adjustedCursor
+        };
     }
 };
 
