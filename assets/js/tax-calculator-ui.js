@@ -12,7 +12,7 @@ const TaxUI = {
         }
     },
 
-    // 2. Custom Select Interaction Layer (Updated to support both custom wrappers and native dynamic selects)
+    // 2. Custom Select Interaction Layer (Updated to safely style dynamic container fields)
     initCustomDropdowns() {
         // Handle custom styled dropdown wrappers (for static fields)
         document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
@@ -50,18 +50,25 @@ const TaxUI = {
             });
         });
 
-        // Safeguard: Force dark styles explicitly via JavaScript on any raw select element found in dynamic containers
-        document.querySelectorAll('#perks-rows-container select, #80c-rows-container select').forEach(dynamicSelect => {
-            dynamicSelect.style.backgroundColor = '#0f172a';
-            dynamicSelect.style.color = '#f8fafc';
-            dynamicSelect.style.border = '1.5px solid #334155';
+        // Safeguard Fix: Apply dark styles independently to each container to avoid query string crashes
+        const styleSelectsInContainer = (containerId) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             
-            // Apply styles directly to the child options inside the dropdown list
-            dynamicSelect.querySelectorAll('option').forEach(opt => {
-                opt.style.backgroundColor = '#1e293b';
-                opt.style.color = '#f8fafc';
+            container.querySelectorAll('select').forEach(dynamicSelect => {
+                dynamicSelect.style.backgroundColor = '#0f172a';
+                dynamicSelect.style.color = '#f8fafc';
+                dynamicSelect.style.border = '1.5px solid #334155';
+                
+                dynamicSelect.querySelectorAll('option').forEach(opt => {
+                    opt.style.backgroundColor = '#1e293b';
+                    opt.style.color = '#f8fafc';
+                });
             });
-        });
+        };
+
+        styleSelectsInContainer('perks-rows-container');
+        styleSelectsInContainer('80c-rows-container');
 
         // Safely close custom dropdowns without blocking standard DOM button actions
         document.addEventListener('click', (e) => {
