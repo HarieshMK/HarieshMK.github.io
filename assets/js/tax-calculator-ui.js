@@ -7,10 +7,57 @@ const TaxUI = {
     // 1. Smooth Scroll Engine
     scrollToResults() {
         const target = document.getElementById('tax-breakdown-section');
-        if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        if (target) { 
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+        }
     },
 
-    // 2. Section Collapsible Accordion Core
+    // 2. Custom Select Interaction Layer (Resolves Dropdown Click Issues)
+    initCustomDropdowns() {
+        document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+            const trigger = wrapper.querySelector('.custom-select-trigger');
+            const targetSelectId = wrapper.getAttribute('data-target');
+            const nativeSelect = document.querySelector(targetSelectId);
+
+            if (!trigger) return;
+
+            // Toggle active selector dropdown panel
+            trigger.onclick = (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper').forEach(other => {
+                    if (other !== wrapper) other.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+            };
+
+            // Option selection click tracking mapping
+            wrapper.querySelectorAll('.custom-option').forEach(option => {
+                option.onclick = (e) => {
+                    e.stopPropagation();
+                    const selectedValue = option.getAttribute('data-value');
+                    
+                    const displaySpan = trigger.querySelector('span');
+                    if (displaySpan) displaySpan.textContent = option.textContent;
+                    
+                    wrapper.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+
+                    if (nativeSelect) {
+                        nativeSelect.value = selectedValue;
+                        nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    wrapper.classList.remove('open');
+                };
+            });
+        });
+
+        // Close select layouts if clicked anywhere outside on the open window canvas
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        });
+    },
+
+    // 3. Section Collapsible Accordion Core
     setupToggle(headerId, contentId, iconId) {
         const header = document.getElementById(headerId);
         const content = document.getElementById(contentId);
@@ -27,7 +74,7 @@ const TaxUI = {
         }
     },
 
-    // 3. Home Loan Interactive Form Wizards
+    // 4. Home Loan Interactive Form Wizards
     toggleLoanWizard() {
         const hasLoan = document.getElementById('has-home-loan')?.checked;
         const wizard = document.getElementById('home-loan-wizard');
@@ -72,7 +119,7 @@ const TaxUI = {
         }
     },
 
-    // 4. Tax Regime Dynamic Highlights (Winner / Loser Card States)
+    // 5. Tax Regime Dynamic Highlights (Winner / Loser Card States)
     updateRegimeHighlights() {
         const oldCard = document.getElementById('old-regime-card');
         const newCard = document.getElementById('new-regime-card');
@@ -101,7 +148,7 @@ const TaxUI = {
         }
     },
 
-    // 5. Compliance Audits (HRA and Active Housing Loan Warnings)
+    // 6. Compliance Audits (HRA and Active Housing Loan Warnings)
     checkHraLoanWarning() {
         const rentInput = document.getElementById('rent-paid');
         const homeLoanCheck = document.getElementById('has-home-loan');
@@ -118,7 +165,7 @@ const TaxUI = {
         }
     },
 
-    // 6. Dynamic Form Warnings Feedback
+    // 7. Dynamic Form Warnings Feedback
     handlePerkUIFeedback(inputElement, perkName) {
         if (!window.TaxController) return;
         const value = window.TaxController.cleanNum(inputElement.value);
@@ -133,7 +180,7 @@ const TaxUI = {
         if (perkName === "Fuel Allowance" || perkName === "Mobile Reimbursement") { inputElement.placeholder = "Enter amount as per bills"; }
     },
 
-    // 7. Input Field Validations
+    // 8. Input Field Validations
     validateInputs() {
         let isValid = true;
         document.querySelectorAll('.currency-mapped').forEach(input => {
@@ -158,10 +205,23 @@ window.toggleLoanWizard = TaxUI.toggleLoanWizard;
 
 // Execute Initializations on DOM Load Completion Lifecycle
 document.addEventListener("DOMContentLoaded", function() {
+    // Structural Accordions Setup
     TaxUI.setupToggle('80c-header', '80c-content', '80c-icon');
     TaxUI.setupToggle('80d-header', '80d-content', '80d-icon');
     TaxUI.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
     TaxUI.setupToggle('nps-header', 'nps-content', 'nps-icon');
+
+    // Initialize interactive dropdown panels
+    TaxUI.initCustomDropdowns();
+
+    // Link View Breakdown Action Trigger to Smooth Scroll Engine
+    const breakdownBtn = document.getElementById('view-breakdown-btn');
+    if (breakdownBtn) {
+        breakdownBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            TaxUI.scrollToResults();
+        });
+    }
 
     // Attach explicit layout listener for the home loan primary checkbox element
     const homeLoanCheck = document.getElementById('has-home-loan');
@@ -184,9 +244,24 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(TaxUI.updateRegimeHighlights, 50); 
     });
 
+    // Handle home loan parameter date adjustments dynamically
+    const sanctionInput = document.getElementById('loan-sanction-date');
+    if (sanctionInput) {
+        sanctionInput.addEventListener('change', () => {
+            TaxUI.handleDateBranching();
+            if (window.TaxController) window.TaxController.calculateAll();
+        });
+    }
+
+    const possessionRadios = document.querySelectorAll('input[name="possession"]');
+    possessionRadios.forEach(radio => {
+        radio.addEventListener('change', TaxUI.handleLoanStatusChange);
+    });
+
     setTimeout(() => {
         TaxUI.updateRegimeHighlights();
         TaxUI.checkHraLoanWarning();
+        TaxUI.handleDateBranching();
     }, 400);
 });
 
