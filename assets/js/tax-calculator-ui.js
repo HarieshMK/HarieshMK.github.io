@@ -202,6 +202,7 @@ window.TaxUI = TaxUI;
 window.scrollToResults = TaxUI.scrollToResults;
 window.validateInputs = TaxUI.validateInputs;
 window.toggleLoanWizard = TaxUI.toggleLoanWizard;
+window.initCustomDropdowns = TaxUI.initCustomDropdowns;
 
 // Execute Initializations on DOM Load Completion Lifecycle
 document.addEventListener("DOMContentLoaded", function() {
@@ -274,41 +275,50 @@ document.addEventListener("DOMContentLoaded", function() {
         .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
         .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
         
-        /* 1. Force row components to align as a single structural line */
-        .perk-row, 
-        #perks-rows-container > div, 
+        /* Fix structural grid track alignment for manual/statutory 80C Rows (3 columns) */
         #80c-rows-container > div {
             display: grid !important;
-            grid-template-columns: 1.62fr 1fr auto !important;
+            grid-template-columns: 1.6fr 1fr 40px !important;
             align-items: center !important;
-            gap: 15px !important;
+            gap: 12px !important;
             margin-bottom: 12px !important;
             width: 100% !important;
         }
 
-        /* Prevent trash containers or buttons from dropping down */
-        .perk-row button, 
-        #perks-rows-container .delete-perk-btn, 
-        #80c-rows-container .remove-btn {
-            margin: 0 !important;
-            display: inline-flex !important;
+        /* Fix structural grid track alignment for Perk Rows (4 columns: type, amt, eligibility, delete) */
+        .perk-row,
+        #perks-rows-container > div {
+            display: grid !important;
+            grid-template-columns: 1.6fr 1fr 0.8fr 40px !important;
             align-items: center !important;
-            justify-content: center !important;
-            grid-column: 3 / 4 !important;
+            gap: 12px !important;
+            margin-bottom: 12px !important;
+            width: 100% !important;
         }
 
-        /* 2. Absolute fix for native dropdown select element background & font appearance */
+        /* Prevent button alignments from losing grid assignments */
+        #80c-rows-container button, #80c-rows-container i.fa-lock {
+            grid-column: 3 / 4 !important;
+            justify-self: center;
+        }
+        #perks-rows-container button {
+            grid-column: 4 / 5 !important;
+            justify-self: center;
+        }
+
+        /* 2. Absolute fix for native dropdown select element appearance */
         .unique-tax-calc select, 
         #perks-rows-container select, 
         #80c-rows-container select {
-            background-color: #0f172a !important;   /* Hardcoded rich slate dark instead of relying on broken vars */
-            color: #f8fafc !important;              /* Force crisp near-white font text color */
-            padding: 12px 15px !important;
+            background-color: #0f172a !important;   /* Hardcoded rich slate dark base */
+            color: #f8fafc !important;              /* Force crisp text visibility */
+            padding: 10px 15px !important;
             border-radius: 12px !important;
-            height: 50px !important;
-            border: 1.5px solid #334155 !important; /* Dark Slate border lines */
-            font-family: 'JetBrains Mono', monospace !important;
-            font-weight: 700 !important;
+            height: 48px !important;
+            border: 1.5px solid #334155 !important; 
+            font-family: inherit !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
             appearance: none !important;
             -webkit-appearance: none !important;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394a3b8' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !important;
@@ -317,12 +327,12 @@ document.addEventListener("DOMContentLoaded", function() {
             padding-right: 40px !important;
         }
 
-        /* Force option lists to use matching dark backgrounds across all browser rendering engines */
+        /* Force cross-browser dropdown options context to match layout theme */
         .unique-tax-calc select option, 
         #perks-rows-container select option, 
         #80c-rows-container select option {
-            background-color: #1e293b !important;   /* Rich card dark base color */
-            color: #f8fafc !important;              /* High visibility text */
+            background-color: #1e293b !important;   
+            color: #f8fafc !important;              
         }
     `;
     document.head.appendChild(errorStyle);
