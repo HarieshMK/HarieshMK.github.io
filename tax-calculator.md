@@ -8,6 +8,7 @@ permalink: /tax-calculator/
 <script src="/assets/js/investment-options.js"></script>
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/tax-calculator.js"></script>
+<script src="/assets/js/tax-calculator-ui.js"></script>
 
 <script>
     // Pure Visual/Layout Controller for the Jekyll MD File context
