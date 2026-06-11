@@ -12,7 +12,7 @@ const TaxUI = {
         }
     },
 
-    // 2. Custom Select Interaction Layer (Resolves Dropdown Click Issues)
+    // 2. Custom Select Interaction Layer (Handles Layout and Themes)
     initCustomDropdowns() {
         document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
             const trigger = wrapper.querySelector('.custom-select-trigger');
@@ -258,6 +258,32 @@ document.addEventListener("DOMContentLoaded", function() {
         radio.addEventListener('change', TaxUI.handleLoanStatusChange);
     });
 
+    // Fix layouts dynamically when elements are added to containers (e.g. dynamic perk rows)
+    const dynamicObserver = new MutationObserver(() => {
+        document.querySelectorAll('.perk-row, [id*="-rows-container"] > div').forEach(row => {
+            // Re-apply explicit alignment logic to match grid rules perfectly
+            if (row.style.display !== 'grid') {
+                row.style.setProperty('display', 'grid', 'important');
+                row.style.setProperty('grid-template-columns', '1.62fr 1fr auto', 'important');
+                row.style.setProperty('align-items', 'center', 'important');
+                row.style.setProperty('gap', '15px', 'important');
+            }
+            
+            // Re-adjust inline trash bins alignment to prevent line breaking
+            const trashBtn = row.querySelector('.delete-perk-btn, .remove-btn, .fa-trash')?.parentElement || row.querySelector('button, i.fa-trash');
+            if (trashBtn) {
+                trashBtn.style.setProperty('margin', '0', 'important');
+                trashBtn.style.setProperty('display', 'inline-flex', 'important');
+                trashBtn.style.setProperty('align-items', 'center', 'important');
+            }
+        });
+    });
+
+    const containers = [document.getElementById('perks-rows-container'), document.getElementById('80c-rows-container')];
+    containers.forEach(container => {
+        if (container) dynamicObserver.observe(container, { childList: true, subtree: true });
+    });
+
     setTimeout(() => {
         TaxUI.updateRegimeHighlights();
         TaxUI.checkHraLoanWarning();
@@ -273,6 +299,37 @@ document.addEventListener("DOMContentLoaded", function() {
     errorStyle.innerHTML = `
         .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
         .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
+        
+        /* Force theme native elements to resolve white-out options across all engines */
+        .unique-tax-calc select, 
+        #perks-rows-container select, 
+        #80c-rows-container select {
+            background-color: var(--bg-body) !important;
+            color: var(--text-primary) !important;
+            padding: 12px 15px !important;
+            border-radius: 14px !important;
+            height: 50px !important;
+            border: 1.5px solid var(--border-base) !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-weight: 700 !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !important;
+            background-repeat: no-repeat !important;
+            background-position: calc(100% - 15px) center !important;
+            padding-right: 40px !important;
+        }
+        .unique-tax-calc select option, 
+        #perks-rows-container select option, 
+        #80c-rows-container select option {
+            background-color: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+        }
+        .unique-tax-calc select:hover, 
+        #perks-rows-container select:hover, 
+        #80c-rows-container select:hover {
+            border-color: var(--brand-primary) !important;
+        }
     `;
     document.head.appendChild(errorStyle);
 })();
