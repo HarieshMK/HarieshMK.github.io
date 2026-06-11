@@ -78,7 +78,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
         <div class="post-card calculation-card">
             <div class="section-card-header">
                 <h3><i class="fas fa-gift" style="margin-right: 8px; color: #ec4899;"></i> Perks & Flexi-Benefits</h3>
