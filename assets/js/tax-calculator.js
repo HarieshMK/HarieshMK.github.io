@@ -17,17 +17,14 @@ const TaxController = {
             }
         });
 
-        // OPTIMIZATION FIXED HERE: 
-        // We attached a single listener to the global document object.
-        // This watches all inputs, even new rows that are added later!
-        document.addEventListener('input', TaxController.handleDelegatedInput);
-
         TaxController.setupToggle('80c-header', '80c-content', '80c-icon');
         TaxController.setupToggle('80d-header', '80d-content', '80d-icon');
         TaxController.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
         TaxController.setupToggle('nps-header', 'nps-content', 'nps-icon');
         
         document.addEventListener('input', (e) => {
+            TaxController.handleDelegatedInput(e);
+
             if (e.target.matches('input, select, .dynamic-input') || e.target.type === 'checkbox') {
                 TaxController.isDirty = true;
                 const row = e.target.closest('.perk-row');
@@ -56,41 +53,21 @@ const TaxController = {
         setTimeout(() => { TaxController.isDirty = false; }, 500);
     },
 
-    cleanNum: (val) => {
-        if (val === undefined || val === null || val === '') return 0;
-        const cleanValue = val.toString().replace(/,/g, "").replace(/[^0-9.-]+/g, "");
-        return parseFloat(cleanValue) || 0;
-    },
+    cleanNum: (val) => window.FinanceEngine.Formatters.cleanNum(val),
+    formatIndianCurrency: (valString) => window.FinanceEngine.Formatters.formatIndianCurrency(valString),
 
-    formatIndianCurrency: (valueString) => {
-        let value = valueString.replace(/,/g, '');
-        if (!value) return '';
-        let parts = value.split('.');
-        let lastThree = parts[0].substring(parts[0].length - 3);
-        let otherBits = parts[0].substring(0, parts[0].length - 3);
-        if (otherBits !== '') lastThree = ',' + lastThree;
-        let formatted = otherBits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-        if (parts.length > 1) { formatted += '.' + parts[1]; }
-        return formatted;
-    },
-
-    // 2. THIS IS THE NEW "handleDelegatedInput" FUNCTION
     // It captures anytime a user inputs data, checks if it's a numeric field, and formats it instantly.
     handleDelegatedInput: (e) => {
         const target = e.target;
-        // This matches all your target IDs and classes automatically!
         if (target.matches('#basic-salary, #hra-received, #rent-paid, #other-income, #loan-interest, #loan-principal, [id="80d-self"], [id="80d-parents"], #nps-80ccd-1b, #original-loan-amt, #property-stamp-value, .perk-amount, .row-amount-80c')) {
             if (target.tagName === 'INPUT' && !target.classList.contains('currency-mapped')) {
                 target.classList.add('currency-mapped');
                 target.setAttribute('type', 'text');
                 target.setAttribute('inputmode', 'decimal');
             }
-            let selectionStart = target.selectionStart;
-            let oldLength = target.value.length;
-            let formatted = TaxController.formatIndianCurrency(target.value);
-            target.value = formatted;
-            let newLength = target.value.length;
-            target.setSelectionRange(selectionStart + (newLength - oldLength), selectionStart + (newLength - oldLength));
+            const maskResult = window.FinanceEngine.Formatters.applyCurrencyMask(target.value, target.selectionStart);
+            target.value = maskResult.formattedValue;
+            target.setSelectionRange(maskResult.newCursorPosition, maskResult.newCursorPosition);
         }
     },
 
@@ -141,16 +118,25 @@ const TaxController = {
     },
 
     handleDateBranching: () => {
-        const dateVal = document.getElementById('loan-sanction-date')?.value;
-        const branchEE = document.getElementById('branch-80ee-fields');
-        const branchEEA = document.getElementById('branch-80eea-fields');
-        if (!branchEE || !branchEEA) return;
-        branchEE.style.display = 'none';
-        branchEEA.style.display = 'none';
-        if (!dateVal) return;
-        const sanctionDate = new Date(dateVal);
-        if (sanctionDate >= ELIGIBILITY_RULES.sec80EE.start && sanctionDate <= ELIGIBILITY_RULES.sec80EE.end) { branchEE.style.display = 'block'; } else if (sanctionDate >= ELIGIBILITY_RULES.sec80EEA.start && sanctionDate <= ELIGIBILITY_RULES.sec80EEA.end) { branchEEA.style.display = 'block'; }
-    },
+    const dateVal = document.getElementById('loan-sanction-date')?.value;
+    const branchEE = document.getElementById('branch-80ee-fields');
+    const branchEEA = document.getElementById('branch-80eea-fields');
+    if (!branchEE || !branchEEA) return;
+    
+    branchEE.style.display = 'none';
+    branchEEA.style.display = 'none';
+
+    if (!dateVal || !window.ELIGIBILITY_RULES) return; 
+    
+    const sanctionDate = new Date(dateVal);
+    const rules = window.ELIGIBILITY_RULES;
+    
+    if (rules.sec80EE && sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end) { 
+        branchEE.style.display = 'block'; 
+    } else if (rules.sec80EEA && sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end) { 
+        branchEEA.style.display = 'block'; 
+    }
+},
 
     syncPrincipalTo80C: (amount) => {
         const container = document.getElementById('80c-rows-container');
@@ -170,6 +156,16 @@ const TaxController = {
     },
 
     handleSave: async () => {
+        // 1. Validate numbers immediately before hitting backend pipelines
+        if (typeof window.validateInputs === 'function' && !window.validateInputs()) {
+            const status = document.getElementById('save-status');
+            if (status) {
+                status.style.color = "#ef4444";
+                status.innerText = "❌ Cannot sync profiles containing invalid or negative figures.";
+            }
+            return;
+        }
+    
         const btn = document.getElementById('save-btn');
         const status = document.getElementById('save-status');
         const selectedYear = document.getElementById('fy-selector')?.value || '2026-27';
@@ -267,7 +263,7 @@ const TaxController = {
         row.className = "perk-row";
         row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
         const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
-        let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString().replace(/[^0-9.]/g, '')) : "";
+        let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString()) : "";
         row.innerHTML = `
             <select class="perk-type dynamic-input">
                 <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
@@ -427,7 +423,11 @@ const TaxController = {
         if (error || !data || !data.calculator_inputs) { TaxController.addPerkRow("Professional Tax", 2500); TaxController.add80CRow(); return; }
         try {
             const i = data.calculator_inputs || {};
-            const setNumericValue = (id, value) => { const el = document.getElementById(id); if (el) { const parsed = parseFloat(value); el.value = isNaN(parsed) ? "" : TaxController.formatIndianCurrency(parsed.toString()); } };
+            const setNumericValue = (id, value) => { 
+            const el = document.getElementById(id); 
+            if (el) { const parsed = TaxController.cleanNum(value); el.value = parsed === 0 ? "" : TaxController.formatIndianCurrency(parsed.toString()); 
+            } 
+        };
             setNumericValue('basic-salary', i.basic); setNumericValue('hra-received', i.hra); setNumericValue('rent-paid', i.rent); setNumericValue('other-income', i.otherIncome);
             if (document.getElementById('is-metro')) { document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false"; }
             if (document.getElementById('has-home-loan')) { document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true); TaxController.toggleLoanWizard(); }
