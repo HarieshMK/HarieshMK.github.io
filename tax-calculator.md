@@ -430,8 +430,7 @@ permalink: /tax-calculator/
 .unique-tax-calc select,
 .perk-row select,
 .row-80c-manual select {
-    background-color: var(--bg-body) !important;
-    color: var(--text-primary) !important;
+    color-scheme: dark !important;
 }
 
 .unique-tax-calc select option,
@@ -440,6 +439,7 @@ permalink: /tax-calculator/
     color: #0f172a !important; /* Premium deep charcoal text color */
     background-color: #ffffff !important; /* Force matching white background */
 }
+
 
 /* ==========================================================================
    3. DYNAMIC PREMIUM SIDEBAR (THEME-AWARE)
