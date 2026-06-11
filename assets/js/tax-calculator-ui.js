@@ -308,13 +308,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
         /* Fix structural grid track alignment for Perk Rows (4 columns: type, amt, eligibility, delete) */
         .perk-row,
+        /* Update the CSS string inside tax-calculator-ui.js to match this: */
         #perks-rows-container > div {
-            display: grid !important;
+            display: grid;
             grid-template-columns: 1.6fr 1fr 0.8fr 40px !important;
-            align-items: center !important;
-            gap: 12px !important;
-            margin-bottom: 12px !important;
-            width: 100% !important;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            #perks-rows-container > div { 
+                /* Adding !important here ensures mobile overrides the desktop definition above */
+                grid-template-columns: 1fr !important; 
+                gap: 15px;
+            }
         }
 
         /* Prevent button alignments from losing grid assignments */
