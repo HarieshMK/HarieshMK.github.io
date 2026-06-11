@@ -334,319 +334,42 @@ permalink: /tax-calculator/
 </div>
 
 <style>
-    /* ==========================================================================
-       1. STRUCTURAL LAYOUTS & CONTAINERS
-       ========================================================================== */
-    .unique-tax-calc .collapsible-section-box {
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .unique-tax-calc .calc-collapse-trigger {
-        padding: 20px 25px;
-        background: transparent;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        border: none;
-    }
-
-    .unique-tax-calc .collapsible-content-wrapper {
-        padding: 5px 25px 25px 25px;
-        border-top: 1px solid var(--border-base);
-    }
-
-    .unique-tax-calc .heading-title-text {
-        font-family: 'Lora', serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    .unique-tax-calc .toggle-chevron-arrow {
-        transition: transform 0.3s ease;
-        color: var(--text-muted);
-    }
-
-    .unique-tax-calc .calc-grid-layout {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .unique-tax-calc .calc-custom-row {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .unique-tax-calc .calc-custom-row label {
-        font-weight: 700;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    #perks-rows-container > div,
-    #80c-rows-container > div {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr auto; 
-        gap: 15px;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .unique-tax-calc .dark-mode-notice-box {
-        background: var(--bg-offset);
-        border: 1px solid var(--border-base);
-        border-left: 4px solid var(--brand-primary);
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin-top: 15px;
-        margin-bottom: 25px;
-    }
-
-    .unique-tax-calc .dark-mode-notice-box p,
-    .unique-tax-calc .dark-mode-notice-box strong {
-        color: var(--text-primary);
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    /* ==========================================================================
-       2. PREMIUM FIELD INJECTIONS (THEME-AWARE)
-       ========================================================================== */
-    .unique-tax-calc input[type="text"],
-    .unique-tax-calc input[type="number"],
-    .unique-tax-calc select,
-    .unique-tax-calc .dynamic-input,
-    .perk-row input,
-    .perk-row select,
-    .row-80c-manual select,
-    .row-80c-manual input,
-    .row-80c-statutory input {
-        width: 100% !important;
-        box-sizing: border-box !important;
-        padding: 12px 20px !important;
-        border-radius: 14px !important;
-        font-size: 1.1rem !important;
-        height: 50px !important;
-        font-family: 'JetBrains Mono', monospace !important;
-        font-weight: 700 !important;
-        transition: all 0.25s ease-in-out !important;
-        text-align: left !important;
-        background-color: var(--bg-body) !important;
-        border: 1.5px solid var(--border-base) !important;
-        color: var(--text-primary) !important;
-    }
-
-    /* Native select updates adapting smoothly across user light/dark themes */
-    .unique-tax-calc select,
-    .perk-row select,
-    .row-80c-manual select {
-        color-scheme: light dark !important;
-    }
-
-    .unique-tax-calc select option,
-    .perk-row select option,
-    .row-80c-manual select option {
-        color: var(--text-primary) !important;
-        background-color: var(--bg-card) !important;
-    }
-
-    /* ==========================================================================
-       3. DYNAMIC PREMIUM SIDEBAR & REGIME ENGINE
-       ========================================================================== */
-    .unique-tax-calc .sidebar-stacked-layout {
-        background: var(--bg-card) !important;
-        padding: 24px;
-        border-radius: 16px;
-        border: 1px solid var(--border-base) !important;
-    }
-
-    .unique-tax-calc .sidebar-panel-header-accent {
-        border-bottom: 1px solid var(--border-base);
-        padding-bottom: 12px;
-        margin-bottom: 20px;
-        width: 100%;
-    }
-
-    .unique-tax-calc .sidebar-panel-heading {
-        margin: 0;
-        text-align: left;
-        font-family: 'Lora', serif;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        display: flex;
-        align-items: center;
-    }
-
-    .unique-tax-calc .sidebar-stacked-rows-container {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        width: 100%;
-    }
-
-    .unique-tax-calc .regime-row-card {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 24px 20px;
-        margin-bottom: 16px;
-        border-radius: 12px;
-        border: 1.5px solid var(--border-base) !important;
-        background-color: var(--bg-body) !important; 
-        transition: all 0.3s ease;
-    }
-
-    .unique-tax-calc .regime-row-title {
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        color: var(--text-muted);
-        margin-bottom: 8px;
-    }
-
-    .unique-tax-calc .regime-row-value {
-        font-family: 'JetBrains Mono', monospace !important;
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    /* WINNER/LOSER ENGINE STATES */
-    .unique-tax-calc .regime-row-card.regime-winner {
-        transform: scale(1.02);
-        border-color: var(--color-success) !important;
-        background-color: rgba(16, 185, 129, 0.05) !important;
-    }
-
-    .unique-tax-calc .regime-row-card.regime-winner .regime-row-value {
-        color: var(--color-success) !important;
-    }
-
-    .unique-tax-calc .regime-row-card.regime-loser {
-        transform: scale(1);
-        opacity: 1;
-        border-color: var(--border-base) !important;
-    }
-
-    .unique-tax-calc .regime-row-card.regime-loser .regime-row-value {
-        color: var(--text-muted) !important;
-    }
-
-    /* ==========================================================================
-       4. CUSTOM THEME-AWARE SELECT COMPONENT
-       ========================================================================== */
-    .custom-select-wrapper {
-        position: relative;
-        width: 100%;
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 700;
-        user-select: none;
-    }
-
-    .custom-select-trigger {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 50px;
-        padding: 12px 20px;
-        background-color: var(--bg-body) !important;
-        border: 1.5px solid var(--border-base) !important;
-        color: var(--text-primary) !important;
-        border-radius: 14px;
-        font-size: 1.1rem;
-        cursor: pointer;
-        box-sizing: border-box;
-        transition: all 0.2s ease-in-out;
-    }
-
-    .custom-select-trigger:hover {
-        border-color: var(--brand-primary) !important;
-    }
-
-    .custom-select-wrapper.open .custom-select-trigger {
-        border-color: var(--brand-primary) !important;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
-    }
-
-    .custom-select-trigger i {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        transition: transform 0.25s ease;
-    }
-
-    .custom-select-wrapper.open .custom-select-trigger i {
-        transform: rotate(180deg);
-    }
-
-    .custom-options-panel {
-        position: absolute;
-        top: calc(100% + 6px);
-        left: 0;
-        right: 0;
-        background-color: var(--bg-card) !important;
-        border: 1.5px solid var(--border-base) !important;
-        border-radius: 14px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        z-index: 999;
-        overflow: hidden;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .custom-select-wrapper.open .custom-options-panel {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    .custom-option {
-        padding: 12px 20px;
-        color: var(--text-secondary) !important;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        text-align: left;
-    }
-
-    .custom-option:hover {
-        background-color: rgba(56, 189, 248, 0.08) !important;
-        color: var(--text-primary) !important;
-    }
-
-    .custom-option.selected {
-        background-color: rgba(56, 189, 248, 0.15) !important;
-        color: var(--brand-primary) !important;
-    }
-
-    /* ==========================================================================
-       5. RESPONSIVE HOOKS & FLEX BLOCKS
-       ========================================================================== */
-    .benefit-flex-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 20px;
-        background: var(--bg-offset);
-        border-radius: 10px;
-        box-sizing: border-box;
-        width: 100%;
-        min-height: 80px;
-        gap: 15px;
-    }
+    /* 1. STRUCTURAL LAYOUTS & CONTAINERS */
+    .unique-tax-calc .collapsible-section-box { padding: 0; overflow: hidden; }
+    .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
+    .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
+    .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
+    .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; }
+    .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    #perks-rows-container > div, #80c-rows-container > div { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 15px; align-items: center; margin-bottom: 12px; }
     
+    .unique-tax-calc .dark-mode-notice-box { background: var(--bg-offset); border: 1px solid var(--border-base); border-left: 4px solid var(--brand-primary); padding: 15px 20px; border-radius: 8px; margin-top: 15px; margin-bottom: 25px; }
+    .unique-tax-calc .dark-mode-notice-box p { color: var(--text-primary); font-size: 0.9rem; line-height: 1.5; margin: 0; }
+
+    /* 2. PREMIUM FIELD INJECTIONS (THEME-AWARE) */
+    .unique-tax-calc input[type="text"], .unique-tax-calc input[type="number"], .unique-tax-calc select, .unique-tax-calc .dynamic-input, .perk-row input, .perk-row select, .row-80c-manual select, .row-80c-manual input, .row-80c-statutory input {
+        width: 100% !important; box-sizing: border-box !important; padding: 12px 20px !important; border-radius: 14px !important; font-size: 1.1rem !important; height: 50px !important; font-family: 'JetBrains Mono', monospace !important; font-weight: 700 !important; background-color: var(--bg-body) !important; border: 1.5px solid var(--border-base) !important; color: var(--text-primary) !important;
+    }
+    .unique-tax-calc select { color-scheme: light dark !important; }
+    .unique-tax-calc select option { color: var(--text-primary) !important; background-color: var(--bg-card) !important; }
+
+    /* 3. SIDEBAR & WINNER/LOSER STATE ENGINE */
+    .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
+    .unique-tax-calc .sidebar-panel-header-accent { border-bottom: 1px solid var(--border-base); padding-bottom: 12px; margin-bottom: 20px; width: 100%; }
+    .unique-tax-calc .sidebar-panel-heading { margin: 0; font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .sidebar-stacked-rows-container { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+    .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
+    .unique-tax-calc .regime-row-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 8px; }
+    .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+    
+    .unique-tax-calc .regime-row-card.regime-winner { transform: scale(1.02); border-color: var(--color-success) !important; background-color: rgba(16, 185, 129, 0.05) !important; }
+    .unique-tax-calc .regime-row-card.regime-winner .regime-row-value { color: var(--color-success) !important; }
+    .unique-tax-calc .regime-row-card.regime-loser .regime-row-value { color: var(--text-muted) !important; }
+
+    /* 4. RESPONSIVE HOOKS & FLEX BLOCKS */
+    .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; box-sizing: border-box; width: 100%; min-height: 80px; gap: 15px; }
     .benefit-text-stack { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
     .benefit-badge-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .benefit-section-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
