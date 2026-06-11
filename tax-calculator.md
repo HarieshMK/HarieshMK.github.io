@@ -291,7 +291,7 @@ permalink: /tax-calculator/
                 </tr>
                 <tr>
                     <td style="padding: 14px 12px;">Standard Deduction</td>
-                    <td id="summary-standard-deduction-old" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
+                    <td id="summary-standard-deduction" class="text-right color-success tabular-nums" style="padding: 14px 12px;">₹ 0</td>
                     <td id="summary-standard-deduction-new" class="text-right tabular-nums" style="padding: 14px 12px;">₹ 0</td>
                 </tr>
                 <tr>
