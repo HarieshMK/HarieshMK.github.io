@@ -409,9 +409,12 @@ permalink: /tax-calculator/
     .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
 
     #perks-rows-container .perk-row, #perks-rows-container > div { display: grid !important; grid-template-columns: 1fr 0.8fr 40px !important; gap: 12px !important; align-items: center !important; margin-bottom: 12px !important; width: 100% !important; }
-    #perks-rows-container .perk-type, #perks-rows-container .perk-amount { width: 100% !important; min-width: 0 !important; white-space: normal; overflow: visible; }
-    #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; }
-    .perk-row-wrapper { margin-bottom: 15px; width: 100%; }
+    #perks-rows-container .perk-type, 
+    #perks-rows-container .perk-amount { width: 100% !important; height: 50px !important;min-width: 0 !important; }
+    #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0;}
+    .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
+    .perk-row-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; width: 100%; }
+    .perk-row { display: grid !important; grid-template-columns: 1fr 0.8fr 40px !important; gap: 12px !important; align-items: center !important; width: 100% !important;}
     .perk-warning, .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
     #80c-rows-container > div { display: grid !important; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
     .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
