@@ -370,25 +370,62 @@ permalink: /tax-calculator/
     /* ==========================================================================
        2. COMPONENT SPECIFIC LAYOUTS
        ========================================================================== */
-    .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
-    .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
-    .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
-    .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-    .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
-    .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
-    .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    /* ... (keep your existing collapsible and grid layout styles here) ... */
 
-    /* Perks & 80C Grid Layouts */
-    #perks-rows-container .perk-row { display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr !important; gap: 10px !important; align-items: center;width: 100% !important; margin-bottom: 15px !important; }
+    /* Consolidated Perks & 80C Grid Layouts */
+    #perks-rows-container .perk-row,
+    #perks-rows-container > div {
+        display: grid !important;
+        grid-template-columns: 0.6fr 0.35fr 0.05fr !important;
+        gap: 12px !important;
+        align-items: center !important;
+        margin-bottom: 12px !important;
+        width: 100% !important;
+    }
+
     #perks-rows-container .perk-type, 
-    #perks-rows-container .perk-amount {width: 100% !important;min-width: 0 !important; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+    #perks-rows-container .perk-amount {
+        width: 100% !important;
+        min-width: 0 !important; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #perks-rows-container button {
+        grid-column: 3 / 4 !important;
+        justify-self: center;
+        color: #ef4444; 
+        background: none; 
+        border: none; 
+        cursor: pointer;
+    }
+
     .perk-row-wrapper { margin-bottom: 15px; width: 100%; }
     .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
-    #80c-rows-container > div { display: grid; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
+    
+    #80c-rows-container > div { 
+        display: grid !important; 
+        grid-template-columns: 1.5fr 1fr auto !important; 
+        gap: 15px; 
+        align-items: center; 
+        margin-bottom: 12px; 
+    }
 
-    .unique-tax-calc .dark-mode-notice-box { background: var(--bg-offset); border: 1px solid var(--border-base); border-left: 4px solid var(--brand-primary); padding: 15px 20px; border-radius: 8px; margin-top: 15px; margin-bottom: 25px; }
-    .unique-tax-calc .dark-mode-notice-box p { color: var(--text-primary); font-size: 0.9rem; line-height: 1.5; margin: 0; }
+    .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
+    .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
+
+/* Add the Validation Error styles that were in JS */
+.input-error { 
+    border: 1px solid #ef4444 !important; 
+    background-color: #fef2f2 !important; 
+} 
+.perk-limit-warning { 
+    color: #f59e0b; 
+    font-size: 0.75rem; 
+    margin-top: 4px; 
+    display: none; 
+}
 
     /* ==========================================================================
        3. INTERACTIVE ELEMENTS (Hover, Radio, Select)
