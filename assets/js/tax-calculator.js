@@ -207,25 +207,43 @@ const TaxController = {
     },
 
     addPerkRow: (type = "", value = "") => {
-        const container = document.getElementById('perks-rows-container');
-        if (!container) return;
-        const row = document.createElement('div');
-        row.className = "perk-row";
-        row.style = "display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 30px; gap: 10px; margin-bottom: 12px; align-items: center;";
-        const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
-        let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString()) : "";
-        row.innerHTML = `
-            <select class="perk-type dynamic-input" style="background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155;">
-                <option value="" disabled ${!type ? 'selected' : ''} style="background-color: #1e293b; color: #f8fafc;">Select Perk</option>
-                ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''} style="background-color: #1e293b; color: #f8fafc;">${opt}</option>`).join('')}
-            </select>
-            <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right; background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155;">
-            <div class="perk-eligible" style="text-align: right; color: #4ade80; font-size: 0.75rem;">₹ 0</div>
-            <button type="button" onclick="this.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none;"><i class="fas fa-trash"></i></button>`;
-        container.appendChild(row);
-        if (window.initCustomDropdowns) window.initCustomDropdowns();
-        if (!TaxController.isInitialLoading) TaxController.calculateAll();
-    },
+    const container = document.getElementById('perks-rows-container');
+    if (!container) return;
+    
+    // Create a wrapper for the row to hold both the inputs and the warning message
+    const rowWrapper = document.createElement('div');
+    rowWrapper.className = "perk-row-wrapper";
+    rowWrapper.style = "margin-bottom: 15px;";
+
+    const row = document.createElement('div');
+    row.className = "perk-row";
+    // Now using a 3-column grid as discussed
+    row.style = "display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr; gap: 12px; align-items: center;";
+    
+    const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
+    let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString()) : "";
+    
+    row.innerHTML = `
+        <select class="perk-type dynamic-input" style="background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155; height: 50px; border-radius: 14px;">
+            <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
+            ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
+        </select>
+        <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right; background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155; height: 50px; border-radius: 14px;">
+        <button type="button" onclick="this.parentElement.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button>
+    `;
+
+    // Add a container for the warning message below the row
+    const warningDiv = document.createElement('div');
+    warningDiv.className = "perk-warning";
+    warningDiv.style = "margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none;"; // Hidden by default
+    
+    rowWrapper.appendChild(row);
+    rowWrapper.appendChild(warningDiv);
+    container.appendChild(rowWrapper);
+    
+    if (window.initCustomDropdowns) window.initCustomDropdowns();
+    if (!TaxController.isInitialLoading) TaxController.calculateAll();
+},
 
     calculateAll: () => {
         if (!window.FinanceEngine || !window.TAX_CONFIG) return;
