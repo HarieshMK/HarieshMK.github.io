@@ -300,12 +300,7 @@ const TaxController = {
             const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, deductionsObj, basic);
             processedPerks.forEach((p, index) => { const eligibleVal = p.eligibleNew; if (rawPerks[index]?.element) { rawPerks[index].element.innerText = `₹ ${Number(eligibleVal).toLocaleString('en-IN')}`; } });
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
-            
-            // Invoke display updates globally across layout layers
-            if (window.TaxUI) {
-                window.TaxUI.updateRegimeHighlights();
-                window.TaxUI.checkHraLoanWarning();
-            }
+
         } catch (err) { console.error("Calculation Engine Error:", err); }
     },
 
