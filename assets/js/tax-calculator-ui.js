@@ -169,7 +169,28 @@ const TaxUI = {
         }
     },
 
-    // 6. Compliance Audits (HRA and Active Housing Loan Warnings)
+    // 6. Standalone Recommendation Logic
+    updateRegimeRecommendation(oldTax, newTax) {
+        const banner = document.getElementById('regime-recommendation-banner');
+        if (!banner) return;
+        
+        const diff = oldTax - newTax;
+        if (diff > 0) {
+            banner.style.display = 'block';
+            banner.style.backgroundColor = '#dcfce7';
+            banner.style.color = '#166534';
+            banner.innerHTML = `<i class="fas fa-check-circle"></i> New Regime is better! You save ₹${diff.toLocaleString('en-IN')}`;
+        } else if (diff < 0) {
+            banner.style.display = 'block';
+            banner.style.backgroundColor = '#fee2e2';
+            banner.style.color = '#991b1b';
+            banner.innerHTML = `<i class="fas fa-info-circle"></i> Old Regime is better! You save ₹${Math.abs(diff).toLocaleString('en-IN')}`;
+        } else {
+            banner.style.display = 'none';
+        }
+    },
+
+    // 7. Compliance Audits (HRA and Active Housing Loan Warnings)
     checkHraLoanWarning() {
         const rentInput = document.getElementById('rent-paid');
         const homeLoanCheck = document.getElementById('has-home-loan');
@@ -186,7 +207,7 @@ const TaxUI = {
         }
     },
 
-    // 7. Dynamic Form Warnings Feedback
+    // 8. Dynamic Form Warnings Feedback
     handlePerkUIFeedback(inputElement, perkName) {
         if (!window.TaxController) return;
         const value = window.TaxController.cleanNum(inputElement.value);
@@ -201,7 +222,7 @@ const TaxUI = {
         if (perkName === "Fuel Allowance" || perkName === "Mobile Reimbursement") { inputElement.placeholder = "Enter amount as per bills"; }
     },
 
-    // 8. Input Field Validations
+    // 9. Input Field Validations
     validateInputs() {
         let isValid = true;
         document.querySelectorAll('.currency-mapped').forEach(input => {
@@ -255,7 +276,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const targetOld = document.getElementById('old-regime-tax');
     const targetNew = document.getElementById('new-regime-tax');
     if (targetOld && targetNew) {
-        const layoutObserver = new MutationObserver(() => { TaxUI.updateRegimeHighlights(); });
+        const layoutObserver = new MutationObserver(() => { TaxUI.updateRegimeHighlights(); 
+        const oldVal = parseFloat(targetOld.innerText.replace(/[^0-9.-]+/g, "")) || 0;
+        const newVal = parseFloat(targetNew.innerText.replace(/[^0-9.-]+/g, "")) || 0;
+        TaxUI.updateRegimeRecommendation(oldVal, newVal);
+  });
         layoutObserver.observe(targetOld, { childList: true, characterData: true, subtree: true });
         layoutObserver.observe(targetNew, { childList: true, characterData: true, subtree: true });
     }
