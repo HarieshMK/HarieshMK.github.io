@@ -49,23 +49,34 @@ const TaxUI = {
                 };
             });
         });
-    }, // <-- Ensure this comma is here
+    },
 
-    // NEW: Properly placed as its own method in TaxUI
-    syncCustomDropdowns: function() {
-        document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
-            const targetSelectId = wrapper.getAttribute('data-target');
-            const nativeSelect = document.getElementById(targetSelectId);
-            const displaySpan = wrapper.querySelector('.custom-select-trigger span');
+    styleSelectsInContainer: function(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.querySelectorAll('select').forEach(dynamicSelect => {
+            dynamicSelect.style.backgroundColor = '#0f172a';
+            dynamicSelect.style.color = '#f8fafc';
+            dynamicSelect.style.border = '1.5px solid #334155';
             
-            if (nativeSelect && displaySpan) {
-                const selectedOption = nativeSelect.options[nativeSelect.selectedIndex];
-                if (selectedOption) {
-                    displaySpan.textContent = selectedOption.textContent;
-                }
+            dynamicSelect.querySelectorAll('option').forEach(opt => {
+                opt.style.backgroundColor = '#1e293b';
+                opt.style.color = '#f8fafc';
+            });
+        });
+    },
+
+    initDropdownStyles: function() {
+        this.styleSelectsInContainer('perks-rows-container');
+        this.styleSelectsInContainer('80c-rows-container');
+        
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-select-wrapper')) {
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
             }
         });
-    }, // <-- Ensure this comma is here
+    },
         
 
         // Safeguard Fix: Apply dark styles independently to each container to avoid query string crashes
@@ -157,9 +168,12 @@ const TaxUI = {
             branchEEA.style.display = 'block'; 
         }
     },
-
+isUpdating: false,
     // 5. Tax Regime Dynamic Highlights
     updateRegimeHighlights() {
+        if (this.isUpdating) return;
+        this.isUpdating = true;
+
         const oldCard = document.getElementById('old-regime-card');
         const newCard = document.getElementById('new-regime-card');
         if (!oldCard || !newCard) return;
@@ -185,6 +199,7 @@ const TaxUI = {
             newCard.classList.add('regime-winner');
             oldCard.classList.add('regime-loser');
         }
+    this.isUpdating = false;
     },
 
     // 6. Compliance Audits (HRA and Active Housing Loan Warnings)
@@ -253,6 +268,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Initialize interactive dropdown panels
     TaxUI.initCustomDropdowns();
+    TaxUI.initDropdownStyles();
 
     // Link View Breakdown Action Trigger to Smooth Scroll Engine
     const breakdownBtn = document.getElementById('view-breakdown-btn');
