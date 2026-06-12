@@ -380,7 +380,9 @@ permalink: /tax-calculator/
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
     /* Perks & 80C Grid Layouts */
-    #perks-rows-container .perk-row { display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr !important; gap: 12px !important; align-items: center; }
+    #perks-rows-container .perk-row { display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr !important; gap: 10px !important; align-items: center;width: 100% !important; margin-bottom: 15px !important; }
+    #perks-rows-container .perk-type, 
+    #perks-rows-container .perk-amount {width: 100% !important;min-width: 0 !important; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
     .perk-row-wrapper { margin-bottom: 15px; width: 100%; }
     .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
     #80c-rows-container > div { display: grid; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
