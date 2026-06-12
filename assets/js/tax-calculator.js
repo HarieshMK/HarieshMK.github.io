@@ -295,7 +295,6 @@ const TaxController = {
         const rawPerks = Array.from(perkRows).map(row => ({
             type: row.querySelector('.perk-type').value,
             amount: TaxController.cleanNum(row.querySelector('.perk-amount').value),
-            element: row.querySelector('.perk-eligible')
         }));
         const processedPerks = FinanceEngine.TaxEngine.processPerks(rawPerks, basic, fy);
         const otherIncome = TaxController.cleanNum(document.getElementById('other-income')?.value);
@@ -316,7 +315,6 @@ const TaxController = {
         try {
             const oldReg = window.FinanceEngine.TaxEngine.calculateOldRegime(fy, gross, deductionsObj, processedPerks, basic);
             const newReg = window.FinanceEngine.TaxEngine.calculateNewRegime(fy, gross, processedPerks, deductionsObj, basic);
-            processedPerks.forEach((p, index) => { const eligibleVal = p.eligibleNew; if (rawPerks[index]?.element) { rawPerks[index].element.innerText = `₹ ${Number(eligibleVal).toLocaleString('en-IN')}`; } });
             TaxController.updateSummaryUI(newReg.tax, oldReg.tax, oldReg, newReg, gross);
 
         } catch (err) { console.error("Calculation Engine Error:", err); }
