@@ -195,7 +195,6 @@ FinanceEngine.TaxEngine = {
         const config = yearData.newRegime;
         const perksConfig = yearData.perkRules;
         let totalExemptions = config.stdDeduction;
-        console.log("DEBUG: New Regime Deductions:", deductions);
 
         if ((deductions.occupancy === 'let-out' || deductions.occupancy === 'rented') && (deductions.homeLoanInterest > 0)) {
             totalExemptions += (deductions.homeLoanInterest || 0);
