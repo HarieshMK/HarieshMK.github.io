@@ -344,7 +344,31 @@ permalink: /tax-calculator/
 
 <style>
     /* ==========================================================================
-       1. STRUCTURAL LAYOUTS & HOVER TRANSITIONS
+       1. GLOBAL UTILITIES & SHARED STYLES
+       ========================================================================== */
+    .unique-tax-calc select, 
+    .unique-tax-calc input[type="text"], 
+    .unique-tax-calc input[type="number"], 
+    .unique-tax-calc .dynamic-input, 
+    .perk-row input, .perk-row select,
+    .row-80c-manual input, .row-80c-manual select, 
+    .row-80c-statutory input, .row-80c-statutory select {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 20px !important;
+        border-radius: 14px !important;
+        font-size: 1.1rem !important;
+        height: 50px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 700 !important;
+        background-color: #0f172a !important;
+        border: 1.5px solid #334155 !important;
+        color: #f8fafc !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    }
+
+    /* ==========================================================================
+       2. COMPONENT SPECIFIC LAYOUTS
        ========================================================================== */
     .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
     .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
@@ -354,78 +378,36 @@ permalink: /tax-calculator/
     .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
     .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    
-    /* Column allocations to resolve text clipping "..." */
-    #perks-rows-container > div { display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr !important; gap: 12px; align-items: center; margin-bottom: 12px; width: 100%;}
-    #perks-rows-container select, #perks-rows-container input {width: 100% !important;min-width: 0;}
+
+    /* Perks & 80C Grid Layouts */
+    #perks-rows-container .perk-row { display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr !important; gap: 12px !important; align-items: center; }
+    .perk-row-wrapper { margin-bottom: 15px; width: 100%; }
+    .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
     #80c-rows-container > div { display: grid; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
-    
+
     .unique-tax-calc .dark-mode-notice-box { background: var(--bg-offset); border: 1px solid var(--border-base); border-left: 4px solid var(--brand-primary); padding: 15px 20px; border-radius: 8px; margin-top: 15px; margin-bottom: 25px; }
     .unique-tax-calc .dark-mode-notice-box p { color: var(--text-primary); font-size: 0.9rem; line-height: 1.5; margin: 0; }
 
     /* ==========================================================================
-       2. PREMIUM FIELD INJECTIONS & REACTION INTERACTIONS
+       3. INTERACTIVE ELEMENTS (Hover, Radio, Select)
        ========================================================================== */
-    .unique-tax-calc input[type="text"], 
-    .unique-tax-calc input[type="number"], 
-    .unique-tax-calc .dynamic-input, 
-    .perk-row input, 
-    .row-80c-manual input, 
-    .row-80c-statutory input {
-        width: 100% !important; 
-        box-sizing: border-box !important; 
-        padding: 12px 20px !important; 
-        border-radius: 14px !important; 
-        font-size: 1.1rem !important; 
-        height: 50px !important; 
-        font-family: 'JetBrains Mono', monospace !important; 
-        font-weight: 700 !important; 
-        background-color: var(--bg-body) !important; 
-        border: 1.5px solid var(--border-base) !important; 
-        color: var(--text-primary) !important;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-    }
-    /* Styling for the new Radio Buttons */
-        input[type="radio"] {
-            accent-color: #38bdf8; /* Uses a nice sky-blue highlight color */
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
+    input[type="radio"] { accent-color: #38bdf8; width: 18px; height: 18px; cursor: pointer; }
 
-    /* ISSUE 2 RESOLVED: Dynamic field outline transformation when hovering input directly */
-    .unique-tax-calc input[type="text"]:hover,
-    .unique-tax-calc input[type="number"]:hover,
-    .unique-tax-calc .dynamic-input:hover {
-        border-color: var(--brand-primary) !important;
-    }
+    .unique-tax-calc input:hover { border-color: var(--brand-primary) !important; }
 
-    /* UPDATED: Force dark background and white text for all dropdowns */
-    .unique-tax-calc select, 
-    .perk-row select, 
-    .row-80c-manual select,
-    .row-80c-statutory select {
-        background-color: #0f172a !important; 
-        color: #f8fafc !important; 
-        border: 1.5px solid #334155 !important;
-        appearance: none !important; 
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
+    /* Select Arrow Optimization */
+    .unique-tax-calc select {
+        appearance: none !important;
         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 15px top 50% !important;
-    background-size: 12px auto !important;
+        background-repeat: no-repeat !important;
+        background-position: right 15px top 50% !important;
+        background-size: 12px auto !important;
     }
 
-    .unique-tax-calc select option, 
-    .perk-row select option, 
-    .row-80c-manual select option { 
-        color: #f8fafc !important; 
-        background-color: #0f172a !important; 
-    }
+    select option { color: #f8fafc !important; background-color: #0f172a !important; }
 
     /* ==========================================================================
-       3. PREMIUM HIGH-FIDELITY SELECT OVERLAY COMPONENT
+       4. PREMIUM OVERLAY & SIDEBAR (Unchanged)
        ========================================================================== */
     .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; user-select: none; z-index: 99; }
     .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.1rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); box-sizing: border-box; transition: border-color 0.2s ease; }
@@ -436,9 +418,6 @@ permalink: /tax-calculator/
     .custom-option:hover { background: var(--bg-offset); color: var(--brand-primary); }
     .custom-option.selected { background: rgba(14, 165, 233, 0.1); color: var(--brand-primary); font-weight: bold; }
 
-    /* ==========================================================================
-       4. SIDEBAR & TAX LIABILITY ENGINE
-       ========================================================================== */
     .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
     .unique-tax-calc .sidebar-panel-header-accent { border-bottom: 1px solid var(--border-base); padding-bottom: 12px; margin-bottom: 20px; width: 100%; }
     .unique-tax-calc .sidebar-panel-heading { margin: 0; font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
@@ -446,13 +425,12 @@ permalink: /tax-calculator/
     .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
     .unique-tax-calc .regime-row-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 8px; }
     .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
-    
     .unique-tax-calc .regime-row-card.regime-winner { transform: scale(1.02); border-color: var(--color-success) !important; background-color: rgba(16, 185, 129, 0.05) !important; }
     .unique-tax-calc .regime-row-card.regime-winner .regime-row-value { color: var(--color-success) !important; }
     .unique-tax-calc .regime-row-card.regime-loser .regime-row-value { color: var(--text-muted) !important; }
 
     /* ==========================================================================
-       5. RESPONSIVE HOOKS & FLEX BLOCKS
+       5. RESPONSIVE HOOKS
        ========================================================================== */
     .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; box-sizing: border-box; width: 100%; min-height: 80px; gap: 15px; }
     .benefit-text-stack { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
