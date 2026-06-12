@@ -232,7 +232,7 @@ const TaxController = {
         const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
         const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
         const rentPaid = TaxController.cleanNum(document.getElementById('rent-paid')?.value);
-        const isMetro = document.getElementById('is-metro')?.value === 'true';
+        const isMetro = document.querySelector('input[name="is-metro"]:checked')?.value === 'true';
         const fy = document.getElementById('fy-selector')?.value || '2026-27';
         TaxController.manageStatutoryRows(basic);
         const hasLoan = document.getElementById('has-home-loan')?.checked;
@@ -350,7 +350,7 @@ const TaxController = {
             const rentPaid = TaxController.cleanNum(document.getElementById('rent-paid')?.value);
             const basic = TaxController.cleanNum(document.getElementById('basic-salary')?.value);
             const hraRec = TaxController.cleanNum(document.getElementById('hra-received')?.value);
-            const isMetro = document.getElementById('is-metro')?.value === 'true';
+            const isMetro = document.querySelector('input[name="is-metro"]:checked')?.value === 'true';
             const calculatedHRA = window.FinanceEngine?.TaxEngine?.calculateExemptHRA(basic, hraRec, rentPaid, isMetro)?.actualExemption || 0;
             setVal('summary-80c-deduction', applied80C);
             setVal('summary-hra-deduction', calculatedHRA);
@@ -383,7 +383,7 @@ const TaxController = {
                 if (el) { const parsed = TaxController.cleanNum(value); el.value = parsed === 0 ? "" : TaxController.formatIndianCurrency(parsed.toString()); } 
             };
             setNumericValue('basic-salary', i.basic); setNumericValue('hra-received', i.hra); setNumericValue('rent-paid', i.rent); setNumericValue('other-income', i.otherIncome);
-            if (document.getElementById('is-metro')) { document.getElementById('is-metro').value = (i.isMetro === 'true' || i.isMetro === true) ? "true" : "false"; }
+            const metroRadio = document.querySelector(`input[name="is-metro"][value="${(i.isMetro === 'true' || i.isMetro === true) ? 'true' : 'false'}"]`); if (metroRadio) metroRadio.checked = true;
             if (document.getElementById('has-home-loan')) { document.getElementById('has-home-loan').checked = (parseFloat(i.homeInterest) > 0 || i.isUnderConstruction === true); if (window.TaxUI) window.TaxUI.toggleLoanWizard(); }
             setNumericValue('loan-interest', i.homeInterest); setNumericValue('loan-principal', i.loanPrincipal); setNumericValue('property-stamp-value', i.propertyValue);
             if (document.getElementById('loan-sanction-date')) { document.getElementById('loan-sanction-date').value = i.sanctionDate || ""; }
