@@ -217,8 +217,6 @@ const TaxController = {
 
     const row = document.createElement('div');
     row.className = "perk-row";
-    // Now using a 3-column grid as discussed
-    row.style = "display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr; gap: 12px; align-items: center;";
     
     const perkOptions = ["Meal Coupons", "Corporate NPS", "Fuel Allowance", "LTA", "Professional Tax", "Mobile Reimbursement"];
     let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString()) : "";
