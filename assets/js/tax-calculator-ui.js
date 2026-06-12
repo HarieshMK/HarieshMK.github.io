@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .perk-row,
         #perks-rows-container > div {
             display: grid !important;
-            grid-template-columns: 1.6fr 1fr 0.8fr 40px !important;
+            grid-template-columns: 0.6fr 0.35fr 0.05fr !important; /* Update this line */
             align-items: center !important;
             gap: 12px !important;
             margin-bottom: 12px !important;
@@ -348,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function() {
             justify-self: center;
         }
         #perks-rows-container button {
-            grid-column: 4 / 5 !important;
+            grid-column: 3 / 4 !important; /* Change from 4/5 to 3/4 */
             justify-self: center;
         }
 
