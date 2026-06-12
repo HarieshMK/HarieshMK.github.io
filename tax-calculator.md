@@ -50,24 +50,17 @@ permalink: /tax-calculator/
                         <label for="rent-paid">Actual Rent Paid (Annual)</label>
                         <input type="text" id="rent-paid" value="3,60,000">
                     </div>
-                    <div class="calc-custom-row">
-                        <label for="is-metro">City of Residence</label>
-                        <select id="is-metro" class="calc-select" style="display: none !important;">
-                            <option value="true" selected>Metro</option>
-                            <option value="false">Non-Metro</option>
-                        </select>
-                        <div class="custom-select-wrapper" data-target="#is-metro">
-                            <div class="custom-select-trigger">
-                                <span>Metro</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="custom-options-panel">
-                                <div class="custom-option selected" data-value="true">Metro</div>
-                                <div class="custom-option" data-value="false">Non-Metro</div>
-                            </div>
-                        </div>
+                   <div class="calc-custom-row">
+                    <label>City of Residence</label>
+                    <div class="radio-group" style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="is-metro" value="true" checked> Metro
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="is-metro" value="false"> Non-Metro
+                        </label>
                     </div>
-                </div>
+                </div>                </div>
                 <div id="hra-warning" class="calc-warning-banner" style="display: none;"></div>
                 <div id="hra-loan-legal-warning" class="dark-mode-notice-box" style="display: none; margin-top: 15px;">
                     <p><i class="fas fa-exclamation-triangle" style="color: #eab308; margin-right: 8px;"></i> <strong>Note:</strong> You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
@@ -391,6 +384,13 @@ permalink: /tax-calculator/
         color: var(--text-primary) !important;
         transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
+    /* Styling for the new Radio Buttons */
+        input[type="radio"] {
+            accent-color: #38bdf8; /* Uses a nice sky-blue highlight color */
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
 
     /* ISSUE 2 RESOLVED: Dynamic field outline transformation when hovering input directly */
     .unique-tax-calc input[type="text"]:hover,
