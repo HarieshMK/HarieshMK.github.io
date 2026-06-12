@@ -356,7 +356,8 @@ permalink: /tax-calculator/
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
     
     /* Column allocations to resolve text clipping "..." */
-    #perks-rows-container > div { display: grid; grid-template-columns: 1.62fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
+    #perks-rows-container > div { display: grid; grid-template-columns: 0.6fr 0.35fr 0.05fr !important; gap: 12px; align-items: center; margin-bottom: 12px; width: 100%;}
+    #perks-rows-container select, #perks-rows-container input {width: 100% !important;min-width: 0;}
     #80c-rows-container > div { display: grid; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
     
     .unique-tax-calc .dark-mode-notice-box { background: var(--bg-offset); border: 1px solid var(--border-base); border-left: 4px solid var(--brand-primary); padding: 15px 20px; border-radius: 8px; margin-top: 15px; margin-bottom: 25px; }
