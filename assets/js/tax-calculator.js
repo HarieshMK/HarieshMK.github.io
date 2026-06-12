@@ -213,7 +213,6 @@ const TaxController = {
     // Create a wrapper for the row to hold both the inputs and the warning message
     const rowWrapper = document.createElement('div');
     rowWrapper.className = "perk-row-wrapper";
-    rowWrapper.style = "margin-bottom: 15px;";
 
     const row = document.createElement('div');
     row.className = "perk-row";
@@ -222,13 +221,13 @@ const TaxController = {
     let displayVal = (value !== "" && value !== undefined && value !== null) ? TaxController.formatIndianCurrency(value.toString()) : "";
     
     row.innerHTML = `
-        <select class="perk-type dynamic-input" style="background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155; height: 50px; border-radius: 14px;">
-            <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
-            ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
-        </select>
-        <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}" style="text-align: right; background-color: #0f172a; color: #f8fafc; border: 1.5px solid #334155; height: 50px; border-radius: 14px;">
-        <button type="button" onclick="this.parentElement.parentElement.remove(); window.TaxController.calculateAll();" style="color:#ef4444; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button>
-    `;
+    <select class="perk-type dynamic-input">
+        <option value="" disabled ${!type ? 'selected' : ''}>Select Perk</option>
+        ${perkOptions.map(opt => `<option value="${opt}" ${opt === type ? 'selected' : ''}>${opt}</option>`).join('')}
+    </select>
+    <input type="text" inputmode="decimal" class="perk-amount currency-mapped dynamic-input" placeholder="Amt" value="${displayVal}">
+    <button type="button" onclick="this.parentElement.parentElement.remove(); window.TaxController.calculateAll();"><i class="fas fa-trash"></i></button>
+`;
 
     // Add a container for the warning message below the row
     const warningDiv = document.createElement('div');
