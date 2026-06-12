@@ -370,13 +370,20 @@ permalink: /tax-calculator/
     /* ==========================================================================
        2. COMPONENT SPECIFIC LAYOUTS
        ========================================================================== */
-    /* ... (keep your existing collapsible and grid layout styles here) ... */
+    .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
+    .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
+    .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
+    .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
+    .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
+    .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-    /* Consolidated Perks & 80C Grid Layouts */
+    /* Perks & 80C Grid Layouts */
     #perks-rows-container .perk-row,
     #perks-rows-container > div {
         display: grid !important;
-        grid-template-columns: 0.6fr 0.35fr 0.05fr !important;
+        grid-template-columns: 1fr 0.8fr 40px !important; 
         gap: 12px !important;
         align-items: center !important;
         margin-bottom: 12px !important;
@@ -387,9 +394,8 @@ permalink: /tax-calculator/
     #perks-rows-container .perk-amount {
         width: 100% !important;
         min-width: 0 !important; 
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: normal; /* Changed from nowrap to allow text to wrap */
+        overflow: visible;
     }
 
     #perks-rows-container button {
@@ -415,26 +421,12 @@ permalink: /tax-calculator/
     .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
     .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
 
-/* Add the Validation Error styles that were in JS */
-.input-error { 
-    border: 1px solid #ef4444 !important; 
-    background-color: #fef2f2 !important; 
-} 
-.perk-limit-warning { 
-    color: #f59e0b; 
-    font-size: 0.75rem; 
-    margin-top: 4px; 
-    display: none; 
-}
-
     /* ==========================================================================
        3. INTERACTIVE ELEMENTS (Hover, Radio, Select)
        ========================================================================== */
     input[type="radio"] { accent-color: #38bdf8; width: 18px; height: 18px; cursor: pointer; }
-
     .unique-tax-calc input:hover { border-color: var(--brand-primary) !important; }
 
-    /* Select Arrow Optimization */
     .unique-tax-calc select {
         appearance: none !important;
         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
@@ -446,7 +438,7 @@ permalink: /tax-calculator/
     select option { color: #f8fafc !important; background-color: #0f172a !important; }
 
     /* ==========================================================================
-       4. PREMIUM OVERLAY & SIDEBAR (Unchanged)
+       4. PREMIUM OVERLAY & SIDEBAR
        ========================================================================== */
     .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; user-select: none; z-index: 99; }
     .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.1rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); box-sizing: border-box; transition: border-color 0.2s ease; }
