@@ -399,15 +399,25 @@ permalink: /tax-calculator/
         border-color: var(--brand-primary) !important;
     }
 
-    /* Native select element theme adaptation rules */
-    .unique-tax-calc select, .perk-row select, .row-80c-manual select {
-        color-scheme: light dark !important;
-        color: var(--text-primary) !important;
-        background-color: var(--bg-body) !important;
+    /* UPDATED: Force dark background and white text for all dropdowns */
+    .unique-tax-calc select, 
+    .perk-row select, 
+    .row-80c-manual select,
+    .row-80c-statutory select {
+        background-color: #0f172a !important; 
+        color: #f8fafc !important; 
+        border: 1.5px solid #334155 !important;
+        /* This removes the browser's default arrow so you can control it better */
+        appearance: none !important; 
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
     }
-    .unique-tax-calc select option, .perk-row select option, .row-80c-manual select option { 
-        color: var(--text-primary) !important; 
-        background-color: var(--bg-card) !important; 
+
+    .unique-tax-calc select option, 
+    .perk-row select option, 
+    .row-80c-manual select option { 
+        color: #f8fafc !important; 
+        background-color: #0f172a !important; 
     }
 
     /* ==========================================================================
