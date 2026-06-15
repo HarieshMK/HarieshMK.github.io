@@ -361,27 +361,6 @@ permalink: /tax-calculator/
     /* ==========================================================================
        2. INPUTS, SELECTS & DYNAMIC ELEMENTS
        ========================================================================== */
-    .unique-tax-calc select, 
-    .unique-tax-calc input[type="text"], 
-    .unique-tax-calc input[type="number"], 
-    .unique-tax-calc .dynamic-input, 
-    .unique-tax-calc .calc-select,
-    .perk-row input, .perk-row select,
-    .row-80c-manual input, .row-80c-manual select, 
-    .row-80c-statutory input, .row-80c-statutory select {
-        width: 100% !important;
-        box-sizing: border-box !important;
-        padding: 12px 20px !important;
-        border-radius: 14px !important;
-        font-size: 1.1rem !important;
-        height: 50px !important;
-        font-family: 'JetBrains Mono', monospace !important;
-        font-weight: 700 !important;
-        background-color: #0f172a !important;
-        border: 1.5px solid #334155 !important;
-        color: #f8fafc !important;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-    }
 
     .unique-tax-calc select, .unique-tax-calc .calc-select {
         appearance: none !important;
@@ -417,13 +396,7 @@ permalink: /tax-calculator/
     width: 100% !important;
     box-sizing: border-box !important;
 }
-    #perks-rows-container .perk-type, 
-#perks-rows-container .perk-amount {
-    width: 100% !important;
-    height: 50px !important;
-    min-width: 100px !important;
-    box-sizing: border-box !important;
-}
+    
     #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0;}
     .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
     .perk-row-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; width: 100%; }
@@ -481,27 +454,33 @@ permalink: /tax-calculator/
 }
 
 
-/* Consolidated Perks Layout & Input Override */
-.unique-tax-calc #perks-rows-container .perk-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 40px !important;
-    gap: 12px !important;
-    align-items: center !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Force the inputs inside to ignore intrinsic size and fill the grid cells */
-.unique-tax-calc .perk-row .perk-type, 
-.unique-tax-calc .perk-row .perk-amount {
+/* Unified Perk Input Override */
+.unique-tax-calc #perks-rows-container .perk-row .perk-type,
+.unique-tax-calc #perks-rows-container .perk-row .perk-amount {
+    /* Layout: Force grid alignment */
     display: block !important;
-    width: 100% !important; /* Forces 100% width of the grid cell */
-    min-width: 0 !important; /* The magic fix for elements that refuse to shrink */
+    width: 100% !important;
+    min-width: 0 !important;
     height: 50px !important;
     box-sizing: border-box !important;
-    /* We use !important to guarantee these override the JS style injection */
+    
+    /* Appearance: Match the theme */
     background-color: #0f172a !important;
     border: 1.5px solid #334155 !important;
+    color: #f8fafc !important;
+    border-radius: 14px !important;
+    padding: 0 15px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    
+    /* Ensure no browser defaults interfere */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px top 50% !important;
+    background-size: 12px auto !important;
 }
 
     @media (max-width: 768px) {
