@@ -350,7 +350,7 @@ permalink: /tax-calculator/
     .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
     .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .unique-tax-calc .calculation-card { padding: 20px !important; }
+    .unique-tax-calc .calculation-card { padding: 20px !important; position: sticky !important; top: 20px !important; align-self: flex-start !important; }
 
     /* ==========================================================================
        2. INPUTS, SELECTS & DYNAMIC ELEMENTS
@@ -374,7 +374,7 @@ permalink: /tax-calculator/
         background-repeat: no-repeat !important; background-position: right 15px top 50% !important; background-size: 12px auto !important; 
     }
     select option { color: #f8fafc !important; background-color: #0f172a !important; }
-    input[type="radio"] { accent-color: #38bdf8; width: 18px; height: 18px; cursor: pointer; }
+    input[type="radio"] { accent-color: #38bdf8; width: 18px !important; height: 18px !important; cursor: pointer; margin: 0 !important; }
     .unique-tax-calc input:hover, .unique-tax-calc .calc-select:focus { border-color: var(--brand-primary) !important; outline: none; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .unique-tax-calc .dynamic-row-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; animation: fadeIn 0.2s ease-out; }
@@ -382,6 +382,7 @@ permalink: /tax-calculator/
     /* ==========================================================================
        3. COMPONENTS (Collapsibles, Perks, Sidebars)
        ========================================================================== */
+    .summary-footer-hidden { display: none !important; }
     .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
     .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
     .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
@@ -412,7 +413,46 @@ permalink: /tax-calculator/
        4. RESPONSIVE HOOKS
        ========================================================================== */
     .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; width: 100%; min-height: 80px; gap: 15px; }
+   /* ==========================================================================
+       4. RESPONSIVE HOOKS (EXPANDED)
+       ========================================================================== */
     @media (max-width: 768px) {
-        #perks-rows-container > div, #80c-rows-container > div { grid-template-columns: 1fr !important; gap: 8px !important; padding: 12px !important; }
+        /* 1. Reset main grid to single column */
+        .unique-tax-calc .calc-form-grid, 
+        .unique-tax-calc .calc-grid-layout { 
+            grid-template-columns: 1fr !important; 
+            gap: 15px !important; 
+        }
+
+        /* 2. Perks & 80C container padding and spacing */
+        #perks-rows-container > div, 
+        #80c-rows-container > div { 
+            grid-template-columns: 1fr !important; 
+            gap: 8px !important; 
+            padding: 12px !important; 
+            background: var(--bg-offset); 
+            border-radius: 12px; 
+            width: 100% !important; 
+        }
+
+        /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
+        .unique-tax-calc .sidebar-stacked-layout { 
+            padding: 16px !important; 
+            margin-top: 20px !important; 
+        }
+
+        /* 4. Ensure Benefit Cards maintain their 'heft' on mobile */
+        .benefit-flex-row { 
+            flex-direction: column !important; 
+            align-items: flex-start !important; 
+            gap: 12px !important; 
+            text-align: left !important; 
+        }
+        
+        .benefit-value-text { 
+            margin-left: 0 !important; 
+            width: 100% !important; 
+            text-align: left !important; 
+        }
     }
 </style>
