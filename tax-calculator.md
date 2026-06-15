@@ -489,20 +489,24 @@ permalink: /tax-calculator/
     width: 100% !important;
 }
 
-/* We target the inputs within those specific rows */
-.unique-tax-calc #perks-rows-container .perk-type, 
-.unique-tax-calc #perks-rows-container .perk-amount {
+/* Consolidated Perks Layout & Input Override */
+.unique-tax-calc #perks-rows-container .perk-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 40px !important;
+    gap: 12px !important;
+    align-items: center !important;
     width: 100% !important;
-    height: 50px !important;
     box-sizing: border-box !important;
 }
-    /* ADD THIS TEMPORARILY TO SEE THE BORDERS */
-.unique-tax-calc #perks-rows-container {
-    border: 3px solid red !important; /* This will draw a red box around the whole container */
-}
 
-.unique-tax-calc .perk-row {
-    border: 2px dashed lime !important; /* This will draw a green box around each row */
+.unique-tax-calc .perk-row .perk-type, 
+.unique-tax-calc .perk-row .perk-amount {
+    width: 100% !important;
+    min-width: 0 !important; 
+    height: 50px !important;
+    box-sizing: border-box !important;
+    background-color: #0f172a !important;
+    border: 1.5px solid #334155 !important;
 }
 
     @media (max-width: 768px) {
