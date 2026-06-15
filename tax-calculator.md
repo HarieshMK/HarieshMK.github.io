@@ -480,14 +480,6 @@ permalink: /tax-calculator/
     display: block !important;
 }
 
-/* We target the specific rows within that container */
-.unique-tax-calc #perks-rows-container .perk-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr 40px !important;
-    gap: 12px !important;
-    align-items: center !important;
-    width: 100% !important;
-}
 
 /* Consolidated Perks Layout & Input Override */
 .unique-tax-calc #perks-rows-container .perk-row {
@@ -499,12 +491,15 @@ permalink: /tax-calculator/
     box-sizing: border-box !important;
 }
 
+/* Force the inputs inside to ignore intrinsic size and fill the grid cells */
 .unique-tax-calc .perk-row .perk-type, 
 .unique-tax-calc .perk-row .perk-amount {
-    width: 100% !important;
-    min-width: 0 !important; 
+    display: block !important;
+    width: 100% !important; /* Forces 100% width of the grid cell */
+    min-width: 0 !important; /* The magic fix for elements that refuse to shrink */
     height: 50px !important;
     box-sizing: border-box !important;
+    /* We use !important to guarantee these override the JS style injection */
     background-color: #0f172a !important;
     border: 1.5px solid #334155 !important;
 }
