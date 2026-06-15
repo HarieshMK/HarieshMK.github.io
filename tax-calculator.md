@@ -408,9 +408,22 @@ permalink: /tax-calculator/
     .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
     .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
 
-    #perks-rows-container .perk-row, #perks-rows-container > div { display: grid !important; grid-template-columns: 1fr 0.8fr 40px !important; gap: 12px !important; align-items: center !important; margin-bottom: 12px !important; width: 100% !important; }
+    #perks-rows-container .perk-row, #perks-rows-container > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 40px !important;
+    gap: 12px !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
     #perks-rows-container .perk-type, 
-    #perks-rows-container .perk-amount { width: 100% !important; height: 50px !important;min-width: 0 !important; }
+#perks-rows-container .perk-amount {
+    width: 100% !important;
+    height: 50px !important;
+    min-width: 100px !important;
+    box-sizing: border-box !important;
+}
     #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0;}
     .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
     .perk-row-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; width: 100%; }
@@ -457,8 +470,13 @@ permalink: /tax-calculator/
     .value-red { color: #ef4444; }
 
     @media (max-width: 768px) {
-        .benefit-flex-row { flex-direction: column; align-items: flex-start; gap: 12px; padding: 15px; }
-        .benefit-value-text { margin-left: 0; width: 100%; text-align: left; border-top: 1px dashed var(--border-base); padding-top: 8px; }
-        #perks-rows-container > div, #80c-rows-container > div { grid-template-columns: 1fr; gap: 8px; padding: 12px; background: var(--bg-offset); border-radius: 12px; }
+    #perks-rows-container > div, #80c-rows-container > div {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 12px !important;
+        background: var(--bg-offset);
+        border-radius: 12px;
+        width: 100% !important; 
     }
+}
 </style>
