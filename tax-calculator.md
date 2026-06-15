@@ -346,36 +346,56 @@ permalink: /tax-calculator/
     /* ==========================================================================
        1. LAYOUT & GRID STRUCTURE
        ========================================================================== */
-    .unique-tax-calc .calc-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px; }
+    .unique-tax-calc .calc-form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-top: 10px;
+    }
+
     .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    
     .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .unique-tax-calc .calculation-card { padding: 20px !important; }
 
     /* ==========================================================================
        2. INPUTS, SELECTS & DYNAMIC ELEMENTS
        ========================================================================== */
-    /* Base input/select styling */
     .unique-tax-calc select, 
-    .unique-tax-calc input, 
-    .unique-tax-calc .calc-select, 
-    .unique-tax-calc .dynamic-input {
-        width: 100% !important; height: 50px !important; box-sizing: border-box !important;
-        padding: 0 15px !important; border-radius: 14px !important;
-        font-family: 'JetBrains Mono', monospace !important; font-weight: 700 !important;
-        background-color: #0f172a !important; border: 1.5px solid #334155 !important;
-        color: #f8fafc !important; min-inline-size: 0 !important; min-width: 0 !important;
+    .unique-tax-calc input[type="text"], 
+    .unique-tax-calc input[type="number"], 
+    .unique-tax-calc .dynamic-input, 
+    .unique-tax-calc .calc-select,
+    .perk-row input, .perk-row select,
+    .row-80c-manual input, .row-80c-manual select, 
+    .row-80c-statutory input, .row-80c-statutory select {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 20px !important;
+        border-radius: 14px !important;
+        font-size: 1.1rem !important;
+        height: 50px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 700 !important;
+        background-color: #0f172a !important;
+        border: 1.5px solid #334155 !important;
+        color: #f8fafc !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
 
-    /* Select-specific aesthetics */
-    .unique-tax-calc select, .unique-tax-calc .calc-select { 
-        appearance: none !important; cursor: pointer;
-        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important; 
-        background-repeat: no-repeat !important; background-position: right 15px top 50% !important; background-size: 12px auto !important; 
+    .unique-tax-calc select, .unique-tax-calc .calc-select {
+        appearance: none !important;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 15px top 50% !important;
+        background-size: 12px auto !important;
+        cursor: pointer;
     }
+
     select option { color: #f8fafc !important; background-color: #0f172a !important; }
     input[type="radio"] { accent-color: #38bdf8; width: 18px; height: 18px; cursor: pointer; }
     .unique-tax-calc input:hover, .unique-tax-calc .calc-select:focus { border-color: var(--brand-primary) !important; outline: none; }
+
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .unique-tax-calc .dynamic-row-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; animation: fadeIn 0.2s ease-out; }
 
@@ -388,31 +408,117 @@ permalink: /tax-calculator/
     .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
     .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
 
-    /* Perks Grid System */
-    #perks-rows-container { width: 100% !important; display: block !important; }
-    .perk-row { display: grid !important; grid-template-columns: 1fr 1fr 40px !important; gap: 12px !important; align-items: center !important; width: 100% !important; box-sizing: border-box !important; margin-bottom: 12px; }
-    #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0; }
+    #perks-rows-container .perk-row, #perks-rows-container > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 40px !important;
+    gap: 12px !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+    #perks-rows-container .perk-type, 
+#perks-rows-container .perk-amount {
+    width: 100% !important;
+    height: 50px !important;
+    min-width: 100px !important;
+    box-sizing: border-box !important;
+}
+    #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0;}
+    .perk-warning { margin-top: 8px; color: #fbbf24; font-size: 0.75rem; display: none; }
     .perk-row-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; width: 100%; }
+    .perk-row { display: grid !important; grid-template-columns: 1fr 0.8fr 40px !important; gap: 12px !important; align-items: center !important; width: 100% !important;}
     .perk-warning, .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
-
-    /* 80C Rows & Custom Selects */
     #80c-rows-container > div { display: grid !important; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
     .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
-    .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; z-index: 99; }
-    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.1rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); }
+
+    .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; user-select: none; z-index: 99; }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.1rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); transition: border-color 0.2s ease; }
+    .custom-select-wrapper:hover .custom-select-trigger { border-color: var(--brand-primary) !important; }
     .custom-options-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1.5px solid var(--border-base); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 100; max-height: 200px; overflow-y: auto; }
     .custom-select-wrapper.open .custom-options-panel { display: block; }
+    .custom-option { padding: 12px 20px; font-size: 1rem; color: var(--text-primary); transition: background 0.2s ease; text-align: left; }
+    .custom-option:hover { background: var(--bg-offset); color: var(--brand-primary); }
+    .custom-option.selected { background: rgba(14, 165, 233, 0.1); color: var(--brand-primary); font-weight: bold; }
 
-    /* Sidebar Panels & Regimes */
     .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
-    .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
+    .unique-tax-calc .sidebar-panel-header-accent { border-bottom: 1px solid var(--border-base); padding-bottom: 12px; margin-bottom: 20px; width: 100%; }
+    .unique-tax-calc .sidebar-panel-heading { margin: 0; font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .sidebar-stacked-rows-container { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+    .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
+    .unique-tax-calc .regime-row-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 8px; }
     .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .regime-row-card.regime-winner { transform: scale(1.02); border-color: var(--color-success) !important; background-color: rgba(16, 185, 129, 0.05) !important; }
+    .unique-tax-calc .regime-row-card.regime-winner .regime-row-value { color: var(--color-success) !important; }
+    .unique-tax-calc .regime-row-card.regime-loser .regime-row-value { color: var(--text-muted) !important; }
 
     /* ==========================================================================
        4. RESPONSIVE HOOKS
        ========================================================================== */
-    .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; width: 100%; min-height: 80px; gap: 15px; }
+    .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; box-sizing: border-box; width: 100%; min-height: 80px; gap: 15px; }
+    .benefit-text-stack { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
+    .benefit-badge-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .benefit-section-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+    .badge-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+    .badge-blue { background: rgba(14, 165, 233, 0.15); color: #38bdf8; }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+    .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--color-danger); }
+    .benefit-description { margin: 0; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+    .benefit-value-text { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; text-align: right; margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+    .value-blue { color: #38bdf8; }
+    .value-green { color: var(--color-success); }
+    .value-red { color: #ef4444; }
+
+    /* We target the calculation-card ONLY if it is inside your unique tax calculator wrapper */
+.unique-tax-calc .calculation-card {
+    padding: 20px !important;
+}
+
+/* We target the container specifically within your tax calculator */
+.unique-tax-calc #perks-rows-container {
+    width: 100% !important;
+    display: block !important;
+}
+
+
+/* Consolidated Perks Layout & Input Override */
+.unique-tax-calc #perks-rows-container .perk-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 40px !important;
+    gap: 12px !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Force the inputs inside to ignore intrinsic size and fill the grid cells */
+.unique-tax-calc .perk-row .perk-type, 
+.unique-tax-calc .perk-row .perk-amount {
+    display: block !important;
+    width: 100% !important; /* Forces 100% width of the grid cell */
+    min-width: 0 !important; /* The magic fix for elements that refuse to shrink */
+    height: 50px !important;
+    box-sizing: border-box !important;
+    /* We use !important to guarantee these override the JS style injection */
+    background-color: #0f172a !important;
+    border: 1.5px solid #334155 !important;
+}
+    /* --- FIX: PERKS CRAMPING --- */
+.unique-tax-calc select, 
+.unique-tax-calc .perk-type, 
+.unique-tax-calc .perk-amount {
+    min-inline-size: 0 !important;
+    min-width: 0 !important;
+}
+
     @media (max-width: 768px) {
-        #perks-rows-container > div, #80c-rows-container > div { grid-template-columns: 1fr !important; gap: 8px !important; padding: 12px !important; }
+    #perks-rows-container > div, #80c-rows-container > div {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 12px !important;
+        background: var(--bg-offset);
+        border-radius: 12px;
+        width: 100% !important; 
     }
+}
 </style>
