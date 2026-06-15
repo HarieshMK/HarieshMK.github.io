@@ -344,13 +344,36 @@ permalink: /tax-calculator/
 
 <style>
     /* ==========================================================================
-       1. LAYOUT & GRID STRUCTURE
-       ========================================================================== */
-    .unique-tax-calc .calc-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px; }
-    .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
-    .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .unique-tax-calc .calculation-card { padding: 20px !important; top: 20px !important; align-self: flex-start !important; }
+   1. LAYOUT & GRID STRUCTURE (UPDATED)
+   ========================================================================== */
+/* Ensure the parent is a flex container */
+.calculator-container.unique-tax-calc {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 30px !important;
+    position: relative !important;
+}
+
+/* Make inputs take up the remaining space */
+.calc-inputs {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+/* Sidebar Sticky Logic */
+.unique-tax-calc .sidebar-stacked-layout { 
+    background: var(--bg-card) !important; 
+    padding: 24px; 
+    border-radius: 16px; 
+    border: 1px solid var(--border-base) !important;
+    
+    /* Sticky Properties */
+    width: 350px !important; /* Set a fixed width for the sidebar */
+    position: sticky !important;
+    top: 20px !important; /* Distance from top of browser window */
+    align-self: flex-start !important;
+    flex-shrink: 0 !important;
+}
 
     /* ==========================================================================
        2. INPUTS, SELECTS & DYNAMIC ELEMENTS
