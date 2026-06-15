@@ -469,6 +469,34 @@ permalink: /tax-calculator/
     .value-green { color: var(--color-success); }
     .value-red { color: #ef4444; }
 
+    /* We target the calculation-card ONLY if it is inside your unique tax calculator wrapper */
+.unique-tax-calc .calculation-card {
+    padding: 20px !important;
+}
+
+/* We target the container specifically within your tax calculator */
+.unique-tax-calc #perks-rows-container {
+    width: 100% !important;
+    display: block !important;
+}
+
+/* We target the specific rows within that container */
+.unique-tax-calc #perks-rows-container .perk-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 40px !important;
+    gap: 12px !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* We target the inputs within those specific rows */
+.unique-tax-calc #perks-rows-container .perk-type, 
+.unique-tax-calc #perks-rows-container .perk-amount {
+    width: 100% !important;
+    height: 50px !important;
+    box-sizing: border-box !important;
+}
+
     @media (max-width: 768px) {
     #perks-rows-container > div, #80c-rows-container > div {
         grid-template-columns: 1fr !important;
