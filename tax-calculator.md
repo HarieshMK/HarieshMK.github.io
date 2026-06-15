@@ -357,6 +357,7 @@ permalink: /tax-calculator/
     
     .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .unique-tax-calc .sidebar-sticky {position: -webkit-sticky; /* For Safari */position: sticky;top: 20px;align-self: flex-start;}
 
     /* ==========================================================================
        2. INPUTS, SELECTS & DYNAMIC ELEMENTS
@@ -393,7 +394,7 @@ permalink: /tax-calculator/
     }
 
     select option { color: #f8fafc !important; background-color: #0f172a !important; }
-    input[type="radio"] { accent-color: #38bdf8; width: 18px; height: 18px; cursor: pointer; }
+    input[type="radio"] { accent-color: #38bdf8; width: 18px; height: 18px; cursor: pointer; margin: 0; }
     .unique-tax-calc input:hover, .unique-tax-calc .calc-select:focus { border-color: var(--brand-primary) !important; outline: none; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -503,10 +504,9 @@ permalink: /tax-calculator/
     background-color: #0f172a !important;
     border: 1.5px solid #334155 !important;
 }
-    /* --- FIX: PERKS CRAMPING --- */
-.unique-tax-calc select, 
-.unique-tax-calc .perk-type, 
-.unique-tax-calc .perk-amount {
+.perk-row select, 
+.perk-row .perk-type, 
+.perk-row .perk-amount {
     min-inline-size: 0 !important;
     min-width: 0 !important;
 }
