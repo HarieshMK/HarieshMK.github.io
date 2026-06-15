@@ -350,7 +350,7 @@ permalink: /tax-calculator/
     .unique-tax-calc .calc-grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
     .unique-tax-calc .calc-custom-row { display: flex; flex-direction: column; gap: 8px; position: relative; }
     .unique-tax-calc .calc-custom-row label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .unique-tax-calc .calculation-card { padding: 20px !important; position: sticky !important; top: 20px !important; align-self: flex-start !important; }
+    .unique-tax-calc .calculation-card { padding: 20px !important; top: 20px !important; align-self: flex-start !important; }
 
     /* ==========================================================================
        2. INPUTS, SELECTS & DYNAMIC ELEMENTS
@@ -405,7 +405,7 @@ permalink: /tax-calculator/
     .custom-select-wrapper.open .custom-options-panel { display: block; }
 
     /* Sidebar Panels & Regimes */
-    .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
+    .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; position: sticky; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
     .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
     .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
 
