@@ -496,6 +496,14 @@ permalink: /tax-calculator/
     height: 50px !important;
     box-sizing: border-box !important;
 }
+    /* ADD THIS TEMPORARILY TO SEE THE BORDERS */
+.unique-tax-calc #perks-rows-container {
+    border: 3px solid red !important; /* This will draw a red box around the whole container */
+}
+
+.unique-tax-calc .perk-row {
+    border: 2px dashed lime !important; /* This will draw a green box around each row */
+}
 
     @media (max-width: 768px) {
     #perks-rows-container > div, #80c-rows-container > div {
