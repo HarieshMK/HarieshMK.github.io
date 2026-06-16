@@ -464,10 +464,31 @@ permalink: /tax-calculator/
        3. COMPONENTS (Collapsibles, Perks, Sidebars)
        ========================================================================== */
     .summary-footer-hidden { display: none !important; }
-    .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
-    .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
-    .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
-    .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .collapsible-section-box { 
+        padding: 0; 
+        overflow: visible !important; 
+        border: 1.5px solid var(--border-base); 
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
+    .unique-tax-calc .calc-collapse-trigger { 
+        padding: 20px 25px; 
+        background: transparent; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        cursor: pointer; 
+        border: none;
+        border-bottom: 1.5px solid var(--border-base); 
+    }
+    .unique-tax-calc .collapsible-content-wrapper { padding: 20px 25px 25px 25px;}
+    .unique-tax-calc .heading-title-text { 
+        font-family: 'Lora', serif; 
+        font-size: 1.3rem !important;
+        font-weight: 700 !important; 
+        color: var(--text-primary);
+        letter-spacing: 0.3px;
+    }
     .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
 
     /* Perks Grid System */
