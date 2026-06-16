@@ -377,6 +377,7 @@ permalink: /tax-calculator/
     .unique-tax-calc label {
         display: block !important;
         margin-bottom: 8px !important;
+        font-size: 1rem !important;
         font-weight: 600 !important;
         color: var(--text-primary);
     }
@@ -466,7 +467,7 @@ permalink: /tax-calculator/
     .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
     .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
     .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
-    .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
     .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
 
     /* Perks Grid System */
