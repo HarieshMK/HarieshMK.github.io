@@ -344,98 +344,139 @@ permalink: /tax-calculator/
 
 <style>
     /* ==========================================================================
-       1. LAYOUT & GRID STRUCTURE (PREMIUM INTEGRATION)
-       ========================================================================== */
-    .calculator-container.unique-tax-calc {
-        display: grid !important;
-        grid-template-columns: 1fr 380px !important;
-        gap: 30px !important;
-        align-items: flex-start !important;
-        max-width: 1200px !important;
-        margin: 0 auto !important;
-    }
+   1. LAYOUT & GRID STRUCTURE (UPDATED)
+   ========================================================================== */
+/* Ensure the parent is a flex container */
+.calculator-container.unique-tax-calc {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 30px !important;
+    position: relative !important;
+    flex-wrap: wrap !important;
+}
 
-    .calc-inputs {
-        flex: 1 !important;
-        min-width: 0 !important;
-    }
+/* Make inputs take up the remaining space */
+.calc-inputs {
+    flex: 1 !important;
+    min-width: 600px !important;
+}
 
-    /* Sidebar Sticky Logic */
-    .unique-tax-calc .sidebar-stacked-layout { 
-        background: var(--bg-card) !important; 
-        padding: 24px !important; 
-        border-radius: 20px !important; 
-        border: 1px solid var(--border-base) !important;
-        box-shadow: 0 10px 30px -5px rgba(0,0,0,0.3) !important;
-        width: 350px !important; 
-        position: sticky !important;
-        top: 20px !important; 
-        align-self: flex-start !important;
-        flex-shrink: 0 !important;
-    }
+/* Sidebar Sticky Logic */
+.unique-tax-calc .sidebar-stacked-layout { 
+    background: var(--bg-card) !important; 
+    padding: 24px; 
+    border-radius: 16px; 
+    border: 1px solid var(--border-base) !important;
+    
+    /* Sticky Properties */
+    width: 350px !important; /* Set a fixed width for the sidebar */
+    position: sticky !important;
+    top: 20px !important; /* Distance from top of browser window */
+    align-self: flex-start !important;
+    flex-shrink: 0 !important;
+}
 
     /* ==========================================================================
-       2. INPUTS, SELECTS & DYNAMIC ELEMENTS (PRESERVED LOGIC + PREMIUM STYLE)
+       2. INPUTS, SELECTS & DYNAMIC ELEMENTS
        ========================================================================== */
+    /* Base input/select styling */
     .unique-tax-calc select, 
     .unique-tax-calc input, 
     .unique-tax-calc .calc-select, 
     .unique-tax-calc .dynamic-input {
         width: 100% !important; height: 50px !important; box-sizing: border-box !important;
-        padding: 0 15px !important; border-radius: 12px !important;
+        padding: 0 15px !important; border-radius: 14px !important;
         font-family: 'JetBrains Mono', monospace !important; font-weight: 700 !important;
         background-color: #0f172a !important; border: 1.5px solid #334155 !important;
-        color: #f8fafc !important; transition: border-color 0.2s ease !important;
+        color: #f8fafc !important; min-inline-size: 0 !important; min-width: 0 !important;
     }
 
     /* Select-specific aesthetics */
     .unique-tax-calc select, .unique-tax-calc .calc-select { 
         appearance: none !important; cursor: pointer;
         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important; 
-        background-repeat: no-repeat !important; background-position: right 15px top 50% !important; background-size: 10px auto !important; 
+        background-repeat: no-repeat !important; background-position: right 15px top 50% !important; background-size: 12px auto !important; 
     }
-    
-    input[type="radio"], input[type="checkbox"] { 
-        accent-color: #38bdf8 !important; width: 20px !important; height: 20px !important; cursor: pointer; margin: 0 !important; 
-    }
-    
+    select option { color: #f8fafc !important; background-color: #0f172a !important; }
+    input[type="radio"] { accent-color: #38bdf8; width: 18px !important; height: 18px !important; cursor: pointer; margin: 0 !important; }
+    .unique-tax-calc input:hover, .unique-tax-calc .calc-select:focus { border-color: var(--brand-primary) !important; outline: none; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .unique-tax-calc .dynamic-row-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; animation: fadeIn 0.2s ease-out; }
 
     /* ==========================================================================
-       3. COMPONENTS (PRESERVED LOGIC)
+       3. COMPONENTS (Collapsibles, Perks, Sidebars)
        ========================================================================== */
     .summary-footer-hidden { display: none !important; }
     .unique-tax-calc .collapsible-section-box { padding: 0; overflow: visible !important; }
     .unique-tax-calc .calc-collapse-trigger { padding: 20px 25px; background: transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: none; }
     .unique-tax-calc .collapsible-content-wrapper { padding: 5px 25px 25px 25px; border-top: 1px solid var(--border-base); }
     .unique-tax-calc .heading-title-text { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+    .unique-tax-calc .toggle-chevron-arrow { transition: transform 0.3s ease; color: var(--text-muted); }
 
     /* Perks Grid System */
     #perks-rows-container { width: 100% !important; display: block !important; }
-    .perk-row { display: grid !important; grid-template-columns: 1fr 1fr 40px !important; gap: 12px !important; align-items: center !important; }
+    .perk-row { display: grid !important; grid-template-columns: 1fr 1fr 40px !important; gap: 12px !important; align-items: center !important; width: 100% !important; box-sizing: border-box !important; margin-bottom: 12px; }
     #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0; }
+    .perk-row-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; width: 100%; }
+    .perk-warning, .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
 
     /* 80C Rows & Custom Selects */
     #80c-rows-container > div { display: grid !important; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
-    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 12px; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); }
+    .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
+    .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; z-index: 99; }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.1rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); }
     .custom-options-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1.5px solid var(--border-base); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 100; max-height: 200px; overflow-y: auto; }
     .custom-select-wrapper.open .custom-options-panel { display: block; }
 
-    /* Buttons Premium Enhancement */
-    .unique-tax-calc button { 
-        background: #1e293b !important; color: #f8fafc !important; 
-        border-radius: 10px !important; padding: 10px 16px !important; border: 1px solid #475569 !important; 
-        cursor: pointer !important; transition: all 0.2s ease !important;
-    }
-    .unique-tax-calc button:hover { background: #334155 !important; }
+    /* Sidebar Panels & Regimes */
+    .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; position: sticky; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
+    .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
+    .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
 
     /* ==========================================================================
-       4. RESPONSIVE HOOKS (PRESERVED & OPTIMIZED)
+       4. RESPONSIVE HOOKS
        ========================================================================== */
-    @media (max-width: 992px) {
-        .calculator-container.unique-tax-calc { grid-template-columns: 1fr !important; }
-        .unique-tax-calc .sidebar-stacked-layout { position: relative !important; top: 0 !important; width: 100% !important; }
-        .unique-tax-calc .calc-form-grid { grid-template-columns: 1fr !important; }
+    .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; width: 100%; min-height: 80px; gap: 15px; }
+   /* ==========================================================================
+       4. RESPONSIVE HOOKS (EXPANDED)
+       ========================================================================== */
+    @media (max-width: 768px) {
+        /* 1. Reset main grid to single column */
+        .unique-tax-calc .calc-form-grid, 
+        .unique-tax-calc .calc-grid-layout { 
+            grid-template-columns: 1fr !important; 
+            gap: 15px !important; 
+        }
+
+        /* 2. Perks & 80C container padding and spacing */
+        #perks-rows-container > div, 
+        #80c-rows-container > div { 
+            grid-template-columns: 1fr !important; 
+            gap: 8px !important; 
+            padding: 12px !important; 
+            background: var(--bg-offset); 
+            border-radius: 12px; 
+            width: 100% !important; 
+        }
+
+        /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
+        .unique-tax-calc .sidebar-stacked-layout { 
+            padding: 16px !important; 
+            margin-top: 20px !important; 
+        }
+
+        /* 4. Ensure Benefit Cards maintain their 'heft' on mobile */
+        .benefit-flex-row { 
+            flex-direction: column !important; 
+            align-items: flex-start !important; 
+            gap: 12px !important; 
+            text-align: left !important; 
+        }
+        
+        .benefit-value-text { 
+            margin-left: 0 !important; 
+            width: 100% !important; 
+            text-align: left !important; 
+        }
     }
 </style>
