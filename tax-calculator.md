@@ -352,12 +352,13 @@ permalink: /tax-calculator/
     align-items: flex-start !important;
     gap: 30px !important;
     position: relative !important;
+    flex-wrap: wrap !important;
 }
 
 /* Make inputs take up the remaining space */
 .calc-inputs {
     flex: 1 !important;
-    min-width: 0 !important;
+    min-width: 600px !important;
 }
 
 /* Sidebar Sticky Logic */
