@@ -344,61 +344,84 @@ permalink: /tax-calculator/
 
 <style>
     /* ==========================================================================
-   1. LAYOUT & GRID STRUCTURE (UPDATED)
-   ========================================================================== */
-/* Ensure the parent is a flex container */
-.calculator-container.unique-tax-calc {
-    display: flex !important;
-    align-items: flex-start !important;
-    gap: 30px !important;
-    position: relative !important;
-    flex-wrap: wrap !important;
-}
+       1. LAYOUT & GRID STRUCTURE
+       ========================================================================== */
+    .calculator-container.unique-tax-calc {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 30px !important;
+        position: relative !important;
+        flex-wrap: wrap !important;
+    }
 
-/* Make inputs take up the remaining space */
-.calc-inputs {
-    flex: 1 !important;
-    min-width: 600px !important;
-}
+    .calc-inputs {
+        flex: 1 !important;
+        min-width: 600px !important;
+    }
 
-/* Sidebar Sticky Logic */
-.unique-tax-calc .sidebar-stacked-layout { 
-    background: var(--bg-card) !important; 
-    padding: 24px; 
-    border-radius: 16px; 
-    border: 1px solid var(--border-base) !important;
-    
-    /* Sticky Properties */
-    width: 350px !important; /* Set a fixed width for the sidebar */
-    position: sticky !important;
-    top: 20px !important; /* Distance from top of browser window */
-    align-self: flex-start !important;
-    flex-shrink: 0 !important;
-}
+    .unique-tax-calc .calc-grid-layout {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+        width: 100% !important;
+    }
+
+    .unique-tax-calc .single-row-span {
+        grid-column: 1 / 3 !important;
+    }
 
     /* ==========================================================================
-       2. INPUTS, SELECTS & DYNAMIC ELEMENTS
+       2. INPUTS, SELECTS & LABELS
        ========================================================================== */
-    /* Base input/select styling */
-    .unique-tax-calc select, 
-    .unique-tax-calc input, 
-    .unique-tax-calc .calc-select, 
-    .unique-tax-calc .dynamic-input {
-        width: 100% !important; height: 50px !important; box-sizing: border-box !important;
-        padding: 0 15px !important; border-radius: 14px !important;
-        font-family: 'JetBrains Mono', monospace !important; font-weight: 700 !important;
-        background-color: #0f172a !important; border: 1.5px solid #334155 !important;
-        color: #f8fafc !important; min-inline-size: 0 !important; min-width: 0 !important;
+    .unique-tax-calc label {
+        display: block !important;
+        margin-bottom: 8px !important;
+        font-weight: 600 !important;
+        color: var(--text-primary);
     }
 
-    /* Select-specific aesthetics */
-    .unique-tax-calc select, .unique-tax-calc .calc-select { 
-        appearance: none !important; cursor: pointer;
+    .unique-tax-calc select, 
+    .unique-tax-calc input[type="text"], 
+    .unique-tax-calc .calc-select { 
+        width: 100% !important; 
+        height: 50px !important; 
+        box-sizing: border-box !important;
+        padding: 0 15px !important; 
+        border-radius: 14px !important;
+        font-family: 'JetBrains Mono', monospace !important; 
+        font-weight: 700 !important;
+        background-color: #0f172a !important; 
+        border: 1.5px solid #334155 !important;
+        color: #f8fafc !important;
+        appearance: none !important; 
+        cursor: pointer;
         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important; 
-        background-repeat: no-repeat !important; background-position: right 15px top 50% !important; background-size: 12px auto !important; 
+        background-repeat: no-repeat !important; 
+        background-position: right 15px top 50% !important; 
+        background-size: 12px auto !important; 
     }
-    select option { color: #f8fafc !important; background-color: #0f172a !important; }
-    input[type="radio"] { accent-color: #38bdf8; width: 18px !important; height: 18px !important; cursor: pointer; margin: 0 !important; }
+
+    .radio-group {
+        display: flex !important;
+        gap: 20px !important;
+        align-items: center !important;
+        height: 50px !important; 
+    }
+
+    input[type="radio"] { 
+        accent-color: #38bdf8; 
+        width: 18px !important; 
+        height: 18px !important; 
+        cursor: pointer; 
+        margin: 0 !important; 
+    }
+
+    .calc-checkbox-label-wrapper input[type="checkbox"] {
+        width: 20px !important;
+        height: 20px !important;
+        accent-color: #38bdf8 !important;
+        cursor: pointer;
+    }
     .unique-tax-calc input:hover, .unique-tax-calc .calc-select:focus { border-color: var(--brand-primary) !important; outline: none; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .unique-tax-calc .dynamic-row-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; animation: fadeIn 0.2s ease-out; }
@@ -478,5 +501,6 @@ permalink: /tax-calculator/
             width: 100% !important; 
             text-align: left !important; 
         }
+        .calc-inputs { min-width: 100% !important; }
     }
 </style>
