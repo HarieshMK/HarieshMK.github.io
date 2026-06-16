@@ -465,13 +465,16 @@ permalink: /tax-calculator/
        ========================================================================== */
     .summary-footer-hidden { display: none !important; }
     .unique-tax-calc .collapsible-section-box { 
-        all: unset !important;
-        display: block !important;
-        padding: 0; 
-        overflow: visible !important; 
-        border: 1.5px solid var(--border-base); 
-        border-radius: 16px;
-        margin-bottom: 20px;
+        background: var(--bg-card) !important; /* Force your calc background */
+        border: 1.5px solid var(--border-base) !important; /* Force your calc border */
+        border-radius: 16px !important;
+        box-shadow: none !important; /* Often blog cards have shadows that mess up calc design */
+        
+        /* Keep these */
+        padding: 0 !important; 
+        margin-bottom: 20px !important;
+        position: relative !important;
+        overflow: visible !important;
     }
     .unique-tax-calc .calc-collapse-trigger { 
         padding: 20px 25px; 
