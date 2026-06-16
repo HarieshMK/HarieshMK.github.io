@@ -465,6 +465,8 @@ permalink: /tax-calculator/
        ========================================================================== */
     .summary-footer-hidden { display: none !important; }
     .unique-tax-calc .collapsible-section-box { 
+        all: unset !important;
+        display: block !important;
         padding: 0; 
         overflow: visible !important; 
         border: 1.5px solid var(--border-base); 
@@ -508,10 +510,12 @@ permalink: /tax-calculator/
 
     /* Sidebar Panels & Regimes */
     .unique-tax-calc .sidebar-stacked-layout { 
+        all: unset !important; /* Stop global card styles */
+        display: block !important;
         background: var(--bg-card) !important; 
-        padding: 24px; 
-        border-radius: 16px; 
-        border: 1px solid var(--border-base) !important;
+        padding: 24px !important; 
+        border-radius: 16px !important;
+        border: 1.5px solid var(--border-base) !important;
         width: 350px !important; 
         position: sticky !important;
         top: 20px !important; 
@@ -549,6 +553,7 @@ permalink: /tax-calculator/
 
         /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
         .unique-tax-calc .sidebar-stacked-layout { 
+            
             padding: 16px !important; 
             margin-top: 20px !important; 
         }
@@ -567,10 +572,4 @@ permalink: /tax-calculator/
             text-align: left !important; 
         }
         .calc-inputs { flex: 1 !important; min-width: 600px !important; }
-    .unique-tax-calc .calc-grid-layout {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
-        width: 100% !important;
-    }
 </style>
