@@ -116,9 +116,10 @@ permalink: /tax-calculator/
                         <input type="text" id="80d-parents" placeholder="Max ₹25,000">
                     </div>
                 </div>
-                <label class="calc-checkbox-label-wrapper" style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem; margin-top: 15px; font-weight: 600;">
-                    <input type="checkbox" id="parents-senior" style="width: 16px; height: 16px; cursor: pointer;"> Parents are Senior Citizens (60+)
-                </label>
+               <div class="calc-checkbox-label-wrapper">
+    <input type="checkbox" id="parents-senior">
+    <label for="parents-senior">Parents are Senior Citizens (60+)</label>
+    </div>
             </div>
         </div>
 
@@ -129,10 +130,10 @@ permalink: /tax-calculator/
             </div>
             <div id="home-loan-content" class="collapsible-content-wrapper" style="display: none;">
                 <div class="home-loan-active-banner" style="background: rgba(14, 165, 233, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--brand-primary); margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <label style="font-size: 0.9rem; color: var(--text-primary); font-weight: 700; cursor: pointer;" for="has-home-loan">Do you have an active Home Loan?</label>
-                        <input type="checkbox" id="has-home-loan" style="width: 18px; height: 18px; cursor: pointer;">
-                    </div>
+                <div class="calc-checkbox-label-wrapper">
+    <input type="checkbox" id="has-home-loan">
+    <label for="has-home-loan">Do you have an active Home Loan?</label>
+    </div>
                 </div>
                 <div id="home-loan-wizard" style="display: none;">
                     <div style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-base);">
@@ -416,12 +417,30 @@ permalink: /tax-calculator/
         margin: 0 !important; 
     }
 
-    .calc-checkbox-label-wrapper input[type="checkbox"] {
-        width: 20px !important;
-        height: 20px !important;
-        accent-color: #38bdf8 !important;
-        cursor: pointer;
-    }
+    .calc-checkbox-label-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-top: 15px !important;
+    cursor: pointer;
+}
+
+.calc-checkbox-label-wrapper input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    accent-color: #38bdf8 !important;
+    cursor: pointer;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+    .calc-checkbox-label-wrapper label {
+    display: block !important;
+    margin: 0 !important; /* Removes the margin-bottom from your general label rule */
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    cursor: pointer;
+}
     .unique-tax-calc input:hover, .unique-tax-calc .calc-select:focus { border-color: var(--brand-primary) !important; outline: none; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .unique-tax-calc .dynamic-row-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; animation: fadeIn 0.2s ease-out; }
@@ -452,7 +471,17 @@ permalink: /tax-calculator/
     .custom-select-wrapper.open .custom-options-panel { display: block; }
 
     /* Sidebar Panels & Regimes */
-    .unique-tax-calc .sidebar-stacked-layout { background: var(--bg-card) !important; position: sticky; padding: 24px; border-radius: 16px; border: 1px solid var(--border-base) !important; }
+    .unique-tax-calc .sidebar-stacked-layout { 
+        background: var(--bg-card) !important; 
+        padding: 24px; 
+        border-radius: 16px; 
+        border: 1px solid var(--border-base) !important;
+        width: 350px !important; 
+        position: sticky !important;
+        top: 20px !important; 
+        align-self: flex-start !important;
+        flex-shrink: 0 !important;
+    }
     .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
     .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
 
@@ -501,6 +530,11 @@ permalink: /tax-calculator/
             width: 100% !important; 
             text-align: left !important; 
         }
-        .calc-inputs { min-width: 100% !important; }
+        .calc-inputs { flex: 1 !important; min-width: 600px !important; }
+    .unique-tax-calc .calc-grid-layout {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+        width: 100% !important;
     }
 </style>
