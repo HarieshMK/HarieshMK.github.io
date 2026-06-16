@@ -390,6 +390,7 @@ permalink: /tax-calculator/
         padding: 0 15px !important; 
         border-radius: 14px !important;
         font-family: 'JetBrains Mono', monospace !important; 
+        font-size: 1rem !important;
         font-weight: 700 !important;
         background-color: #0f172a !important; 
         border: 1.5px solid #334155 !important;
