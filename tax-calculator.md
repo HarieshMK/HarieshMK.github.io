@@ -467,7 +467,7 @@ permalink: /tax-calculator/
     #80c-rows-container > div { display: grid !important; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
     .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
     .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; z-index: 99; }
-    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.1rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.2rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); }
     .custom-options-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1.5px solid var(--border-base); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 100; max-height: 200px; overflow-y: auto; }
     .custom-select-wrapper.open .custom-options-panel { display: block; }
 
