@@ -540,6 +540,9 @@ permalink: /tax-calculator/
     .mobile-tracker-bar {
         display: none !important;
     }
+    body {
+    padding-bottom: 120px !important;
+}
     @media (max-width: 768px) {
         /* Show mobile tracker only on small screens */
         .mobile-tracker-bar {
@@ -549,10 +552,11 @@ permalink: /tax-calculator/
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--bg-card);
+            background-color: var(--bg-card) !important;
             padding: 15px;
-            z-index: 1000;
-            border-top: 1px solid var(--border-base);
+            z-index: 9999;
+            border-top: 1.5px solid var(--border-base);
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
         }
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
