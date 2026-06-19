@@ -535,8 +535,28 @@ permalink: /tax-calculator/
    /* ==========================================================================
        4. RESPONSIVE HOOKS (EXPANDED)
        ========================================================================== */
+
+   /* Default: Hide mobile tracker */
+    .mobile-tracker-bar {
+        display: none !important;
+    }
+
     @media (max-width: 768px) {
-        /* 1. Reset main grid to single column */
+        /* Show mobile tracker only on small screens */
+        .mobile-tracker-bar {
+            display: flex !important;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-card);
+            padding: 15px;
+            z-index: 1000;
+            border-top: 1px solid var(--border-base);
+        }
+
+        /* 1. Reset main grid */
         .unique-tax-calc .calc-form-grid, 
         .unique-tax-calc .calc-grid-layout { 
             grid-template-columns: 1fr !important; 
@@ -559,6 +579,7 @@ permalink: /tax-calculator/
             
             padding: 16px !important; 
             margin-top: 20px !important; 
+            width: 100% !important;
         }
 
         /* 4. Ensure Benefit Cards maintain their 'heft' on mobile */
