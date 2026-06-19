@@ -579,10 +579,19 @@ permalink: /tax-calculator/
 
         /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
         .unique-tax-calc .sidebar-stacked-layout { 
-            
-            padding: 16px !important; 
+            padding: 12px !important;
             margin-top: 20px !important; 
             width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Adjust the font/spacing inside the tax liability card for mobile */
+        .unique-tax-calc .regime-row-card { 
+            padding: 15px 10px !important; 
+        }
+        
+        .unique-tax-calc .regime-row-value { 
+            font-size: 1.5rem !important; /* Slightly smaller font to prevent line breaks */
         }
         /* DEFINITIVE FIX: Allow inputs to shrink on mobile */
         .calc-inputs { 
