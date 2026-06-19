@@ -342,8 +342,8 @@ const TaxController = {
         const config = window.TAX_CONFIG[fy] || window.TAX_CONFIG["2026-27"];
         const oldStdDeduction = 50000;
         const newStdDeduction = config?.stdDeduction !== undefined ? config.stdDeduction : 75000;
-        const nEl = document.getElementById('new-regime-tax');
-        const oEl = document.getElementById('old-regime-tax');
+        const nEl = document.getElementById('float-new-tax');
+        const oEl = document.getElementById('float-old-tax');
         if (nEl) nEl.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`;
         if (oEl) oEl.innerText = `₹ ${Math.round(finalOldTax || 0).toLocaleString('en-IN')}`;
         const setVal = (id, val) => {
