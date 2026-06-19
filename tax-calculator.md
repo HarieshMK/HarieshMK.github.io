@@ -357,10 +357,10 @@ permalink: /tax-calculator/
         flex-wrap: wrap !important;
     }
 
-    .calc-inputs { 
-            min-width: 100% !important; 
-            width: 100% !important; 
-        }
+    .calc-inputs {
+        flex: 1 !important;
+        min-width: 0 !important; 
+    }
 
     .unique-tax-calc .calc-grid-layout {
         display: grid !important;
