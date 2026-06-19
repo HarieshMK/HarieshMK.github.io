@@ -357,10 +357,7 @@ permalink: /tax-calculator/
         flex-wrap: wrap !important;
     }
 
-    .calc-inputs {
-        flex: 1 !important;
-        min-width: 600px !important;
-    }
+    ..calc-inputs { flex: 1 !important; min-width: 600px !important; }
 
     .unique-tax-calc .calc-grid-layout {
         display: grid !important;
@@ -518,12 +515,13 @@ permalink: /tax-calculator/
         all: unset !important; /* Stop global card styles */
         display: block !important;
         background: var(--bg-card) !important; 
-        padding: 24px !important; 
+        padding: 16px !important; 
         border-radius: 16px !important;
         border: 1.5px solid var(--border-base) !important;
-        width: 350px !important; 
-        position: sticky !important;
-        top: 20px !important; 
+        width: 100% !important; 
+        position: relative !important;
+        top: 0 !important; 
+        margin-top: 20px !important;
         align-self: flex-start !important;
         flex-shrink: 0 !important;
     }
@@ -554,35 +552,40 @@ permalink: /tax-calculator/
             bottom: 0 !important;
             left: 0 !important;
             width: 100% !important;
-            background: rgba(15, 23, 42, 0.95); /* Semi-transparent dark blue */
-            backdrop-filter: blur(10px); /* The "Glass" effect */
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
             padding: 12px 20px !important;
             z-index: 9999 !important;
-            border-top: 1px solid rgba(51, 65, 85, 0.5); /* Subtle separator */
-            display: flex;
-            justify-content: space-around; /* Spreads Old/New evenly */
+            border-top: 1px solid rgba(51, 65, 85, 0.5);
+            justify-content: space-around;    
             align-items: center;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-        }
-
-            /* Style for the labels (OLD / NEW) */
-        .mobile-label {
-            font-size: 0.60rem !important;
-            letter-spacing: 0.05em;
-            color: #94a3b8; /* Muted grey from your screenshot */
-            margin-bottom: 2px;
-            text-transform: uppercase;
+            box-sizing: border-box !important;
         }
         
-        /* Style for the numbers */
-        .mobile-value {
-            font-size: 1.1rem !important;
-            font-weight: 700 !important;
-        }
+        .mobile-tax-column {
+                flex: 1;
+                text-align: center;
+                border-right: 1px solid #334155;
+            }
+            .mobile-tax-column:last-child { border-right: none; }
+            
+            .mobile-label {
+                font-size: 0.60rem !important;
+                letter-spacing: 0.05em;
+                color: #94a3b8;
+                margin-bottom: 2px;
+                text-transform: uppercase;
+            }
+            
+            .mobile-value {
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+            }
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
-            padding: 15px !important;
-            padding-bottom: 20px !important;
+            padding: 10px !important;
+            padding-bottom: 120px !important;
         }
 
         /* 1. Reset main grid */
@@ -590,6 +593,7 @@ permalink: /tax-calculator/
         .unique-tax-calc .calc-grid-layout { 
             grid-template-columns: 1fr !important; 
             gap: 15px !important; 
+            width: 100% !important;
         }
 
         /* 2. Perks & 80C container padding and spacing */
@@ -637,9 +641,5 @@ permalink: /tax-calculator/
             margin-left: 0 !important; 
             width: 100% !important; 
             text-align: left !important; 
-        }
-
-        .calculator-container.unique-tax-calc {
-            padding-bottom: 100px !important;
         }
 </style>
