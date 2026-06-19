@@ -333,13 +333,11 @@ permalink: /tax-calculator/
 </div>
 
 <div id="mobile-tax-bar" class="mobile-tracker-bar">
-    <div style="text-align: center;">
+    <div class="mobile-tax-column">
         <div class="mobile-label">Old Regime</div>
         <div id="float-old-tax" class="old-regime-tax-display mobile-value">₹ 0</div>
     </div>
-    <!-- A thin vertical line separator adds a premium touch -->
-    <div style="width: 1px; height: 30px; background: #334155;"></div>
-    <div style="text-align: center;">
+    <div class="mobile-tax-column">
         <div class="mobile-label">New Regime</div>
         <div id="float-new-tax" class="new-regime-tax-display mobile-value" style="color: #38bdf8;">₹ 0</div>
     </div>
@@ -544,100 +542,84 @@ permalink: /tax-calculator/
         display: none !important;
     }
 @media (max-width: 768px) {
-        /* Force body padding to push content up above the fixed bar */
-        body {
-            padding-bottom: 120px !important;
-        }
+    /* 1. Global Page Adjustments */
+    body { padding-bottom: 120px !important; }
+    
+    .calculator-container.unique-tax-calc {
+        padding: 10px !important;
+        padding-bottom: 120px !important;
+    }
 
-        .mobile-tracker-bar {
-            display: flex !important;
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            background: rgba(15, 23, 42, 0.95); /* Semi-transparent dark blue */
-            backdrop-filter: blur(10px); /* The "Glass" effect */
-            padding: 12px 20px !important;
-            z-index: 9999 !important;
-            border-top: 1px solid rgba(51, 65, 85, 0.5); /* Subtle separator */
-            display: flex;
-            justify-content: space-around; /* Spreads Old/New evenly */
-            align-items: center;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-        }
+    /* 2. Mobile Tracker Bar (Cleaned up) */
+    .mobile-tracker-bar {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 12px 20px !important;
+        z-index: 9999 !important;
+        border-top: 1px solid rgba(51, 65, 85, 0.5);
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+        box-sizing: border-box !important; /* Prevents overflow */
+    }
 
-            /* Style for the labels (OLD / NEW) */
-        .mobile-label {
-            font-size: 0.60rem !important;
-            letter-spacing: 0.05em;
-            color: #94a3b8; /* Muted grey from your screenshot */
-            margin-bottom: 2px;
-            text-transform: uppercase;
-        }
-        
-        /* Style for the numbers */
-        .mobile-value {
-            font-size: 1.1rem !important;
-            font-weight: 700 !important;
-        }
-        /* FIX: Reset container for mobile */
-        .calculator-container.unique-tax-calc {
-            padding: 10px !important;
-            padding-bottom: 120px !important;
-        }
+    .mobile-tax-column {
+        flex: 1;
+        text-align: center;
+        border-right: 1px solid #334155;
+    }
+    .mobile-tax-column:last-child { border-right: none; }
+    
+    .mobile-label {
+        font-size: 0.60rem !important;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+    }
+    
+    .mobile-value {
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+    }
 
-        /* 1. Reset main grid */
-        .unique-tax-calc .calc-form-grid, 
-        .unique-tax-calc .calc-grid-layout { 
-            grid-template-columns: 1fr !important; 
-            gap: 15px !important; 
-            width: 100% !important;
-        }
+    /* 3. Main Layout & Inputs */
+    .calc-inputs,
+    .unique-tax-calc .calc-form-grid, 
+    .unique-tax-calc .calc-grid-layout,
+    .unique-tax-calc .sidebar-stacked-layout { 
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
 
-        /* 2. Perks & 80C container padding and spacing */
-        #perks-rows-container > div, 
-        #80c-rows-container > div { 
-            grid-template-columns: 1fr !important; 
-            gap: 8px !important; 
-            padding: 12px !important; 
-            background: var(--bg-offset); 
-            border-radius: 12px; 
-            width: 100% !important; 
-        }
+    .unique-tax-calc .sidebar-stacked-layout { 
+        padding: 12px !important;
+        margin-top: 20px !important; 
+        position: relative !important;
+        top: 0 !important;
+    }
 
-        /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
-        .unique-tax-calc .sidebar-stacked-layout { 
-            padding: 12px !important;
-            margin-top: 20px !important; 
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
+    /* 4. Component Refinement */
+    #perks-rows-container > div, 
+    #80c-rows-container > div { 
+        grid-template-columns: 1fr !important; 
+        gap: 8px !important; 
+        padding: 12px !important; 
+    }
 
-        /* Adjust the font/spacing inside the tax liability card for mobile */
-        .unique-tax-calc .regime-row-card { 
-            padding: 15px 10px !important; 
-        }
-        
-        .unique-tax-calc .regime-row-value { 
-            font-size: 1.5rem !important; /* Slightly smaller font to prevent line breaks */
-        }
-        /* DEFINITIVE FIX: Allow inputs to shrink on mobile */
-        .calc-inputs { 
-            min-width: 100% !important; 
-            width: 100% !important; 
-        }
+    .unique-tax-calc .regime-row-card { padding: 15px 10px !important; }
+    .unique-tax-calc .regime-row-value { font-size: 1.5rem !important; }
 
-        /* 4. Ensure Benefit Cards maintain their 'heft' on mobile */
-        .benefit-flex-row { 
-            flex-direction: column !important; 
-            align-items: flex-start !important; 
-            gap: 12px !important; 
-            text-align: left !important; 
-        }
-        
-        .benefit-value-text { 
-            margin-left: 0 !important; 
-            width: 100% !important; 
-            text-align: left !important; 
-        }
+    .benefit-flex-row { 
+        flex-direction: column !important; 
+        align-items: flex-start !important; 
+        gap: 12px !important; 
+    }
+}
 </style>
