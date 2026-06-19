@@ -532,11 +532,14 @@ permalink: /tax-calculator/
        4. RESPONSIVE HOOKS
        ========================================================================== */
     .benefit-flex-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--bg-offset); border-radius: 10px; width: 100%; min-height: 80px; gap: 15px; }
+   /* ==========================================================================
+       4. RESPONSIVE HOOKS (EXPANDED)
+       ========================================================================== */
+
    /* Default: Hide mobile tracker */
     .mobile-tracker-bar {
         display: none !important;
     }
-
     @media (max-width: 768px) {
         /* Show mobile tracker only on small screens */
         .mobile-tracker-bar {
@@ -551,7 +554,6 @@ permalink: /tax-calculator/
             z-index: 1000;
             border-top: 1px solid var(--border-base);
         }
-
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
             padding: 15px !important;
@@ -564,7 +566,7 @@ permalink: /tax-calculator/
             gap: 15px !important; 
         }
 
-        /* 2. Perks & 80C container */
+        /* 2. Perks & 80C container padding and spacing */
         #perks-rows-container > div, 
         #80c-rows-container > div { 
             grid-template-columns: 1fr !important; 
@@ -575,20 +577,20 @@ permalink: /tax-calculator/
             width: 100% !important; 
         }
 
-        /* 3. Sidebar and Inputs adjustment */
+        /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
         .unique-tax-calc .sidebar-stacked-layout { 
+            
             padding: 16px !important; 
             margin-top: 20px !important; 
             width: 100% !important;
         }
-
         /* DEFINITIVE FIX: Allow inputs to shrink on mobile */
         .calc-inputs { 
             min-width: 100% !important; 
             width: 100% !important; 
         }
 
-        /* 4. Benefit Cards */
+        /* 4. Ensure Benefit Cards maintain their 'heft' on mobile */
         .benefit-flex-row { 
             flex-direction: column !important; 
             align-items: flex-start !important; 
@@ -596,8 +598,13 @@ permalink: /tax-calculator/
             text-align: left !important; 
         }
         
-        /* Add padding-bottom to the container so nothing hides behind the tracker */
+        .benefit-value-text { 
+            margin-left: 0 !important; 
+            width: 100% !important; 
+            text-align: left !important; 
+        }
+
         .calculator-container.unique-tax-calc {
             padding-bottom: 100px !important;
         }
-    }
+</style>
