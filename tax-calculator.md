@@ -357,10 +357,10 @@ permalink: /tax-calculator/
         flex-wrap: wrap !important;
     }
 
-    .calc-inputs {
-        flex: 1 !important;
-        min-width: 0 !important; 
-    }
+    .calc-inputs { 
+            min-width: 100% !important; 
+            width: 100% !important; 
+        }
 
     .unique-tax-calc .calc-grid-layout {
         display: grid !important;
@@ -555,36 +555,31 @@ permalink: /tax-calculator/
             bottom: 0 !important;
             left: 0 !important;
             width: 100% !important;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.95); /* Semi-transparent dark blue */
+            backdrop-filter: blur(10px); /* The "Glass" effect */
             padding: 12px 20px !important;
             z-index: 9999 !important;
-            border-top: 1px solid rgba(51, 65, 85, 0.5);
-            justify-content: space-around;    
+            border-top: 1px solid rgba(51, 65, 85, 0.5); /* Subtle separator */
+            display: flex;
+            justify-content: space-around; /* Spreads Old/New evenly */
             align-items: center;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-            box-sizing: border-box !important;
+        }
+
+            /* Style for the labels (OLD / NEW) */
+        .mobile-label {
+            font-size: 0.60rem !important;
+            letter-spacing: 0.05em;
+            color: #94a3b8; /* Muted grey from your screenshot */
+            margin-bottom: 2px;
+            text-transform: uppercase;
         }
         
-        .mobile-tax-column {
-                flex: 1;
-                text-align: center;
-                border-right: 1px solid #334155;
-            }
-            .mobile-tax-column:last-child { border-right: none; }
-            
-            .mobile-label {
-                font-size: 0.60rem !important;
-                letter-spacing: 0.05em;
-                color: #94a3b8;
-                margin-bottom: 2px;
-                text-transform: uppercase;
-            }
-            
-            .mobile-value {
-                font-size: 1.1rem !important;
-                font-weight: 700 !important;
-            }
+        /* Style for the numbers */
+        .mobile-value {
+            font-size: 1.1rem !important;
+            font-weight: 700 !important;
+        }
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
             padding: 10px !important;
