@@ -342,10 +342,11 @@ const TaxController = {
         const config = window.TAX_CONFIG[fy] || window.TAX_CONFIG["2026-27"];
         const oldStdDeduction = 50000;
         const newStdDeduction = config?.stdDeduction !== undefined ? config.stdDeduction : 75000;
-        const nEl = document.getElementById('float-new-tax');
-        const oEl = document.getElementById('float-old-tax');
-        if (nEl) nEl.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`;
-        if (oEl) oEl.innerText = `₹ ${Math.round(finalOldTax || 0).toLocaleString('en-IN')}`;
+        const nEls = document.querySelectorAll('.new-regime-tax-display');
+        nEls.forEach(el => el.innerText = `₹ ${Math.round(newTax || 0).toLocaleString('en-IN')}`);
+    
+        const oEls = document.querySelectorAll('.old-regime-tax-display');
+        oEls.forEach(el => el.innerText = `₹ ${Math.round(finalOldTax || 0).toLocaleString('en-IN')}`);
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) { const safeVal = isNaN(val) || val === undefined || val === null ? 0 : val; el.innerText = `₹ ${Math.round(safeVal).toLocaleString('en-IN')}`; }
