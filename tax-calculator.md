@@ -248,13 +248,13 @@ permalink: /tax-calculator/
                 <div class="regime-meta-info">
                     <span class="regime-row-title">Old Regime</span>
                 </div>
-                <div id="old-regime-tax" class="regime-row-value">₹ 0</div>
+                <div id="old-regime-tax" class="regime-row-value old-regime-tax-display">₹ 0</div>
             </div>
             <div id="new-regime-card" class="regime-row-card">
                 <div class="regime-meta-info">
                     <span class="regime-row-title">New Regime</span>
                 </div>
-                <div id="new-regime-tax" class="regime-row-value">₹ 0</div>
+                <div id="new-regime-tax" class="regime-row-value new-regime-tax-display">₹ 0</div>
             </div>
         </div>
 
@@ -335,11 +335,11 @@ permalink: /tax-calculator/
 <div id="mobile-tax-bar" class="mobile-tracker-bar">
     <div style="text-align: center;">
         <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">OLD</div>
-        <div id="float-old-tax" class="tabular-nums font-bold">₹ 0</div>
+        <div id="float-old-tax" class="tabular-nums font-bold old-regime-tax-display">₹ 0</div>
     </div>
     <div style="text-align: center;">
         <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">NEW</div>
-        <div id="float-new-tax" class="tabular-nums font-bold" style="color: var(--brand-primary);">₹ 0</div>
+        <div id="float-new-tax" class="tabular-nums font-bold new-regime-tax-display" style="color: var(--brand-primary);">₹ 0</div>
     </div>
 </div>
 
