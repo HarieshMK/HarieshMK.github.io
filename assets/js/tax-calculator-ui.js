@@ -179,12 +179,12 @@ const TaxUI = {
             banner.style.display = 'block';
             banner.style.backgroundColor = '#dcfce7';
             banner.style.color = '#166534';
-            banner.innerHTML = `<i class="fas fa-check-circle"></i> New Regime is better! You save ₹${diff.toLocaleString('en-IN')}`;
+            banner.innerHTML = `<i class="fas fa-check-circle"></i> New Regime is better! <br> You save ₹${diff.toLocaleString('en-IN')}`;
         } else if (diff < 0) {
             banner.style.display = 'block';
             banner.style.backgroundColor = '#fee2e2';
             banner.style.color = '#991b1b';
-            banner.innerHTML = `<i class="fas fa-info-circle"></i> Old Regime is better! You save ₹${Math.abs(diff).toLocaleString('en-IN')}`;
+            banner.innerHTML = `<i class="fas fa-info-circle"></i> Old Regime is better! <br> You save ₹${Math.abs(diff).toLocaleString('en-IN')}`;
         } else {
             banner.style.display = 'none';
         }
