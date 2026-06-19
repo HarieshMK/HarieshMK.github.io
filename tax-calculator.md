@@ -556,7 +556,8 @@ permalink: /tax-calculator/
             /* Hardcoded dark color to ensure it is NOT transparent */
             background-color: #0f172a !important; 
             padding: 15px !important;
-            z-index: 9999 !important;
+            z-index: 99999 !important;
+            transform: translateZ(0);
             border-top: 1.5px solid #334155 !important;
             box-shadow: 0 -4px 12px rgba(0,0,0,0.5) !important;
         }
