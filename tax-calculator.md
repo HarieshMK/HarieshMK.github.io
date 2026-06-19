@@ -357,10 +357,10 @@ permalink: /tax-calculator/
         flex-wrap: wrap !important;
     }
 
-    .calc-inputs { 
-            min-width: 100% !important; 
-            width: 100% !important; 
-        }
+    .calc-inputs {
+        flex: 1 !important;
+        min-width: 600px !important;
+    }
 
     .unique-tax-calc .calc-grid-layout {
         display: grid !important;
@@ -518,13 +518,12 @@ permalink: /tax-calculator/
         all: unset !important; /* Stop global card styles */
         display: block !important;
         background: var(--bg-card) !important; 
-        padding: 16px !important; 
+        padding: 24px !important; 
         border-radius: 16px !important;
         border: 1.5px solid var(--border-base) !important;
-        width: 100% !important; 
-        position: relative !important;
-        top: 0 !important; 
-        margin-top: 20px !important;
+        width: 350px !important; 
+        position: sticky !important;
+        top: 20px !important; 
         align-self: flex-start !important;
         flex-shrink: 0 !important;
     }
@@ -582,8 +581,8 @@ permalink: /tax-calculator/
         }
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
-            padding: 10px !important;
-            padding-bottom: 120px !important;
+            padding: 15px !important;
+            padding-bottom: 20px !important;
         }
 
         /* 1. Reset main grid */
@@ -591,7 +590,6 @@ permalink: /tax-calculator/
         .unique-tax-calc .calc-grid-layout { 
             grid-template-columns: 1fr !important; 
             gap: 15px !important; 
-            width: 100% !important;
         }
 
         /* 2. Perks & 80C container padding and spacing */
@@ -639,5 +637,9 @@ permalink: /tax-calculator/
             margin-left: 0 !important; 
             width: 100% !important; 
             text-align: left !important; 
+        }
+
+        .calculator-container.unique-tax-calc {
+            padding-bottom: 100px !important;
         }
 </style>
