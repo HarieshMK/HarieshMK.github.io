@@ -334,12 +334,14 @@ permalink: /tax-calculator/
 
 <div id="mobile-tax-bar" class="mobile-tracker-bar">
     <div style="text-align: center;">
-        <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">OLD</div>
-        <div id="float-old-tax" class="tabular-nums font-bold old-regime-tax-display">₹ 0</div>
+        <div class="mobile-label">Old Regime</div>
+        <div id="float-old-tax" class="old-regime-tax-display mobile-value">₹ 0</div>
     </div>
+    <!-- A thin vertical line separator adds a premium touch -->
+    <div style="width: 1px; height: 30px; background: #334155;"></div>
     <div style="text-align: center;">
-        <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">NEW</div>
-        <div id="float-new-tax" class="tabular-nums font-bold new-regime-tax-display" style="color: var(--brand-primary);">₹ 0</div>
+        <div class="mobile-label">New Regime</div>
+        <div id="float-new-tax" class="new-regime-tax-display mobile-value" style="color: #38bdf8;">₹ 0</div>
     </div>
 </div>
 
@@ -548,20 +550,35 @@ permalink: /tax-calculator/
 
         .mobile-tracker-bar {
             display: flex !important;
-            justify-content: space-around;
             position: fixed !important;
             bottom: 0 !important;
             left: 0 !important;
             width: 100% !important;
-            /* Hardcoded dark color to ensure it is NOT transparent */
-            background-color: #0f172a !important; 
-            padding: 15px !important;
-            z-index: 99999 !important;
-            transform: translateZ(0);
-            border-top: 1.5px solid #334155 !important;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.5) !important;
+            background: rgba(15, 23, 42, 0.95); /* Semi-transparent dark blue */
+            backdrop-filter: blur(10px); /* The "Glass" effect */
+            padding: 12px 20px !important;
+            z-index: 9999 !important;
+            border-top: 1px solid rgba(51, 65, 85, 0.5); /* Subtle separator */
+            display: flex;
+            justify-content: space-around; /* Spreads Old/New evenly */
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
         }
-    
+
+            /* Style for the labels (OLD / NEW) */
+        .mobile-label {
+            font-size: 0.60rem !important;
+            letter-spacing: 0.05em;
+            color: #94a3b8; /* Muted grey from your screenshot */
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        
+        /* Style for the numbers */
+        .mobile-value {
+            font-size: 1.1rem !important;
+            font-weight: 700 !important;
+        }
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
             padding: 15px !important;
