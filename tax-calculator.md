@@ -540,27 +540,31 @@ permalink: /tax-calculator/
     .mobile-tracker-bar {
         display: none !important;
     }
-    body {
-    padding-bottom: 120px !important;
-}
-    @media (max-width: 768px) {
-        /* Show mobile tracker only on small screens */
+@media (max-width: 768px) {
+        /* Force body padding to push content up above the fixed bar */
+        body {
+            padding-bottom: 120px !important;
+        }
+
         .mobile-tracker-bar {
             display: flex !important;
             justify-content: space-around;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-card) !important;
-            padding: 15px;
-            z-index: 9999;
-            border-top: 1.5px solid var(--border-base);
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            /* Hardcoded dark color to ensure it is NOT transparent */
+            background-color: #0f172a !important; 
+            padding: 15px !important;
+            z-index: 9999 !important;
+            border-top: 1.5px solid #334155 !important;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.5) !important;
         }
+    
         /* FIX: Reset container for mobile */
         .calculator-container.unique-tax-calc {
             padding: 15px !important;
+            padding-bottom: 20px !important;
         }
 
         /* 1. Reset main grid */
