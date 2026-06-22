@@ -237,6 +237,16 @@ const TaxUI = {
         });
         return isValid;
     }
+    // 10. Toggle First Home Fields
+    toggleFirstHomeFields() {
+        const isFirstHome = document.getElementById('is-first-buyer')?.checked;
+        const container = document.getElementById('first-home-details-container');
+        if (container) {
+            container.style.display = isFirstHome ? 'block' : 'none';
+        }
+        // Recalculate everything when visibility changes
+        if (window.TaxController) window.TaxController.calculateAll();
+    },
 };
 
 // Global mounting onto layout window context
@@ -313,14 +323,5 @@ document.addEventListener("DOMContentLoaded", function() {
         TaxUI.handleDateBranching();
     }, 400);
 
-    // 10. Toggle First Home Fields
-    toggleFirstHomeFields() {
-        const isFirstHome = document.getElementById('is-first-buyer')?.checked;
-        const container = document.getElementById('first-home-details-container');
-        if (container) {
-            container.style.display = isFirstHome ? 'block' : 'none';
-        }
-        // Recalculate everything when visibility changes
-        if (window.TaxController) window.TaxController.calculateAll();
-    },
+    
 });
