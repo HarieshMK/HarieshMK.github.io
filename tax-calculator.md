@@ -368,10 +368,11 @@ permalink: /tax-calculator/
         }
     }
 
-    .unique-tax-calc .calc-grid-layout {
+    .unique-tax-calc .calc-grid-layout, 
+    .unique-tax-calc .calc-form-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
+        grid-template-columns: 1fr !important; /* Stacked! */
+        gap: 15px !important;
         width: 100% !important;
     }
 
@@ -549,6 +550,10 @@ permalink: /tax-calculator/
         display: none !important;
     }
 @media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
     /* 1. Unified body and container padding */
     body { padding-bottom: 140px !important; }
     
@@ -556,7 +561,6 @@ permalink: /tax-calculator/
         padding: 15px !important;
         padding-bottom: 100px !important; /* This overrides your previous 20px, which is better for footer clearance */
         width: 100% !important;
-        max-width: 100vw !important;
         box-sizing: border-box !important;
     }
 
@@ -578,7 +582,6 @@ permalink: /tax-calculator/
         bottom: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        max-width: 100vw !important;
         justify-content: space-evenly !important; 
         align-items: center !important;
         background: rgba(15, 23, 42, 0.95);
@@ -593,7 +596,6 @@ permalink: /tax-calculator/
     .perk-row, #80c-rows-container > div {
         display: flex !important;
         flex-direction: column !important;
-        gap: 10px !important;
         width: 100% !important;
         background: #1e293b !important;
         padding: 15px !important;
@@ -622,6 +624,7 @@ permalink: /tax-calculator/
         margin-top: 20px !important;
         box-sizing: border-box !important;
     }
+    input, select, .custom-select-wrapper { width: 100% !important; box-sizing: border-box !important; }
 
     .unique-tax-calc .regime-row-card { padding: 15px 10px !important; }
     .unique-tax-calc .regime-row-value { font-size: 1.5rem !important; }
