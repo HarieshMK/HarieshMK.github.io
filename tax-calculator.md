@@ -733,4 +733,40 @@ permalink: /tax-calculator/
         margin-top: 10px;
     }
 }
+    /* Styling the premium dropdown panel */
+.custom-options-panel {
+    display: none; 
+    position: absolute; 
+    top: 110%; /* Slight offset for breathing room */
+    left: 0; 
+    right: 0; 
+    background: #0f172a !important; /* Solid dark background */
+    border: 1.5px solid #334155 !important; 
+    border-radius: 12px !important;
+    padding: 8px !important; /* Internal spacing */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    z-index: 1000 !important;
+}
+
+.custom-option {
+    padding: 12px 20px !important;
+    color: #e2e8f0 !important; /* Lighter, more visible text */
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+}
+
+/* Hover and selection state for premium feel */
+.custom-option:hover {
+    background: #1e293b !important;
+    color: #38bdf8 !important; /* Highlight color on hover */
+}
+
+.custom-option.selected {
+    background: #1e293b !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+}
 </style>
