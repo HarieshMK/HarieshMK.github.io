@@ -32,7 +32,7 @@ permalink: /tax-calculator/
 
 <div class="calculator-container unique-tax-calc">
     <div class="mobile-desktop-notice">
-    <span>💡 For the best experience and detailed breakdown, we recommend using this calculator on a desktop/PC.</span>
+    <span>💡 For the best experience and detailed breakdown, we recommend using this calculator on a Desktop/PC.</span>
 </div>
     <div class="calc-inputs">
         <div class="post-card calculation-card">
@@ -381,6 +381,20 @@ permalink: /tax-calculator/
         gap: 15px !important;
         width: 100% !important;
     }
+    /* Desktop: Two-column layout for salary inputs */
+@media (min-width: 769px) {
+    .unique-tax-calc .calc-grid-layout {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* Two equal columns */
+        align-items: center !important; 
+        gap: 20px !important;
+    }
+    
+    /* Ensure labels don't have unnecessary bottom margin in the 2-col layout */
+    .unique-tax-calc .calc-grid-layout label {
+        margin-bottom: 0 !important;
+    }
+}
 
     .unique-tax-calc .single-row-span {
         grid-column: 1 / 3 !important;
