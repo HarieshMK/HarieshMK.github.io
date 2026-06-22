@@ -470,15 +470,37 @@ permalink: /tax-calculator/
         width: 100% !important;
         box-sizing: border-box !important;
     }
-
-    input[type="radio"] { 
-        accent-color: var(--brand-primary) !important;
-        width: 18px !important; 
-        height: 18px !important; 
-        cursor: pointer; 
-        margin: 0 !important; 
+    /* Refined Radio Buttons */
+    input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-base);
+        border-radius: 50%;
+        cursor: pointer;
+        background-color: var(--bg-container);
+        transition: all 0.2s ease;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 !important;
     }
 
+    input[type="radio"]:checked {
+        border: 6px solid var(--brand-primary);
+        background-color: var(--bg-container);
+    }
+
+    input[type="radio"]:hover {
+        border-color: var(--brand-primary);
+    }
+
+    .radio-group label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        cursor: pointer;
+    }
     .calc-checkbox-label-wrapper {
     display: flex !important;
     align-items: center !important;
@@ -631,14 +653,6 @@ permalink: /tax-calculator/
     .unique-tax-calc select {
         max-width: 100% !important;
         box-sizing: border-box !important;
-    }
-
-    .radio-group label {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        margin: 0 !important;
-        white-space: normal !important; /* Allows text to wrap */
     }
     .radio-group + div, 
     .radio-group + label {
