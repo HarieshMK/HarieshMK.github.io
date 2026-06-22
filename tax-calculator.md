@@ -592,13 +592,16 @@ permalink: /tax-calculator/
         white-space: nowrap !important;
         gap: 15px !important;
     }
-    /* 1. Unified body and container padding */
-    body { padding-bottom: 140px !important; }
+   body { 
+        padding-bottom: 140px !important; 
+        overflow-x: hidden !important; 
+        width: 100% !important;
+    }
     
     .calculator-container.unique-tax-calc {
         padding: 10px !important;
         padding-bottom: 100px !important;
-        width: 100vw !important;
+        width: 100% !important;
         box-sizing: border-box !important;
     }
 
@@ -656,11 +659,8 @@ permalink: /tax-calculator/
 
     /* 5. Sidebar & Regimes */
     .unique-tax-calc .sidebar-stacked-layout { 
-        position: relative !important;
-        top: 0 !important;
         width: 100% !important;
-        padding: 12px !important;
-        margin-top: 20px !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
     input, select, .custom-select-wrapper { width: 100% !important; box-sizing: border-box !important; }
