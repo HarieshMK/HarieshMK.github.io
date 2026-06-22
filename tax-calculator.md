@@ -338,7 +338,7 @@ permalink: /tax-calculator/
         <div id="float-old-tax" class="old-regime-tax-display mobile-value">₹ 0</div>
     </div>
     <!-- A thin vertical line separator adds a premium touch -->
-    <div style="width: 1px; height: 30px; background: #334155;"></div>
+    <div style="width: 1px; height: 30px; background: var(--border-base);"></div>
     <div style="text-align: center;">
         <div class="mobile-label">New Regime</div>
         <div id="float-new-tax" class="new-regime-tax-display mobile-value" style="color: #38bdf8;">₹ 0</div>
@@ -429,7 +429,7 @@ permalink: /tax-calculator/
     }
 
     .unique-tax-calc select, 
-.unique-tax-calc .calc-select { 
+    .unique-tax-calc .calc-select { 
     width: 100% !important; 
     height: 50px !important; 
     box-sizing: border-box !important;
@@ -438,17 +438,16 @@ permalink: /tax-calculator/
     font-family: 'JetBrains Mono', monospace !important; 
     font-size: 1.1rem !important; 
     font-weight: 700 !important;
-    background-color: #0f172a !important; 
-    border: 1.5px solid #334155 !important;
-    color: #f8fafc !important;
+    background-color: var(--bg-container) !important; 
+    border: 1.5px solid var(--border-base) !important;
+    color: var(--text-primary) !important;
     appearance: none !important; 
     cursor: pointer;
-    /* Only dropdowns get the arrow */
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f8fafc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") !important; 
-    background-repeat: no-repeat !important; 
-    background-position: right 15px top 50% !important; 
-    background-size: 12px auto !important; 
-}
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-primary) 50%), linear-gradient(135deg, var(--text-primary) 50%, transparent 50%);
+    background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    }
     .unique-tax-calc input[type="text"] { 
     width: 100% !important; 
     height: 50px !important; 
@@ -458,9 +457,9 @@ permalink: /tax-calculator/
     font-family: 'JetBrains Mono', monospace !important; 
     font-size: 1rem !important; 
     font-weight: 700 !important;
-    background-color: #0f172a !important; 
-    border: 1.5px solid #334155 !important;
-    color: #f8fafc !important;
+    background-color: var(--bg-container) !important; 
+    border: 1.5px solid var(--border-base) !important;
+    color: var(--text-primary) !important;
 }
 
     .radio-group {
@@ -473,7 +472,7 @@ permalink: /tax-calculator/
     }
 
     input[type="radio"] { 
-        accent-color: #38bdf8; 
+        accent-color: var(--brand-primary) !important;
         width: 18px !important; 
         height: 18px !important; 
         cursor: pointer; 
@@ -513,7 +512,7 @@ permalink: /tax-calculator/
        ========================================================================== */
     .summary-footer-hidden { display: none !important; }
     .unique-tax-calc .collapsible-section-box { 
-        background: var(--bg-card) !important; /* Force your calc background */
+        background: var(--bg-container) !important; /* Force your calc background */
         border: 1.5px solid var(--border-base) !important; /* Force your calc border */
         border-radius: 16px !important;
         box-shadow: none !important; /* Often blog cards have shadows that mess up calc design */
@@ -549,20 +548,19 @@ permalink: /tax-calculator/
     .perk-row { display: grid !important; grid-template-columns: 1fr 1fr 40px !important; gap: 12px !important; align-items: center !important; width: 100% !important; box-sizing: border-box !important; margin-bottom: 12px; }
     #perks-rows-container button { grid-column: 3 / 4 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0; }
     .perk-row-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; width: 100%; }
-    .perk-warning, .perk-limit-warning { color: #f59e0b; font-size: 0.75rem; margin-top: 4px; display: none; }
-
+    .perk-warning, .perk-limit-warning { color: var(--color-danger) !important; font-size: 0.75rem; margin-top: 4px; display: none; }
     /* 80C Rows & Custom Selects */
     #80c-rows-container > div { display: grid !important; grid-template-columns: 1.5fr 1fr auto !important; gap: 15px; align-items: center; margin-bottom: 12px; }
-    .input-error { border: 1px solid #ef4444 !important; background-color: #fef2f2 !important; } 
+    .input-error { border: 1.5px solid var(--color-danger) !important; background-color: rgba(239, 68, 68, 0.1) !important; }
     .custom-select-wrapper { position: relative; width: 100%; cursor: pointer; z-index: 99; }
-    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.2rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-body); border: 1.5px solid var(--border-base); color: var(--text-primary); }
-    .custom-options-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1.5px solid var(--border-base); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 100; max-height: 200px; overflow-y: auto; }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-radius: 14px; font-size: 1.2rem; height: 50px; font-family: 'JetBrains Mono', monospace; font-weight: 700; background-color: var(--bg-container); border: 1.5px solid var(--border-base); color: var(--text-primary); }
+    .custom-options-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-container); border: 1.5px solid var(--border-base); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 100; max-height: 200px; overflow-y: auto; }
     .custom-select-wrapper.open .custom-options-panel { display: block; }
 
     /* Sidebar Panels & Regimes */
     .unique-tax-calc .sidebar-stacked-layout {
     display: block !important;
-    background: var(--bg-card) !important;
+    background: var(--bg-container) !important;
     padding: 24px !important;
     border-radius: 16px !important;
     border: 1.5px solid var(--border-base) !important;
@@ -574,7 +572,7 @@ permalink: /tax-calculator/
     color: var(--text-primary) !important;
     font-size: 1rem !important;
 }
-    .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
+    .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-container) !important; transition: all 0.3s ease; }
     .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
 
     /* ==========================================================================
@@ -594,9 +592,9 @@ permalink: /tax-calculator/
 @media (max-width: 768px) {
     .mobile-desktop-notice {
         display: block !important;
-        background: rgba(56, 189, 248, 0.1) !important; /* Soft blue tint */
-        border: 1px solid #38bdf8 !important;
-        color: #38bdf8 !important;
+        background: color-mix(in srgb, var(--brand-primary) 10%, transparent) !important;
+        border: 1px solid var(--brand-primary) !important;
+        color: var(--brand-primary) !important;
         padding: 12px 15px !important;
         margin-bottom: 20px !important;
         border-radius: 12px !important;
@@ -668,11 +666,11 @@ permalink: /tax-calculator/
         width: 100% !important;
         justify-content: space-evenly !important; 
         align-items: center !important;
-        background: rgba(15, 23, 42, 0.95);
+        background: var(--bg-container) !important;
         backdrop-filter: blur(10px);
         padding: 12px 20px !important;
         z-index: 9999 !important;
-        border-top: 1px solid rgba(51, 65, 85, 0.5);
+        border-top: 1px solid var(--border-base) !important;
         box-sizing: border-box !important;
     }
 
@@ -683,7 +681,7 @@ permalink: /tax-calculator/
         width: 100% !important;
         gap: 8px !important;
         padding: 12px !important;
-        background: #1e293b !important;
+        background: var(--bg-offset) !important;
     }
     .perk-row {
         display: flex !important;
@@ -735,11 +733,11 @@ permalink: /tax-calculator/
 .custom-options-panel {
     display: none; 
     position: absolute; 
-    top: 110%; /* Slight offset for breathing room */
+    top: 110%; 
     left: 0; 
     right: 0; 
-    background: #0f172a !important; /* Solid dark background */
-    border: 1.5px solid #334155 !important; 
+    background: var(--bg-container) !important;
+    border: 1.5px solid var(--border-base) !important; 
     border-radius: 12px !important;
     padding: 8px !important; /* Internal spacing */
     box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
@@ -748,7 +746,7 @@ permalink: /tax-calculator/
 
 .custom-option {
     padding: 12px 20px !important;
-    color: #e2e8f0 !important; /* Lighter, more visible text */
+    color: var(--text-secondary) !important;
     font-family: 'JetBrains Mono', monospace !important;
     font-weight: 500 !important;
     cursor: pointer;
@@ -758,13 +756,13 @@ permalink: /tax-calculator/
 
 /* Hover and selection state for premium feel */
 .custom-option:hover {
-    background: #1e293b !important;
-    color: #38bdf8 !important; /* Highlight color on hover */
+    background: var(--bg-offset) !important;
+    color: var(--brand-primary) !important; /* Highlight color on hover */
 }
 
 .custom-option.selected {
-    background: #1e293b !important;
-    color: #fff !important;
+    background: var(--bg-offset) !important;
+    color: var(--brand-primary) !important;
     font-weight: 700 !important;
 }
 </style>
