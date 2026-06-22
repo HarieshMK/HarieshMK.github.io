@@ -12,8 +12,7 @@ permalink: /tax-calculator/
 
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
     <h2 class="calc-main-title" style="margin: 0; font-family: 'Lora', serif; font-size: 1.6rem;"><i class="fas fa-wallet" style="margin-right: 12px; color: var(--brand-primary);"></i>Income Tax Calculator</h2>
-    <div class="calc-custom-row">
-    <label>Financial Year</label>
+    <div class="calc-custom-row" style="margin-bottom: 0;">
     <div class="custom-select-wrapper" data-target="#fy-selector">
         <div class="custom-select-trigger">
             <span>FY 2026-27</span>
@@ -24,6 +23,11 @@ permalink: /tax-calculator/
             <div class="custom-option" data-value="2025-26">FY 2025-26</div>
         </div>
     </div>
+    <select id="fy-selector" style="display: none !important;">
+        <option value="2026-27" selected>FY 2026-27</option>
+        <option value="2025-26">FY 2025-26</option> 
+    </select>
+</div>
     <select id="fy-selector" style="display: none !important;">
         <option value="2026-27" selected>FY 2026-27</option>
         <option value="2025-26">FY 2025-26</option> 
@@ -716,5 +720,17 @@ permalink: /tax-calculator/
     .mobile-value { font-size: 1.1rem !important; font-weight: 700 !important; }
     .benefit-flex-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; text-align: left !important; }
     .benefit-value-text { margin-left: 0 !important; width: 100% !important; text-align: left !important; }
+}
+    /* FY Selector Specific Alignment */
+.calc-header-wrapper .custom-select-wrapper {
+    width: 180px !important; /* Matches typical dropdown width */
+    min-width: 150px;
+}
+
+@media (max-width: 768px) {
+    .calc-header-wrapper .custom-select-wrapper {
+        width: 100% !important; /* Full width on mobile */
+        margin-top: 10px;
+    }
 }
 </style>
