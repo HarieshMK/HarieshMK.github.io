@@ -585,17 +585,31 @@ permalink: /tax-calculator/
         overflow-x: hidden !important;
         width: 100% !important;
     }
-    .radio-group {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap;
-        white-space: nowrap !important;
-        gap: 15px !important;
-        background: rgba(30, 41, 59, 0.5) !important;
-        padding: 10px 15px !important;
-        border-radius: 12px !important;
-        border: 1px solid #334155 !important;
-        margin-bottom: 25px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 10px !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    margin-bottom: 30px !important; /* Increased gap here */
+}
+
+    .radio-group label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 12px 15px !important;
+    background: rgba(30, 41, 59, 0.5) !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    cursor: pointer;
+    flex: 1; /* Makes them equal width */
+    justify-content: center;
+}
+    .radio-group + div, 
+    .radio-group + label {
+        margin-top: 20px !important;
     }
     .unique-tax-calc .radio-group {
         margin-bottom: 25px !important;
