@@ -521,19 +521,20 @@ permalink: /tax-calculator/
     .custom-select-wrapper.open .custom-options-panel { display: block; }
 
     /* Sidebar Panels & Regimes */
-    .unique-tax-calc .sidebar-stacked-layout { 
-        all: unset !important; /* Stop global card styles */
-        display: block !important;
-        background: var(--bg-card) !important; 
-        padding: 24px !important; 
-        border-radius: 16px !important;
-        border: 1.5px solid var(--border-base) !important;
-        width: 350px !important; 
-        position: sticky !important;
-        top: 20px !important; 
-        align-self: flex-start !important;
-        flex-shrink: 0 !important;
-    }
+    .unique-tax-calc .sidebar-stacked-layout {
+    display: block !important;
+    background: var(--bg-card) !important;
+    padding: 24px !important;
+    border-radius: 16px !important;
+    border: 1.5px solid var(--border-base) !important;
+    width: 350px !important;
+    position: sticky !important;
+    top: 20px !important;
+    align-self: flex-start !important;
+    flex-shrink: 0 !important;
+    color: var(--text-primary) !important;
+    font-size: 1rem !important;
+}
     .unique-tax-calc .regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-body) !important; transition: all 0.3s ease; }
     .unique-tax-calc .regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 2rem; font-weight: 700; color: var(--text-primary); }
 
@@ -544,23 +545,42 @@ permalink: /tax-calculator/
    /* ==========================================================================
        4. RESPONSIVE HOOKS (EXPANDED)
        ========================================================================== */
-
    /* Default: Hide mobile tracker */
     .mobile-tracker-bar {
         display: none !important;
     }
 @media (max-width: 768px) {
+    /* 1. Header & FY Selector Logic */
+    .calc-header-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 15px !important;
+    }
+    .calc-fy-dropdown-container .calc-select {
+        width: 140px !important;
+        height: 40px !important;
+        font-size: 0.9rem !important;
+    }
     html, body {
         overflow-x: hidden !important;
         width: 100% !important;
+    }
+    .radio-group {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        white-space: nowrap !important;
+        gap: 15px !important;
     }
     /* 1. Unified body and container padding */
     body { padding-bottom: 140px !important; }
     
     .calculator-container.unique-tax-calc {
-        padding: 15px !important;
-        padding-bottom: 100px !important; /* This overrides your previous 20px, which is better for footer clearance */
-        width: 100% !important;
+        padding: 10px !important;
+        padding-bottom: 100px !important;
+        width: 100vw !important;
         box-sizing: border-box !important;
     }
 
@@ -597,13 +617,14 @@ permalink: /tax-calculator/
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
+        gap: 8px !important;
+        padding: 12px !important;
         background: #1e293b !important;
-        padding: 15px !important;
-        border-radius: 12px !important;
-        margin-bottom: 12px !important;
-        box-sizing: border-box !important;
     }
-
+    .perk-row {
+        display: flex !important;
+        grid-template-columns: none !important; 
+    }
     .perk-row select, .perk-row input, 
     #80c-rows-container > div select, #80c-rows-container > div input,
     .custom-select-wrapper {
