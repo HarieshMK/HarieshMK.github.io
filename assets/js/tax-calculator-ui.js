@@ -253,10 +253,12 @@ document.addEventListener("DOMContentLoaded", function() {
     TaxUI.setupToggle('80d-header', '80d-content', '80d-icon');
     TaxUI.setupToggle('home-loan-header', 'home-loan-content', 'home-loan-icon');
     TaxUI.setupToggle('nps-header', 'nps-content', 'nps-icon');
-
-    // Initialize interactive dropdown panels
     TaxUI.initCustomDropdowns();
-
+    
+    const firstBuyerCheck = document.getElementById('is-first-buyer');
+    if (firstBuyerCheck) {
+        firstBuyerCheck.addEventListener('change', TaxUI.toggleFirstHomeFields);
+    }
     // Link View Breakdown Action Trigger to Smooth Scroll Engine
     const breakdownBtn = document.getElementById('view-breakdown-btn');
     if (breakdownBtn) {
@@ -310,4 +312,15 @@ document.addEventListener("DOMContentLoaded", function() {
         TaxUI.checkHraLoanWarning();
         TaxUI.handleDateBranching();
     }, 400);
+
+    // 10. Toggle First Home Fields
+    toggleFirstHomeFields() {
+        const isFirstHome = document.getElementById('is-first-buyer')?.checked;
+        const container = document.getElementById('first-home-details-container');
+        if (container) {
+            container.style.display = isFirstHome ? 'block' : 'none';
+        }
+        // Recalculate everything when visibility changes
+        if (window.TaxController) window.TaxController.calculateAll();
+    },
 });
