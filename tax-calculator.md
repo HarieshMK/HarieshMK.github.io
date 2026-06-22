@@ -549,121 +549,87 @@ permalink: /tax-calculator/
         display: none !important;
     }
 @media (max-width: 768px) {
-        /* Force body padding to push content up above the fixed bar */
-        body {
-            padding-bottom: 140px !important;
-        }
-
-        .mobile-tracker-bar {
-            display: flex !important;
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            max-width: 100vw !important;
-            justify-content: space-evenly !important; 
-            align-items: center !important;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 12px 20px !important;
-            z-index: 9999 !important;
-            border-top: 1px solid rgba(51, 65, 85, 0.5);
-            box-sizing: border-box !important;
-        }
-
-        /* Force both Perks and 80C into a single column */
-        .perk-row, #80c-rows-container > div {
-            grid-template-columns: 1fr !important; /* Forces everything to stack */
-            gap: 10px !important;
-            padding: 12px !important;
-            background: #1e293b !important; /* Slightly lighter than background to define the card */
-            border-radius: 12px !important;
-            margin-bottom: 12px !important;
-        }
+    /* 1. Unified body and container padding */
+    body { padding-bottom: 140px !important; }
     
-        /* Clean up the delete/lock buttons for mobile */
-        .perk-row button, #80c-rows-container > div > div:last-child {
-            justify-self: end !important; /* Move the trash/lock icon to the right */
-            margin-top: 5px;
-        }
+    .calculator-container.unique-tax-calc {
+        padding: 15px !important;
+        padding-bottom: 100px !important; /* This overrides your previous 20px, which is better for footer clearance */
+        width: 100% !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+    }
 
-            /* Style for the labels (OLD / NEW) */
-        .mobile-label {
-            font-size: 0.60rem !important;
-            letter-spacing: 0.05em;
-            color: #94a3b8; /* Muted grey from your screenshot */
-            margin-bottom: 2px;
-            text-transform: uppercase;
-        }
-        
-        /* Style for the numbers */
-        .mobile-value {
-            font-size: 1.1rem !important;
-            font-weight: 700 !important;
-        }
-        /* FIX: Reset container for mobile */
-        .calculator-container.unique-tax-calc {
-            padding: 15px !important;
-            padding-bottom: 20px !important;
-        }
+    /* 2. Global container width fixes (prevents horizontal scroll) */
+    .calc-inputs, 
+    .collapsible-content-wrapper,
+    .perk-row-wrapper {
+        width: 100% !important;
+        max-width: 100vw !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        box-sizing: border-box !important;
+    }
 
-        /* 1. Reset main grid */
-        .unique-tax-calc .calc-form-grid, 
-        .unique-tax-calc .calc-grid-layout { 
-            grid-template-columns: 1fr !important; 
-            gap: 15px !important; 
-        }
+    /* 3. Mobile Tracker Bar */
+    .mobile-tracker-bar {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        justify-content: space-evenly !important; 
+        align-items: center !important;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 12px 20px !important;
+        z-index: 9999 !important;
+        border-top: 1px solid rgba(51, 65, 85, 0.5);
+        box-sizing: border-box !important;
+    }
 
-        /* 2. Perks & 80C container padding and spacing */
-        #perks-rows-container > div, 
-        #80c-rows-container > div { 
-            grid-template-columns: 1fr !important; 
-            gap: 8px !important; 
-            padding: 12px !important; 
-            background: var(--bg-offset); 
-            border-radius: 12px; 
-            width: 100% !important; 
-        }
+    /* 4. Row Layouts: Stacking (Perks & 80C) */
+    .perk-row, #80c-rows-container > div {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+        background: #1e293b !important;
+        padding: 15px !important;
+        border-radius: 12px !important;
+        margin-bottom: 12px !important;
+        box-sizing: border-box !important;
+    }
 
-        /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
-        .unique-tax-calc .sidebar-stacked-layout { 
-            position: relative !important;
-            top: 0 !important;
-            width: 100% !important;
-            padding: 12px !important;
-            margin-top: 20px !important;
-            box-sizing: border-box !important;
-        }
+    .perk-row select, .perk-row input, 
+    #80c-rows-container > div select, #80c-rows-container > div input,
+    .custom-select-wrapper {
+        width: 100% !important;
+    }
 
-        /* Adjust the font/spacing inside the tax liability card for mobile */
-        .unique-tax-calc .regime-row-card { 
-            padding: 15px 10px !important; 
-        }
-        
-        .unique-tax-calc .regime-row-value { 
-            font-size: 1.5rem !important; /* Slightly smaller font to prevent line breaks */
-        }
-        /* DEFINITIVE FIX: Allow inputs to shrink on mobile */
-        .calc-inputs { 
-            min-width: 100% !important; 
-            width: 100% !important; 
-        }
+    .perk-row button, #80c-rows-container > div > div:last-child {
+        justify-self: end !important;
+        margin-top: 5px;
+    }
 
-        /* 4. Ensure Benefit Cards maintain their 'heft' on mobile */
-        .benefit-flex-row { 
-            flex-direction: column !important; 
-            align-items: flex-start !important; 
-            gap: 12px !important; 
-            text-align: left !important; 
-        }
-        
-        .benefit-value-text { 
-            margin-left: 0 !important; 
-            width: 100% !important; 
-            text-align: left !important; 
-        }
+    /* 5. Sidebar & Regimes */
+    .unique-tax-calc .sidebar-stacked-layout { 
+        position: relative !important;
+        top: 0 !important;
+        width: 100% !important;
+        padding: 12px !important;
+        margin-top: 20px !important;
+        box-sizing: border-box !important;
+    }
 
-        .calculator-container.unique-tax-calc {
-            padding-bottom: 100px !important;
-        }
+    .unique-tax-calc .regime-row-card { padding: 15px 10px !important; }
+    .unique-tax-calc .regime-row-value { font-size: 1.5rem !important; }
+
+    /* 6. Text & Utility */
+    .mobile-label { font-size: 0.60rem !important; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 2px; text-transform: uppercase; }
+    .mobile-value { font-size: 1.1rem !important; font-weight: 700 !important; }
+    .benefit-flex-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; text-align: left !important; }
+    .benefit-value-text { margin-left: 0 !important; width: 100% !important; text-align: left !important; }
+}
 </style>
