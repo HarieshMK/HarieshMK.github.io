@@ -244,9 +244,8 @@ const TaxUI = {
         if (container) {
             container.style.display = isFirstHome ? 'block' : 'none';
         }
-        // Recalculate everything when visibility changes
         if (window.TaxController) window.TaxController.calculateAll();
-    },
+    }
 };
 
 // Global mounting onto layout window context
