@@ -236,7 +236,7 @@ const TaxUI = {
             }
         });
         return isValid;
-    }
+    },
     // 10. Toggle First Home Fields
     toggleFirstHomeFields() {
         const isFirstHome = document.getElementById('is-first-buyer')?.checked;
