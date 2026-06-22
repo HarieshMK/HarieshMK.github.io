@@ -560,15 +560,13 @@ permalink: /tax-calculator/
             bottom: 0 !important;
             left: 0 !important;
             width: 100% !important;
-            background: rgba(15, 23, 42, 0.95); /* Semi-transparent dark blue */
-            backdrop-filter: blur(10px); /* The "Glass" effect */
+            max-width: 100vw !important;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
             padding: 12px 20px !important;
             z-index: 9999 !important;
-            border-top: 1px solid rgba(51, 65, 85, 0.5); /* Subtle separator */
-            display: flex;
-            justify-content: space-around; /* Spreads Old/New evenly */
-            align-items: center;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(51, 65, 85, 0.5);
+            box-sizing: border-box !important;
         }
 
             /* Style for the labels (OLD / NEW) */
