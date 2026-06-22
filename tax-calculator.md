@@ -13,21 +13,20 @@ permalink: /tax-calculator/
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
     <h2 class="calc-main-title" style="margin: 0; font-family: 'Lora', serif; font-size: 1.6rem;"><i class="fas fa-wallet" style="margin-right: 12px; color: var(--brand-primary);"></i>Income Tax Calculator</h2>
     <div class="calc-fy-dropdown-container" style="min-width: 240px; position: relative;">
-        <select id="fy-selector" class="calc-select" style="display: none !important;">
-            <option value="2026-27" selected>FY 2026-27</option>
-            <option value="2025-26">FY 2025-26</option> 
-        </select>
-        <div class="custom-select-wrapper" data-target="#fy-selector">
-            <div class="custom-select-trigger">
-                <span>FY 2026-27</span>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="custom-options-panel">
-                <div class="custom-option selected" data-value="2026-27">FY 2026-27</div>
-                <div class="custom-option" data-value="2025-26">FY 2025-26</div>
-            </div>
+    <select id="fy-selector" style="display: none !important;">
+        <option value="2026-27" selected>FY 2026-27</option>
+        <option value="2025-26">FY 2025-26</option> 
+    </select>
+    <div class="custom-select-wrapper" data-target="#fy-selector">
+        <div class="custom-select-trigger">
+            <span>FY 2026-27</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="custom-select-options"> <div class="custom-option selected" data-value="2026-27">FY 2026-27</div>
+            <div class="custom-option" data-value="2025-26">FY 2025-26</div>
         </div>
     </div>
+</div>
 </div>
 
 <div class="calculator-container unique-tax-calc">
