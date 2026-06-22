@@ -358,6 +358,7 @@ permalink: /tax-calculator/
         gap: 30px !important;
         position: relative !important;
         flex-wrap: wrap !important;
+        transition: all 0.3s ease-in-out;
     }
 
     .calc-inputs {
@@ -431,9 +432,11 @@ permalink: /tax-calculator/
 
     .radio-group {
         display: flex !important;
-        gap: 20px !important;
-        align-items: center !important;
-        height: 50px !important; 
+        flex-direction: row !important;
+        flex-wrap: wrap !important; /* Allows items to drop to next line instead of forcing width */
+        gap: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     input[type="radio"] { 
@@ -581,32 +584,30 @@ permalink: /tax-calculator/
         height: 40px !important;
         font-size: 0.9rem !important;
     }
-    html, body {
-        overflow-x: hidden !important;
+    .radio-group {
+        display: flex !important;
+        flex-direction: row !important;
+        padding: 15px;
+        flex-wrap: wrap !important;
+        gap: 20px !important;
         width: 100% !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
     }
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap;
-    gap: 10px !important;
-    background: transparent !important;
-    padding: 0 !important;
-    border: none !important;
-    margin-bottom: 30px !important; /* Increased gap here */
-}
+    /* 3. Ensure inputs inside the form don't expand past 100% */
+    .unique-tax-calc input, 
+    .unique-tax-calc select {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
 
     .radio-group label {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 12px 15px !important;
-    background: rgba(30, 41, 59, 0.5) !important;
-    border: 1px solid #334155 !important;
-    border-radius: 12px !important;
-    cursor: pointer;
-    flex: 1; /* Makes them equal width */
-    justify-content: center;
-}
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+        white-space: normal !important; /* Allows text to wrap */
+    }
     .radio-group + div, 
     .radio-group + label {
         margin-top: 20px !important;
@@ -630,6 +631,8 @@ permalink: /tax-calculator/
         padding-bottom: 100px !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        transition: all 0.3s ease-in-out;
     }
 
     /* 2. Global container width fixes (prevents horizontal scroll) */
@@ -686,12 +689,14 @@ permalink: /tax-calculator/
 
     /* 5. Sidebar & Regimes */
     .unique-tax-calc .sidebar-stacked-layout { 
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-    input, select, .custom-select-wrapper { width: 100% !important; box-sizing: border-box !important; }
-
+    position: relative !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important; /* Added: prevents it from being wider than the screen */
+    padding: 12px !important;
+    margin-top: 20px !important;
+    box-sizing: border-box !important;
+}
     .unique-tax-calc .regime-row-card { padding: 15px 10px !important; }
     .unique-tax-calc .regime-row-value { font-size: 1.5rem !important; }
 
