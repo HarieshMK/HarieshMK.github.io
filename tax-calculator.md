@@ -31,6 +31,9 @@ permalink: /tax-calculator/
 </div>
 
 <div class="calculator-container unique-tax-calc">
+    <div class="mobile-desktop-notice">
+    <span>💡 For the best experience and detailed breakdown, we recommend using this calculator on a desktop/PC.</span>
+</div>
     <div class="calc-inputs">
         <div class="post-card calculation-card">
             <div class="section-card-header">
@@ -549,7 +552,22 @@ permalink: /tax-calculator/
     .mobile-tracker-bar {
         display: none !important;
     }
+    .mobile-desktop-notice {
+    display: none !important;
+}
 @media (max-width: 768px) {
+    .mobile-desktop-notice {
+        display: block !important;
+        background: rgba(56, 189, 248, 0.1) !important; /* Soft blue tint */
+        border: 1px solid #38bdf8 !important;
+        color: #38bdf8 !important;
+        padding: 12px 15px !important;
+        margin-bottom: 20px !important;
+        border-radius: 12px !important;
+        font-size: 0.85rem !important;
+        text-align: center !important;
+        font-weight: 500 !important;
+    }
     /* 1. Header & FY Selector Logic */
     .calc-header-wrapper {
         display: flex !important;
