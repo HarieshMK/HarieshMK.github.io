@@ -33,8 +33,6 @@ permalink: /tax-calculator/
         <option value="2025-26">FY 2025-26</option> 
     </select>
 </div>
-</div>
-
 <div class="calculator-container unique-tax-calc">
     <div class="mobile-desktop-notice">
     <span>💡 For the best experience and detailed breakdown, we recommend using this calculator on a Desktop/PC.</span>
