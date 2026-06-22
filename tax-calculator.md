@@ -349,56 +349,76 @@ permalink: /tax-calculator/
 </div>
 
 <style>
-    /* ==========================================================================
-       1. LAYOUT & GRID STRUCTURE
-       ========================================================================== */
-    .calculator-container.unique-tax-calc {
-        display: flex !important;
-        align-items: flex-start !important;
-        gap: 30px !important;
-        position: relative !important;
-        flex-wrap: wrap !important;
-        transition: all 0.3s ease-in-out;
-        padding: 10px !important;
-        padding-bottom: 100px !important;
-    }
+/* ==========================================================================
+   1. LAYOUT & GRID STRUCTURE
+   ========================================================================== */
+.calculator-container.unique-tax-calc {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 30px !important;
+    position: relative !important;
+    flex-wrap: wrap !important;
+    transition: all 0.3s ease-in-out;
+    padding: 10px !important;
+    padding-bottom: 100px !important;
+}
 
-    .calc-inputs {
-        flex: 1 !important;
-        width: 100% !important;
-    }
-    /* Desktop Only: Restore the wide view */
-    @media (min-width: 769px) {
-        .calc-inputs {
-            min-width: 600px !important;
-        }
-    }
+.calc-inputs {
+    flex: 1 !important;
+    width: 100% !important;
+}
 
-    .unique-tax-calc .calc-grid-layout, 
-    .unique-tax-calc .calc-form-grid {
-        display: grid !important;
-        grid-template-columns: 1fr !important; /* Stacked! */
-        gap: 15px !important;
-        width: 100% !important;
-    }
-    /* Desktop: Two-column layout for salary inputs */
 @media (min-width: 769px) {
-    .unique-tax-calc .calc-grid-layout {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important; /* Two equal columns */
-        align-items: center !important; 
-        gap: 20px !important;
-    }
-    
-    /* Ensure labels don't have unnecessary bottom margin in the 2-col layout */
-    .unique-tax-calc .calc-grid-layout label {
-        margin-bottom: 0 !important;
+    .calc-inputs {
+        min-width: 600px !important;
     }
 }
 
-    .unique-tax-calc .single-row-span {
-        grid-column: 1 / 3 !important;
+.unique-tax-calc .calc-grid-layout, 
+.unique-tax-calc .calc-form-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    width: 100% !important;
+}
+
+.calc-custom-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+/* Desktop: Label on Left, Input on Right */
+@media (min-width: 769px) {
+    .calc-custom-row {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 20px !important;
     }
+
+    .calc-custom-row label {
+        margin-bottom: 0 !important;
+        flex: 0 0 40% !important;
+    }
+
+    .calc-custom-row input, 
+    .calc-custom-row .radio-group,
+    .calc-custom-row .custom-select-wrapper {
+        flex: 1 !important;
+        margin-top: 0 !important;
+    }
+}
+
+.unique-tax-calc .single-row-span {
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+.unique-tax-calc .single-row-span label {
+    flex: 0 0 100% !important;
+    margin-bottom: 8px !important;
+}
 
     /* ==========================================================================
        2. INPUTS, SELECTS & LABELS
