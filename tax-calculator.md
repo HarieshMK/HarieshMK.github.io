@@ -68,7 +68,7 @@ permalink: /tax-calculator/
                 <div id="hra-loan-legal-warning" class="dark-mode-notice-box" style="display: none; margin-top: 15px;">
                     <p><i class="fas fa-exclamation-triangle" style="color: #eab308; margin-right: 8px;"></i> <strong>Note:</strong> You are claiming both HRA and Home Loan (Self-Occupied). Ensure you meet legal criteria.</p>
                 </div>
-                <div class="calc-custom-row single-row-span" style="margin-top: 15px;">
+                <div class="calc-custom-row" style="margin-top: 15px;">
                     <label for="other-income">Other Income / Allowances / Bonus</label>
                     <input type="text" id="other-income" placeholder="₹ Enter Total Amount">
                 </div>
@@ -86,7 +86,6 @@ permalink: /tax-calculator/
                 <button type="button" id="add-perk-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Benefit/Perk</button>
             </div>
         </div>
-
         <div class="post-card calculation-card collapsible-section-box">
             <div id="80c-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-coins" style="margin-right: 8px; color: #eab308;"></i>Section 80C Deductions</span>
@@ -102,7 +101,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
         <div class="post-card calculation-card collapsible-section-box">
             <div id="80d-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-hand-holding-medical" style="margin-right: 8px; color: #10b981;"></i>Section 80D: Health Insurance</span>
@@ -125,7 +123,6 @@ permalink: /tax-calculator/
     </div>
             </div>
         </div>
-
         <div class="post-card calculation-card collapsible-section-box">
             <div id="home-loan-header" class="calc-collapse-trigger">
                 <span class="heading-title-text"><i class="fas fa-home" style="margin-right: 8px; color: #6366f1;"></i>Home Loan Assistant</span>
@@ -175,20 +172,22 @@ permalink: /tax-calculator/
                             </div>
                         </div>
                         <div style="background: var(--bg-offset); padding: 20px; border-radius: 12px; border: 1px solid var(--border-base);">
-                            <div class="calc-grid-layout">
-                                <div class="calc-custom-row">
-                                    <label for="loan-sanction-date">Sanction Date</label>
-                                    <input type="date" id="loan-sanction-date" class="calc-select" style="font-size: 0.85rem;">
+                            <div id="first-home-details-container" style="display: none;">
+                                <div class="calc-grid-layout" style="margin-bottom: 20px;">
+                                    <div class="calc-custom-row">
+                                        <label for="loan-sanction-date">Sanction Date</label>
+                                        <input type="date" id="loan-sanction-date" class="calc-select" style="font-size: 0.85rem;">
+                                    </div>
+                                    <div class="calc-custom-row">
+                                        <label for="property-stamp-value">Stamp Duty Value</label>
+                                        <input type="text" id="property-stamp-value" placeholder="₹">
+                                    </div>
                                 </div>
-                                <div class="calc-custom-row">
-                                    <label for="property-stamp-value">Stamp Duty Value</label>
-                                    <input type="text" id="property-stamp-value" placeholder="₹">
+                                <div id="branch-80ee-fields" class="calc-custom-row" style="display:none; margin-top: 15px;">
+                                    <label for="original-loan-amt">Sanctioned Loan Amount</label>
+                                    <input type="text" id="original-loan-amt">
                                 </div>
-                            </div>
-                            <div id="branch-80ee-fields" class="calc-custom-row single-row-span" style="display:none; margin-top: 15px;">
-                                <label for="original-loan-amt">Sanctioned Loan Amount</label>
-                                <input type="text" id="original-loan-amt">
-                            </div>
+                                </div>
                             <div id="branch-80eea-fields" style="display:none; margin-top: 15px; text-align: center;">
                                 <p style="font-size: 0.85rem; color: var(--color-success); margin: 0; font-weight: 600;"><i class="fas fa-check-circle"></i> Eligible for 80EEA Affordable Housing Deduction.</p>
                             </div>
@@ -197,7 +196,6 @@ permalink: /tax-calculator/
                 </div>
             </div>
         </div>
-
         <div id="conditional-deductions" style="display: none; margin-top: 25px;">
             <div class="post-card collapsible-section-box" style="border: 1px solid var(--border-base); border-radius: 12px; background: var(--bg-container); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                 <div id="benefits-summary-header" class="calc-collapse-trigger" style="padding: 18px 25px; background: rgba(14,165,233,0.03); border-bottom: 1px solid var(--border-base);">
@@ -239,7 +237,6 @@ permalink: /tax-calculator/
             </div>
         </div>
     </div> 
-    
     <div class="calc-results sticky-score-panel sidebar-stacked-layout">
         <div class="sidebar-panel-header-accent">
             <h3 class="sidebar-panel-heading">
@@ -260,14 +257,11 @@ permalink: /tax-calculator/
                 <div id="new-regime-tax" class="regime-row-value new-regime-tax-display">₹ 0</div>
             </div>
         </div>
-
         <div id="regime-recommendation-banner" class="dark-mode-notice-box" style="margin-top: 15px; text-align: center; font-weight: 600; display: none;"></div>
-
         <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
         <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
     </div>
 </div>
-
 <div id="tax-breakdown-section" class="post-card breakdown-section-wrapper" style="padding: 25px; border-top: 4px solid var(--brand-primary); margin-top: 30px;">
     <h3 style="margin-top: 0; text-align: center;"><i class="fas fa-list-ul" style="margin-right: 10px; color: var(--brand-primary);"></i>Detailed Comparison Summary</h3>
     <div class="table-wrapper">
