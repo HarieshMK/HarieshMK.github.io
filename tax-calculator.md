@@ -359,7 +359,13 @@ permalink: /tax-calculator/
 
     .calc-inputs {
         flex: 1 !important;
-        min-width: 600px !important;
+        width: 100% !important;
+    }
+    /* Desktop Only: Restore the wide view */
+    @media (min-width: 769px) {
+        .calc-inputs {
+            min-width: 600px !important;
+        }
     }
 
     .unique-tax-calc .calc-grid-layout {
@@ -545,7 +551,7 @@ permalink: /tax-calculator/
 @media (max-width: 768px) {
         /* Force body padding to push content up above the fixed bar */
         body {
-            padding-bottom: 120px !important;
+            padding-bottom: 140px !important;
         }
 
         .mobile-tracker-bar {
@@ -605,9 +611,11 @@ permalink: /tax-calculator/
 
         /* 3. Ensure the Sidebar (Tax Liability Card) behaves on mobile */
         .unique-tax-calc .sidebar-stacked-layout { 
-            padding: 12px !important;
-            margin-top: 20px !important; 
+            position: relative !important;
+            top: 0 !important;
             width: 100% !important;
+            padding: 12px !important;
+            margin-top: 20px !important;
             box-sizing: border-box !important;
         }
 
