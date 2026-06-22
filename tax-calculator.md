@@ -595,6 +595,7 @@ permalink: /tax-calculator/
         padding: 10px 15px !important;
         border-radius: 12px !important;
         border: 1px solid #334155 !important;
+        margin-bottom: 25px !important;
     }
     .unique-tax-calc .radio-group {
         margin-bottom: 25px !important;
