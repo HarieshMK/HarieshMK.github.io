@@ -359,6 +359,8 @@ permalink: /tax-calculator/
         position: relative !important;
         flex-wrap: wrap !important;
         transition: all 0.3s ease-in-out;
+        padding: 10px !important;
+        padding-bottom: 100px !important;
     }
 
     .calc-inputs {
@@ -433,7 +435,7 @@ permalink: /tax-calculator/
     .radio-group {
         display: flex !important;
         flex-direction: row !important;
-        flex-wrap: wrap !important; /* Allows items to drop to next line instead of forcing width */
+        flex-wrap: wrap !important;
         gap: 10px !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -593,6 +595,7 @@ permalink: /tax-calculator/
         width: 100% !important;
         align-items: center !important;
         box-sizing: border-box !important;
+        margin-bottom: 25px !important;
     }
     /* 3. Ensure inputs inside the form don't expand past 100% */
     .unique-tax-calc input, 
@@ -612,37 +615,16 @@ permalink: /tax-calculator/
     .radio-group + label {
         margin-top: 20px !important;
     }
-    .unique-tax-calc .radio-group {
-        margin-bottom: 25px !important;
-    }
     .unique-tax-calc label[for="other-income-input"], 
     .unique-tax-calc .other-income-label-wrapper { 
         margin-top: 15px !important;
         display: block !important;
     }
-   body { 
-        padding-bottom: 140px !important; 
-        overflow-x: hidden !important; 
-        width: 100% !important;
-    }
-    
-    .calculator-container.unique-tax-calc {
-        padding: 10px !important;
-        padding-bottom: 100px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        overflow-x: hidden !important;
-        transition: all 0.3s ease-in-out;
-    }
-
-    /* 2. Global container width fixes (prevents horizontal scroll) */
     .calc-inputs, 
     .collapsible-content-wrapper,
     .perk-row-wrapper {
         width: 100% !important;
         max-width: 100vw !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
         box-sizing: border-box !important;
     }
 
