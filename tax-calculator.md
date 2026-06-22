@@ -12,11 +12,11 @@ permalink: /tax-calculator/
 
 <div class="calc-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-base);">
     <h2 class="calc-main-title" style="margin: 0; font-family: 'Lora', serif; font-size: 1.6rem;"><i class="fas fa-wallet" style="margin-right: 12px; color: var(--brand-primary);"></i>Income Tax Calculator</h2>
-    <div class="calc-fy-dropdown-container" style="min-width: 240px; position: relative; z-index: 1000;">
+    <div class="calc-fy-dropdown-container" style="min-width: 240px; position: relative;">
     <div class="custom-select-wrapper" data-target="#fy-selector">
         <div class="custom-select-trigger">
             <span>FY 2026-27</span>
-            <i class="fas fa-chevron-down" style="font-size: 0.8rem; opacity: 0.7;"></i>
+            <i class="fas fa-chevron-down"></i>
         </div>
         <div class="custom-options-panel">
             <div class="custom-option selected" data-value="2026-27">FY 2026-27</div>
@@ -345,36 +345,6 @@ permalink: /tax-calculator/
 /* ==========================================================================
    1. LAYOUT & GRID STRUCTURE
    ========================================================================== */
-
-    /* FY Dropdown Premium Override */
-.calc-fy-dropdown-container .custom-select-trigger {
-    background-color: #0f172a !important; /* Force dark background */
-    border: 1.5px solid #334155 !important;
-    border-radius: 14px !important;
-    color: #f8fafc !important;
-    font-size: 1rem !important;
-    padding: 12px 20px !important;
-    height: 50px !important;
-}
-
-.calc-fy-dropdown-container .custom-options-panel {
-    background-color: #1e293b !important;
-    border: 1.5px solid #334155 !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
-    border-radius: 12px !important;
-    width: 100% !important;
-    margin-top: 8px !important;
-}
-
-.calc-fy-dropdown-container .custom-option {
-    padding: 12px 20px !important;
-    color: #e2e8f0 !important;
-    font-weight: 500 !important;
-}
-
-.calc-fy-dropdown-container .custom-option:hover {
-    background-color: #334155 !important;
-}
 .calculator-container.unique-tax-calc {
     display: flex !important;
     align-items: flex-start !important;
