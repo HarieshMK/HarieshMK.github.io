@@ -561,12 +561,30 @@ permalink: /tax-calculator/
             left: 0 !important;
             width: 100% !important;
             max-width: 100vw !important;
+            justify-content: space-evenly !important; 
+            align-items: center !important;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             padding: 12px 20px !important;
             z-index: 9999 !important;
             border-top: 1px solid rgba(51, 65, 85, 0.5);
             box-sizing: border-box !important;
+        }
+
+        /* Force both Perks and 80C into a single column */
+        .perk-row, #80c-rows-container > div {
+            grid-template-columns: 1fr !important; /* Forces everything to stack */
+            gap: 10px !important;
+            padding: 12px !important;
+            background: #1e293b !important; /* Slightly lighter than background to define the card */
+            border-radius: 12px !important;
+            margin-bottom: 12px !important;
+        }
+    
+        /* Clean up the delete/lock buttons for mobile */
+        .perk-row button, #80c-rows-container > div > div:last-child {
+            justify-self: end !important; /* Move the trash/lock icon to the right */
+            margin-top: 5px;
         }
 
             /* Style for the labels (OLD / NEW) */
