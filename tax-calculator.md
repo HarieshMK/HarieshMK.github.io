@@ -591,6 +591,18 @@ permalink: /tax-calculator/
         flex-wrap: wrap;
         white-space: nowrap !important;
         gap: 15px !important;
+        background: rgba(30, 41, 59, 0.5) !important;
+        padding: 10px 15px !important;
+        border-radius: 12px !important;
+        border: 1px solid #334155 !important;
+    }
+    .unique-tax-calc .radio-group {
+        margin-bottom: 25px !important;
+    }
+    .unique-tax-calc label[for="other-income-input"], 
+    .unique-tax-calc .other-income-label-wrapper { 
+        margin-top: 15px !important;
+        display: block !important;
     }
    body { 
         padding-bottom: 140px !important; 
