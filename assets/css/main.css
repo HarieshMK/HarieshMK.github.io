@@ -18,6 +18,14 @@
   --color-success: #10b981;  /* Green for profits/wealth */
   --color-danger: #ef4444;   /* Red for losses/expenses */
   --border-base: #e2e8f0;    /* Standard borders */
+   
+   /* Button Variables */
+  --btn-primary-bg: var(--brand-primary);
+  --btn-primary-text: var(--text-on-brand);
+  --btn-secondary-border: var(--brand-primary);
+  --btn-secondary-text: var(--brand-primary);
+  --btn-secondary-hover-bg: var(--brand-primary);
+  --btn-secondary-hover-text: var(--text-on-brand);
 }
 
 .dark-theme {
@@ -37,6 +45,14 @@
   --color-success: #34d399;
   --color-danger: #f87171;
   --border-base: #334155;
+
+   /* Button Variables */
+   --btn-primary-bg: var(--brand-primary);
+   --btn-primary-text: var(--text-on-brand);
+   --btn-secondary-border: var(--brand-primary);
+   --btn-secondary-text: var(--brand-primary);
+   --btn-secondary-hover-bg: var(--brand-primary);
+   --btn-secondary-hover-text: var(--text-on-brand);
 }
 /* ================================================================
    PART 1: CONTENTS FROM GLOBAL-STYLES.CSS
@@ -553,3 +569,59 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 /* ROW 5: The View All container */
 .view-all-row .view-all-link { font-size: 0.85rem; font-style: italic; color: var(--text-muted);  text-decoration: none;  transition: color 0.2s ease;}
 .view-all-row .view-all-link:hover { color: var(--brand-primary);}
+
+/* --- PREMIUM BUTTON COMPONENTS --- */
+
+/* Base Premium Button */
+.premium-btn-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95rem;
+    border: none;
+}
+
+/* Primary Action: View Breakdown / Save to Profile */
+.btn-primary-action {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--brand-primary) 50%, transparent);
+}
+
+.btn-primary-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -4px color-mix(in srgb, var(--brand-primary) 60%, transparent);
+}
+
+/* Secondary Action: Add Benefit / Add Entry */
+.btn-secondary-action {
+    background: transparent;
+    border: 1.5px solid var(--btn-secondary-border);
+    color: var(--btn-secondary-text);
+}
+
+.btn-secondary-action:hover {
+    background: var(--btn-secondary-hover-bg);
+    color: var(--btn-secondary-hover-text);
+}
+
+/* Add Perk/Entry (Dashed Style) */
+.btn-secondary-outline {
+    background: transparent;
+    border: 1.5px dashed var(--border-base);
+    color: var(--text-muted);
+}
+
+.btn-secondary-outline:hover {
+    border-style: solid;
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    background: color-mix(in srgb, var(--brand-primary) 5%, transparent);
+}
