@@ -471,30 +471,32 @@ permalink: /tax-calculator/
         box-sizing: border-box !important;
     }
     /* Refined Radio Buttons */
+    /* Refined Radio Buttons */
     input[type="radio"] {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        width: 20px;
-        height: 20px;
-        border: 2px solid var(--border-base);
-        border-radius: 50%;
-        cursor: pointer;
-        background-color: var(--bg-container);
-        transition: all 0.2s ease;
-        display: inline-block;
-        vertical-align: middle;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        width: 20px !important;
+        height: 20px !important;
+        min-width: 20px !important;
+        flex: 0 0 20px !important;
+        border: 2px solid var(--border-base) !important;
+        border-radius: 50% !important;
+        cursor: pointer !important;
+        background-color: var(--bg-container) !important;
+        transition: all 0.2s ease !important;
+        display: inline-block !important;
+        vertical-align: middle !important;
         margin: 0 !important;
-        flex-shrink: 0; 
     }
 
     input[type="radio"]:checked {
-        border: 6px solid var(--brand-primary);
-        background-color: var(--bg-container);
+        border: 6px solid var(--brand-primary) !important;
+        background-color: var(--bg-container) !important;
     }
 
     input[type="radio"]:hover {
-        border-color: var(--brand-primary);
+        border-color: var(--brand-primary) !important;
     }
 
     .radio-group label {
