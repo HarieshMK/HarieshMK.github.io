@@ -618,7 +618,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 .btn-secondary-outline {
     border: 2px solid var(--btn-secondary-border);
     color: var(--btn-secondary-text);
-    font-weight: 700;
+    font-weight: 600;
     padding: 12px 24px;
     border-radius: 12px;
     cursor: pointer;
