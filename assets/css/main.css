@@ -616,7 +616,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 
 /* Add Perk/Entry (Dashed Style) */
 .btn-secondary-outline {
-    background: var(--bg-offset);
+    background: color-mix(in srgb, var(--brand-primary) 6%, transparent);
     border: 1.5px dashed var(--border-base);
     color: var(--text-muted);
 }
