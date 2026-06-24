@@ -474,6 +474,7 @@ permalink: /tax-calculator/
     input[type="radio"] {
         appearance: none;
         -webkit-appearance: none;
+        -moz-appearance: none;
         width: 20px;
         height: 20px;
         border: 2px solid var(--border-base);
@@ -484,6 +485,7 @@ permalink: /tax-calculator/
         display: inline-block;
         vertical-align: middle;
         margin: 0 !important;
+        flex-shrink: 0; 
     }
 
     input[type="radio"]:checked {
