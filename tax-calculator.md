@@ -86,7 +86,7 @@ permalink: /tax-calculator/
                     <p><i class="fas fa-info-circle" style="color: #38bdf8; margin-right: 8px;"></i> <strong>Important Note:</strong> Only add perks here if they are already included in your <strong>Other Income</strong> above.</p>
                 </div>
                 <div id="perks-rows-container"></div>
-                <button type="button" id="add-perk-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Benefit/Perk</button>
+                <button type="button" id="add-perk-btn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 10px;"> <i class="fas fa-plus-circle"></i> Add Benefit/Perk </button>
             </div>
         </div>
         <div class="post-card calculation-card collapsible-section-box">
@@ -98,7 +98,7 @@ permalink: /tax-calculator/
                 <div id="80c-rows-container">
                     <p id="empty-80c-msg" style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; text-align: center; margin: 20px 0;">No entries added yet.</p>
                 </div>
-                <button type="button" id="add-80c-btn" class="btn-secondary-outline" style="width: 100%; padding: 12px; margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Entry</button>
+                <button type="button" id="add-80c-btn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 10px;"><i class="fas fa-plus-circle"></i> Add Entry </button>
                 <div class="calc-total-summary-text" style="margin-top: 15px; text-align: right; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
                     Total 80C: <span id="display-80c-total" style="color: var(--color-success); font-family: 'JetBrains Mono', monospace;">₹ 0</span> / ₹ 1,50,000
                 </div>
@@ -261,8 +261,8 @@ permalink: /tax-calculator/
             </div>
         </div>
         <div id="regime-recommendation-banner" class="dark-mode-notice-box" style="margin-top: 15px; text-align: center; font-weight: 600; display: none;"></div>
-        <button id="view-breakdown-btn" class="btn-primary-action" style="width: 100%; margin-top: 22px; padding: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s ease;">View Detailed Breakdown</button>
-        <button id="save-btn" class="btn-secondary-action" style="width: 100%; margin-top: 12px; padding: 12px; font-weight: bold; cursor: pointer; border: 2px solid var(--brand-primary); border-radius: 12px; background: transparent; color: var(--brand-primary); font-size: 0.95rem; transition: all 0.2s ease;">Save to Profile</button>
+        <button id="view-breakdown-btn" class="btn-primary-action premium-btn-base" style="width: 100%; margin-top: 22px;"> View Detailed Breakdown </button>
+        <button id="save-btn" class="btn-secondary-action premium-btn-base" style="width: 100%; margin-top: 12px;"> Save to Profile </button>
     </div>
 </div>
 <div id="tax-breakdown-section" class="post-card breakdown-section-wrapper" style="padding: 25px; border-top: 4px solid var(--brand-primary); margin-top: 30px;">
