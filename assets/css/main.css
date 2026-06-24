@@ -574,18 +574,20 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 
 /* Base Premium Button */
 .premium-btn-base {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 14px 24px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 0.95rem;
-    border: none;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 14px 24px;
+   width: 100%;
+   font-weight: 700;
+   text-transform: uppercase;
+   letter-spacing: 0.8px;
+   border-radius: 12px;
+   cursor: pointer;
+   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   font-size: 0.95rem;
+   border: none;
+   box-sizing: border-box;
 }
 
 /* Primary Action: View Breakdown / Save to Profile */
@@ -614,7 +616,7 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 
 /* Add Perk/Entry (Dashed Style) */
 .btn-secondary-outline {
-    background: transparent;
+    background: var(--bg-offset);
     border: 1.5px dashed var(--border-base);
     color: var(--text-muted);
 }
