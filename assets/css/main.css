@@ -616,23 +616,24 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 
 /* Add Perk/Entry (Dashed Style) */
 .btn-secondary-outline {
-   background-color: var(--bg-offset);
-  border: 1px solid var(--border-base);
-   color: var(--text-primary);
-   font-weight: 600;
+   background: color-mix(in srgb, var(--brand-primary) 8%, var(--bg-container));
+   border: 2px solid var(--btn-secondary-border);
+   color: var(--btn-secondary-text);
+   font-weight: 700;
    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+   align-items: center;
+   justify-content: center;
+   padding: 12px 24px;
+   border-radius: 12px;
+   cursor: pointer;
+   transition: all 0.3s ease;
 }
 
 .btn-secondary-outline:hover {
-    border-style: solid;
-    border-color: var(--brand-primary);
-    color: var(--brand-primary);
-    background: color-mix(in srgb, var(--brand-primary) 5%, transparent);
+   background: var(--btn-secondary-hover-bg);
+   color: var(--btn-secondary-hover-text);
+   border-color: var(--btn-secondary-hover-bg);
+   transform: translateY(-2px);
+   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
