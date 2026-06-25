@@ -652,12 +652,19 @@ permalink: /tax-calculator/
         box-sizing: border-box !important;
         margin-bottom: 25px !important;
     }
-    /* 3. Ensure inputs inside the form don't expand past 100% */
     .unique-tax-calc input, 
     .unique-tax-calc select {
-        max-width: 100% !important;
-        box-sizing: border-box !important;
+        border-radius: 12px;
+        border: 1px solid var(--border-base);
+        transition: border-color 0.2s ease;
+        padding: 10px 15px;
     }
+    .unique-tax-calc input:focus, 
+    .unique-tax-calc select:focus {
+        border-color: var(--brand-primary);
+        outline: none;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-primary) 20%, transparent);
+}
     .radio-group + div, 
     .radio-group + label {
         margin-top: 20px !important;
@@ -782,5 +789,16 @@ permalink: /tax-calculator/
     background: var(--bg-offset) !important;
     color: var(--brand-primary) !important;
     font-weight: 700 !important;
+}
+    .btn-secondary-outline {
+    gap: 8px;
+    min-height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+    .custom-select-trigger:focus {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-primary) 20%, transparent);
 }
 </style>
