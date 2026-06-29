@@ -5,8 +5,8 @@ permalink: /calculators/clhl/
 ---
 
 <div class="calculator-container">
-    <details open class="calc-inputs">
-        <summary><h3>Property Profile</h3></summary>
+    <section class="calc-inputs">
+        <h3>Property Profile</h3>
         <div class="input-grid">
             <div class="input-group">
                 <div class="label-row"><label>Super Built-up Area (sq.ft)</label></div>
@@ -18,18 +18,18 @@ permalink: /calculators/clhl/
             </div>
             <div class="input-group">
                 <div class="label-row"><label>Basic Cost (Auto)</label></div>
-                <input type="number" id="basicCost" readonly style="background: var(--bg-offset);">
+                <input type="number" id="basicCost" readonly>
             </div>
         </div>
         <div id="extraChargesContainer"></div>
-        <button id="addChargeBtn" class="btn-secondary-outline" style="margin-top: 15px;">+ Add Extra Charge</button>
-        <div class="summary-results" style="margin-top: 20px; padding: 15px; background: var(--bg-offset);">
-            <div class="result-item"><span>GST Amount:</span> <strong id="gstDisplay">₹0</strong></div>
-            <div class="result-item"><span>Total Property Cost (incl. GST):</span> <strong id="totalPropertyCost">₹0</strong></div>
+        <button id="addChargeBtn" class="premium-btn-base btn-secondary-outline" style="margin-top: 15px;">+ Add Extra Charge</button>
+        <div class="summary-results" style="margin-top: 25px; padding: 20px; background: var(--bg-offset); border-radius: 16px;">
+            <div class="result-item"><span>GST Amount</span> <strong id="gstDisplay">₹0</strong></div>
+            <div class="result-item"><span>Total Property Cost</span> <strong id="totalPropertyCost">₹0</strong></div>
         </div>
-    </details>
-    <details open class="calc-inputs" style="margin-top: 20px;">
-        <summary><h3>Loan Particulars</h3></summary>
+    </section>
+    <section class="calc-inputs">
+        <h3>Loan Particulars</h3>
         <div class="input-grid">
             <div class="input-group">
                 <div class="label-row"><label>Loan Amount (₹)</label></div>
@@ -48,15 +48,15 @@ permalink: /calculators/clhl/
                 <input type="date" id="emiDate">
             </div>
         </div>
-        <div class="summary-results" style="margin-top: 20px; padding: 15px; border-top: 1px solid var(--border-color);">
-            <div class="result-item"><span>Closing Principal:</span> <strong id="closingPrincipal">₹0</strong></div>
-            <div class="result-item"><span>Unpaid Interest:</span> <strong id="unpaidInterest">₹0</strong></div>
+        <div class="summary-results" style="padding: 20px; border: 1px solid var(--border-base); border-radius: 16px;">
+            <div class="result-item"><span>Closing Principal</span> <strong id="closingPrincipal">₹0</strong></div>
+            <div class="result-item"><span>Unpaid Interest</span> <strong id="unpaidInterest">₹0</strong></div>
         </div>
-    </details>
+    </section>
     <div class="calculator-container" style="margin-top: 20px;">
         <h3>Transaction Ledger</h3>
         <div class="table-wrapper">
-            <table class="styled-table" id="transactionTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -68,7 +68,7 @@ permalink: /calculators/clhl/
                     </tbody>
             </table>
         </div>
-        <button id="addRowBtn" class="btn-secondary-outline" style="margin-top: 15px;">+ Add Transaction</button>
+        <button id="addRowBtn" class="premium-btn-base btn-secondary-outline">+ Add Transaction</button>
     </div>
 </div>
 
