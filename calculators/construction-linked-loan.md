@@ -5,53 +5,71 @@ permalink: /calculators/clhl/
 ---
 
 <div class="calculator-container">
-    <section class="calc-inputs">
-        <h3>Property Profile</h3>
-        <div class="input-grid">
-            <div class="input-group">
-                <div class="label-row"><label>Super Built-up Area (sq.ft)</label></div>
-                <input type="number" id="superArea" placeholder="648">
+    <div class="calc-inputs">
+        <div class="post-card calculation-card">
+            <div class="section-card-header">
+                <h3>🏢 Property Profile</h3>
             </div>
-            <div class="input-group">
-                <div class="label-row"><label>Price per sq.ft (₹)</label></div>
-                <input type="number" id="pricePerSqft" placeholder="4859">
-            </div>
-            <div class="input-group">
-                <div class="label-row"><label>Basic Cost (Auto)</label></div>
-                <input type="number" id="basicCost" readonly>
-            </div>
-        </div>
-        <div id="extraChargesContainer"></div>
-        <button id="addChargeBtn" class="premium-btn-base btn-secondary-outline" style="margin-top: 15px;">+ Add Extra Charge</button>
-        <div class="summary-results" style="margin-top: 25px; padding: 20px; background: var(--bg-offset); border-radius: 16px;">
-            <div class="result-item"><span>GST Amount</span> <strong id="gstDisplay">₹0</strong></div>
-            <div class="result-item"><span>Total Property Cost</span> <strong id="totalPropertyCost">₹0</strong></div>
-        </div>
-    </section>
-    <section class="calc-inputs">
-        <h3>Loan Particulars</h3>
-        <div class="input-grid">
-            <div class="input-group">
-                <div class="label-row"><label>Loan Amount (₹)</label></div>
-                <input type="number" id="loanAmount" placeholder="3190000">
-            </div>
-            <div class="input-group">
-                <div class="label-row"><label>Interest Rate (%)</label></div>
-                <input type="number" id="interestRate" placeholder="7.5">
-            </div>
-            <div class="input-group">
-                <div class="label-row"><label>Tenure (Years)</label></div>
-                <input type="number" id="tenureYears" placeholder="30">
-            </div>
-            <div class="input-group">
-                <div class="label-row"><label>EMI Start Date</label></div>
-                <input type="date" id="emiDate">
+            <div class="section-card-content">
+                <div class="calc-grid-layout">
+                    <div class="calc-custom-row">
+                        <label>Super Built-up Area (sq.ft)</label>
+                        <input type="number" id="superArea" placeholder="648">
+                    </div>
+                    <div class="calc-custom-row">
+                        <label>Price per sq.ft (₹)</label>
+                        <input type="number" id="pricePerSqft" placeholder="4859">
+                    </div>
+                    <div class="calc-custom-row">
+                        <label>Basic Cost (Auto)</label>
+                        <input type="number" id="basicCost" readonly>
+                    </div>
+                </div>
+                <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
             </div>
         </div>
-        <div class="summary-results" style="padding: 20px; border: 1px solid var(--border-base); border-radius: 16px;">
-            <div class="result-item"><span>Closing Principal</span> <strong id="closingPrincipal">₹0</strong></div>
-            <div class="result-item"><span>Unpaid Interest</span> <strong id="unpaidInterest">₹0</strong></div>
+        <div class="post-card calculation-card" style="margin-top: 25px;">
+            <div class="section-card-header">
+                <h3>🏦 Loan Particulars</h3>
+            </div>
+            <div class="section-card-content">
+                <div class="calc-grid-layout">
+                    <div class="calc-custom-row">
+                        <label>Loan Amount (₹)</label>
+                        <input type="number" id="loanAmount" placeholder="3190000">
+                    </div>
+                    <div class="calc-custom-row">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="interestRate" placeholder="7.5">
+                    </div>
+                    <div class="calc-custom-row">
+                        <label>Tenure (Years)</label>
+                        <input type="number" id="tenureYears" placeholder="30">
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="calc-results sticky-score-panel">
+        <div class="sidebar-panel-header-accent">
+            <h3 class="sidebar-panel-heading">Summary</h3>
+        </div>
+        <div class="sidebar-stacked-rows-container">
+            <div class="regime-row-card">
+                <span class="regime-row-title">Total Property Cost</span>
+                <div class="regime-row-value" id="totalPropertyCost">₹ 0</div>
+            </div>
+            <div class="regime-row-card">
+                <span class="regime-row-title">Closing Principal</span>
+                <div class="regime-row-value" id="closingPrincipal">₹ 0</div>
+            </div>
+            <div class="regime-row-card">
+                <span class="regime-row-title">Unpaid Interest</span>
+                <div class="regime-row-value" id="unpaidInterest">₹ 0</div>
+            </div>
+        </div>
+    </div>
+</div>
     </section>
     <div class="calculator-container" style="margin-top: 20px;">
         <h3>Transaction Ledger</h3>
@@ -74,3 +92,150 @@ permalink: /calculators/clhl/
 
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/clhl-calculator.js"></script>
+
+<style>
+/* ==========================================================================
+   LOAN CALCULATOR - PREMIUM STYLING (MATCHING TAX CALCULATOR)
+   ========================================================================== */
+
+/* Main Container & Layout */
+.calculator-container {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 30px !important;
+    position: relative !important;
+    flex-wrap: wrap !important;
+    padding: 10px !important;
+    padding-bottom: 100px !important;
+}
+
+.calc-inputs {
+    flex: 1 !important;
+    min-width: 600px !important;
+}
+
+/* Card Styling */
+.post-card.calculation-card {
+    background: var(--bg-container) !important;
+    border: 1.5px solid var(--border-base) !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    margin-bottom: 25px !important;
+    overflow: hidden;
+}
+
+.section-card-header {
+    padding: 20px 25px;
+    border-bottom: 1.5px solid var(--border-base);
+}
+
+.section-card-header h3 {
+    font-family: 'Lora', serif;
+    font-size: 1.3rem !important;
+    margin: 0 !important;
+    color: var(--text-primary);
+}
+
+.section-card-content {
+    padding: 20px 25px;
+}
+
+/* Inputs & Grid Alignment */
+.calc-grid-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+}
+
+.calc-custom-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+}
+
+.calc-custom-row label {
+    flex: 0 0 40% !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: var(--text-primary);
+    margin: 0 !important;
+}
+
+.calc-custom-row input {
+    flex: 1 !important;
+    height: 50px !important;
+    padding: 0 15px !important;
+    border-radius: 14px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    background-color: var(--bg-container) !important;
+    border: 1.5px solid var(--border-base) !important;
+    color: var(--text-primary) !important;
+}
+
+.calc-custom-row input:focus {
+    border-color: var(--brand-primary) !important;
+    outline: none;
+}
+
+/* Results Sidebar */
+.calc-results.sticky-score-panel {
+    display: block !important;
+    background: var(--bg-container) !important;
+    padding: 24px !important;
+    border-radius: 16px !important;
+    border: 1.5px solid var(--border-base) !important;
+    width: 350px !important;
+    position: sticky !important;
+    top: 20px !important;
+    flex-shrink: 0 !important;
+}
+
+.sidebar-panel-header-accent {
+    border-bottom: 1.5px solid var(--border-base);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.sidebar-panel-heading {
+    font-family: 'Lora', serif;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.regime-row-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 15px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-base) !important;
+    background-color: var(--bg-offset) !important;
+    margin-bottom: 15px;
+}
+
+.regime-row-title {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.regime-row-value {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Mobile Responsive Override */
+@media (max-width: 768px) {
+    .calc-inputs { min-width: 100% !important; }
+    .calc-results { width: 100% !important; position: relative !important; }
+    .calc-custom-row { flex-direction: column !important; align-items: flex-start !important; }
+    .calc-custom-row label { flex: 0 0 100% !important; margin-bottom: 8px !important; }
+}
+</style>
