@@ -580,19 +580,16 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
     border: none !important;
     cursor: pointer !important;
     padding: 0 !important;
-    color: var(--color-danger) !important; /* Uses your red variable */
-    font-size: 1.25rem !important;
+    color: #ef4444 !important; 
     transition: transform 0.2s ease, opacity 0.2s ease;
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 1.1rem !important;
 }
 
 .btn-delete:hover {
     transform: scale(1.15);
     opacity: 0.8;
-}
-
-/* Using the standard trash can Unicode character */
-.btn-delete::before {
-    content: "\1F5D1"; 
 }
 
 /* Base Premium Button */
