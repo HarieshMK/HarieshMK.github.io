@@ -94,70 +94,45 @@ permalink: /calculators/clhl/
 
 <style>
 /* ==========================================================================
-   CLEANED LOAN CALCULATOR STYLES
+   LOAN CALCULATOR - PREMIUM STYLING
    ========================================================================== */
 
-/* Main Container */
-.calculator-container {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 30px !important;
-    padding: 10px 10px 100px 10px !important;
-}
-
+/* Main Container & Layout */
+.calculator-container { display: flex !important; align-items: flex-start !important; gap: 30px !important; position: relative !important; flex-wrap: wrap !important; padding: 10px !important; padding-bottom: 100px !important; }
 .calc-inputs { flex: 1 !important; min-width: 600px !important; }
 
-/* Unified Row Grid (The core of your new layout) */
-.row-grid {
-    display: grid !important;
-    grid-template-columns: 2fr 1.5fr 1fr 0.5fr; /* Name, Amount, AddToCost, Action */
-    gap: 15px !important;
-    align-items: center !important;
-    margin-bottom: 12px !important;
-}
+/* Card Styling */
+.post-card.calculation-card { background: var(--bg-container) !important; border: 1.5px solid var(--border-base) !important; border-radius: 16px !important; padding: 0 !important; margin-bottom: 25px !important; overflow: hidden; }
+.section-card-header { padding: 20px 25px; border-bottom: 1.5px solid var(--border-base); }
+.section-card-header h3 { font-family: 'Lora', serif; font-size: 1.3rem !important; margin: 0 !important; color: var(--text-primary); }
+.section-card-content { padding: 20px 25px; }
 
-/* Card & Input Styles */
-.post-card.calculation-card { background: var(--bg-container); border: 1.5px solid var(--border-base); border-radius: 16px; padding: 0; margin-bottom: 25px; }
+/* Standard Row Input Layout */
+.calc-grid-layout { display: flex !important; flex-direction: column !important; gap: 20px !important; }
+.calc-custom-row { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; }
+.calc-custom-row label { flex: 0 0 40% !important; font-size: 1rem !important; font-weight: 600 !important; color: var(--text-primary); margin: 0 !important; }
+.calc-custom-row input { flex: 1 !important; height: 50px !important; padding: 0 15px !important; border-radius: 14px !important; font-family: 'JetBrains Mono', monospace !important; font-size: 1rem !important; font-weight: 700 !important; background-color: var(--bg-container) !important; border: 1.5px solid var(--border-base) !important; color: var(--text-primary) !important; }
+.calc-custom-row input:focus { border-color: var(--brand-primary) !important; outline: none; }
 
-/* All Inputs inside grid */
-.row-grid input {
-    height: 45px !important;
-    padding: 0 15px !important;
-    border-radius: 10px !important;
-    border: 1.5px solid var(--border-base) !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-weight: 700 !important;
-}
+/* Results Sidebar */
+.calc-results.sticky-score-panel { display: block !important; background: var(--bg-container) !important; padding: 24px !important; border-radius: 16px !important; border: 1.5px solid var(--border-base) !important; width: 350px !important; position: sticky !important; top: 20px !important; flex-shrink: 0 !important; }
+.sidebar-panel-header-accent { border-bottom: 1.5px solid var(--border-base); margin-bottom: 20px; padding-bottom: 10px; }
+.sidebar-panel-heading { font-family: 'Lora', serif; font-size: 1.2rem; margin: 0; }
+.regime-row-card { display: flex; flex-direction: column; align-items: center; padding: 20px 15px; border-radius: 12px; border: 1.5px solid var(--border-base) !important; background-color: var(--bg-offset) !important; margin-bottom: 15px; }
+.regime-row-title { font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; }
+.regime-row-value { font-family: 'JetBrains Mono', monospace !important; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
 
-input[readonly] {
-    background-color: var(--bg-offset);
-    cursor: not-allowed;
-    color: var(--text-secondary);
-}
+/* Extra Charges - Row Grid Layout */
+#extraChargesContainer { margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-base); }
+.charge-row { display: grid !important; grid-template-columns: 2fr 1.5fr 1fr 0.5fr !important; gap: 10px !important; align-items: center !important; margin-bottom: 12px !important; }
+.charge-row input { height: 40px !important; padding: 0 10px !important; border: 1.5px solid var(--border-base) !important; border-radius: 8px !important; }
+.charge-row label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
+.btn-delete, .btn-save { cursor: pointer; border: none; background: none; font-size: 1.2rem; }
 
-/* Actions & Icons */
-.action-col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.2rem;
-}
+/* Readonly Styling for Locked Rows */
+input[readonly] { background-color: var(--bg-offset) !important; cursor: not-allowed !important; color: var(--text-secondary) !important; }
 
-.btn-delete, .btn-save { cursor: pointer; border: none; background: none; padding: 5px; }
-
-/* Sidebar Results (Retained) */
-.calc-results.sticky-score-panel {
-    display: block;
-    background: var(--bg-container);
-    padding: 24px;
-    border-radius: 16px;
-    border: 1.5px solid var(--border-base);
-    width: 350px;
-    position: sticky;
-    top: 20px;
-}
-
-/* Mobile Responsive Override */
+/* Mobile Responsive */
 @media (max-width: 768px) {
     .calc-inputs { min-width: 100% !important; }
     .calc-results { width: 100% !important; position: relative !important; }
