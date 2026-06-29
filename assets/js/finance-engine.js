@@ -312,10 +312,7 @@ FinanceEngine.TaxEngine = {
 };
 
 FinanceEngine.LoanEngine = {
-    // transactions: Array of objects { date: 'YYYY-MM-DD', type: 'disbursement'|'payment', amount: number }
-    // rate: Annual interest rate (e.g., 7.5)
     calculateCLHL: function(transactions, annualRate) {
-        // 1. Sort events chronologically
         transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         let schedule = [];
@@ -323,29 +320,24 @@ FinanceEngine.LoanEngine = {
         let unpaidInterest = 0;
         const dailyRate = (annualRate / 100) / 365;
 
-        let currentDate = new Date(transactions[0].date);
-        let endDate = new Date(transactions[transactions.length - 1].date);
-
-        // 2. Iterate through every day (Simplified for high-performance)
-        // We calculate interest based on the interval between transactions
-        for (let i = 0; i < transactions.length - 1; i++) {
+        // Loop through all transactions
+        for (let i = 0; i < transactions.length; i++) {
             let event = transactions[i];
-            let nextEvent = transactions[i + 1];
             
-            let d1 = new Date(event.date);
-            let d2 = new Date(nextEvent.date);
-            let diffDays = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
+            // 1. Calculate interest accrued since the PREVIOUS transaction
+            if (i > 0) {
+                let prevDate = new Date(transactions[i - 1].date);
+                let currDate = new Date(event.date);
+                let diffDays = Math.ceil((currDate - prevDate) / (1000 * 60 * 60 * 24));
+                
+                unpaidInterest += (runningPrincipal * dailyRate * diffDays);
+            }
 
-            // Calculate interest for this period
-            let interestAccrued = runningPrincipal * dailyRate * diffDays;
-            unpaidInterest += interestAccrued;
-
-            // Apply the transaction (disbursement or payment)
+            // 2. Apply current transaction
             if (event.type === 'disbursement') {
                 runningPrincipal += event.amount;
             } else if (event.type === 'payment') {
                 let payment = event.amount;
-                // Pay interest first, then principal
                 let interestPaid = Math.min(payment, unpaidInterest);
                 unpaidInterest -= interestPaid;
                 runningPrincipal -= (payment - interestPaid);
@@ -353,6 +345,19 @@ FinanceEngine.LoanEngine = {
 
             schedule.push({
                 date: event.date,
+                principal: runningPrincipal,
+                interest: unpaidInterest
+            });
+        }
+
+        // 3. OPTIONAL: Add interest up to "Today" if you want to see current status
+        const today = new Date();
+        const lastEventDate = new Date(transactions[transactions.length - 1].date);
+        if (today > lastEventDate) {
+            let diffDays = Math.ceil((today - lastEventDate) / (1000 * 60 * 60 * 24));
+            unpaidInterest += (runningPrincipal * dailyRate * diffDays);
+            schedule.push({
+                date: today.toISOString().split('T')[0],
                 principal: runningPrincipal,
                 interest: unpaidInterest
             });
