@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- PART 1: PROPERTY ASSET MANAGER (The Setup) ---
+    const superArea = document.getElementById('superArea');
+    const pricePerSqft = document.getElementById('pricePerSqft');
+    const basicCost = document.getElementById('basicCost');
+
+    function updateBasicCost() {
+        basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
+    }
+    [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
+
+    document.getElementById('addChargeBtn').addEventListener('click', () => {
+        const container = document.getElementById('extraChargesContainer');
+        const div = document.createElement('div');
+        div.className = 'input-grid';
+        div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val">`;
+        container.appendChild(div);
+    });
+
+    // --- PART 2: LEDGER & FINANCE ENGINE (The Math) ---
     const tableBody = document.getElementById('transactionBody');
     const addBtn = document.getElementById('addRowBtn');
 
@@ -8,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <td><input type="date" class="trans-date" value="${date}"></td>
             <td>
                 <select class="trans-type">
-                    <option value="disbursement" ${type === 'disbursement' ? 'selected' : ''}>Disbursement</option>
-                    <option value="payment" ${type === 'payment' ? 'selected' : ''}>Payment</option>
+                    <option value="disbursement">Disbursement</option>
+                    <option value="payment" selected>Payment</option>
                 </select>
             </td>
             <td><input type="number" class="trans-amount" value="${amount}"></td>
