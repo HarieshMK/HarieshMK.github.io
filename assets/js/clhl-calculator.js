@@ -36,48 +36,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const addChargeBtn = document.getElementById('addChargeBtn');
     const container = document.getElementById('extraChargesContainer');
 
-    // --- UPDATED: BUTTON AND CONTAINER ---
-    if (addChargeBtn && container) {
-        addChargeBtn.addEventListener('click', () => {
-            const div = document.createElement('div');
-            div.className = 'calc-custom-row charge-row';
-            div.style.marginBottom = '15px';
-            div.innerHTML = `
-                <input type="text" placeholder="Charge Name" class="charge-name">
-                <input type="number" placeholder="Amount" class="charge-amount">
-                <label><input type="checkbox" class="add-to-cost-check" checked> Add to Cost?</label>
-                <div class="action-col">
-                    <button class="btn-save">💾</button>
-                </div>
-            `;
-            
-            // Save functionality
-    div.querySelector('.btn-save').addEventListener('click', function() {
-        const row = this.closest('.charge-row');
-        const name = row.querySelector('.charge-name').value;
-        const amount = row.querySelector('.charge-amount').value;
-        const isChecked = row.querySelector('.add-to-cost-check').checked;
-        
-        // Use <input> instead of <span> so it's always editable!
+    // --- STANDARDIZED ROW CREATOR ---
+    function createRow(name, amount, isDefault = false, isChecked = true) {
+        const row = document.createElement('div');
+        row.className = 'row-grid charge-row';
         row.innerHTML = `
-            <input type="text" value="${name}" class="charge-name">
-            <input type="number" value="${amount}" class="charge-amount">
-            <label><input type="checkbox" class="add-to-cost-check" ${isChecked ? 'checked' : ''}> Add to Cost?</label>
-            <div class="action-col"><button class="btn-delete">🗑️</button></div>
+            <input type="text" value="${name}" ${isDefault ? 'readonly' : ''} class="charge-name">
+            <input type="number" value="${amount}" ${isDefault ? 'readonly' : ''} class="charge-amount">
+            <label class="action-col">
+                <input type="checkbox" class="add-to-cost-check" ${isChecked ? 'checked' : ''} ${isDefault ? 'disabled' : ''}>
+            </label>
+            <div class="action-col">
+                ${isDefault ? '🔒' : '<button type="button" class="btn-delete">🗑️</button>'}
+            </div>
         `;
         
-        // Re-attach listeners so edits trigger re-calculation
-        row.querySelector('.charge-amount').addEventListener('input', runCalculation);
-        row.querySelector('.add-to-cost-check').addEventListener('change', runCalculation);
-        row.querySelector('.btn-delete').addEventListener('click', () => {
-            row.remove();
-            runCalculation();
+        if (!isDefault) {
+            row.querySelector('.btn-delete').addEventListener('click', () => {
+                row.remove();
+                runCalculation();
+            });
+            row.querySelector('.charge-amount').addEventListener('input', runCalculation);
+            row.querySelector('.add-to-cost-check').addEventListener('change', runCalculation);
+        }
+        return row;
+    }
+
+    // --- BUTTON LOGIC ---
+    if (addChargeBtn && container) {
+        addChargeBtn.addEventListener('click', () => {
+            const draftRow = createRow('', '', false, true);
+            const saveBtn = document.createElement('button');
+            saveBtn.type = "button";
+            saveBtn.innerText = '💾';
+            saveBtn.className = 'btn-save';
+            
+            saveBtn.onclick = function() {
+                container.appendChild(draftRow); 
+                this.remove();
+                runCalculation();
+            };
+            draftRow.querySelector('.action-col').appendChild(saveBtn);
+            container.appendChild(draftRow);
         });
-        runCalculation();
-    });
-    
-    container.appendChild(div);
-});
     }
 
     // --- PART 2: LEDGER ---
