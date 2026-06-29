@@ -367,6 +367,14 @@ FinanceEngine.LoanEngine = {
     }
 };
 
+// Add to FinanceEngine
+GSTHelper: {
+    calculateGST: function(basicCost) {
+        // 1% for Affordable (<= 45L), 5% for Non-Affordable (> 45L)
+        return basicCost <= 4500000 ? basicCost * 0.01 : basicCost * 0.05;
+    }
+}
+
 // Add to FinanceEngine.TaxEngine
 FinanceEngine.TaxRules = {
     // Moved from tax-calculator.js: manageStatutoryRows
