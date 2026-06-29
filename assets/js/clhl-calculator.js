@@ -5,18 +5,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
 
-    function updateBasicCost() {
-        const cost = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
-        basicCost.value = cost;
-        runCalculation(); // Recalculate everything when property cost changes
+    function calculateTotalPropertyCost() {
+        const basic = parseFloat(basicCost.value) || 0;
+        const gstRate = basic <= 4500000 ? 0.01 : 0.05;
+        const gstAmount = basic * gstRate;
+        const totalWithGST = basic + gstAmount;
+
+        if (document.getElementById('gstDisplay')) {
+            document.getElementById('gstDisplay').innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
+        }
+        if (document.getElementById('totalPropertyCost')) {
+            document.getElementById('totalPropertyCost').innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
+        }
+        return totalWithGST;
     }
+
+    function updateBasicCost() {
+        basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
+        calculateTotalPropertyCost();
+        runCalculation();
+    }
+
     [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
 
     document.getElementById('addChargeBtn').addEventListener('click', () => {
         const container = document.getElementById('extraChargesContainer');
         const div = document.createElement('div');
         div.className = 'input-grid';
-        div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val" oninput="runCalculation()">`;
+        div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val">`;
+        // Add event listener to the new input directly
+        div.querySelector('.extra-charge-val').addEventListener('input', runCalculation);
         container.appendChild(div);
     });
 
@@ -50,12 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
         
-        // Only run if we have valid engine data
         if (transactions.length > 0 && annualRate > 0 && typeof FinanceEngine !== 'undefined') {
             const results = FinanceEngine.LoanEngine.calculateCLHL(transactions, annualRate);
             const last = results[results.length - 1];
             
-            // These IDs need to exist in your HTML results card
             if(document.getElementById('closingPrincipal')) {
                 document.getElementById('closingPrincipal').innerText = `₹${Math.round(last.principal).toLocaleString()}`;
                 document.getElementById('unpaidInterest').innerText = `₹${Math.round(last.interest).toLocaleString()}`;
@@ -66,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- PART 3: LISTENERS ---
     addBtn.addEventListener('click', () => addRow());
     ['loanAmount', 'interestRate', 'tenureYears', 'emiDate'].forEach(id => {
-        document.getElementById(id).addEventListener('input', runCalculation);
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('input', runCalculation);
     });
 });
