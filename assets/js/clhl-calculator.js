@@ -34,17 +34,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- STANDARDIZED ROW CREATOR ---
     function createRow(name = '', amount = '', isDefault = false) {
     const row = document.createElement('div');
-        row.className = 'row-grid charge-row';
-        row.innerHTML = `
-            <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="Charge Name"'} class="charge-name">
-            <input type="number" value="${amount}" ${isDefault ? 'readonly' : 'placeholder="Amount"'} class="charge-amount">
-            <label class="action-col">
-                <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
-            </label>
-            <div class="action-col">
-                ${isDefault ? '🔒' : '<button type="button" class="btn-delete"></button>'}
-            </div>
-        `;
+    row.className = 'row-grid charge-row'; 
+    row.innerHTML = `
+        <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="Charge Name"'} class="charge-name">
+        <input type="number" value="${amount}" ${isDefault ? 'readonly' : 'placeholder="Amount"'} class="charge-amount">
+        <label class="action-col">
+            <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
+        </label>
+        <div class="action-col">
+            ${isDefault ? '🔒' : '<button type="button" class="btn-delete"></button>'}
+        </div>
+    `;
         
         if (!isDefault) {
             row.querySelector('.btn-delete').addEventListener('click', () => {
