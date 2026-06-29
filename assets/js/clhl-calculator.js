@@ -39,12 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addChargeBtn && container) {
         addChargeBtn.addEventListener('click', () => {
             const div = document.createElement('div');
-            // Matches your CSS class structure
             div.className = 'calc-custom-row'; 
             div.innerHTML = `
+                <label>Extra Charge</label>
                 <input type="text" placeholder="Charge Name">
                 <input type="number" class="extra-charge-val" placeholder="Amount">
             `;
+            
+            // Add the listener for automatic calculation
             div.querySelector('.extra-charge-val').addEventListener('input', runCalculation);
             container.appendChild(div);
         });
