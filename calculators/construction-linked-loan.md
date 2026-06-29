@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Home Loan Ledger
+permalink: /calculators/clhl/
 ---
 
 <div class="calculator-container" id="clhl-calculator">
