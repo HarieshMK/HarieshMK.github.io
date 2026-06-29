@@ -590,9 +590,9 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
     opacity: 0.8;
 }
 
-/* Inject the icon via CSS so the JS stays clean */
+/* Using the standard trash can Unicode character */
 .btn-delete::before {
-    content: "🗑️";
+    content: "\1F5D1"; 
 }
 
 /* Base Premium Button */
