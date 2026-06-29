@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- STANDARDIZED ROW CREATOR ---
     function createRow(name = '', amount = '', isDefault = false) {
-        const row = document.createElement('div');
+    const row = document.createElement('div');
         row.className = 'row-grid charge-row';
         row.innerHTML = `
             <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="Charge Name"'} class="charge-name">
