@@ -45,18 +45,39 @@ document.addEventListener('DOMContentLoaded', function() {
             div.innerHTML = `
                 <input type="text" placeholder="Charge Name" class="charge-name">
                 <input type="number" placeholder="Amount" class="charge-amount">
-                <label style="font-size: 0.8rem;"><input type="checkbox" class="add-to-cost-check" checked> Add to Cost?</label>
-                <button type="button" class="btn-delete" style="cursor:pointer;">✕</button>
+                <label><input type="checkbox" class="add-to-cost-check" checked> Add to Cost?</label>
+                <div class="action-col">
+                    <button class="btn-save">💾</button>
+                </div>
             `;
             
-            div.querySelector('.btn-delete').addEventListener('click', () => {
-                div.remove();
-                updateBasicCost();
-            });
-            div.querySelectorAll('input').forEach(i => i.addEventListener('input', updateBasicCost));
-            container.appendChild(div);
+            // Save functionality
+    div.querySelector('.btn-save').addEventListener('click', function() {
+        const row = this.closest('.charge-row');
+        const name = row.querySelector('.charge-name').value;
+        const amount = row.querySelector('.charge-amount').value;
+        const isChecked = row.querySelector('.add-to-cost-check').checked;
+        
+        // Use <input> instead of <span> so it's always editable!
+        row.innerHTML = `
+            <input type="text" value="${name}" class="charge-name">
+            <input type="number" value="${amount}" class="charge-amount">
+            <label><input type="checkbox" class="add-to-cost-check" ${isChecked ? 'checked' : ''}> Add to Cost?</label>
+            <div class="action-col"><button class="btn-delete">🗑️</button></div>
+        `;
+        
+        // Re-attach listeners so edits trigger re-calculation
+        row.querySelector('.charge-amount').addEventListener('input', runCalculation);
+        row.querySelector('.add-to-cost-check').addEventListener('change', runCalculation);
+        row.querySelector('.btn-delete').addEventListener('click', () => {
+            row.remove();
+            runCalculation();
         });
-    }
+        runCalculation();
+    });
+    
+    container.appendChild(div);
+});
 
     // --- PART 2: LEDGER ---
     const tableBody = document.getElementById('transactionBody');
@@ -82,15 +103,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function runCalculation() {
         if (!tableBody) return;
         
-        // 1. Calculate Extra Charges
+        // 1. Calculate Extra Charges (This now correctly finds the inputs)
         let extraChargesTotal = 0;
         document.querySelectorAll('.charge-row').forEach(row => {
-            const amount = parseFloat(row.querySelector('.charge-amount').value) || 0;
+            const amountInput = row.querySelector('.charge-amount');
+            const amount = parseFloat(amountInput.value) || 0;
             const addToCost = row.querySelector('.add-to-cost-check').checked;
             if (addToCost) extraChargesTotal += amount;
         });
 
-        // 2. Pass total to Total Property Cost logic
+        // 2. Final Basic Cost
         const basic = parseFloat(basicCost.value) || 0;
         const finalBasic = basic + extraChargesTotal;
 
