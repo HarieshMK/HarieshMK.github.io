@@ -36,11 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const row = document.createElement('div');
     row.className = 'row-grid charge-row'; 
     row.innerHTML = `
-        <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="Charge Name"'} class="charge-name">
-        <input type="number" value="${amount}" ${isDefault ? 'readonly' : 'placeholder="Amount"'} class="charge-amount">
-        <label class="action-col">
-            <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
-        </label>
+        <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="e.g. Clubhouse, Parking..."'} class="charge-name">
+        <input type="number" value="${amount}" ${isDefault ? 'readonly' : 'placeholder="Amount (₹)"'} class="charge-amount">
+        <label class="action-col"><input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}></label>
         <div class="action-col">${isDefault ? '🔒' : '<button type="button" class="btn-delete"><i class="fas fa-trash"></i></button>'}</div>
     `;
         
