@@ -4,50 +4,48 @@ title: Home Loan Ledger
 permalink: /calculators/clhl/
 ---
 
-<div class="calculator-container" id="clhl-calculator">
-    <div class="calc-inputs">
-        <h3>Loan Parameters</h3>
-        <div class="input-group">
-            <div class="label-row">
+<div class="calculator-container">
+    <details open class="calc-inputs" style="width: 100%; margin-bottom: 20px;">
+        <summary><h3>Property Profile</h3></summary>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Super Built-up Area (sq.ft)</label>
+                <input type="number" id="superArea" placeholder="648">
+            </div>
+            <div class="input-group">
+                <label>Price per sq.ft (₹)</label>
+                <input type="number" id="pricePerSqft" placeholder="4859">
+            </div>
+            <div class="input-group">
+                <label>Basic Cost (Auto)</label>
+                <input type="number" id="basicCost" readonly style="background: var(--bg-offset);">
+            </div>
+        </div>
+        <div id="extraChargesContainer">
+            </div>
+        <button id="addChargeBtn" class="btn-secondary-outline">+ Add Extra Charge</button>
+    </details>
+    <details open class="calc-inputs" style="width: 100%;">
+        <summary><h3>Loan Particulars</h3></summary>
+        <div class="input-grid">
+            <div class="input-group">
                 <label>Loan Amount (₹)</label>
                 <input type="number" id="loanAmount" placeholder="3190000">
             </div>
-            <div class="label-row">
-                <label>Annual Interest (%)</label>
+            <div class="input-group">
+                <label>Interest Rate (%)</label>
                 <input type="number" id="interestRate" placeholder="7.5">
             </div>
-            <div class="label-row">
-                <label>EMI Date</label>
+            <div class="input-group">
+                <label>Tenure (Years)</label>
+                <input type="number" id="tenureYears" placeholder="30">
+            </div>
+            <div class="input-group">
+                <label>EMI Start Date</label>
                 <input type="date" id="emiDate">
             </div>
         </div>
-        <h3>Transaction Ledger</h3>
-        <table class="styled-table" id="transactionTable">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody id="transactionBody">
-                </tbody>
-        </table>
-        <button id="addRowBtn" class="btn-secondary-outline" style="width: 100%; margin-top: 15px;">+ Add Transaction</button>
-    </div>
-    <div class="calc-results">
-        <div class="input-header">Summary</div>
-        <div id="summaryResults">
-            <div class="result-item">
-                <span>Closing Principal</span>
-                <strong id="closingPrincipal">₹0</strong>
-            </div>
-            <div class="result-item">
-                <span>Unpaid Interest</span>
-                <strong id="unpaidInterest">₹0</strong>
-            </div>
-        </div>
-    </div>
+    </details>
 </div>
 
 <script src="/assets/js/finance-engine.js"></script>
