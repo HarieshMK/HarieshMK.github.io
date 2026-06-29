@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     container.appendChild(div);
 });
+    }
 
     // --- PART 2: LEDGER ---
     const tableBody = document.getElementById('transactionBody');
