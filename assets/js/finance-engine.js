@@ -311,6 +311,17 @@ FinanceEngine.TaxEngine = {
     }
 };
 
+FinanceEngine.LoanEngine = {
+    calculateCLHL: function(disbursements, annualRate, tenureMonths) {
+        const monthlyRate = (annualRate / 100) / 12;
+        let schedule = [];
+        let runningPrincipal = 0;
+
+        disbursements.sort((a, b) => new Date(a.date) - new Date(b.date));  
+        return schedule;
+    }
+};
+
 // Add to FinanceEngine.TaxEngine
 FinanceEngine.TaxRules = {
     // Moved from tax-calculator.js: manageStatutoryRows
