@@ -7,11 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function calculateTotalPropertyCost() {
         const basic = parseFloat(basicCost.value) || 0;
-        // Use FinanceEngine safely
         const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(basic) : 0;
         const totalWithGST = basic + gstAmount;
     
-        // Safety check: Only update if the element actually exists
         const gstDisplay = document.getElementById('gstDisplay');
         if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
         
@@ -22,38 +20,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateBasicCost() {
-        if(superArea && pricePerSqft) {
+        if(superArea && pricePerSqft && basicCost) {
             basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
         }
         calculateTotalPropertyCost();
         runCalculation();
     }
 
+    // Initialize inputs
     if(superArea && pricePerSqft) {
         [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
     }
 
-    // FIXED: Only add listener if the button exists
+    // --- FIX: BUTTON AND CONTAINER ---
     const addChargeBtn = document.getElementById('addChargeBtn');
-    if (addChargeBtn) {
+    const container = document.getElementById('extraChargesContainer');
+
+    if (addChargeBtn && container) {
         addChargeBtn.addEventListener('click', () => {
-            const container = document.getElementById('extraChargesContainer');
-            // If the container doesn't exist, this will prevent the crash
-            if (!container) return; 
-            
             const div = document.createElement('div');
-            div.className = 'input-grid';
-            div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val">`;
+            // Matches your CSS class structure
+            div.className = 'calc-custom-row'; 
+            div.innerHTML = `
+                <input type="text" placeholder="Charge Name">
+                <input type="number" class="extra-charge-val" placeholder="Amount">
+            `;
             div.querySelector('.extra-charge-val').addEventListener('input', runCalculation);
             container.appendChild(div);
         });
     }
 
-    // --- PART 2: LEDGER & FINANCE ENGINE ---
+    // --- PART 2: LEDGER ---
     const tableBody = document.getElementById('transactionBody');
     const addBtn = document.getElementById('addRowBtn');
 
     function addRow(date = '', type = 'payment', amount = '') {
+        if (!tableBody) return;
         const row = document.createElement('tr');
         row.innerHTML = `
             <td><input type="date" class="trans-date" value="${date}"></td>
@@ -65,10 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td><input type="number" class="trans-amount" value="${amount}"></td>
         `;
-        if (tableBody) {
-            tableBody.appendChild(row);
-            row.addEventListener('input', runCalculation);
-        }
+        tableBody.appendChild(row);
+        row.addEventListener('input', runCalculation);
     }
 
     function runCalculation() {
@@ -96,12 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- PART 3: LISTENERS ---
     if(addBtn) addBtn.addEventListener('click', () => addRow());
-    
-    // Check elements before adding listeners
-    ['loanAmount', 'interestRate', 'tenureYears', 'emiDate'].forEach(id => {
+    ['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('input', runCalculation);
     });
+
+    // --- CRITICAL FIX: TRIGGER ON LOAD ---
+    updateBasicCost();
 });
