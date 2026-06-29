@@ -36,18 +36,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const addChargeBtn = document.getElementById('addChargeBtn');
     const container = document.getElementById('extraChargesContainer');
 
+    // --- UPDATED: BUTTON AND CONTAINER ---
     if (addChargeBtn && container) {
         addChargeBtn.addEventListener('click', () => {
             const div = document.createElement('div');
-            div.className = 'calc-custom-row'; 
+            div.className = 'calc-custom-row charge-row';
+            div.style.marginBottom = '15px';
             div.innerHTML = `
-                <label>Extra Charge</label>
-                <input type="text" placeholder="Charge Name">
-                <input type="number" class="extra-charge-val" placeholder="Amount">
+                <input type="text" placeholder="Charge Name" class="charge-name">
+                <input type="number" placeholder="Amount" class="charge-amount">
+                <label style="font-size: 0.8rem;"><input type="checkbox" class="add-to-cost-check" checked> Add to Cost?</label>
+                <button type="button" class="btn-delete" style="cursor:pointer;">✕</button>
             `;
             
-            // Add the listener for automatic calculation
-            div.querySelector('.extra-charge-val').addEventListener('input', runCalculation);
+            div.querySelector('.btn-delete').addEventListener('click', () => {
+                div.remove();
+                updateBasicCost();
+            });
+            div.querySelectorAll('input').forEach(i => i.addEventListener('input', updateBasicCost));
             container.appendChild(div);
         });
     }
@@ -76,6 +82,24 @@ document.addEventListener('DOMContentLoaded', function() {
     function runCalculation() {
         if (!tableBody) return;
         
+        // 1. Calculate Extra Charges
+        let extraChargesTotal = 0;
+        document.querySelectorAll('.charge-row').forEach(row => {
+            const amount = parseFloat(row.querySelector('.charge-amount').value) || 0;
+            const addToCost = row.querySelector('.add-to-cost-check').checked;
+            if (addToCost) extraChargesTotal += amount;
+        });
+
+        // 2. Pass total to Total Property Cost logic
+        const basic = parseFloat(basicCost.value) || 0;
+        const finalBasic = basic + extraChargesTotal;
+
+        // Existing GST/Property logic
+        const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
+        const totalPropCost = document.getElementById('totalPropertyCost');
+        if (totalPropCost) totalPropCost.innerText = `₹${Math.round(finalBasic + gstAmount).toLocaleString()}`;
+
+        // 3. Loan Ledger calculation
         const rows = document.querySelectorAll('#transactionBody tr');
         const transactions = Array.from(rows).map(row => ({
             date: row.querySelector('.trans-date').value,
