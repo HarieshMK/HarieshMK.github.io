@@ -70,7 +70,6 @@ permalink: /calculators/clhl/
         </div>
     </div>
 </div>
-    </section>
     <div class="calculator-container" style="margin-top: 20px;">
         <h3>Transaction Ledger</h3>
         <div class="table-wrapper">
@@ -88,7 +87,6 @@ permalink: /calculators/clhl/
         </div>
         <button id="addRowBtn" class="premium-btn-base btn-secondary-outline">+ Add Transaction</button>
     </div>
-</div>
 
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/clhl-calculator.js"></script>
