@@ -64,5 +64,13 @@ permalink: /calculators/clhl/
         <button id="addRowBtn" class="btn-secondary-outline" style="margin-top: 15px;">+ Add Transaction</button>
     </div>
 </div>
+<div class="result-item">
+    <span>Closing Principal</span>
+    <strong id="closingPrincipal">₹0</strong>
+</div>
+<div class="result-item">
+    <span>Unpaid Interest</span>
+    <strong id="unpaidInterest">₹0</strong>
+</div>
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/clhl-calculator.js"></script>
