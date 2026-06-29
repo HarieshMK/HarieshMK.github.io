@@ -27,24 +27,19 @@ document.addEventListener('DOMContentLoaded', function() {
         runCalculation();
     }
 
-    // Initialize inputs
     if(superArea && pricePerSqft) {
         [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
     }
 
-    // --- FIX: BUTTON AND CONTAINER ---
-    const addChargeBtn = document.getElementById('addChargeBtn');
-    const container = document.getElementById('extraChargesContainer');
-
     // --- STANDARDIZED ROW CREATOR ---
-    function createRow(name, amount, isDefault = false, isChecked = true) {
+    function createRow(name = '', amount = '', isDefault = false) {
         const row = document.createElement('div');
         row.className = 'row-grid charge-row';
         row.innerHTML = `
-            <input type="text" value="${name}" ${isDefault ? 'readonly' : ''} class="charge-name">
-            <input type="number" value="${amount}" ${isDefault ? 'readonly' : ''} class="charge-amount">
+            <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="Charge Name"'} class="charge-name">
+            <input type="number" value="${amount}" ${isDefault ? 'readonly' : 'placeholder="Amount"'} class="charge-amount">
             <label class="action-col">
-                <input type="checkbox" class="add-to-cost-check" ${isChecked ? 'checked' : ''} ${isDefault ? 'disabled' : ''}>
+                <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
             </label>
             <div class="action-col">
                 ${isDefault ? '🔒' : '<button type="button" class="btn-delete">🗑️</button>'}
@@ -63,17 +58,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- BUTTON LOGIC ---
+    const addChargeBtn = document.getElementById('addChargeBtn');
+    const container = document.getElementById('extraChargesContainer');
+
     if (addChargeBtn && container) {
         addChargeBtn.addEventListener('click', () => {
-            const draftRow = createRow('', '', false, true);
+            const draftRow = createRow('', '', false); // Fixed: 3 arguments only
             const saveBtn = document.createElement('button');
             saveBtn.type = "button";
             saveBtn.innerText = '💾';
             saveBtn.className = 'btn-save';
             
             saveBtn.onclick = function() {
-                container.appendChild(draftRow); 
-                this.remove();
+                this.remove(); // Removes save button, row remains
                 runCalculation();
             };
             draftRow.querySelector('.action-col').appendChild(saveBtn);
@@ -105,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function runCalculation() {
         if (!tableBody) return;
         
-        // 1. Calculate Extra Charges (This now correctly finds the inputs)
         let extraChargesTotal = 0;
         document.querySelectorAll('.charge-row').forEach(row => {
             const amountInput = row.querySelector('.charge-amount');
@@ -114,16 +110,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (addToCost) extraChargesTotal += amount;
         });
 
-        // 2. Final Basic Cost
         const basic = parseFloat(basicCost.value) || 0;
         const finalBasic = basic + extraChargesTotal;
 
-        // Existing GST/Property logic
         const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
         const totalPropCost = document.getElementById('totalPropertyCost');
         if (totalPropCost) totalPropCost.innerText = `₹${Math.round(finalBasic + gstAmount).toLocaleString()}`;
 
-        // 3. Loan Ledger calculation
         const rows = document.querySelectorAll('#transactionBody tr');
         const transactions = Array.from(rows).map(row => ({
             date: row.querySelector('.trans-date').value,
@@ -152,6 +145,5 @@ document.addEventListener('DOMContentLoaded', function() {
         if(el) el.addEventListener('input', runCalculation);
     });
 
-    // --- CRITICAL FIX: TRIGGER ON LOAD ---
     updateBasicCost();
 });
