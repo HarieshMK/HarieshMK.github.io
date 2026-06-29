@@ -131,6 +131,9 @@ permalink: /calculators/clhl/
 
 /* Readonly Styling for Locked Rows */
 input[readonly] { background-color: var(--bg-offset) !important; cursor: not-allowed !important; color: var(--text-secondary) !important; }
+    /* This targets the delete button inside your charges container to match your existing red icon style */
+#extraChargesContainer button.btn-delete { 
+    grid-column: 4 / 5 !important; justify-self: center; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0; font-size: 1.2rem;}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
