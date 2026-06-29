@@ -229,6 +229,24 @@ permalink: /calculators/clhl/
     font-weight: 700;
     color: var(--text-primary);
 }
+    /* Fix spacing and layout for Extra Charges */
+#extraChargesContainer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-base);
+}
+
+.charge-row {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr 1fr 0.5fr;
+    gap: 10px !important;
+    align-items: center;
+}
+
+.charge-row input {
+    height: 40px !important;
+    padding: 0 10px !important;
+}
 
 /* Mobile Responsive Override */
 @media (max-width: 768px) {
