@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Construction-Linked Home Loan Calculator
-permalink: /calculators/construction-linked-loan/
+permalink: /calculators/clhl/
 ---
 
 # Construction-Linked Home Loan Calculator
