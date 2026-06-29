@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-    // --- PART 1: PROPERTY ASSET MANAGER (The Setup) ---
+    // --- PART 1: PROPERTY ASSET MANAGER ---
     const superArea = document.getElementById('superArea');
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
 
     function updateBasicCost() {
-        basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
+        const cost = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
+        basicCost.value = cost;
+        runCalculation(); // Recalculate everything when property cost changes
     }
     [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
 
@@ -14,11 +16,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('extraChargesContainer');
         const div = document.createElement('div');
         div.className = 'input-grid';
-        div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val">`;
+        div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val" oninput="runCalculation()">`;
         container.appendChild(div);
     });
 
-    // --- PART 2: LEDGER & FINANCE ENGINE (The Math) ---
+    // --- PART 2: LEDGER & FINANCE ENGINE ---
     const tableBody = document.getElementById('transactionBody');
     const addBtn = document.getElementById('addRowBtn');
 
@@ -48,16 +50,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
         
-        if (transactions.length > 0 && annualRate > 0) {
+        // Only run if we have valid engine data
+        if (transactions.length > 0 && annualRate > 0 && typeof FinanceEngine !== 'undefined') {
             const results = FinanceEngine.LoanEngine.calculateCLHL(transactions, annualRate);
             const last = results[results.length - 1];
             
-            document.getElementById('closingPrincipal').innerText = `₹${Math.round(last.principal).toLocaleString()}`;
-            document.getElementById('unpaidInterest').innerText = `₹${Math.round(last.interest).toLocaleString()}`;
+            // These IDs need to exist in your HTML results card
+            if(document.getElementById('closingPrincipal')) {
+                document.getElementById('closingPrincipal').innerText = `₹${Math.round(last.principal).toLocaleString()}`;
+                document.getElementById('unpaidInterest').innerText = `₹${Math.round(last.interest).toLocaleString()}`;
+            }
         }
     }
 
+    // --- PART 3: LISTENERS ---
     addBtn.addEventListener('click', () => addRow());
-    document.getElementById('loanAmount').addEventListener('input', runCalculation);
-    document.getElementById('interestRate').addEventListener('input', runCalculation);
+    ['loanAmount', 'interestRate', 'tenureYears', 'emiDate'].forEach(id => {
+        document.getElementById(id).addEventListener('input', runCalculation);
+    });
 });
