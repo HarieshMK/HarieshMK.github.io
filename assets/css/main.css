@@ -572,6 +572,30 @@ img { max-width: 100%; height: auto; border-radius: 8px; }
 
 /* --- PREMIUM BUTTON COMPONENTS --- */
 
+/* --- GLOBAL DELETE BUTTON COMPONENT --- */
+.btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    color: var(--color-danger) !important; /* Uses your red variable */
+    font-size: 1.25rem !important;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-delete:hover {
+    transform: scale(1.15);
+    opacity: 0.8;
+}
+
+/* Inject the icon via CSS so the JS stays clean */
+.btn-delete::before {
+    content: "🗑️";
+}
+
 /* Base Premium Button */
 .premium-btn-base {
    display: flex;
