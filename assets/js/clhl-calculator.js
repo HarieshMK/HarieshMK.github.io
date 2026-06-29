@@ -41,9 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <label class="action-col">
             <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
         </label>
-        <div class="action-col">
-            ${isDefault ? '🔒' : '<button type="button" class="btn-delete"></button>'}
-        </div>
+        <div class="action-col">${isDefault ? '🔒' : '<button type="button" class="btn-delete"><i class="fas fa-trash"></i></button>'}</div>
     `;
         
         if (!isDefault) {
