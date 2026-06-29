@@ -5,38 +5,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
 
-   
     function calculateTotalPropertyCost() {
         const basic = parseFloat(basicCost.value) || 0;
-        const gstAmount = FinanceEngine.GSTHelper.calculateGST(basic); // Using the engine!
+        // Use FinanceEngine safely
+        const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(basic) : 0;
         const totalWithGST = basic + gstAmount;
     
-        if (document.getElementById('gstDisplay')) {
-            document.getElementById('gstDisplay').innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
-        }
-        if (document.getElementById('totalPropertyCost')) {
-            document.getElementById('totalPropertyCost').innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
-        }
+        // Safety check: Only update if the element actually exists
+        const gstDisplay = document.getElementById('gstDisplay');
+        if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
+        
+        const totalPropCost = document.getElementById('totalPropertyCost');
+        if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
+        
         return totalWithGST;
     }
 
     function updateBasicCost() {
-        basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
+        if(superArea && pricePerSqft) {
+            basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
+        }
         calculateTotalPropertyCost();
         runCalculation();
     }
 
-    [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
+    if(superArea && pricePerSqft) {
+        [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
+    }
 
-    document.getElementById('addChargeBtn').addEventListener('click', () => {
-        const container = document.getElementById('extraChargesContainer');
-        const div = document.createElement('div');
-        div.className = 'input-grid';
-        div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val">`;
-        // Add event listener to the new input directly
-        div.querySelector('.extra-charge-val').addEventListener('input', runCalculation);
-        container.appendChild(div);
-    });
+    // FIXED: Only add listener if the button exists
+    const addChargeBtn = document.getElementById('addChargeBtn');
+    if (addChargeBtn) {
+        addChargeBtn.addEventListener('click', () => {
+            const container = document.getElementById('extraChargesContainer');
+            // If the container doesn't exist, this will prevent the crash
+            if (!container) return; 
+            
+            const div = document.createElement('div');
+            div.className = 'input-grid';
+            div.innerHTML = `<input type="text" placeholder="Charge Name"><input type="number" class="extra-charge-val">`;
+            div.querySelector('.extra-charge-val').addEventListener('input', runCalculation);
+            container.appendChild(div);
+        });
+    }
 
     // --- PART 2: LEDGER & FINANCE ENGINE ---
     const tableBody = document.getElementById('transactionBody');
@@ -54,11 +65,15 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td><input type="number" class="trans-amount" value="${amount}"></td>
         `;
-        tableBody.appendChild(row);
-        row.addEventListener('input', runCalculation);
+        if (tableBody) {
+            tableBody.appendChild(row);
+            row.addEventListener('input', runCalculation);
+        }
     }
 
     function runCalculation() {
+        if (!tableBody) return;
+        
         const rows = document.querySelectorAll('#transactionBody tr');
         const transactions = Array.from(rows).map(row => ({
             date: row.querySelector('.trans-date').value,
@@ -66,21 +81,25 @@ document.addEventListener('DOMContentLoaded', function() {
             amount: parseFloat(row.querySelector('.trans-amount').value) || 0
         })).filter(t => t.date && t.amount > 0);
 
-        const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
+        const interestEl = document.getElementById('interestRate');
+        const annualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
         
         if (transactions.length > 0 && annualRate > 0 && typeof FinanceEngine !== 'undefined') {
             const results = FinanceEngine.LoanEngine.calculateCLHL(transactions, annualRate);
             const last = results[results.length - 1];
             
-            if(document.getElementById('closingPrincipal')) {
-                document.getElementById('closingPrincipal').innerText = `₹${Math.round(last.principal).toLocaleString()}`;
-                document.getElementById('unpaidInterest').innerText = `₹${Math.round(last.interest).toLocaleString()}`;
-            }
+            const closingPrincipal = document.getElementById('closingPrincipal');
+            const unpaidInterest = document.getElementById('unpaidInterest');
+            
+            if(closingPrincipal) closingPrincipal.innerText = `₹${Math.round(last.principal).toLocaleString()}`;
+            if(unpaidInterest) unpaidInterest.innerText = `₹${Math.round(last.interest).toLocaleString()}`;
         }
     }
 
     // --- PART 3: LISTENERS ---
-    addBtn.addEventListener('click', () => addRow());
+    if(addBtn) addBtn.addEventListener('click', () => addRow());
+    
+    // Check elements before adding listeners
     ['loanAmount', 'interestRate', 'tenureYears', 'emiDate'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('input', runCalculation);
