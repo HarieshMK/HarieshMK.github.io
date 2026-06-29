@@ -5,12 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
 
+   
     function calculateTotalPropertyCost() {
         const basic = parseFloat(basicCost.value) || 0;
-        const gstRate = basic <= 4500000 ? 0.01 : 0.05;
-        const gstAmount = basic * gstRate;
+        const gstAmount = FinanceEngine.GSTHelper.calculateGST(basic); // Using the engine!
         const totalWithGST = basic + gstAmount;
-
+    
         if (document.getElementById('gstDisplay')) {
             document.getElementById('gstDisplay').innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
         }
