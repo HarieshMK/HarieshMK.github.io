@@ -367,34 +367,27 @@ FinanceEngine.LoanEngine = {
     }
 };
 
-// Add to FinanceEngine
-GSTHelper: {
+FinanceEngine.GSTHelper = {
     calculateGST: function(basicCost) {
-        // 1% for Affordable (<= 45L), 5% for Non-Affordable (> 45L)
         return basicCost <= 4500000 ? basicCost * 0.01 : basicCost * 0.05;
     }
-}
+};
 
-// Add to FinanceEngine.TaxEngine
 FinanceEngine.TaxRules = {
-    // Moved from tax-calculator.js: manageStatutoryRows
     calculateEPF: (basic) => Math.round(basic * 0.12),
 
-    // Moved from tax-calculator.js: 80EE/80EEA logic
     getLoanTaxBenefits: (sanctionDateStr, propVal, loanAmt, interestPaid, isSelfOccupied) => {
         const sanctionDate = new Date(sanctionDateStr);
-        const rules = window.ELIGIBILITY_RULES; // From tax-config.js
+        const rules = window.ELIGIBILITY_RULES; 
         let extraSection = null;
         let dExtra = 0;
 
         if (isSelfOccupied && interestPaid > 200000) {
-            // Check 80EEA
             if (sanctionDate >= rules.sec80EEA.start && sanctionDate <= rules.sec80EEA.end &&
                 propVal > 0 && propVal <= rules.sec80EEA.propertyLimit) {
                 dExtra = Math.min(interestPaid - 200000, rules.sec80EEA.deductionLimit);
                 extraSection = 'card-80eea';
             } 
-            // Check 80EE
             else if (sanctionDate >= rules.sec80EE.start && sanctionDate <= rules.sec80EE.end &&
                      propVal > 0 && propVal <= rules.sec80EE.propertyLimit &&
                      loanAmt > 0 && loanAmt <= rules.sec80EE.loanLimit) {
