@@ -70,9 +70,20 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.className = 'btn-save';
             
             saveBtn.onclick = function() {
-                this.remove(); // Removes save button, row remains fully interactive
-                runCalculation();
-            };
+            // 1. Target the main Property Profile container
+            const profileContainer = document.getElementById('propertyProfileContainer'); // Ensure your main div has this ID
+            
+            // 2. Change the class to match your main input rows
+            draftRow.className = 'calc-custom-row'; 
+            
+            // 3. Remove the Save Button
+            this.remove(); 
+            
+            // 4. Move the row to the top section
+            profileContainer.appendChild(draftRow); 
+            
+            runCalculation();
+        };
             draftRow.querySelector('.action-col').appendChild(saveBtn);
             container.appendChild(draftRow);
         });
