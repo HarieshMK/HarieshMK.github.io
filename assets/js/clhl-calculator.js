@@ -33,22 +33,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- STANDARDIZED ROW CREATOR ---
     function createRow(name = '', amount = '', isDefault = false) {
-    const row = document.createElement('div');
-    row.className = 'row-grid charge-row'; 
-    row.innerHTML = `
-        <input type="text" value="${name}" ${isDefault ? 'readonly' : 'placeholder="e.g. Clubhouse, Parking..."'} class="charge-name">
-        <input type="number" value="${amount}" ${isDefault ? 'readonly' : 'placeholder="Amount (₹)"'} class="charge-amount">
-        <label class="action-col"><input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}></label>
-        <div class="action-col">${isDefault ? '🔒' : '<button type="button" class="btn-delete"><i class="fas fa-trash"></i></button>'}</div>
-    `;
+        const row = document.createElement('div');
+        row.className = 'row-grid charge-row'; 
+        row.innerHTML = `
+            <input type="text" value="${name}" class="charge-name" placeholder="e.g. Clubhouse, Parking...">
+            <input type="number" value="${amount}" class="charge-amount" placeholder="Amount (₹)">
+            <label class="action-col" style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
+                <span style="font-size: 0.75rem; color: #64748b;">Add to Cost</span>
+            </label>
+            <div class="action-col">${isDefault ? '🔒' : '<button type="button" class="btn-delete"><i class="fas fa-trash"></i></button>'}</div>
+        `;
         
+        row.querySelector('.charge-amount').addEventListener('input', runCalculation);
+        row.querySelector('.add-to-cost-check').addEventListener('change', runCalculation);
+            
         if (!isDefault) {
             row.querySelector('.btn-delete').addEventListener('click', () => {
                 row.remove();
                 runCalculation();
             });
-            row.querySelector('.charge-amount').addEventListener('input', runCalculation);
-            row.querySelector('.add-to-cost-check').addEventListener('change', runCalculation);
         }
         return row;
     }
@@ -59,14 +63,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (addChargeBtn && container) {
         addChargeBtn.addEventListener('click', () => {
-            const draftRow = createRow('', '', false); // Fixed: 3 arguments only
+            const draftRow = createRow('', '', false);
             const saveBtn = document.createElement('button');
             saveBtn.type = "button";
             saveBtn.innerText = '💾';
             saveBtn.className = 'btn-save';
             
             saveBtn.onclick = function() {
-                this.remove(); // Removes save button, row remains
+                this.remove(); // Removes save button, row remains fully interactive
                 runCalculation();
             };
             draftRow.querySelector('.action-col').appendChild(saveBtn);
