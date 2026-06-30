@@ -70,16 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.className = 'btn-save';
             
             saveBtn.onclick = function() {
-            // 1. Target the main Property Profile container
             const profileContainer = document.getElementById('propertyProfileContainer');
-            
-            // 2. Remove the Save Button
+
             this.remove(); 
-            
-            // 3. Move the row to the top section
-            // We KEEP the class as 'charge-row' so the layout stays correct
             profileContainer.appendChild(draftRow); 
-            
             runCalculation();
         };
             draftRow.querySelector('.action-col').appendChild(saveBtn);
