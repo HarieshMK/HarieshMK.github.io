@@ -70,17 +70,20 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.className = 'btn-save';
             
             saveBtn.onclick = function() {
-            // 1. Target the main Property Profile container
-            const profileContainer = document.getElementById('propertyProfileContainer'); // Ensure your main div has this ID
+            const profileContainer = document.getElementById('propertyProfileContainer');
             
-            // 2. Change the class to match your main input rows
+            // 1. Give it the standard class so it picks up the grid sizing
             draftRow.className = 'calc-custom-row'; 
             
-            // 3. Remove the Save Button
-            this.remove(); 
+            // 2. Add a label element so the CSS 'label' selector works
+            const label = document.createElement('label');
+            label.innerText = draftRow.querySelector('.charge-name').value;
             
-            // 4. Move the row to the top section
-            profileContainer.appendChild(draftRow); 
+            // 3. Remove the Save Button
+            this.remove();
+            
+            // 4. Move it to the profile area
+            profileContainer.appendChild(draftRow);
             
             runCalculation();
         };
