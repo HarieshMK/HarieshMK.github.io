@@ -58,28 +58,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- BUTTON LOGIC ---
-    const addChargeBtn = document.getElementById('addChargeBtn');
-    const container = document.getElementById('extraChargesContainer');
+    // --- BUTTON LOGIC ---
+const addChargeBtn = document.getElementById('addChargeBtn');
+const container = document.getElementById('extraChargesContainer');
+const profileContainer = document.getElementById('propertyProfileContainer');
 
-    if (addChargeBtn && container) {
-        addChargeBtn.addEventListener('click', () => {
-            const draftRow = createRow('', '', false);
-            const saveBtn = document.createElement('button');
-            saveBtn.type = "button";
-            saveBtn.innerText = '💾';
-            saveBtn.className = 'btn-save';
+if (addChargeBtn && container) {
+    addChargeBtn.addEventListener('click', () => {
+        const draftRow = createRow('', '', false);
+        
+        // Create Save Button
+        const saveBtn = document.createElement('button');
+        saveBtn.type = "button";
+        saveBtn.innerHTML = '💾'; // Use innerHTML for icon support
+        saveBtn.className = 'btn-save';
+        saveBtn.style.cursor = 'pointer';
+        
+        saveBtn.onclick = function() {
+            // 1. Move to profileContainer
+            profileContainer.appendChild(draftRow);
             
-            saveBtn.onclick = function() {
-            const profileContainer = document.getElementById('propertyProfileContainer');
-
+            // 2. Remove the save button now that it's "committed"
             this.remove(); 
-            profileContainer.appendChild(draftRow); 
+            
+            // 3. Trigger calculation
             runCalculation();
         };
-            draftRow.querySelector('.action-col').appendChild(saveBtn);
-            container.appendChild(draftRow);
-        });
-    }
+        
+        // Append save button to the action column
+        draftRow.querySelector('.action-col').appendChild(saveBtn);
+        
+        // Add to the bottom draft container
+        container.appendChild(draftRow);
+    });
+}
 
     // --- PART 2: LEDGER ---
     const tableBody = document.getElementById('transactionBody');
