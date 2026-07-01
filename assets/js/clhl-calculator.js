@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- STANDARDIZED ROW CREATOR ---
     function createRow(name = '', amount = '', isDefault = false) {
         const row = document.createElement('div');
-        row.className = 'row-grid charge-row'; 
+        row.className = 'charge-row'; 
         row.innerHTML = `
             <input type="text" value="${name}" class="charge-name" placeholder="e.g. Clubhouse, Parking...">
             <input type="number" value="${amount}" class="charge-amount" placeholder="Amount (₹)">
@@ -58,40 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- BUTTON LOGIC ---
-    // --- BUTTON LOGIC ---
-const addChargeBtn = document.getElementById('addChargeBtn');
-const container = document.getElementById('extraChargesContainer');
-const profileContainer = document.getElementById('propertyProfileContainer');
-
-if (addChargeBtn && container) {
-    addChargeBtn.addEventListener('click', () => {
-        const draftRow = createRow('', '', false);
-        
-        // Create Save Button
-        const saveBtn = document.createElement('button');
-        saveBtn.type = "button";
-        saveBtn.innerHTML = '💾'; // Use innerHTML for icon support
-        saveBtn.className = 'btn-save';
-        saveBtn.style.cursor = 'pointer';
-        
-        saveBtn.onclick = function() {
-            // 1. Move to profileContainer
-            profileContainer.appendChild(draftRow);
-            
-            // 2. Remove the save button now that it's "committed"
-            this.remove(); 
-            
-            // 3. Trigger calculation
+    const addChargeBtn = document.getElementById('addChargeBtn');
+    const container = document.getElementById('extraChargesContainer');
+    
+    if (addChargeBtn && container) {
+        addChargeBtn.addEventListener('click', () => {
+            const newRow = createRow('', '', false);
+            container.appendChild(newRow);
             runCalculation();
-        };
-        
-        // Append save button to the action column
-        draftRow.querySelector('.action-col').appendChild(saveBtn);
-        
-        // Add to the bottom draft container
-        container.appendChild(draftRow);
-    });
-}
+        });
+    }
 
     // --- PART 2: LEDGER ---
     const tableBody = document.getElementById('transactionBody');
@@ -115,14 +91,15 @@ if (addChargeBtn && container) {
     }
 
     function runCalculation() {
-        if (!tableBody) return;
+        if (!basicCost) return;
         
         let extraChargesTotal = 0;
         document.querySelectorAll('.charge-row').forEach(row => {
             const amountInput = row.querySelector('.charge-amount');
-            const amount = parseFloat(amountInput.value) || 0;
-            const addToCost = row.querySelector('.add-to-cost-check').checked;
-            if (addToCost) extraChargesTotal += amount;
+            const addToCost = row.querySelector('.add-to-cost-check');
+            if (amountInput && addToCost && addToCost.checked) {
+                extraChargesTotal += parseFloat(amountInput.value) || 0;
+            }
         });
 
         const basic = parseFloat(basicCost.value) || 0;
@@ -132,6 +109,7 @@ if (addChargeBtn && container) {
         const totalPropCost = document.getElementById('totalPropertyCost');
         if (totalPropCost) totalPropCost.innerText = `₹${Math.round(finalBasic + gstAmount).toLocaleString()}`;
 
+        if (!tableBody) return;
         const rows = document.querySelectorAll('#transactionBody tr');
         const transactions = Array.from(rows).map(row => ({
             date: row.querySelector('.trans-date').value,
