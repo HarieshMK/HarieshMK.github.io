@@ -12,18 +12,21 @@ permalink: /calculators/clhl/
             </div>
             <div class="section-card-content">
                 <div class="calc-grid-layout" id="propertyProfileContainer">
-                    <div class="calc-custom-row">
+                    <div class="charge-row">
                         <label>Super Built-up Area (sq.ft)</label>
                         <input type="number" id="superArea" placeholder="e.g. 500">
-                    </div>
-                    <div class="calc-custom-row">
+                        <div></div> <div>🔒</div> </div>
+                
+                    <div class="charge-row">
                         <label>Price per sq.ft (₹)</label>
                         <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
-                    </div>
-                    <div class="calc-custom-row">
+                        <div></div> <div>🔒</div> </div>
+                
+                    <div class="charge-row">
                         <label>Basic Cost of property</label>
                         <input type="number" id="basicCost" readonly>
-                    </div>
+                        <div></div> <div>🔒</div> </div>
+                
                     <div id="extraChargesContainer"></div>
                 </div>
                 <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
@@ -136,7 +139,7 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
 @media (max-width: 768px) {
     .calc-inputs { min-width: 100% !important; }
     .calc-results { width: 100% !important; position: relative !important; }
-    .calc-custom-row { flex-direction: column !important; align-items: flex-start !important; }
+    .calc-custom-row, .charge-row { flex-direction: column !important; align-items: flex-start !important; grid-template-columns: 1fr !important;}
     .calc-custom-row label { flex: 0 0 100% !important; margin-bottom: 8px !important; }
 }
 </style>
