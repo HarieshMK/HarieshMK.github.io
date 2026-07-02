@@ -104,6 +104,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const basic = parseFloat(basicCost.value) || 0;
         const finalBasic = basic + extraChargesTotal;
+        const loanData = {
+        amount: parseFloat(document.getElementById('loanAmount').value) || 0,
+        rate: parseFloat(document.getElementById('interestRate').value) || 0,
+        tenure: parseFloat(document.getElementById('tenureYears').value) || 0,
+        startDate: document.getElementById('loanStartDate').value,
+        emiDate: document.getElementById('emiStartDate').value,
+        moroType: document.querySelector('input[name="moroType"]:checked').value,
+        customMoroMonths: parseFloat(document.getElementById('customMoroMonths').value) || 0
+    };
 
         const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
         const totalPropCost = document.getElementById('totalPropertyCost');
@@ -132,11 +141,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if(addBtn) addBtn.addEventListener('click', () => addRow());
-    ['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
+    function handleMoratoriumUI() {
+    const isCustom = document.querySelector('input[name="moroType"]:checked').value === 'custom';
+    const customInput = document.getElementById('customMoroMonths');
+    customInput.disabled = !isCustom;
+    if (!isCustom) customInput.value = ''; // Clear if not selected
+}
+// Add this to the change listener for radios:
+document.querySelectorAll('input[name="moroType"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        handleMoratoriumUI();
+        runCalculation();
+    });
+});
+    // --- CONSOLIDATED LISTENERS ---
+    
+    // 1. Add listeners for all numeric and date inputs
+    const allInputs = [
+        'loanAmount', 'interestRate', 'tenureYears', 
+        'loanStartDate', 'emiStartDate', 'customMoroMonths'
+    ];
+
+    allInputs.forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.addEventListener('input', runCalculation);
+        if (el) el.addEventListener('input', runCalculation);
     });
 
+    // 2. Listener for radio buttons (updates UI and runs calculation)
+    document.querySelectorAll('input[name="moroType"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            handleMoratoriumUI();
+            runCalculation();
+        });
+    });
+    
+    // 3. Button listeners
+    if(addBtn) addBtn.addEventListener('click', () => addRow());
+
+    // 4. Initialize UI state on page load
+    handleMoratoriumUI();
     updateBasicCost();
 });
