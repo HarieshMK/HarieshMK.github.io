@@ -66,12 +66,42 @@ document.addEventListener('DOMContentLoaded', function() {
         row.innerHTML = `
             <td><input type="text" class="milestone-name" placeholder="e.g. Plinth"></td>
             <td><input type="date" class="milestone-date"></td>
-            <td class="action-col"><button type="button" class="btn-delete">🗑️</button></td>
+            <td class="milestone-actions">
+                <div class="action-menu-container">
+                    <button type="button" class="btn-action-trigger">⚙️</button>
+                    <div class="action-menu-options" style="display: none;">
+                        <button type="button" class="btn-edit">Edit</button>
+                        <button type="button" class="btn-duplicate">Duplicate</button>
+                        <button type="button" class="btn-delete">Delete</button>
+                    </div>
+                </div>
+            </td>
         `;
+
+        // Action Trigger Logic
+        const trigger = row.querySelector('.btn-action-trigger');
+        const menu = row.querySelector('.action-menu-options');
+        trigger.addEventListener('click', () => {
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Delete Logic
         row.querySelector('.btn-delete').addEventListener('click', () => {
             row.remove();
             runCalculation();
         });
+
+        // Duplicate Logic
+        row.querySelector('.btn-duplicate').addEventListener('click', () => {
+            const newRow = createMilestoneRow();
+            // Copy values from current row
+            newRow.querySelector('.milestone-name').value = row.querySelector('.milestone-name').value;
+            newRow.querySelector('.milestone-date').value = row.querySelector('.milestone-date').value;
+            milestoneBody.appendChild(newRow);
+            menu.style.display = 'none';
+            runCalculation();
+        });
+
         row.addEventListener('input', runCalculation);
         milestoneBody.appendChild(row);
     }
