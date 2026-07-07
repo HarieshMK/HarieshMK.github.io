@@ -6,31 +6,51 @@ permalink: /calculators/clhl/
 
 <div class="calculator-container">
     <div class="calc-left-col">
-        <div class="post-card calculation-card">
-            <div class="section-card-header"><h3>🏢 Property Profile</h3></div>
-            <div class="section-card-content">
-                <div class="calc-grid-layout" id="propertyProfileContainer">
-                    <div class="charge-row">
-                        <label>Super Built-up Area (sq.ft)</label>
-                        <input type="number" id="superArea" placeholder="e.g. 500">
-                        <div></div> <div>🔒</div> 
-                    </div>
-                    <div class="charge-row">
-                        <label>Price per sq.ft (₹)</label>
-                        <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
-                        <div></div> <div>🔒</div> 
-                    </div>
-                    <div class="charge-row">
-                        <label>Basic Cost of property</label>
-                        <input type="number" id="basicCost" readonly>
-                        <div></div> <div>🔒</div> 
-                    </div>
-                    <div id="extraChargesContainer"></div>
+    <div class="post-card calculation-card">
+        <div class="section-card-header"><h3>🏢 Property Profile</h3></div>
+        <div class="section-card-content">
+            <div class="calc-grid-layout" id="propertyProfileContainer">
+                <div class="charge-row">
+                    <label>Super Built-up Area (sq.ft)</label>
+                    <input type="number" id="superArea" placeholder="e.g. 500">
+                    <div></div> <div>🔒</div> 
                 </div>
-                <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
+                <div class="charge-row">
+                    <label>Price per sq.ft (₹)</label>
+                    <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
+                    <div></div> <div>🔒</div> 
+                </div>
+                <div class="charge-row">
+                    <label>Basic Cost of property</label>
+                    <input type="number" id="basicCost" readonly>
+                    <div></div> <div>🔒</div> 
+                </div>
+                <div id="extraChargesContainer"></div>
             </div>
+            <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
+        </div>
+    </div> 
+
+    <div class="post-card calculation-card">
+        <div class="section-card-header"><h3>🏗️ Project Milestones</h3></div>
+        <div class="section-card-content">
+            <div class="table-wrapper">
+                <table class="milestone-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 10px;">Name</th>
+                            <th style="text-align: left; padding: 10px;">Date</th>
+                            <th style="text-align: left; padding: 10px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="milestoneBody">
+                    </tbody>
+                </table>
+            </div>
+            <button id="addMilestoneBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Milestone</button>
         </div>
     </div>
+</div>
 
     <div class="calc-right-col">
         <div class="post-card calculation-card">
@@ -130,6 +150,26 @@ permalink: /calculators/clhl/
 
 /* Readonly Styling for Locked Rows */
 input[readonly] { background-color: var(--bg-offset) !important; cursor: not-allowed !important; color: var(--text-secondary) !important; }
+    /* Milestone Table Styling */
+.milestone-table input {
+    width: 100%;
+    height: 35px;
+    padding: 5px;
+    border: 1px solid var(--border-base);
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+.milestone-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.btn-copy, .btn-delete {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
