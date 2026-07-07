@@ -251,4 +251,13 @@ document.querySelectorAll('input[name="moroType"]').forEach(radio => {
     // 4. Initialize UI state on page load
     handleMoratoriumUI();
     updateBasicCost();
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.matches('.btn-action-trigger')) {
+            document.querySelectorAll('.action-menu-options').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+    });
 });
