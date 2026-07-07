@@ -82,10 +82,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // Toggle menu
         dotsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Close all other menus first
+            
+            // Close others
             document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
-            // Toggle current
-            menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
+            
+            if (menu.style.display === 'none') {
+                const rect = dotsBtn.getBoundingClientRect();
+                menu.style.display = 'block';
+                // Position it just below the dots button
+                menu.style.top = (rect.bottom + 5) + 'px';
+                menu.style.left = (rect.left - 100) + 'px'; 
+            } else {
+                menu.style.display = 'none';
+            }
         });
 
         // Delete Logic
