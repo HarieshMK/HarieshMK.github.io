@@ -5,6 +5,7 @@ var FinanceEngine = {
         let totalValue = 0;
         let totalInvested = 0;
         let n = 0; 
+        
         let r_periodic = 0; 
 
         if (frequency === 'monthly') {
@@ -364,6 +365,23 @@ FinanceEngine.LoanEngine = {
         }
 
         return schedule;
+    },
+    getMoratoriumEndDate: function(loanStartDate, moroType, customMonths, milestones) {
+        // Create the date object safely
+        let date = new Date(loanStartDate);
+        
+        if (moroType === '18') {
+            date.setMonth(date.getMonth() + 18);
+        } else if (moroType === 'milestone') {
+            if (!milestones || milestones.length === 0) return loanStartDate;
+            // Get the latest date from your milestones array
+            let latest = milestones.reduce((a, b) => new Date(a.date) > new Date(b.date) ? a : b);
+            return latest.date;
+        } else if (moroType === 'custom') {
+            date.setMonth(date.getMonth() + parseInt(customMonths || 0));
+        }
+        
+        return date.toISOString().split('T')[0];
     }
 };
 
