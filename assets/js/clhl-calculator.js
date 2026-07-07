@@ -57,6 +57,25 @@ document.addEventListener('DOMContentLoaded', function() {
         return row;
     }
 
+    // --- MILESTONE ROW CREATOR ---
+    const addMilestoneBtn = document.getElementById('addMilestoneBtn');
+    const milestoneBody = document.getElementById('milestoneBody');
+
+    function createMilestoneRow() {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><input type="text" class="milestone-name" placeholder="e.g. Plinth"></td>
+            <td><input type="date" class="milestone-date"></td>
+            <td class="action-col"><button type="button" class="btn-delete">🗑️</button></td>
+        `;
+        row.querySelector('.btn-delete').addEventListener('click', () => {
+            row.remove();
+            runCalculation();
+        });
+        row.addEventListener('input', runCalculation);
+        milestoneBody.appendChild(row);
+    }
+
     // --- BUTTON LOGIC ---
     const addChargeBtn = document.getElementById('addChargeBtn');
     const container = document.getElementById('extraChargesContainer');
@@ -92,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function runCalculation() {
         if (!basicCost) return;
-        
+
         let extraChargesTotal = 0;
         document.querySelectorAll('.charge-row').forEach(row => {
             const amountInput = row.querySelector('.charge-amount');
@@ -104,15 +123,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const basic = parseFloat(basicCost.value) || 0;
         const finalBasic = basic + extraChargesTotal;
+        
+        // 1. Collect Milestones
+        const milestoneRows = document.querySelectorAll('#milestoneBody tr');
+        const milestones = Array.from(milestoneRows).map(row => ({
+            name: row.querySelector('.milestone-name').value,
+            date: row.querySelector('.milestone-date').value
+        })).filter(m => m.date !== '');
+
+        // 2. Call Engine for Moratorium (with proper closure)
+        if (typeof FinanceEngine !== 'undefined') {
+            const moroEndDate = FinanceEngine.LoanEngine.getMoratoriumEndDate(
+                document.getElementById('loanStartDate').value,
+                document.querySelector('input[name="moroType"]:checked').value,
+                parseFloat(document.getElementById('customMoroMonths').value) || 0,
+                milestones
+            );
+            // You can log or use moroEndDate here
+        }
+
+        // 3. Loan Data
         const loanData = {
-        amount: parseFloat(document.getElementById('loanAmount').value) || 0,
-        rate: parseFloat(document.getElementById('interestRate').value) || 0,
-        tenure: parseFloat(document.getElementById('tenureYears').value) || 0,
-        startDate: document.getElementById('loanStartDate').value,
-        emiDate: document.getElementById('emiStartDate').value,
-        moroType: document.querySelector('input[name="moroType"]:checked').value,
-        customMoroMonths: parseFloat(document.getElementById('customMoroMonths').value) || 0
-    };
+            amount: parseFloat(document.getElementById('loanAmount').value) || 0,
+            rate: parseFloat(document.getElementById('interestRate').value) || 0,
+            tenure: parseFloat(document.getElementById('tenureYears').value) || 0,
+            startDate: document.getElementById('loanStartDate').value,
+            emiDate: document.getElementById('emiStartDate').value,
+            moroType: document.querySelector('input[name="moroType"]:checked').value,
+            customMoroMonths: parseFloat(document.getElementById('customMoroMonths').value) || 0
+        };
 
         const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
         const totalPropCost = document.getElementById('totalPropertyCost');
@@ -128,16 +167,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const interestEl = document.getElementById('interestRate');
         const annualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
-        
+
         if (transactions.length > 0 && annualRate > 0 && typeof FinanceEngine !== 'undefined') {
             const results = FinanceEngine.LoanEngine.calculateCLHL(transactions, annualRate);
             const last = results[results.length - 1];
-            
+
             const closingPrincipal = document.getElementById('closingPrincipal');
             const unpaidInterest = document.getElementById('unpaidInterest');
-            
-            if(closingPrincipal) closingPrincipal.innerText = `₹${Math.round(last.principal).toLocaleString()}`;
-            if(unpaidInterest) unpaidInterest.innerText = `₹${Math.round(last.interest).toLocaleString()}`;
+
+            if (closingPrincipal) closingPrincipal.innerText = `₹${Math.round(last.principal).toLocaleString()}`;
+            if (unpaidInterest) unpaidInterest.innerText = `₹${Math.round(last.interest).toLocaleString()}`;
         }
     }
 
@@ -177,6 +216,7 @@ document.querySelectorAll('input[name="moroType"]').forEach(radio => {
     
     // 3. Button listeners
     if(addBtn) addBtn.addEventListener('click', () => addRow());
+    if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
 
     // 4. Initialize UI state on page load
     handleMoratoriumUI();
