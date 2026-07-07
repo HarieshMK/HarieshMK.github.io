@@ -160,48 +160,54 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
     font-size: 0.9rem;
 }
 
+/* Ensure the table cell doesn't clip the dropdown */
+.milestone-table td { 
+    overflow: visible !important; 
+}
+
 /* Action Menu Styling */
 .milestone-actions { 
     position: relative; 
     text-align: center; 
 }
-.action-menu-container { 
-    position: relative; 
-    display: inline-block; 
-}
-.btn-action-trigger {
-    cursor: pointer;
+
+.btn-dots {
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0 10px;
 }
-.action-menu-options {
+
+.action-menu {
     position: absolute;
     right: 0;
     top: 100%;
     background: var(--bg-container);
     border: 1px solid var(--border-base);
     border-radius: 8px;
-    padding: 5px;
-    z-index: 1000; /* Ensure it floats above other elements */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    min-width: 100px;
+    padding: 5px 0;
+    z-index: 9999; /* Higher than anything else */
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    min-width: 120px;
 }
-.action-menu-options button {
+
+.action-menu button {
     display: block;
     width: 100%;
     text-align: left;
+    padding: 8px 15px;
     background: none;
     border: none;
-    padding: 8px 10px;
     cursor: pointer;
     font-size: 0.9rem;
     color: var(--text-primary);
 }
-.action-menu-options button:hover { 
+
+.action-menu button:hover { 
     background: var(--bg-offset); 
 }
-
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .calc-inputs { min-width: 100% !important; }
