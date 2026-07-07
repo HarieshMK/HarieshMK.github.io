@@ -5,72 +5,50 @@ permalink: /calculators/clhl/
 ---
 
 <div class="calculator-container">
-    <div class="calc-inputs">
+    <div class="calc-left-col">
         <div class="post-card calculation-card">
-            <div class="section-card-header">
-                <h3>🏢 Property Profile</h3>
-            </div>
+            <div class="section-card-header"><h3>🏢 Property Profile</h3></div>
             <div class="section-card-content">
                 <div class="calc-grid-layout" id="propertyProfileContainer">
                     <div class="charge-row">
                         <label>Super Built-up Area (sq.ft)</label>
                         <input type="number" id="superArea" placeholder="e.g. 500">
-                        <div></div> <div>🔒</div> </div>
-                
+                        <div></div> <div>🔒</div> 
+                    </div>
                     <div class="charge-row">
                         <label>Price per sq.ft (₹)</label>
                         <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
-                        <div></div> <div>🔒</div> </div>
-                
+                        <div></div> <div>🔒</div> 
+                    </div>
                     <div class="charge-row">
                         <label>Basic Cost of property</label>
                         <input type="number" id="basicCost" readonly>
-                        <div></div> <div>🔒</div> </div>
-                
+                        <div></div> <div>🔒</div> 
+                    </div>
                     <div id="extraChargesContainer"></div>
                 </div>
                 <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
             </div>
         </div>
-        <!-- 2. Loan Particulars (Updated with Start/EMI Dates) -->
-    <div class="post-card calculation-card" style="margin-top: 25px;">
-        <div class="section-card-header">
-            <h3>🏦 Loan Particulars</h3>
-        </div>
-        <div class="section-card-content">
-            <div class="calc-grid-layout">
-                <div class="calc-custom-row">
-                    <label>Loan Amount (₹)</label>
-                    <input type="number" id="loanAmount" placeholder="e.g. 4000000">
-                </div>
-                <div class="calc-custom-row">
-                    <label>Interest Rate (%)</label>
-                    <input type="number" id="interestRate" placeholder="e.g. 8">
-                </div>
-                <div class="calc-custom-row">
-                    <label>Tenure (Years)</label>
-                    <input type="number" id="tenureYears" placeholder="e.g. 30">
-                </div>
-                <!-- New Date Inputs -->
-                <div class="calc-custom-row">
-                    <label>Loan Start Date</label>
-                    <input type="date" id="loanStartDate">
-                </div>
-                <div class="calc-custom-row">
-                    <label>EMI Start Date</label>
-                    <input type="date" id="emiStartDate">
+    </div>
+
+    <div class="calc-right-col">
+        <div class="post-card calculation-card">
+            <div class="section-card-header"><h3>🏦 Loan Particulars</h3></div>
+            <div class="section-card-content">
+                <div class="calc-grid-layout">
+                    <div class="calc-custom-row"><label>Loan Amount (₹)</label><input type="number" id="loanAmount" placeholder="e.g. 4000000"></div>
+                    <div class="calc-custom-row"><label>Interest Rate (%)</label><input type="number" id="interestRate" placeholder="e.g. 8"></div>
+                    <div class="calc-custom-row"><label>Tenure (Years)</label><input type="number" id="tenureYears" placeholder="e.g. 30"></div>
+                    <div class="calc-custom-row"><label>Loan Start Date</label><input type="date" id="loanStartDate"></div>
+                    <div class="calc-custom-row"><label>EMI Start Date</label><input type="date" id="emiStartDate"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- 3. NEW: Moratorium Period Card -->
-    <div class="post-card calculation-card" style="margin-top: 25px;">
-        <div class="section-card-header">
-            <h3>⏳ Moratorium Period</h3>
-        </div>
-        <div class="section-card-content">
-            <div class="calc-grid-layout" style="gap: 15px;">
+        <div class="post-card calculation-card">
+            <div class="section-card-header"><h3>⏳ Moratorium Period</h3></div>
+            <div class="section-card-content">
                 <div class="radio-group" style="display: flex; flex-direction: column; gap: 10px;">
                     <label><input type="radio" name="moroType" value="18" checked> 18 Months (Standard)</label>
                     <label><input type="radio" name="moroType" value="milestone"> Until Last Milestone</label>
@@ -81,45 +59,34 @@ permalink: /calculators/clhl/
                 </div>
             </div>
         </div>
-    </div>
-</div>
-    <div class="calc-results sticky-score-panel">
-        <div class="sidebar-panel-header-accent">
-            <h3 class="sidebar-panel-heading">Summary</h3>
-        </div>
-        <div class="sidebar-stacked-rows-container">
-            <div class="regime-row-card">
-                <span class="regime-row-title">Total Property Cost</span>
-                <div class="regime-row-value" id="totalPropertyCost">₹ 0</div>
-            </div>
-            <div class="regime-row-card">
-                <span class="regime-row-title">Closing Principal</span>
-                <div class="regime-row-value" id="closingPrincipal">₹ 0</div>
-            </div>
-            <div class="regime-row-card">
-                <span class="regime-row-title">Unpaid Interest</span>
-                <div class="regime-row-value" id="unpaidInterest">₹ 0</div>
+
+        <div class="calc-results sticky-score-panel">
+            <div class="sidebar-panel-header-accent"><h3 class="sidebar-panel-heading">Summary</h3></div>
+            <div class="sidebar-stacked-rows-container">
+                <div class="regime-row-card"><span class="regime-row-title">Total Property Cost</span><div class="regime-row-value" id="totalPropertyCost">₹ 0</div></div>
+                <div class="regime-row-card"><span class="regime-row-title">Closing Principal</span><div class="regime-row-value" id="closingPrincipal">₹ 0</div></div>
+                <div class="regime-row-card"><span class="regime-row-title">Unpaid Interest</span><div class="regime-row-value" id="unpaidInterest">₹ 0</div></div>
             </div>
         </div>
     </div>
 </div>
-    <div class="calculator-container" style="margin-top: 20px;">
-        <h3>Transaction Ledger</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="transactionBody">
-                    </tbody>
-            </table>
+
+<div class="calculator-container" style="margin-top: 20px; grid-template-columns: 1fr !important;">
+    <div class="post-card calculation-card">
+        <div class="section-card-header"><h3>Transaction Ledger</h3></div>
+        <div class="section-card-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Type</th><th>Amount</th></tr>
+                    </thead>
+                    <tbody id="transactionBody"></tbody>
+                </table>
+            </div>
+            <button id="addRowBtn" class="premium-btn-base btn-secondary-outline">+ Add Transaction</button>
         </div>
-        <button id="addRowBtn" class="premium-btn-base btn-secondary-outline">+ Add Transaction</button>
     </div>
+</div>
 
 <script src="/assets/js/finance-engine.js"></script>
 <script src="/assets/js/clhl-calculator.js"></script>
