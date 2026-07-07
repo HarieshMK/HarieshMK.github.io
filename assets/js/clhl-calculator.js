@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return row;
     }
 
-    // --- MILESTONE ROW CREATOR ---
+// --- MILESTONE ROW CREATOR ---
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
     const milestoneBody = document.getElementById('milestoneBody');
 
@@ -66,23 +66,26 @@ document.addEventListener('DOMContentLoaded', function() {
         row.innerHTML = `
             <td><input type="text" class="milestone-name" placeholder="e.g. Plinth"></td>
             <td><input type="date" class="milestone-date"></td>
-            <td class="milestone-actions">
-                <div class="action-menu-container">
-                    <button type="button" class="btn-action-trigger">⚙️</button>
-                    <div class="action-menu-options" style="display: none;">
-                        <button type="button" class="btn-edit">Edit</button>
-                        <button type="button" class="btn-duplicate">Duplicate</button>
-                        <button type="button" class="btn-delete">Delete</button>
-                    </div>
+            <td class="milestone-actions" style="overflow: visible;">
+                <button type="button" class="btn-dots">⋮</button>
+                <div class="action-menu" style="display: none;">
+                    <button type="button" class="btn-edit">Edit</button>
+                    <button type="button" class="btn-duplicate">Duplicate</button>
+                    <button type="button" class="btn-delete" style="color: red;">Delete</button>
                 </div>
             </td>
         `;
 
-        // Action Trigger Logic
-        const trigger = row.querySelector('.btn-action-trigger');
-        const menu = row.querySelector('.action-menu-options');
-        trigger.addEventListener('click', () => {
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        const dotsBtn = row.querySelector('.btn-dots');
+        const menu = row.querySelector('.action-menu');
+
+        // Toggle menu
+        dotsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close all other menus first
+            document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+            // Toggle current
+            menu.style.display = (menu.style.display === 'none') ? 'block' : 'none';
         });
 
         // Delete Logic
@@ -94,7 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Duplicate Logic
         row.querySelector('.btn-duplicate').addEventListener('click', () => {
             const newRow = createMilestoneRow();
-            // Copy values from current row
             newRow.querySelector('.milestone-name').value = row.querySelector('.milestone-name').value;
             newRow.querySelector('.milestone-date').value = row.querySelector('.milestone-date').value;
             milestoneBody.appendChild(newRow);
@@ -254,8 +256,8 @@ document.querySelectorAll('input[name="moroType"]').forEach(radio => {
 
     // Close action menus when clicking outside
     document.addEventListener('click', (e) => {
-        if (!e.target.matches('.btn-action-trigger')) {
-            document.querySelectorAll('.action-menu-options').forEach(menu => {
+        if (!e.target.matches('.btn-dots')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
                 menu.style.display = 'none';
             });
         }
