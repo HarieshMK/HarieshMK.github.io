@@ -121,7 +121,7 @@ permalink: /calculators/clhl/
 .calc-inputs { flex: 1 !important; min-width: 600px !important; }
 
 /* Card Styling */
-.post-card.calculation-card { background: var(--bg-container) !important; border: 1.5px solid var(--border-base) !important; border-radius: 16px !important; padding: 0 !important; margin-bottom: 25px !important; overflow: hidden; }
+.post-card.calculation-card { background: var(--bg-container) !important; border: 1.5px solid var(--border-base) !important; border-radius: 16px !important; padding: 0 !important; margin-bottom: 25px !important; }
 .section-card-header { padding: 20px 25px; border-bottom: 1.5px solid var(--border-base); }
 .section-card-header h3 { font-family: 'Lora', serif; font-size: 1.3rem !important; margin: 0 !important; color: var(--text-primary); }
 .section-card-content { padding: 20px 25px; }
@@ -181,14 +181,14 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
 }
 
 .action-menu {
-    position: absolute;
+    position: fixed;
     right: 0;
     top: 100%;
     background: var(--bg-container);
     border: 1px solid var(--border-base);
     border-radius: 8px;
     padding: 5px 0;
-    z-index: 9999; /* Higher than anything else */
+    z-index: 99999; /* Higher than anything else */
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
     min-width: 120px;
 }
