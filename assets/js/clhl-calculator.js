@@ -83,18 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
         dotsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             
-            // Close others
-            document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+            // 1. Close all other open menus
+            document.querySelectorAll('.action-menu').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
             
-            if (menu.style.display === 'none') {
-                const rect = dotsBtn.getBoundingClientRect();
-                menu.style.display = 'block';
-                // Position it just below the dots button
-                menu.style.top = (rect.bottom + 5) + 'px';
-                menu.style.left = (rect.left - 100) + 'px'; 
-            } else {
-                menu.style.display = 'none';
-            }
+            // 2. Toggle current menu display
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
         });
 
         // Delete Logic
