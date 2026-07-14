@@ -190,24 +190,26 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
     margin-top: 5px;
     background: var(--bg-container);
     border: 1px solid var(--border-base);
-    border-radius: 8px;
-    padding: 5px 0;
-    z-index: 99999;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    min-width: 120px;
+    border-radius: 12px; /* Smoother, more modern radius */
+    padding: 6px 0;
+    z-index: 10000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Softer, premium shadow */
+    min-width: 130px;
     display: none;
+    overflow: hidden; /* Ensures buttons don't bleed out */
 }
 
 .action-menu button {
     display: block;
     width: 100%;
     text-align: left;
-    padding: 8px 15px;
+    padding: 10px 16px; /* Consistent padding */
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem; /* Slightly larger, easier to read */
     color: var(--text-primary);
+    transition: background 0.2s ease;
 }
 
 .action-menu button:hover { 
