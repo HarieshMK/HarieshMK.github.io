@@ -81,16 +81,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Toggle menu
         dotsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            
-            // 1. Close all other open menus
-            document.querySelectorAll('.action-menu').forEach(m => {
-                if (m !== menu) m.style.display = 'none';
-            });
-            
-            // 2. Toggle current menu display
-            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        e.stopPropagation(); // Prevents document click from immediately closing it
+        
+        // 1. Close all other open menus
+        document.querySelectorAll('.action-menu').forEach(m => {
+            if (m !== menu) m.style.display = 'none';
         });
+        
+        // 2. Toggle the current menu
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    });
 
         // Delete Logic
         row.querySelector('.btn-delete').addEventListener('click', () => {
@@ -259,7 +259,8 @@ document.querySelectorAll('input[name="moroType"]').forEach(radio => {
     updateBasicCost();
 
     // Close action menus when clicking outside
-    document.addEventListener('click', (e) => {
+        document.addEventListener('click', (e) => {
+        // If the click is NOT on a dots button, close all menus
         if (!e.target.matches('.btn-dots')) {
             document.querySelectorAll('.action-menu').forEach(menu => {
                 menu.style.display = 'none';
