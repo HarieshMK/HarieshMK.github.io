@@ -167,10 +167,11 @@ document.addEventListener('DOMContentLoaded', function() {
             date: row.querySelector('.milestone-date').value
         })).filter(m => m.date !== '');
 
-        // 2. Call Engine for Moratorium (with proper closure)
-        if (typeof FinanceEngine !== 'undefined') {
+        // 2. Call Engine for Moratorium (Safeguarded against empty start dates)
+        const loanStartDateVal = document.getElementById('loanStartDate').value;
+        if (typeof FinanceEngine !== 'undefined' && loanStartDateVal) {
             const moroEndDate = FinanceEngine.LoanEngine.getMoratoriumEndDate(
-                document.getElementById('loanStartDate').value,
+                loanStartDateVal,
                 document.querySelector('input[name="moroType"]:checked').value,
                 parseFloat(document.getElementById('customMoroMonths').value) || 0,
                 milestones
