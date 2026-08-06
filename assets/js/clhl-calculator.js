@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="action-menu" style="display: none;">
                     <button type="button" class="btn-edit">Edit</button>
                     <button type="button" class="btn-duplicate">Duplicate</button>
-                    <button type="button" class="btn-menu-delete" style="color: red;">Delete</button>
+                    <button type="button" class="btn-menu-delete">Delete</button>
                 </div>
             </td>
         `;
