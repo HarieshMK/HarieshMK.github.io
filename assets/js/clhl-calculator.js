@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const superArea = document.getElementById('superArea');
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
+    const loanAmountInput = document.getElementById('loanAmount');
+    const ltvRatioInput = document.getElementById('ltvRatio');
 
     function getTotalPropertyCostValue() {
         let extraChargesTotal = 0;
@@ -20,6 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return finalBasic + gstAmount;
     }
 
+    function updateOverallLoanAmount() {
+        if (loanAmountInput && !loanAmountInput.dataset.manual) {
+            const totalCost = getTotalPropertyCostValue();
+            const ltv = (parseFloat(ltvRatioInput ? ltvRatioInput.value : 80) || 0) / 100;
+            loanAmountInput.value = Math.round(totalCost * ltv);
+        }
+    }
+
     function calculateTotalPropertyCost() {
         const totalWithGST = getTotalPropertyCostValue();
     
@@ -29,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalPropCost = document.getElementById('totalPropertyCost');
         if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
         
+        updateOverallLoanAmount();
         return totalWithGST;
     }
 
@@ -42,6 +53,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(superArea && pricePerSqft) {
         [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
+    }
+
+    if(ltvRatioInput) {
+        ltvRatioInput.addEventListener('input', () => {
+            updateOverallLoanAmount();
+            runCalculation();
+        });
+    }
+
+    if(loanAmountInput) {
+        loanAmountInput.addEventListener('input', () => {
+            loanAmountInput.dataset.manual = 'true';
+            runCalculation();
+        });
     }
 
     // --- STANDARDIZED ROW CREATOR ---
@@ -58,12 +83,19 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="action-col">${isDefault ? '🔒' : '<button type="button" class="btn-delete"><i class="fas fa-trash"></i></button>'}</div>
         `;
         
-        row.querySelector('.charge-amount').addEventListener('input', runCalculation);
-        row.querySelector('.add-to-cost-check').addEventListener('change', runCalculation);
+        row.querySelector('.charge-amount').addEventListener('input', () => {
+            calculateTotalPropertyCost();
+            runCalculation();
+        });
+        row.querySelector('.add-to-cost-check').addEventListener('change', () => {
+            calculateTotalPropertyCost();
+            runCalculation();
+        });
             
         if (!isDefault) {
             row.querySelector('.btn-delete').addEventListener('click', () => {
                 row.remove();
+                calculateTotalPropertyCost();
                 runCalculation();
             });
         }
@@ -97,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const loanAmtInput = row.querySelector('.milestone-loan-amount');
         const checkInput = row.querySelector('.part-of-loan-check');
 
-        function updateLoanAmountFromPct() {
+        function updateMilestoneLoanAmount() {
             if (!checkInput.checked) {
                 loanAmtInput.value = 0;
                 loanAmtInput.disabled = true;
@@ -105,23 +137,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 loanAmtInput.disabled = false;
                 const pct = parseFloat(pctInput.value) || 0;
                 const totalCost = getTotalPropertyCostValue();
+                const ltv = (parseFloat(ltvRatioInput ? ltvRatioInput.value : 80) || 100) / 100;
+                
                 if (pct > 0 && totalCost > 0 && !loanAmtInput.dataset.manual) {
-                    loanAmtInput.value = Math.round((pct / 100) * totalCost);
+                    loanAmtInput.value = Math.round((pct / 100) * totalCost * ltv);
                 }
             }
         }
 
-        // Initialize state
-        updateLoanAmountFromPct();
+        updateMilestoneLoanAmount();
 
         pctInput.addEventListener('input', () => {
-            loanAmtInput.dataset.manual = ''; // Reset manual flag on pct change
-            updateLoanAmountFromPct();
+            loanAmtInput.dataset.manual = ''; 
+            updateMilestoneLoanAmount();
             runCalculation();
         });
 
         checkInput.addEventListener('change', () => {
-            updateLoanAmountFromPct();
+            updateMilestoneLoanAmount();
             runCalculation();
         });
 
@@ -130,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function() {
             runCalculation();
         });
 
-        // Toggle menu
         dotsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             document.querySelectorAll('.action-menu').forEach(m => {
@@ -139,13 +171,11 @@ document.addEventListener('DOMContentLoaded', function() {
             menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
         });
 
-        // Delete Logic
         row.querySelector('.btn-menu-delete').addEventListener('click', () => {
             row.remove();
             runCalculation();
         });
 
-        // Duplicate Logic
         row.querySelector('.btn-duplicate').addEventListener('click', () => {
             const newRow = createMilestoneRow(
                 row.querySelector('.milestone-name').value,
@@ -172,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addChargeBtn.addEventListener('click', () => {
             const newRow = createRow('', '', false);
             container.appendChild(newRow);
+            calculateTotalPropertyCost();
             runCalculation();
         });
     }
@@ -204,7 +235,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalPropCost = document.getElementById('totalPropertyCost');
         if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
         
-        // 1. Collect Milestones
         const milestoneRows = document.querySelectorAll('#milestoneBody tr');
         const milestones = Array.from(milestoneRows).map(row => ({
             name: row.querySelector('.milestone-name').value,
@@ -214,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
             isPartOfLoan: row.querySelector('.part-of-loan-check').checked
         })).filter(m => m.date !== '');
 
-        // 2. Call Engine for Moratorium
         const loanStartDateVal = document.getElementById('loanStartDate').value;
         if (typeof FinanceEngine !== 'undefined' && loanStartDateVal) {
             const moroEndDate = FinanceEngine.LoanEngine.getMoratoriumEndDate(
@@ -225,12 +254,11 @@ document.addEventListener('DOMContentLoaded', function() {
             );
         }
 
-        // 3. Loan Data
         const loanData = {
-            amount: parseFloat(document.getElementById('loanAmount').value) || 0,
+            amount: parseFloat(loanAmountInput.value) || 0,
             rate: parseFloat(document.getElementById('interestRate').value) || 0,
             tenure: parseFloat(document.getElementById('tenureYears').value) || 0,
-            startDate: document.getElementById('loanStartDate').value,
+            startDate: loanStartDateVal,
             emiDate: document.getElementById('emiStartDate').value,
             moroType: document.querySelector('input[name="moroType"]:checked').value,
             customMoroMonths: parseFloat(document.getElementById('customMoroMonths').value) || 0
@@ -273,9 +301,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- CONSOLIDATED LISTENERS ---
     const allInputs = [
-        'loanAmount', 'interestRate', 'tenureYears', 
+        'interestRate', 'tenureYears', 
         'loanStartDate', 'emiStartDate', 'customMoroMonths'
     ];
 
