@@ -34,13 +34,19 @@ permalink: /calculators/clhl/
     <div class="post-card calculation-card">
         <div class="section-card-header"><h3>🏗️ Project Milestones</h3></div>
         <div class="section-card-content">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.4;">
+                💡 <strong>Note:</strong> Loan Amount auto-calculates from the Milestone % and your property value. Adjust it manually if your bank's disbursement differs. Uncheck <strong>"Part of Loan"</strong> for cash-paid milestones (e.g., booking/down payments) to exclude them from the loan plan.
+            </p>
             <div class="table-wrapper">
                 <table class="milestone-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
                             <th style="text-align: left; padding: 10px;">Name</th>
                             <th style="text-align: left; padding: 10px;">Date</th>
-                            <th style="text-align: left; padding: 10px;">Actions</th>
+                            <th style="text-align: left; padding: 10px;">Milestone %</th>
+                            <th style="text-align: left; padding: 10px;">Loan Amount (₹)</th>
+                            <th style="text-align: center; padding: 10px;">Part of Loan?</th>
+                            <th style="text-align: right; padding: 10px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="milestoneBody">
@@ -50,7 +56,6 @@ permalink: /calculators/clhl/
             <button id="addMilestoneBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Milestone</button>
         </div>
     </div>
-</div>
 
     <div class="calc-right-col">
         <div class="post-card calculation-card">
