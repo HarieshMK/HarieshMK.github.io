@@ -5,10 +5,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
 
-    function calculateTotalPropertyCost() {
+    function getTotalPropertyCostValue() {
+        let extraChargesTotal = 0;
+        document.querySelectorAll('.charge-row').forEach(row => {
+            const amountInput = row.querySelector('.charge-amount');
+            const addToCost = row.querySelector('.add-to-cost-check');
+            if (amountInput && addToCost && addToCost.checked) {
+                extraChargesTotal += parseFloat(amountInput.value) || 0;
+            }
+        });
         const basic = parseFloat(basicCost.value) || 0;
-        const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(basic) : 0;
-        const totalWithGST = basic + gstAmount;
+        const finalBasic = basic + extraChargesTotal;
+        const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
+        return finalBasic + gstAmount;
+    }
+
+    function calculateTotalPropertyCost() {
+        const totalWithGST = getTotalPropertyCostValue();
     
         const gstDisplay = document.getElementById('gstDisplay');
         if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
@@ -57,19 +70,21 @@ document.addEventListener('DOMContentLoaded', function() {
         return row;
     }
 
-// --- MILESTONE ROW CREATOR ---
+    // --- MILESTONE ROW CREATOR ---
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
     const milestoneBody = document.getElementById('milestoneBody');
 
-    function createMilestoneRow() {
+    function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPartOfLoan = true) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><input type="text" class="milestone-name" placeholder="e.g. Plinth"></td>
-            <td><input type="date" class="milestone-date"></td>
+            <td><input type="text" class="milestone-name" value="${name}" placeholder="e.g. Plinth"></td>
+            <td><input type="date" class="milestone-date" value="${date}"></td>
+            <td><input type="number" class="milestone-pct" value="${pct}" placeholder="%"></td>
+            <td><input type="number" class="milestone-loan-amount" value="${loanAmt}" placeholder="₹"></td>
+            <td style="text-align: center;"><input type="checkbox" class="part-of-loan-check" ${isPartOfLoan ? 'checked' : ''}></td>
             <td class="milestone-actions" style="overflow: visible;">
                 <button type="button" class="btn-dots">⋮</button>
                 <div class="action-menu" style="display: none;">
-                    <button type="button" class="btn-edit">Edit</button>
                     <button type="button" class="btn-duplicate">Duplicate</button>
                     <button type="button" class="btn-menu-delete">Delete</button>
                 </div>
@@ -78,19 +93,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const dotsBtn = row.querySelector('.btn-dots');
         const menu = row.querySelector('.action-menu');
+        const pctInput = row.querySelector('.milestone-pct');
+        const loanAmtInput = row.querySelector('.milestone-loan-amount');
+        const checkInput = row.querySelector('.part-of-loan-check');
+
+        function updateLoanAmountFromPct() {
+            if (!checkInput.checked) {
+                loanAmtInput.value = 0;
+                loanAmtInput.disabled = true;
+            } else {
+                loanAmtInput.disabled = false;
+                const pct = parseFloat(pctInput.value) || 0;
+                const totalCost = getTotalPropertyCostValue();
+                if (pct > 0 && totalCost > 0 && !loanAmtInput.dataset.manual) {
+                    loanAmtInput.value = Math.round((pct / 100) * totalCost);
+                }
+            }
+        }
+
+        // Initialize state
+        updateLoanAmountFromPct();
+
+        pctInput.addEventListener('input', () => {
+            loanAmtInput.dataset.manual = ''; // Reset manual flag on pct change
+            updateLoanAmountFromPct();
+            runCalculation();
+        });
+
+        checkInput.addEventListener('change', () => {
+            updateLoanAmountFromPct();
+            runCalculation();
+        });
+
+        loanAmtInput.addEventListener('input', () => {
+            loanAmtInput.dataset.manual = 'true';
+            runCalculation();
+        });
 
         // Toggle menu
         dotsBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevents document click from immediately closing it
-        
-        // 1. Close all other open menus
-        document.querySelectorAll('.action-menu').forEach(m => {
-            if (m !== menu) m.style.display = 'none';
+            e.stopPropagation();
+            document.querySelectorAll('.action-menu').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
         });
-        
-        // 2. Toggle the current menu
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    });
 
         // Delete Logic
         row.querySelector('.btn-menu-delete').addEventListener('click', () => {
@@ -100,9 +147,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Duplicate Logic
         row.querySelector('.btn-duplicate').addEventListener('click', () => {
-            const newRow = createMilestoneRow();
-            newRow.querySelector('.milestone-name').value = row.querySelector('.milestone-name').value;
-            newRow.querySelector('.milestone-date').value = row.querySelector('.milestone-date').value;
+            const newRow = createMilestoneRow(
+                row.querySelector('.milestone-name').value,
+                row.querySelector('.milestone-date').value,
+                pctInput.value,
+                loanAmtInput.value,
+                checkInput.checked
+            );
             milestoneBody.appendChild(newRow);
             menu.style.display = 'none';
             runCalculation();
@@ -110,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         row.addEventListener('input', runCalculation);
         milestoneBody.appendChild(row);
+        return row;
     }
 
     // --- BUTTON LOGIC ---
@@ -148,26 +200,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function runCalculation() {
         if (!basicCost) return;
 
-        let extraChargesTotal = 0;
-        document.querySelectorAll('.charge-row').forEach(row => {
-            const amountInput = row.querySelector('.charge-amount');
-            const addToCost = row.querySelector('.add-to-cost-check');
-            if (amountInput && addToCost && addToCost.checked) {
-                extraChargesTotal += parseFloat(amountInput.value) || 0;
-            }
-        });
-
-        const basic = parseFloat(basicCost.value) || 0;
-        const finalBasic = basic + extraChargesTotal;
+        const totalWithGST = getTotalPropertyCostValue();
+        const totalPropCost = document.getElementById('totalPropertyCost');
+        if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
         
         // 1. Collect Milestones
         const milestoneRows = document.querySelectorAll('#milestoneBody tr');
         const milestones = Array.from(milestoneRows).map(row => ({
             name: row.querySelector('.milestone-name').value,
-            date: row.querySelector('.milestone-date').value
+            date: row.querySelector('.milestone-date').value,
+            pct: parseFloat(row.querySelector('.milestone-pct').value) || 0,
+            loanAmount: parseFloat(row.querySelector('.milestone-loan-amount').value) || 0,
+            isPartOfLoan: row.querySelector('.part-of-loan-check').checked
         })).filter(m => m.date !== '');
 
-        // 2. Call Engine for Moratorium (Safeguarded against empty start dates)
+        // 2. Call Engine for Moratorium
         const loanStartDateVal = document.getElementById('loanStartDate').value;
         if (typeof FinanceEngine !== 'undefined' && loanStartDateVal) {
             const moroEndDate = FinanceEngine.LoanEngine.getMoratoriumEndDate(
@@ -176,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 parseFloat(document.getElementById('customMoroMonths').value) || 0,
                 milestones
             );
-            // You can log or use moroEndDate here
         }
 
         // 3. Loan Data
@@ -189,10 +235,6 @@ document.addEventListener('DOMContentLoaded', function() {
             moroType: document.querySelector('input[name="moroType"]:checked').value,
             customMoroMonths: parseFloat(document.getElementById('customMoroMonths').value) || 0
         };
-
-        const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
-        const totalPropCost = document.getElementById('totalPropertyCost');
-        if (totalPropCost) totalPropCost.innerText = `₹${Math.round(finalBasic + gstAmount).toLocaleString()}`;
 
         if (!tableBody) return;
         const rows = document.querySelectorAll('#transactionBody tr');
@@ -218,21 +260,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleMoratoriumUI() {
-    const isCustom = document.querySelector('input[name="moroType"]:checked').value === 'custom';
-    const customInput = document.getElementById('customMoroMonths');
-    customInput.disabled = !isCustom;
-    if (!isCustom) customInput.value = ''; // Clear if not selected
-}
-// Add this to the change listener for radios:
-document.querySelectorAll('input[name="moroType"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        handleMoratoriumUI();
-        runCalculation();
+        const isCustom = document.querySelector('input[name="moroType"]:checked').value === 'custom';
+        const customInput = document.getElementById('customMoroMonths');
+        customInput.disabled = !isCustom;
+        if (!isCustom) customInput.value = '';
+    }
+
+    document.querySelectorAll('input[name="moroType"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            handleMoratoriumUI();
+            runCalculation();
+        });
     });
-});
+
     // --- CONSOLIDATED LISTENERS ---
-    
-    // 1. Add listeners for all numeric and date inputs
     const allInputs = [
         'loanAmount', 'interestRate', 'tenureYears', 
         'loanStartDate', 'emiStartDate', 'customMoroMonths'
@@ -242,26 +283,14 @@ document.querySelectorAll('input[name="moroType"]').forEach(radio => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', runCalculation);
     });
-
-    // 2. Listener for radio buttons (updates UI and runs calculation)
-    document.querySelectorAll('input[name="moroType"]').forEach(radio => {
-        radio.addEventListener('change', () => {
-            handleMoratoriumUI();
-            runCalculation();
-        });
-    });
     
-    // 3. Button listeners
     if(addBtn) addBtn.addEventListener('click', () => addRow());
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
 
-    // 4. Initialize UI state on page load
     handleMoratoriumUI();
     updateBasicCost();
 
-    // Close action menus when clicking outside
-        document.addEventListener('click', (e) => {
-        // If the click is NOT on a dots button, close all menus
+    document.addEventListener('click', (e) => {
         if (!e.target.matches('.btn-dots')) {
             document.querySelectorAll('.action-menu').forEach(menu => {
                 menu.style.display = 'none';
