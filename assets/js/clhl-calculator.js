@@ -350,4 +350,49 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+    // ==========================================================================
+    // --- NEW: UNSAVED CHANGES & SECURE SAVE GUARD LOGIC ---
+    // ==========================================================================
+    let hasUnsavedChanges = false;
+
+    // Flag changes on inputs/selects
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('input', () => {
+            hasUnsavedChanges = true;
+            const dot = document.getElementById('unsavedDot');
+            if (dot) dot.style.display = 'block';
+        });
+    });
+
+    // Handle click on bottom-right save button
+    const floatingSaveBtn = document.getElementById('floatingSaveBtn');
+    if (floatingSaveBtn) {
+        floatingSaveBtn.addEventListener('click', async () => {
+            if (typeof window.supabaseClient === 'undefined') return;
+
+            const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+            
+            if (userError || !user) {
+                alert("Oops, we don't know who you are, can you please sign in with your account so that we know where to put your numbers? 🏠✍️");
+                return;
+            }
+
+            // Call your database saving routine here...
+            // await saveCalculatorDataToSupabase();
+
+            hasUnsavedChanges = false;
+            const dot = document.getElementById('unsavedDot');
+            if (dot) dot.style.display = 'none';
+        });
+    }
+
+    // Tab close / navigation warning
+    window.addEventListener('beforeunload', (e) => {
+        if (hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = 'Hold on! You have typed in some brilliant numbers but haven’t saved them to your database yet. Do you want to leave and lose them?';
+            return e.returnValue;
+        }
+    });
+
 });
