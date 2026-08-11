@@ -81,6 +81,19 @@ permalink: /calculators/clhl/
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.4;">
                 💡 <strong>Note:</strong> Loan Amount auto-calculates from the Milestone % and your property value. Adjust it manually if your bank's disbursement differs. Uncheck <strong>"Part of Loan"</strong> for cash-paid milestones (e.g., booking/down payments) to exclude them from the loan plan.
             </p>
+
+            <!-- 👉 ADD THE TOTALS BAR HERE -->
+            <div class="milestone-totals-bar" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-offset); padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border-base); margin-bottom: 15px;">
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Total Milestone %: </span>
+                    <strong id="totalMilestonePct" style="font-family: 'JetBrains Mono', monospace;">0%</strong>
+                </div>
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Total Milestone Loan: </span>
+                    <strong id="totalMilestoneLoan" style="font-family: 'JetBrains Mono', monospace;">₹ 0</strong>
+                </div>
+            </div>
+
             <div class="table-wrapper">
                 <table class="milestone-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
