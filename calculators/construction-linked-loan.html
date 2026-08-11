@@ -423,11 +423,17 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
     /* ==========================================================================
    BOTTOM-RIGHT FLOATING SAVE ICON & TOOLTIP
    ========================================================================== */
+/* Container holding your calculator grid */
+.calculator-card-container {
+    position: relative; /* Acts as the boundary */
+}
+
 .bottom-right-save-wrapper {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 9999;
+    position: sticky; /* Stays in view as you scroll within the container bounds */
+    float: right;     /* Pulls it neatly to the right side */
+    bottom: 30px;     /* Sticks 30px above the bottom of the screen when scrolling */
+    margin-right: -20px; /* Fine-tunes alignment to match your circled area */
+    z-index: 50;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -435,8 +441,8 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
 
 .br-save-btn {
     position: relative;
-    width: 52px;
-    height: 52px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     background-color: var(--brand-primary, #2563eb);
     color: #ffffff;
@@ -444,9 +450,9 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     opacity: 0.4; /* Semi-transparent by default */
     transition: all 0.3s ease;
 }
@@ -454,16 +460,16 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
 .bottom-right-save-wrapper:hover .br-save-btn {
     opacity: 1; /* Fully opaque on hover */
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .save-tooltip {
     background: var(--bg-container);
     color: var(--text-primary);
-    padding: 8px 14px;
-    border-radius: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
     border: 1.5px solid var(--border-base);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     white-space: nowrap;
@@ -480,14 +486,13 @@ input[readonly] { background-color: var(--bg-offset) !important; cursor: not-all
     transform: translateX(0);
 }
 
-/* Unsaved changes indicator dot */
 .unsaved-dot {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 12px;
-    height: 12px;
-    background-color: #f59e0b; /* Amber warning dot */
+    top: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background-color: #f59e0b;
     border: 2px solid var(--bg-container);
     border-radius: 50%;
 }
