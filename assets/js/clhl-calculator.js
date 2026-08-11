@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const ltv = (parseFloat(ltvRatioInput ? ltvRatioInput.value : 80) || 100) / 100;
                 
                 if (pct > 0 && totalCost > 0 && !loanAmtInput.dataset.manual) {
-                    loanAmtInput.value = Math.round((pct / 100) * totalCost * ltv);
+                    loanAmtInput.value = Math.round((pct / 100) * totalCost);
                 }
             }
         }
