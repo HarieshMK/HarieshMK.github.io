@@ -244,6 +244,21 @@ document.addEventListener('DOMContentLoaded', function() {
             isPartOfLoan: row.querySelector('.part-of-loan-check').checked
         })).filter(m => m.date !== '');
 
+        // Loan amount disbursed calculation:
+        let cumulativePct = 0;
+        let cumulativeLoanAmt = 0;
+        milestones.forEach(m => {
+            cumulativePct += m.pct;
+            if (m.isPartOfLoan) {
+                cumulativeLoanAmt += m.loanAmount;
+            }
+        });
+
+        const totalPctEl = document.getElementById('totalMilestonePct');
+        const totalLoanEl = document.getElementById('totalMilestoneLoan');
+        if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
+        if (totalLoanEl) totalLoanEl.innerText = `₹${Math.round(cumulativeLoanAmt).toLocaleString()}`;
+
         const loanStartDateVal = document.getElementById('loanStartDate').value;
         if (typeof FinanceEngine !== 'undefined' && loanStartDateVal) {
             const moroEndDate = FinanceEngine.LoanEngine.getMoratoriumEndDate(
