@@ -341,8 +341,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if(addBtn) addBtn.addEventListener('click', () => addRow());
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
 
-    handleMoratoriumUI();
-    updateBasicCost();
+        handleMoratoriumUI();
+        updateBasicCost();
+        loadCalculatorDataFromSupabase();
 
     document.addEventListener('click', (e) => {
         if (!e.target.matches('.btn-dots')) {
@@ -493,4 +494,74 @@ async function saveCalculatorDataToSupabase() {
     }
 
     alert('Calculator progress successfully saved! 🚀');
+}
+// Add this function near your other Supabase logic
+async function loadCalculatorDataFromSupabase() {
+    const activeSupabase = window.supabaseClient || window.supabase;
+    if (!activeSupabase) return;
+
+    const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
+    if (userError || !user) return;
+
+    // 1. Fetch Profile Data
+    const { data: profiles, error: profileError } = await activeSupabase
+        .from('clhl_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .limit(1);
+
+    if (profileError || !profiles || profiles.length === 0) return;
+    const profile = profiles[0];
+
+    // Populate Profile Fields Safely
+    const setValue = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== null && val !== undefined) el.value = val;
+    };
+
+    setValue('superArea', profile.super_area);
+    setValue('pricePerSqft', profile.price_per_sqft);
+    setValue('ltvRatio', profile.ltv_ratio);
+    setValue('loanAmount', profile.loan_amount);
+    setValue('interestRate', profile.interest_rate);
+    setValue('tenureYears', profile.tenure_years);
+    setValue('loanStartDate', profile.loan_start_date);
+    setValue('emiStartDate', profile.emi_start_date);
+    setValue('customMoroMonths', profile.custom_moro_months);
+
+    if (profile.moro_type) {
+        const radio = document.querySelector(`input[name="moroType"][value="${profile.moro_type}"]`);
+        if (radio) {
+            radio.checked = true;
+            handleMoratoriumUI();
+        }
+    }
+
+    // Trigger basic cost calculation update with loaded values
+    updateBasicCost();
+
+    // 2. Fetch Milestones Data
+    const { data: milestones, error: milestoneError } = await activeSupabase
+        .from('clhl_milestones')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .order('sort_order', { ascending: true });
+
+    if (!milestoneError && milestones && milestones.length > 0) {
+        const milestoneBody = document.getElementById('milestoneBody');
+        if (milestoneBody) {
+            milestoneBody.innerHTML = ''; // Clear default rows
+            milestones.forEach(m => {
+                createMilestoneRow(
+                    m.milestone_name, 
+                    m.milestone_date, 
+                    m.milestone_pct, 
+                    m.loan_amount, 
+                    m.is_part_of_loan
+                );
+            });
+        }
+    }
+
+    runCalculation();
 }
