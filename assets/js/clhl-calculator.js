@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    
+        
     // --- PART 1: PROPERTY ASSET MANAGER ---
     const superArea = document.getElementById('superArea');
     const pricePerSqft = document.getElementById('pricePerSqft');
@@ -34,6 +34,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalWithGST = getTotalPropertyCostValue();
     
         const gstDisplay = document.getElementById('gstDisplay');
+        // Fixed gstAmount scoping variable reference safety
+        const basic = parseFloat(basicCost?.value) || 0;
+        let extraChargesTotal = 0;
+        document.querySelectorAll('.charge-row').forEach(row => {
+            const amountInput = row.querySelector('.charge-amount');
+            const addToCost = row.querySelector('.add-to-cost-check');
+            if (amountInput && addToCost && addToCost.checked) {
+                extraChargesTotal += parseFloat(amountInput.value) || 0;
+            }
+        });
+        const finalBasic = basic + extraChargesTotal;
+        const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
+
         if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
         
         const totalPropCost = document.getElementById('totalPropertyCost');
@@ -255,7 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const milestoneDate = new Date(mData.date);
                 milestoneDate.setHours(0, 0, 0, 0);
 
-                // Apply date condition to BOTH if you only want past/today's progress
                 if (milestoneDate <= today) {
                     cumulativePct += mData.pct; 
                     cumulativeLoanAmt += mData.loanAmount; 
@@ -264,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return mData;
         }).filter(m => m.date !== '');
 
-        // Update the display elements in your UI (Single declaration block)
         const totalPctEl = document.getElementById('totalMilestonePct');
         const totalLoanEl = document.getElementById('totalMilestoneLoan');
         if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
@@ -272,23 +283,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const loanStartDateVal = document.getElementById('loanStartDate').value;
         if (typeof FinanceEngine !== 'undefined' && loanStartDateVal) {
-            const moroEndDate = FinanceEngine.LoanEngine.getMoratoriumEndDate(
+            FinanceEngine.LoanEngine.getMoratoriumEndDate(
                 loanStartDateVal,
                 document.querySelector('input[name="moroType"]:checked').value,
                 parseFloat(document.getElementById('customMoroMonths').value) || 0,
                 milestones
             );
         }
-
-        const loanData = {
-            amount: parseFloat(loanAmountInput.value) || 0,
-            rate: parseFloat(document.getElementById('interestRate').value) || 0,
-            tenure: parseFloat(document.getElementById('tenureYears').value) || 0,
-            startDate: loanStartDateVal,
-            emiDate: document.getElementById('emiStartDate').value,
-            moroType: document.querySelector('input[name="moroType"]:checked').value,
-            customMoroMonths: parseFloat(document.getElementById('customMoroMonths').value) || 0
-        };
 
         if (!tableBody) return;
         const rows = document.querySelectorAll('#transactionBody tr');
@@ -350,12 +351,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
     // ==========================================================================
-    // --- NEW: UNSAVED CHANGES & SECURE SAVE GUARD LOGIC ---
+    // --- UNSAVED CHANGES & SECURE SAVE GUARD LOGIC ---
     // ==========================================================================
     let hasUnsavedChanges = false;
 
-    // Flag changes on inputs/selects
     document.querySelectorAll('input, select').forEach(input => {
         input.addEventListener('input', () => {
             hasUnsavedChanges = true;
@@ -364,7 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle click on bottom-right save button
     const floatingSaveBtn = document.getElementById('floatingSaveBtn');
     if (floatingSaveBtn) {
         floatingSaveBtn.addEventListener('click', async () => {
@@ -377,8 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Call your database saving routine here...
-            // await saveCalculatorDataToSupabase();
+            await saveCalculatorDataToSupabase();
 
             hasUnsavedChanges = false;
             const dot = document.getElementById('unsavedDot');
@@ -386,7 +385,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Tab close / navigation warning
     window.addEventListener('beforeunload', (e) => {
         if (hasUnsavedChanges) {
             e.preventDefault();
@@ -396,3 +394,98 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
+
+async function saveCalculatorDataToSupabase() {
+    if (typeof window.supabaseClient === 'undefined') {
+        alert("Supabase client not found!");
+        return;
+    }
+
+    const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+    
+    if (userError || !user) {
+        alert("Please sign in first so we know where to save your data! 🏠✍️");
+        return;
+    }
+
+    const profilePayload = {
+        user_id: user.id,
+        profile_name: 'My Property Loan',
+        super_area: parseFloat(document.getElementById('superArea')?.value) || null,
+        price_per_sqft: parseFloat(document.getElementById('pricePerSqft')?.value) || null,
+        ltv_ratio: parseFloat(document.getElementById('ltvRatio')?.value) || 80,
+        loan_amount: parseFloat(document.getElementById('loanAmount')?.value) || null,
+        interest_rate: parseFloat(document.getElementById('interestRate')?.value) || null,
+        tenure_years: parseInt(document.getElementById('tenureYears')?.value) || null,
+        loan_start_date: document.getElementById('loanStartDate')?.value || null,
+        emi_start_date: document.getElementById('emiStartDate')?.value || null,
+        moro_type: document.querySelector('input[name="moroType"]:checked')?.value || '18',
+        custom_moro_months: parseInt(document.getElementById('customMoroMonths')?.value) || null,
+        updated_at: new Date().toISOString()
+    };
+
+    let { data: existingProfiles } = await window.supabaseClient
+        .from('clhl_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+
+    let profileId;
+
+    if (existingProfiles && existingProfiles.length > 0) {
+        profileId = existingProfiles[0].id;
+        
+        const { error: updateError } = await window.supabaseClient
+            .from('clhl_profiles')
+            .update(profilePayload)
+            .eq('id', profileId);
+
+        if (updateError) {
+            console.error('Error updating profile:', updateError);
+            alert('Failed to save profile data.');
+            return;
+        }
+    } else {
+        const { data: newProfile, error: insertError } = await window.supabaseClient
+            .from('clhl_profiles')
+            .insert([profilePayload])
+            .select('id')
+            .single();
+
+        if (insertError) {
+            console.error('Error inserting profile:', insertError);
+            alert('Failed to create profile data.');
+            return;
+        }
+        profileId = newProfile.id;
+    }
+
+    await window.supabaseClient
+        .from('clhl_milestones')
+        .delete()
+        .eq('profile_id', profileId);
+
+    const milestoneRows = document.querySelectorAll('#milestoneBody tr');
+    const milestonesPayload = Array.from(milestoneRows).map((row, index) => ({
+        profile_id: profileId,
+        milestone_name: row.querySelector('.milestone-name')?.value || '',
+        milestone_date: row.querySelector('.milestone-date')?.value || null,
+        milestone_pct: parseFloat(row.querySelector('.milestone-pct')?.value) || 0,
+        loan_amount: parseFloat(row.querySelector('.milestone-loan-amount')?.value) || 0,
+        is_part_of_loan: row.querySelector('.part-of-loan-check')?.checked ?? true,
+        sort_order: index,
+        updated_at: new Date().toISOString()
+    })).filter(m => m.milestone_name || m.milestone_date);
+
+    if (milestonesPayload.length > 0) {
+        const { error: milestoneError } = await window.supabaseClient
+            .from('clhl_milestones')
+            .insert(milestonesPayload);
+
+        if (milestoneError) {
+            console.error('Error saving milestones:', milestoneError);
+        }
+    }
+
+    alert('Calculator progress successfully saved! 🚀');
+}
