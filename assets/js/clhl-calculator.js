@@ -368,9 +368,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const floatingSaveBtn = document.getElementById('floatingSaveBtn');
     if (floatingSaveBtn) {
         floatingSaveBtn.addEventListener('click', async () => {
-            if (typeof window.supabaseClient === 'undefined') return;
+            const activeSupabase = window.supabaseClient || window.supabase;
+            if (!activeSupabase) {
+                alert("Supabase client not found!");
+                return;
+            }
 
-            const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+            const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
             
             if (userError || !user) {
                 alert("Oops, we don't know who you are, can you please sign in with your account so that we know where to put your numbers? 🏠✍️");
@@ -396,12 +400,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function saveCalculatorDataToSupabase() {
-    if (typeof window.supabaseClient === 'undefined') {
+    const activeSupabase = window.supabaseClient || window.supabase;
+    if (!activeSupabase) {
         alert("Supabase client not found!");
         return;
     }
 
-    const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+    const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
     
     if (userError || !user) {
         alert("Please sign in first so we know where to save your data! 🏠✍️");
@@ -424,7 +429,7 @@ async function saveCalculatorDataToSupabase() {
         updated_at: new Date().toISOString()
     };
 
-    let { data: existingProfiles } = await window.supabaseClient
+    let { data: existingProfiles } = await activeSupabase
         .from('clhl_profiles')
         .select('id')
         .eq('user_id', user.id)
@@ -435,7 +440,7 @@ async function saveCalculatorDataToSupabase() {
     if (existingProfiles && existingProfiles.length > 0) {
         profileId = existingProfiles[0].id;
         
-        const { error: updateError } = await window.supabaseClient
+        const { error: updateError } = await activeSupabase
             .from('clhl_profiles')
             .update(profilePayload)
             .eq('id', profileId);
@@ -446,7 +451,7 @@ async function saveCalculatorDataToSupabase() {
             return;
         }
     } else {
-        const { data: newProfile, error: insertError } = await window.supabaseClient
+        const { data: newProfile, error: insertError } = await activeSupabase
             .from('clhl_profiles')
             .insert([profilePayload])
             .select('id')
@@ -460,7 +465,7 @@ async function saveCalculatorDataToSupabase() {
         profileId = newProfile.id;
     }
 
-    await window.supabaseClient
+    await activeSupabase
         .from('clhl_milestones')
         .delete()
         .eq('profile_id', profileId);
@@ -478,7 +483,7 @@ async function saveCalculatorDataToSupabase() {
     })).filter(m => m.milestone_name || m.milestone_date);
 
     if (milestonesPayload.length > 0) {
-        const { error: milestoneError } = await window.supabaseClient
+        const { error: milestoneError } = await activeSupabase
             .from('clhl_milestones')
             .insert(milestonesPayload);
 
