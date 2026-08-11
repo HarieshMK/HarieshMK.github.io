@@ -137,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 loanAmtInput.disabled = false;
                 const pct = parseFloat(pctInput.value) || 0;
                 const totalCost = getTotalPropertyCostValue();
-                const ltv = (parseFloat(ltvRatioInput ? ltvRatioInput.value : 80) || 100) / 100;
                 
                 if (pct > 0 && totalCost > 0 && !loanAmtInput.dataset.manual) {
                     loanAmtInput.value = Math.round((pct / 100) * totalCost);
@@ -240,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let cumulativePct = 0;
         let cumulativeLoanAmt = 0;
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize time for accurate date comparison
+        today.setHours(0, 0, 0, 0);
 
         const milestones = Array.from(milestoneRows).map(row => {
             const dateVal = row.querySelector('.milestone-date').value;
@@ -252,26 +251,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 isPartOfLoan: row.querySelector('.part-of-loan-check').checked
             };
 
-            // Check if date is valid, part of loan, and has already occurred (<= today)
             if (mData.date && mData.isPartOfLoan) {
-                cumulativePct += mData.pct; // Add to total percentage tracker
+                cumulativePct += mData.pct;
                 
                 const milestoneDate = new Date(mData.date);
                 milestoneDate.setHours(0, 0, 0, 0);
 
                 if (milestoneDate <= today) {
-                    cumulativeLoanAmt += mData.loanAmount; // Only add if milestone date has passed or is today!
+                    cumulativeLoanAmt += mData.loanAmount;
                 }
             }
             return mData;
         }).filter(m => m.date !== '');
 
-        // Update the display elements in your UI
-        const totalPctEl = document.getElementById('totalMilestonePct');
-        const totalLoanEl = document.getElementById('totalMilestoneLoan');
-        if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
-        if (totalLoanEl) totalLoanEl.innerText = `₹${Math.round(cumulativeLoanAmt).toLocaleString()}`;
-
+        // Update the display elements in your UI (Single declaration block)
         const totalPctEl = document.getElementById('totalMilestonePct');
         const totalLoanEl = document.getElementById('totalMilestoneLoan');
         if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
