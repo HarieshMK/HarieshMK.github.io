@@ -252,13 +252,13 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             if (mData.date && mData.isPartOfLoan) {
-                cumulativePct += mData.pct;
-                
                 const milestoneDate = new Date(mData.date);
                 milestoneDate.setHours(0, 0, 0, 0);
 
+                // Apply date condition to BOTH if you only want past/today's progress
                 if (milestoneDate <= today) {
-                    cumulativeLoanAmt += mData.loanAmount;
+                    cumulativePct += mData.pct; 
+                    cumulativeLoanAmt += mData.loanAmount; 
                 }
             }
             return mData;
