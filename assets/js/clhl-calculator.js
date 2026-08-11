@@ -235,24 +235,42 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalPropCost = document.getElementById('totalPropertyCost');
         if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
         
+        // Collect and Filter Milestones based on Today's Date & Loan Check
         const milestoneRows = document.querySelectorAll('#milestoneBody tr');
-        const milestones = Array.from(milestoneRows).map(row => ({
-            name: row.querySelector('.milestone-name').value,
-            date: row.querySelector('.milestone-date').value,
-            pct: parseFloat(row.querySelector('.milestone-pct').value) || 0,
-            loanAmount: parseFloat(row.querySelector('.milestone-loan-amount').value) || 0,
-            isPartOfLoan: row.querySelector('.part-of-loan-check').checked
-        })).filter(m => m.date !== '');
-
-        // Loan amount disbursed calculation:
         let cumulativePct = 0;
         let cumulativeLoanAmt = 0;
-        milestones.forEach(m => {
-            cumulativePct += m.pct;
-            if (m.isPartOfLoan) {
-                cumulativeLoanAmt += m.loanAmount;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize time for accurate date comparison
+
+        const milestones = Array.from(milestoneRows).map(row => {
+            const dateVal = row.querySelector('.milestone-date').value;
+            const mData = {
+                name: row.querySelector('.milestone-name').value,
+                date: dateVal,
+                pct: parseFloat(row.querySelector('.milestone-pct').value) || 0,
+                loanAmount: parseFloat(row.querySelector('.milestone-loan-amount').value) || 0,
+                isPartOfLoan: row.querySelector('.part-of-loan-check').checked
+            };
+
+            // Check if date is valid, part of loan, and has already occurred (<= today)
+            if (mData.date && mData.isPartOfLoan) {
+                cumulativePct += mData.pct; // Add to total percentage tracker
+                
+                const milestoneDate = new Date(mData.date);
+                milestoneDate.setHours(0, 0, 0, 0);
+
+                if (milestoneDate <= today) {
+                    cumulativeLoanAmt += mData.loanAmount; // Only add if milestone date has passed or is today!
+                }
             }
-        });
+            return mData;
+        }).filter(m => m.date !== '');
+
+        // Update the display elements in your UI
+        const totalPctEl = document.getElementById('totalMilestonePct');
+        const totalLoanEl = document.getElementById('totalMilestoneLoan');
+        if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
+        if (totalLoanEl) totalLoanEl.innerText = `₹${Math.round(cumulativeLoanAmt).toLocaleString()}`;
 
         const totalPctEl = document.getElementById('totalMilestonePct');
         const totalLoanEl = document.getElementById('totalMilestoneLoan');
