@@ -400,7 +400,6 @@ function runCalculation() {
         if (moroTypeChecked.value === 'custom') {
             moratoriumMonths = parseInt(customMoroMonthsVal) || 0;
         } else if (moroTypeChecked.value === 'milestone') {
-            // Find the last milestone date relative to loan start date
             if (milestones.length > 0 && loanStartDateVal) {
                 const sortedMilestones = [...milestones].sort((a, b) => new Date(a.date) - new Date(b.date));
                 const lastMDate = new Date(sortedMilestones[sortedMilestones.length - 1].date);
@@ -463,15 +462,16 @@ function runCalculation() {
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
         const ymStr = currentMonthDate.toISOString().substring(0, 7);
         
-        // Milestone VLOOKUP addition to opening balance
+        // Milestone disbursement for this specific month index
         const milestoneDisbursement = getMilestoneDisbursementForMonth(ymStr);
+
+        // Explicit opening balance logic for Month 1 vs Subsequent Months
         if (monthIdx === 1) {
-            // First month base loan amount or initial milestones
-            const initialLoanInput = parseFloat(document.getElementById('loanAmount')?.value) || 0;
-            openingBalance = initialLoanInput + milestoneDisbursement;
+            // Month 1 starts strictly with total loan amount disbursed up to today based on milestones
+            openingBalance = cumulativeLoanAmt;
         } else {
-            // Opening balance = previous closing balance + current month milestone disbursement
-            // Note: closing balance of previous loop iteration is carried over here
+            // Subsequent months carry over previous closing balance + any new milestone disbursement for this month
+            openingBalance = openingBalance + milestoneDisbursement;
         }
 
         // Accrued Interest Calculation
@@ -481,7 +481,6 @@ function runCalculation() {
         let benchmarkEmi = accruedInterest;
         if (!isPreEmi) {
             if (!fullEmiCalculated) {
-                // Calculate full standard amortization EMI based on remaining principal and remaining months
                 const remainingTenureMonths = totalMonths - monthIdx + 1;
                 if (monthlyRate > 0) {
                     fullEmiCache = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
@@ -491,7 +490,7 @@ function runCalculation() {
                 fullEmiCalculated = true;
             }
             benchmarkEmi = fullEmiCache;
-            accruedInterest = openingBalance * monthlyRate; // Keep track of pure accrued interest for the month
+            accruedInterest = openingBalance * monthlyRate; 
         }
 
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
@@ -501,7 +500,7 @@ function runCalculation() {
         const row = document.createElement('tr');
         row.dataset.month = monthIdx;
 
-        const isShortfall = parseFloat(userPlannedEmiStr) < Math.round(isPreEmi ? accruedInterest : accruedInterest); // Compare against required interest/EMI component
+        const isShortfall = parseFloat(userPlannedEmiStr) < Math.round(accruedInterest);
 
         row.innerHTML = `
             <td class="col-left">M${monthIdx} (${ymStr})</td>
@@ -519,21 +518,18 @@ function runCalculation() {
 
         const inputEl = row.querySelector('.planned-emi-input');
         
-        // Calculate breakdown for this row
         const plannedEmiVal = parseFloat(inputEl.value) || 0;
         let principalPaid = 0;
-        let partPayment = 0;
 
         if (isPreEmi) {
             if (plannedEmiVal >= accruedInterest) {
                 const extra = plannedEmiVal - accruedInterest;
-                principalPaid = extra; // Goes to principal reduction during pre-emi if paid in excess
+                principalPaid = extra; 
             } else {
                 const shortfall = accruedInterest - plannedEmiVal;
                 cumulativeUnpaidInterest += shortfall;
             }
         } else {
-            // Full EMI period: Interest component is accruedInterest, rest goes to principal
             const interestComponent = accruedInterest;
             const principalComponent = Math.max(0, plannedEmiVal - interestComponent);
             if (plannedEmiVal < interestComponent) {
@@ -547,30 +543,23 @@ function runCalculation() {
 
         let closingBalance = openingBalance - principalPaid;
         
-        // Update cells
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
-        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`; // Displaying reference part payment
+        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
 
-        // Listen for live updates on user planned EMI input
         inputEl.addEventListener('input', () => {
-            runCalculation(); // Re-run to update subsequent month opening balances and summary cards
+            runCalculation(); 
         });
 
         // Advance month date by 1 month for next loop iteration
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
         openingBalance = Math.max(0, closingBalance);
-
-        // Add next month's milestone disbursement if any
-        const nextYmStr = currentMonthDate.toISOString().substring(0, 7);
-        openingBalance += getMilestoneDisbursementForMonth(nextYmStr);
     }
 
     // Update summary card metrics
     const closingPrincipalEl = document.getElementById('closingPrincipal');
     const unpaidInterestEl = document.getElementById('unpaidInterest');
     
-    // Find final row closing balance
     const finalRow = loanPlanBody.lastElementChild;
     const finalClosingBal = finalRow ? parseFloat(finalRow.querySelector('.closing-balance-cell').innerText.replace(/[₹,]/g, '')) || 0 : 0;
 
