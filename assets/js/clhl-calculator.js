@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- PART 2: LEDGER ---
     const addBtn = document.getElementById('addRowBtn');
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
+    const applyRangeBtn = document.getElementById('applyRangeBtn');
 
     document.querySelectorAll('input[name="moroType"]').forEach(radio => {
         radio.addEventListener('change', () => {
@@ -61,6 +62,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if(addBtn) addBtn.addEventListener('click', () => addRow());
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
+    if(applyRangeBtn) {
+        applyRangeBtn.addEventListener('click', () => {
+            const startM = parseInt(document.getElementById('fillStartMonth')?.value) || 1;
+            const endM = parseInt(document.getElementById('fillEndMonth')?.value) || 360;
+            const emiVal = parseFloat(document.getElementById('fillEmiAmount')?.value) || 0;
+
+            document.querySelectorAll('#loanPlanBody tr').forEach(row => {
+                const mNum = parseInt(row.dataset.month);
+                if (mNum >= startM && mNum <= endM) {
+                    const input = row.querySelector('.planned-emi-input');
+                    if (input) {
+                        input.value = emiVal;
+                    }
+                }
+            });
+            runCalculation();
+        });
+    }
 
     handleMoratoriumUI();
     updateBasicCost();
@@ -375,37 +394,188 @@ function runCalculation() {
     const moroTypeChecked = document.querySelector('input[name="moroType"]:checked');
     const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
     
-    if (typeof FinanceEngine !== 'undefined' && loanStartDateVal && moroTypeChecked) {
-        FinanceEngine.LoanEngine.getMoratoriumEndDate(
-            loanStartDateVal,
-            moroTypeChecked.value,
-            parseFloat(customMoroMonthsVal) || 0,
-            milestones
-        );
+    // Determine Moratorium Duration in Months
+    let moratoriumMonths = 18; // default
+    if (moroTypeChecked) {
+        if (moroTypeChecked.value === 'custom') {
+            moratoriumMonths = parseInt(customMoroMonthsVal) || 0;
+        } else if (moroTypeChecked.value === 'milestone') {
+            // Find the last milestone date relative to loan start date
+            if (milestones.length > 0 && loanStartDateVal) {
+                const sortedMilestones = [...milestones].sort((a, b) => new Date(a.date) - new Date(b.date));
+                const lastMDate = new Date(sortedMilestones[sortedMilestones.length - 1].date);
+                const startD = new Date(loanStartDateVal);
+                const diffTime = lastMDate - startD;
+                const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44));
+                moratoriumMonths = Math.max(0, diffMonths);
+            } else {
+                moratoriumMonths = 0;
+            }
+        } else {
+            moratoriumMonths = parseInt(moroTypeChecked.value) || 18;
+        }
     }
-
-    const tableBody = document.getElementById('transactionBody');
-    if (!tableBody) return;
-    const rows = document.querySelectorAll('#transactionBody tr');
-    const transactions = Array.from(rows).map(row => ({
-        date: row.querySelector('.trans-date').value,
-        type: row.querySelector('.trans-type').value,
-        amount: parseFloat(row.querySelector('.trans-amount').value) || 0
-    })).filter(t => t.date && t.amount > 0);
 
     const interestEl = document.getElementById('interestRate');
     const annualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
+    const monthlyRate = annualRate / 12 / 100;
+    const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
+    const totalMonths = tenureYears * 12;
 
-    if (transactions.length > 0 && annualRate > 0 && typeof FinanceEngine !== 'undefined') {
-        const results = FinanceEngine.LoanEngine.calculateCLHL(transactions, annualRate);
-        const last = results[results.length - 1];
+    const loanPlanBody = document.getElementById('loanPlanBody');
+    if (!loanPlanBody) return;
 
-        const closingPrincipal = document.getElementById('closingPrincipal');
-        const unpaidInterest = document.getElementById('unpaidInterest');
-            
-        if (closingPrincipal) closingPrincipal.innerText = `₹${Math.round(last.principal).toLocaleString()}`;
-        if (unpaidInterest) unpaidInterest.innerText = `₹${Math.round(last.interest).toLocaleString()}`;
+    // Save existing user inputs from the plan table before re-rendering
+    const existingPlannedEmis = {};
+    loanPlanBody.querySelectorAll('tr').forEach(row => {
+        const mNum = row.dataset.month;
+        const input = row.querySelector('.planned-emi-input');
+        if (mNum && input && input.value !== '') {
+            existingPlannedEmis[mNum] = input.value;
+        }
+    });
+
+    loanPlanBody.innerHTML = '';
+
+    let openingBalance = 0;
+    let cumulativeUnpaidInterest = 0;
+    let fullEmiCache = 0;
+    let fullEmiCalculated = false;
+
+    // Helper to get disbursements falling into a given month (YYYY-MM)
+    function getMilestoneDisbursementForMonth(yearMonthStr) {
+        let addedAmt = 0;
+        milestones.forEach(m => {
+            if (m.date && m.isPartOfLoan) {
+                const mYm = m.date.substring(0, 7); // YYYY-MM
+                if (mYm === yearMonthStr) {
+                    addedAmt += m.loanAmount;
+                }
+            }
+        });
+        return addedAmt;
     }
+
+    // Determine starting date object
+    let currentMonthDate = loanStartDateVal ? new Date(loanStartDateVal) : new Date();
+    currentMonthDate.setDate(1);
+
+    for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
+        const ymStr = currentMonthDate.toISOString().substring(0, 7);
+        
+        // Milestone VLOOKUP addition to opening balance
+        const milestoneDisbursement = getMilestoneDisbursementForMonth(ymStr);
+        if (monthIdx === 1) {
+            // First month base loan amount or initial milestones
+            const initialLoanInput = parseFloat(document.getElementById('loanAmount')?.value) || 0;
+            openingBalance = initialLoanInput + milestoneDisbursement;
+        } else {
+            // Opening balance = previous closing balance + current month milestone disbursement
+            // Note: closing balance of previous loop iteration is carried over here
+        }
+
+        // Accrued Interest Calculation
+        let accruedInterest = openingBalance * monthlyRate;
+        let isPreEmi = monthIdx <= moratoriumMonths;
+
+        let benchmarkEmi = accruedInterest;
+        if (!isPreEmi) {
+            if (!fullEmiCalculated) {
+                // Calculate full standard amortization EMI based on remaining principal and remaining months
+                const remainingTenureMonths = totalMonths - monthIdx + 1;
+                if (monthlyRate > 0) {
+                    fullEmiCache = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                } else {
+                    fullEmiCache = openingBalance / remainingTenureMonths;
+                }
+                fullEmiCalculated = true;
+            }
+            benchmarkEmi = fullEmiCache;
+            accruedInterest = openingBalance * monthlyRate; // Keep track of pure accrued interest for the month
+        }
+
+        const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
+        const userPlannedEmiStr = existingPlannedEmis[monthIdx] !== undefined ? existingPlannedEmis[monthIdx] : defaultPlannedEmi;
+
+        // Create table row
+        const row = document.createElement('tr');
+        row.dataset.month = monthIdx;
+
+        const isShortfall = parseFloat(userPlannedEmiStr) < Math.round(isPreEmi ? accruedInterest : accruedInterest); // Compare against required interest/EMI component
+
+        row.innerHTML = `
+            <td class="col-left">M${monthIdx} (${ymStr})</td>
+            <td class="col-right">₹${Math.round(openingBalance).toLocaleString()}</td>
+            <td class="col-right">₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span></td>
+            <td class="col-right">
+                <input type="number" class="planned-emi-input ${isShortfall ? 'shortfall-highlight' : ''}" value="${userPlannedEmiStr}" placeholder="₹">
+            </td>
+            <td class="col-right principal-paid-cell">₹0</td>
+            <td class="col-right part-payment-cell">₹0</td>
+            <td class="col-right closing-balance-cell">₹0</td>
+        `;
+
+        loanPlanBody.appendChild(row);
+
+        const inputEl = row.querySelector('.planned-emi-input');
+        
+        // Calculate breakdown for this row
+        const plannedEmiVal = parseFloat(inputEl.value) || 0;
+        let principalPaid = 0;
+        let partPayment = 0;
+
+        if (isPreEmi) {
+            if (plannedEmiVal >= accruedInterest) {
+                const extra = plannedEmiVal - accruedInterest;
+                principalPaid = extra; // Goes to principal reduction during pre-emi if paid in excess
+            } else {
+                const shortfall = accruedInterest - plannedEmiVal;
+                cumulativeUnpaidInterest += shortfall;
+            }
+        } else {
+            // Full EMI period: Interest component is accruedInterest, rest goes to principal
+            const interestComponent = accruedInterest;
+            const principalComponent = Math.max(0, plannedEmiVal - interestComponent);
+            if (plannedEmiVal < interestComponent) {
+                const shortfall = interestComponent - plannedEmiVal;
+                cumulativeUnpaidInterest += shortfall;
+                principalPaid = 0;
+            } else {
+                principalPaid = principalComponent;
+            }
+        }
+
+        let closingBalance = openingBalance - principalPaid;
+        
+        // Update cells
+        row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
+        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`; // Displaying reference part payment
+        row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
+
+        // Listen for live updates on user planned EMI input
+        inputEl.addEventListener('input', () => {
+            runCalculation(); // Re-run to update subsequent month opening balances and summary cards
+        });
+
+        // Advance month date by 1 month for next loop iteration
+        currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
+        openingBalance = Math.max(0, closingBalance);
+
+        // Add next month's milestone disbursement if any
+        const nextYmStr = currentMonthDate.toISOString().substring(0, 7);
+        openingBalance += getMilestoneDisbursementForMonth(nextYmStr);
+    }
+
+    // Update summary card metrics
+    const closingPrincipalEl = document.getElementById('closingPrincipal');
+    const unpaidInterestEl = document.getElementById('unpaidInterest');
+    
+    // Find final row closing balance
+    const finalRow = loanPlanBody.lastElementChild;
+    const finalClosingBal = finalRow ? parseFloat(finalRow.querySelector('.closing-balance-cell').innerText.replace(/[₹,]/g, '')) || 0 : 0;
+
+    if (closingPrincipalEl) closingPrincipalEl.innerText = `₹${Math.round(finalClosingBal).toLocaleString()}`;
+    if (unpaidInterestEl) unpaidInterestEl.innerText = `₹${Math.round(cumulativeUnpaidInterest).toLocaleString()}`;
 }
 
 function handleMoratoriumUI() {
