@@ -486,6 +486,7 @@ async function saveCalculatorDataToSupabase() {
         profileId = newProfile.id;
     }
 
+    // 1. Save Milestones
     await activeSupabase
         .from('clhl_milestones')
         .delete()
@@ -510,6 +511,32 @@ async function saveCalculatorDataToSupabase() {
 
         if (milestoneError) {
             console.error('Error saving milestones:', milestoneError);
+        }
+    }
+
+    // 2. Save Extra Charges
+    await activeSupabase
+        .from('clhl_extra_charges')
+        .delete()
+        .eq('profile_id', profileId);
+
+    const chargeRows = document.querySelectorAll('#extraChargesContainer .charge-row');
+    const chargesPayload = Array.from(chargeRows).map((row, index) => ({
+        profile_id: profileId,
+        charge_name: row.querySelector('.charge-name')?.value || '',
+        charge_amount: parseFloat(row.querySelector('.charge-amount')?.value) || 0,
+        add_to_cost: row.querySelector('.add-to-cost-check')?.checked ?? true,
+        sort_order: index,
+        updated_at: new Date().toISOString()
+    })).filter(c => c.charge_name || c.charge_amount > 0);
+
+    if (chargesPayload.length > 0) {
+        const { error: chargeError } = await activeSupabase
+            .from('clhl_extra_charges')
+            .insert(chargesPayload);
+
+        if (chargeError) {
+            console.error('Error saving extra charges:', chargeError);
         }
     }
 
@@ -590,6 +617,28 @@ async function loadCalculatorDataFromSupabase() {
 
     updateBasicCost();
 
+    // 1. Load Extra Charges
+    console.log("TRACE [7.5]: Fetching extra charges...");
+    const { data: charges, error: chargeError } = await activeSupabase
+        .from('clhl_extra_charges')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .order('sort_order', { ascending: true });
+
+    if (!chargeError && charges && charges.length > 0) {
+        const container = document.getElementById('extraChargesContainer');
+        if (container) {
+            container.innerHTML = ''; 
+            charges.forEach(c => {
+                const row = createRow(c.charge_name, c.charge_amount, false);
+                const check = row.querySelector('.add-to-cost-check');
+                if (check) check.checked = c.add_to_cost;
+                container.appendChild(row);
+            });
+        }
+    }
+
+    // 2. Load Milestones
     console.log("TRACE [8]: Fetching milestones...");
     const { data: milestones, error: milestoneError } = await activeSupabase
         .from('clhl_milestones')
@@ -621,7 +670,6 @@ async function loadCalculatorDataFromSupabase() {
 }
 
 function hideLoader() {
-    // Change selector to match whatever ID your loading screen uses in HTML
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
     loaders.forEach(loader => {
         loader.style.display = 'none';
