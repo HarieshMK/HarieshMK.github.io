@@ -517,19 +517,52 @@ async function saveCalculatorDataToSupabase() {
 }
 
 async function loadCalculatorDataFromSupabase() {
+    console.log("TRACE [1]: Starting loadCalculatorDataFromSupabase...");
+    
     const activeSupabase = window.supabaseClient || window.supabase;
-    if (!activeSupabase) return;
+    if (!activeSupabase) {
+        console.error("TRACE ERROR: Supabase client not found.");
+        hideLoader();
+        return;
+    }
 
+    console.log("TRACE [2]: Fetching user auth...");
     const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
-    if (userError || !user) return;
+    
+    if (userError) {
+        console.error("TRACE ERROR: User auth error:", userError);
+        hideLoader();
+        return;
+    }
+    
+    if (!user) {
+        console.log("TRACE [3]: No user logged in. Aborting load.");
+        hideLoader();
+        return;
+    }
 
+    console.log("TRACE [4]: User found:", user.id);
+
+    console.log("TRACE [5]: Fetching profiles from DB...");
     const { data: profiles, error: profileError } = await activeSupabase
         .from('clhl_profiles')
         .select('*')
         .eq('user_id', user.id)
         .limit(1);
 
-    if (profileError || !profiles || profiles.length === 0) return;
+    if (profileError) {
+        console.error("TRACE ERROR fetching profiles:", profileError);
+        hideLoader();
+        return;
+    }
+
+    if (!profiles || profiles.length === 0) {
+        console.log("TRACE [6]: No profiles found for user.");
+        hideLoader();
+        return;
+    }
+
+    console.log("TRACE [7]: Profile loaded successfully:", profiles[0]);
     const profile = profiles[0];
 
     const setValue = (id, val) => {
@@ -557,13 +590,16 @@ async function loadCalculatorDataFromSupabase() {
 
     updateBasicCost();
 
+    console.log("TRACE [8]: Fetching milestones...");
     const { data: milestones, error: milestoneError } = await activeSupabase
         .from('clhl_milestones')
         .select('*')
         .eq('profile_id', profile.id)
         .order('sort_order', { ascending: true });
 
-    if (!milestoneError && milestones && milestones.length > 0) {
+    if (milestoneError) {
+        console.error("TRACE ERROR fetching milestones:", milestoneError);
+    } else if (milestones && milestones.length > 0) {
         const milestoneBody = document.getElementById('milestoneBody');
         if (milestoneBody) {
             milestoneBody.innerHTML = ''; 
@@ -580,4 +616,15 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     runCalculation();
+    console.log("TRACE [9]: Load complete. Hiding loader.");
+    hideLoader();
+}
+
+function hideLoader() {
+    // Change selector to match whatever ID your loading screen uses in HTML
+    const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
+    loaders.forEach(loader => {
+        loader.style.display = 'none';
+        console.log("Hidden loader element:", loader.id || loader.className);
+    });
 }
