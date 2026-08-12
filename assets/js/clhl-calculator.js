@@ -307,19 +307,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const last = results[results.length - 1];
 
             const closingPrincipal = document.getElementById('closingPrincipal');
-            const unpaidInterest = document.getElementById('unpaidInterest');
-
-            if (closingPrincipal) closingPrincipal.innerText = `₹${Math.round(last.principal).toLocaleString()}`;
-            if (unpaidInterest) unpaidInterest.innerText = `₹${Math.round(last.interest).toLocaleString()}`;
+                const unpaidInterest = document.getElementById('unpaidInterest');
+                
+                if (closingPrincipal) closingPrincipal.innerText = `₹${Math.round(last.principal).toLocaleString()}`;
+                if (unpaidInterest) unpaidInterest.innerText = `₹${Math.round(last.interest).toLocaleString()}`;
         }
     }
 
-    function handleMoratoriumUI() {
-        const isCustom = document.querySelector('input[name="moroType"]:checked').value === 'custom';
-        const customInput = document.getElementById('customMoroMonths');
-        customInput.disabled = !isCustom;
-        if (!isCustom) customInput.value = '';
-    }
 
     document.querySelectorAll('input[name="moroType"]').forEach(radio => {
         radio.addEventListener('change', () => {
@@ -353,42 +347,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ==========================================================================
-    // --- UNSAVED CHANGES & SECURE SAVE GUARD LOGIC ---
-    // ==========================================================================
-    let hasUnsavedChanges = false;
+// --- UNSAVED CHANGES & SECURE SAVE GUARD LOGIC ---
+let hasUnsavedChanges = false;
 
-    document.querySelectorAll('input, select').forEach(input => {
-        input.addEventListener('input', () => {
-            hasUnsavedChanges = true;
-            const dot = document.getElementById('unsavedDot');
-            if (dot) dot.style.display = 'block';
-        });
-    });
+// Event delegation: listens to inputs anywhere on the page, even newly added rows
+document.addEventListener('input', (e) => {
+    if (e.target.matches('input, select')) {
+        hasUnsavedChanges = true;
+        const dot = document.getElementById('unsavedDot');
+        if (dot) dot.style.display = 'block';
+    }
+});
 
     const floatingSaveBtn = document.getElementById('floatingSaveBtn');
     if (floatingSaveBtn) {
-        floatingSaveBtn.addEventListener('click', async () => {
-            const activeSupabase = window.supabaseClient || window.supabase;
-            if (!activeSupabase) {
-                alert("Supabase client not found!");
-                return;
-            }
+    floatingSaveBtn.addEventListener('click', async () => {
+        const activeSupabase = window.supabaseClient || window.supabase;
+        if (!activeSupabase) {
+            alert("Supabase client not found!");
+            return;
+        }
 
-            const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
-            
-            if (userError || !user) {
-                alert("Oops, we don't know who you are, can you please sign in with your account so that we know where to put your numbers? 🏠✍️");
-                return;
-            }
+        const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
+        
+        if (userError || !user) {
+            alert("Oops, we don't know who you are, can you please sign in with your account so that we know where to put your numbers? 🏠✍️");
+            return;
+        }
 
+        // Disable button to prevent double-clicks
+        floatingSaveBtn.disabled = true;
+        const originalText = floatingSaveBtn.innerText;
+        floatingSaveBtn.innerText = "Saving...";
+
+        try {
             await saveCalculatorDataToSupabase();
-
             hasUnsavedChanges = false;
             const dot = document.getElementById('unsavedDot');
             if (dot) dot.style.display = 'none';
-        });
-    }
+        } finally {
+            // Re-enable button
+            floatingSaveBtn.disabled = false;
+            floatingSaveBtn.innerText = originalText;
+        }
+    });
+}
 
     window.addEventListener('beforeunload', (e) => {
         if (hasUnsavedChanges) {
@@ -399,6 +402,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
+
+function handleMoratoriumUI() {
+    const moroTypeRadio = document.querySelector('input[name="moroType"]:checked');
+    if (!moroTypeRadio) return;
+    
+    const isCustom = moroTypeRadio.value === 'custom';
+    const customInput = document.getElementById('customMoroMonths');
+    if (customInput) {
+        customInput.disabled = !isCustom;
+        if (!isCustom) customInput.value = '';
+    }
+}
 
 async function saveCalculatorDataToSupabase() {
     const activeSupabase = window.supabaseClient || window.supabase;
@@ -540,6 +555,7 @@ async function loadCalculatorDataFromSupabase() {
     // Trigger basic cost calculation update with loaded values
     updateBasicCost();
 
+    // 2. Fetch Milestones Data
     // 2. Fetch Milestones Data
     const { data: milestones, error: milestoneError } = await activeSupabase
         .from('clhl_milestones')
