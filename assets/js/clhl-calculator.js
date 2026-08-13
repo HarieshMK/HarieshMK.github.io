@@ -135,24 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-            // 3. Save Custom Planned EMIs
-    await activeSupabase
-        .from('clhl_planned_emis')
-        .delete()
-        .eq('profile_id', profileId);
-
-
-    if (plannedEmisPayload.length > 0) {
-        const { error: emiError } = await activeSupabase
-            .from('clhl_planned_emis')
-            .insert(plannedEmisPayload);
-
-        if (emiError) {
-            console.error('Error saving planned EMIs:', emiError);
-        }
-    }
-        });
-    }
 
     window.addEventListener('beforeunload', (e) => {
         if (hasUnsavedChanges) {
@@ -557,7 +539,7 @@ function runCalculation() {
             const inputEl = row.querySelector('.planned-emi-input');
             inputEl.value = userPlannedEmiStr;
             
-            // UPDATE THIS LISTENER: Instantly cache what user types so re-renders don't wipe it
+            // Instantly cache what user types so re-renders don't wipe it
             inputEl.addEventListener('input', (e) => {
                 if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
                 window.loadedPlannedEmis[monthIdx] = e.target.value;
@@ -756,7 +738,12 @@ async function saveCalculatorDataToSupabase() {
         }
     }
 
-    // 3. Save Custom Planned EMIs (NOW PROPERLY INSIDE THE FUNCTION WITH profileId)
+    // 3. Save Custom Planned EMIs
+    await activeSupabase
+        .from('clhl_planned_emis')
+        .delete()
+        .eq('profile_id', profileId);
+
     const loanPlanRows = document.querySelectorAll('#loanPlanBody tr');
     const plannedEmisPayload = [];
 
@@ -772,11 +759,6 @@ async function saveCalculatorDataToSupabase() {
             });
         }
     });
-
-    await activeSupabase
-        .from('clhl_planned_emis')
-        .delete()
-        .eq('profile_id', profileId);
 
     if (plannedEmisPayload.length > 0) {
         const { error: emiError } = await activeSupabase
