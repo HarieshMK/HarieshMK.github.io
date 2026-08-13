@@ -77,6 +77,33 @@ document.addEventListener('DOMContentLoaded', function() {
             runCalculation();
         });
     }
+    // --- SYNC ALL TO STANDARD SCHEDULE BUTTON ---
+    const syncDefaultEmisBtn = document.getElementById('syncDefaultEmisBtn');
+    if (syncDefaultEmisBtn) {
+        syncDefaultEmisBtn.addEventListener('click', () => {
+            const interestEl = document.getElementById('interestRate');
+            const annualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
+            const monthlyRate = annualRate / 12 / 100;
+            const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
+            const totalMonths = tenureYears * 12;
+            const rows = document.querySelectorAll('#loanPlanBody tr');
+            if (rows.length === 0) return;
+            window.loadedPlannedEmis = {};
+
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                const inputEl = row.querySelector('.planned-emi-input');
+                const defaultText = row.children[2].innerText;
+                const cleanVal = parseFloat(defaultText.replace(/[₹,]/g, '')) || 0;
+                if (inputEl) {
+                    inputEl.value = cleanVal;
+                    window.loadedPlannedEmis[monthIdx] = cleanVal;
+                }
+            });
+
+            runCalculation();
+        });
+    }
 
     handleMoratoriumUI();
     updateBasicCost();
