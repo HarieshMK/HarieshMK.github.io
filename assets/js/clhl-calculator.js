@@ -133,6 +133,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 floatingSaveBtn.disabled = false;
                 floatingSaveBtn.innerText = originalText;
             }
+            // 3. Save Custom Planned EMIs
+    await activeSupabase
+        .from('clhl_planned_emis')
+        .delete()
+        .eq('profile_id', profileId);
+
+
+    if (plannedEmisPayload.length > 0) {
+        const { error: emiError } = await activeSupabase
+            .from('clhl_planned_emis')
+            .insert(plannedEmisPayload);
+
+        if (emiError) {
+            console.error('Error saving planned EMIs:', emiError);
+        }
+    }
         });
     }
 
@@ -729,9 +745,40 @@ async function saveCalculatorDataToSupabase() {
         }
     }
 
+    // 3. Save Custom Planned EMIs (Safely nested inside the function with profileId available)
+    const loanPlanRows = document.querySelectorAll('#loanPlanBody tr');
+    const plannedEmisPayload = [];
+
+    loanPlanRows.forEach(row => {
+        const monthIdx = parseInt(row.dataset.month);
+        const inputEl = row.querySelector('.planned-emi-input');
+        if (monthIdx && inputEl && inputEl.value !== '') {
+            plannedEmisPayload.push({
+                profile_id: profileId,
+                month_index: monthIdx,
+                planned_emi: parseFloat(inputEl.value) || 0,
+                updated_at: new Date().toISOString()
+            });
+        }
+    });
+
+    if (plannedEmisPayload.length > 0) {
+        await activeSupabase
+            .from('clhl_planned_emis')
+            .delete()
+            .eq('profile_id', profileId);
+
+        const { error: emiError } = await activeSupabase
+            .from('clhl_planned_emis')
+            .insert(plannedEmisPayload);
+
+        if (emiError) {
+            console.error('Error saving planned EMIs:', emiError);
+        }
+    }
+
     alert('Calculator progress successfully saved! 🚀');
 }
-
 async function loadCalculatorDataFromSupabase() {
     console.log("TRACE [1]: Starting loadCalculatorDataFromSupabase...");
     
@@ -851,6 +898,25 @@ async function loadCalculatorDataFromSupabase() {
                 );
             });
         }
+    }
+    // 3. Load Custom Planned EMIs
+    console.log("TRACE [9]: Fetching planned EMIs...");
+    const { data: savedEmis, error: emiError } = await activeSupabase
+        .from('clhl_planned_emis')
+        .select('*')
+        .eq('profile_id', profile.id);
+
+    if (!emiError && savedEmis && savedEmis.length > 0) {
+        // Build a temporary lookup map: { month_index: planned_emi }
+        const emiMap = {};
+        savedEmis.forEach(item => {
+            emiMap[item.month_index] = item.planned_emi;
+        });
+        
+        // Pass this map or store it globally/locally so runCalculation picks it up when rendering
+        window.loadedPlannedEmis = emiMap;
+    } else {
+        window.loadedPlannedEmis = {};
     }
 
     runCalculation();
