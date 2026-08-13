@@ -783,6 +783,7 @@ async function saveCalculatorDataToSupabase() {
     alert('Data saved successfully!');
 }
 
+
     // 2. Save Extra Charges
     await activeSupabase
         .from('clhl_extra_charges')
