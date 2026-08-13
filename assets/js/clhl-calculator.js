@@ -529,7 +529,7 @@ function runCalculation() {
         let benchmarkEmi = accruedInterest;
         if (!isPreEmi) {
             if (!fullEmiCalculated) {
-                const remainingTenureMonths = totalMonths - monthIdx + 1;
+                const remainingTenureMonths = totalMonths - moratoriumMonths; 
                 if (monthlyRate > 0) {
                     fullEmiCache = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
                 } else {
