@@ -424,17 +424,23 @@ function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (!loanPlanBody) return;
 
-    // Save existing user inputs from the plan table before re-rendering
+    // Check if the table already exists. If it does, we update it in-place instead of clearing it,
+    // which prevents the cursor from losing focus when typing!
+    const existingRows = loanPlanBody.querySelectorAll('tr');
+    const isTableBuilt = existingRows.length === totalMonths;
+
     const existingPlannedEmis = {};
-    loanPlanBody.querySelectorAll('tr').forEach(row => {
+    existingRows.forEach(row => {
         const mNum = row.dataset.month;
         const input = row.querySelector('.planned-emi-input');
-        if (mNum && input && input.value !== '') {
-            existingPlannedEmis[mNum] = input.value;
+        if (mNum && input) {
+            existingPlannedEmis[mNum] = input.value; // Keeps even empty strings intact
         }
     });
 
-    loanPlanBody.innerHTML = '';
+    if (!isTableBuilt) {
+        loanPlanBody.innerHTML = '';
+    }
 
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
@@ -467,10 +473,8 @@ function runCalculation() {
 
         // Explicit opening balance logic for Month 1 vs Subsequent Months
         if (monthIdx === 1) {
-            // Month 1 starts strictly with total loan amount disbursed up to today based on milestones
             openingBalance = cumulativeLoanAmt;
         } else {
-            // Subsequent months carry over previous closing balance + any new milestone disbursement for this month
             openingBalance = openingBalance + milestoneDisbursement;
         }
 
@@ -494,30 +498,52 @@ function runCalculation() {
         }
 
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
-        const userPlannedEmiStr = existingPlannedEmis[monthIdx] !== undefined ? existingPlannedEmis[monthIdx] : defaultPlannedEmi;
+        
+        // Fix: Only fallback to default if it has NEVER been touched (undefined). If it's an empty string, keep it empty.
+        let userPlannedEmiStr = existingPlannedEmis[monthIdx];
+        if (userPlannedEmiStr === undefined) {
+            userPlannedEmiStr = defaultPlannedEmi;
+        }
 
-        // Create table row
-        const row = document.createElement('tr');
-        row.dataset.month = monthIdx;
+        let row;
+        if (isTableBuilt) {
+            row = loanPlanBody.querySelector(`tr[data-month="${monthIdx}"]`);
+        }
 
-        const isShortfall = parseFloat(userPlannedEmiStr) < Math.round(accruedInterest);
+        if (!row) {
+            row = document.createElement('tr');
+            row.dataset.month = monthIdx;
+            row.innerHTML = `
+                <td class="col-left">M${monthIdx} (${ymStr})</td>
+                <td class="col-right"></td>
+                <td class="col-right"></td>
+                <td class="col-right">
+                    <input type="number" class="planned-emi-input" placeholder="₹">
+                </td>
+                <td class="col-right principal-paid-cell">₹0</td>
+                <td class="col-right part-payment-cell">₹0</td>
+                <td class="col-right closing-balance-cell">₹0</td>
+            `;
+            loanPlanBody.appendChild(row);
+            
+            const inputEl = row.querySelector('.planned-emi-input');
+            inputEl.value = userPlannedEmiStr;
+            inputEl.addEventListener('input', () => {
+                runCalculation(); 
+            });
+        }
 
-        row.innerHTML = `
-            <td class="col-left">M${monthIdx} (${ymStr})</td>
-            <td class="col-right">₹${Math.round(openingBalance).toLocaleString()}</td>
-            <td class="col-right">₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span></td>
-            <td class="col-right">
-                <input type="number" class="planned-emi-input ${isShortfall ? 'shortfall-highlight' : ''}" value="${userPlannedEmiStr}" placeholder="₹">
-            </td>
-            <td class="col-right principal-paid-cell">₹0</td>
-            <td class="col-right part-payment-cell">₹0</td>
-            <td class="col-right closing-balance-cell">₹0</td>
-        `;
-
-        loanPlanBody.appendChild(row);
+        // Update row cell text values dynamically without breaking input focus
+        row.children[0].innerText = `M${monthIdx} (${ymStr})`;
+        row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
+        row.children[2].innerHTML = `₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
 
         const inputEl = row.querySelector('.planned-emi-input');
-        
+        // Only update input value programmatically if this specific input is not currently focused by the user
+        if (document.activeElement !== inputEl && inputEl.value !== String(userPlannedEmiStr)) {
+            inputEl.value = userPlannedEmiStr;
+        }
+
         const plannedEmiVal = parseFloat(inputEl.value) || 0;
         let principalPaid = 0;
 
@@ -541,15 +567,14 @@ function runCalculation() {
             }
         }
 
+        const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
+        inputEl.classList.toggle('shortfall-highlight', isShortfall);
+
         let closingBalance = openingBalance - principalPaid;
         
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
-
-        inputEl.addEventListener('input', () => {
-            runCalculation(); 
-        });
 
         // Advance month date by 1 month for next loop iteration
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
