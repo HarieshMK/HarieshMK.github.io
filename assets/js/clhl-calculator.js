@@ -521,8 +521,13 @@ function runCalculation() {
 
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
         
-        let userPlannedEmiStr = existingPlannedEmis[monthIdx];
-        if (userPlannedEmiStr === undefined) {
+        // Check window.loadedPlannedEmis first (from Supabase), then fallback to existing DOM values, then default
+        let userPlannedEmiStr;
+        if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
+            userPlannedEmiStr = window.loadedPlannedEmis[monthIdx];
+        } else if (existingPlannedEmis[monthIdx] !== undefined) {
+            userPlannedEmiStr = existingPlannedEmis[monthIdx];
+        } else {
             userPlannedEmiStr = defaultPlannedEmi;
         }
 
