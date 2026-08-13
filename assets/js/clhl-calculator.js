@@ -466,7 +466,13 @@ function runCalculation() {
     currentMonthDate.setDate(1);
 
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
-        const ymStr = currentMonthDate.toISOString().substring(0, 7);
+        // Format the date nicely (e.g., "Apr '26" or change 'short' to 'long' for "April 2026")
+        const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
+        const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
+        const formattedDate = `${monthName} '${yearShort}`; // e.g., "Apr '26"
+        const displayLabel = `${monthIdx} (${formattedDate})`; // e.g., "1 (Apr '26)"
+
+        const ymStr = currentMonthDate.toISOString().substring(0, 7); // kept for disbursement matching logic
         
         // Milestone disbursement for this specific month index
         const milestoneDisbursement = getMilestoneDisbursementForMonth(ymStr);
@@ -499,7 +505,6 @@ function runCalculation() {
 
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
         
-        // Fix: Only fallback to default if it has NEVER been touched (undefined). If it's an empty string, keep it empty.
         let userPlannedEmiStr = existingPlannedEmis[monthIdx];
         if (userPlannedEmiStr === undefined) {
             userPlannedEmiStr = defaultPlannedEmi;
@@ -514,7 +519,7 @@ function runCalculation() {
             row = document.createElement('tr');
             row.dataset.month = monthIdx;
             row.innerHTML = `
-                <td class="col-left">M${monthIdx} (${ymStr})</td>
+                <td class="col-left">${displayLabel}</td>
                 <td class="col-right"></td>
                 <td class="col-right"></td>
                 <td class="col-right">
@@ -533,8 +538,8 @@ function runCalculation() {
             });
         }
 
-        // Update row cell text values dynamically without breaking input focus
-        row.children[0].innerText = `M${monthIdx} (${ymStr})`;
+        // Update row cell text values dynamically
+        row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
 
