@@ -133,6 +133,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 floatingSaveBtn.disabled = false;
                 floatingSaveBtn.innerText = originalText;
             }
+        });
+    }
             // 3. Save Custom Planned EMIs
     await activeSupabase
         .from('clhl_planned_emis')
@@ -554,7 +556,11 @@ function runCalculation() {
             
             const inputEl = row.querySelector('.planned-emi-input');
             inputEl.value = userPlannedEmiStr;
-            inputEl.addEventListener('input', () => {
+            
+            // UPDATE THIS LISTENER: Instantly cache what user types so re-renders don't wipe it
+            inputEl.addEventListener('input', (e) => {
+                if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+                window.loadedPlannedEmis[monthIdx] = e.target.value;
                 runCalculation(); 
             });
         }
@@ -750,29 +756,29 @@ async function saveCalculatorDataToSupabase() {
         }
     }
 
-    // 3. Save Custom Planned EMIs (Safely nested inside the function with profileId available)
+    // 3. Save Custom Planned EMIs (NOW PROPERLY INSIDE THE FUNCTION WITH profileId)
     const loanPlanRows = document.querySelectorAll('#loanPlanBody tr');
     const plannedEmisPayload = [];
 
     loanPlanRows.forEach(row => {
-        const monthIdx = parseInt(row.dataset.month);
+        const mIdx = parseInt(row.dataset.month);
         const inputEl = row.querySelector('.planned-emi-input');
-        if (monthIdx && inputEl && inputEl.value !== '') {
+        if (mIdx && inputEl && inputEl.value !== '') {
             plannedEmisPayload.push({
                 profile_id: profileId,
-                month_index: monthIdx,
+                month_index: mIdx,
                 planned_emi: parseFloat(inputEl.value) || 0,
                 updated_at: new Date().toISOString()
             });
         }
     });
 
-    if (plannedEmisPayload.length > 0) {
-        await activeSupabase
-            .from('clhl_planned_emis')
-            .delete()
-            .eq('profile_id', profileId);
+    await activeSupabase
+        .from('clhl_planned_emis')
+        .delete()
+        .eq('profile_id', profileId);
 
+    if (plannedEmisPayload.length > 0) {
         const { error: emiError } = await activeSupabase
             .from('clhl_planned_emis')
             .insert(plannedEmisPayload);
@@ -784,6 +790,7 @@ async function saveCalculatorDataToSupabase() {
 
     alert('Calculator progress successfully saved! 🚀');
 }
+
 async function loadCalculatorDataFromSupabase() {
     console.log("TRACE [1]: Starting loadCalculatorDataFromSupabase...");
     
