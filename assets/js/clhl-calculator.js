@@ -93,18 +93,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         undoStack.push(currentState);
         if (undoStack.length > MAX_UNDO_STEPS) {
-            undoStack.shift(); // Drop the oldest state if stack exceeds 10
+            undoStack.shift(); // Drop oldest if stack exceeds 10
         }
         updateUndoButtonUI();
     }
 
     function updateUndoButtonUI() {
-        const undoBtn = document.getElementById('undoBtn');
-        if (undoBtn) {
+        const undoBtnEl = document.getElementById('undoBtn');
+        if (undoBtnEl) {
             const canUndo = undoStack.length > 0;
-            undoBtn.disabled = !canUndo;
-            undoBtn.style.opacity = canUndo ? '1' : '0.5';
-            undoBtn.style.cursor = canUndo ? 'pointer' : 'not-allowed';
+            undoBtnEl.disabled = !canUndo;
+            undoBtnEl.style.opacity = canUndo ? '1' : '0.5';
+            undoBtnEl.style.cursor = canUndo ? 'pointer' : 'not-allowed';
         }
     }
 
@@ -131,11 +131,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 2. Hook "Copy Accrued" Button (Separate Action)
+    // 2. Hook "Copy Accrued" Button
     const copyAccruedBtn = document.getElementById('copyAccruedBtn');
     if (copyAccruedBtn) {
         copyAccruedBtn.addEventListener('click', () => {
-            saveStateToUndoStack(); // Save state before modifying so user can undo it
+            saveStateToUndoStack();
 
             window.loadedPlannedEmis = {};
             window.forceDefaultEmis = true;
@@ -153,11 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Hook Range Fill Button with State Preservation AND Execution Logic
+    // 3. Hook Range Fill Button
     const applyRangeBtn = document.getElementById('applyRangeBtn');
     if (applyRangeBtn) {
         applyRangeBtn.addEventListener('click', () => {
-            saveStateToUndoStack(); // Save state before range fill modifies rows
+            saveStateToUndoStack();
 
             const start = parseInt(document.getElementById('fillStartMonth').value) || 1;
             const end = parseInt(document.getElementById('fillEndMonth').value) || 360;
@@ -177,13 +177,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 4. Track individual manual inputs in the table so Undo captures them
+    // 4. Track individual manual inputs in the table for Undo
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (loanPlanBody) {
         let typingTimeout;
         loanPlanBody.addEventListener('input', (e) => {
             if (e.target.matches('.planned-emi-input')) {
-                // Debounce state saving slightly while typing so every single keystroke doesn't flood the 10-step stack
                 clearTimeout(typingTimeout);
                 typingTimeout = setTimeout(() => {
                     saveStateToUndoStack();
@@ -192,9 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    handleMoratoriumUI();
-    updateBasicCost();
-    loadCalculatorDataFromSupabase();
+    // Initialize remaining components
+    if (typeof handleMoratoriumUI === 'function') handleMoratoriumUI();
+    if (typeof updateBasicCost === 'function') updateBasicCost();
+    if (typeof loadCalculatorDataFromSupabase === 'function') loadCalculatorDataFromSupabase();
 
     document.addEventListener('click', (e) => {
         if (!e.target.matches('.btn-dots')) {
@@ -235,7 +235,9 @@ document.addEventListener('DOMContentLoaded', function() {
             floatingSaveBtn.innerText = "Saving...";
 
             try {
-                await saveCalculatorDataToSupabase();
+                if (typeof saveCalculatorDataToSupabase === 'function') {
+                    await saveCalculatorDataToSupabase();
+                }
                 hasUnsavedChanges = false;
                 const dot = document.getElementById('unsavedDot');
                 if (dot) dot.style.display = 'none';
