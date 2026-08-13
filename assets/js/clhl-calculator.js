@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 
     const superArea = document.getElementById('superArea');
     const pricePerSqft = document.getElementById('pricePerSqft');
@@ -59,25 +59,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if(addBtn) addBtn.addEventListener('click', () => addRow());
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
+    
     if(applyRangeBtn) {
         applyRangeBtn.addEventListener('click', () => {
-            const startM = parseInt(document.getElementById('fillStartMonth')?.value) || 1;
-            const endM = parseInt(document.getElementById('fillEndMonth')?.value) || 360;
-            const emiVal = parseFloat(document.getElementById('fillEmiAmount')?.value) || 0;
+            saveStateToUndoStack();
 
-            document.querySelectorAll('#loanPlanBody tr').forEach(row => {
-                const mNum = parseInt(row.dataset.month);
-                if (mNum >= startM && mNum <= endM) {
-                    const input = row.querySelector('.planned-emi-input');
-                    if (input) {
-                        input.value = emiVal;
+            const start = parseInt(document.getElementById('fillStartMonth')?.value) || 1;
+            const end = parseInt(document.getElementById('fillEndMonth')?.value) || 360;
+            const val = parseFloat(document.getElementById('fillEmiAmount')?.value) || 0;
+
+            const rows = document.querySelectorAll('#loanPlanBody tr');
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                if (monthIdx >= start && monthIdx <= end) {
+                    const inputEl = row.querySelector('.planned-emi-input');
+                    if (inputEl) {
+                        inputEl.value = val;
                     }
                 }
             });
             runCalculation();
         });
     }
- // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
+
+    // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
     let undoStack = [];
     const MAX_UNDO_STEPS = 10;
 
@@ -93,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         undoStack.push(currentState);
         if (undoStack.length > MAX_UNDO_STEPS) {
-            undoStack.shift(); // Drop oldest if stack exceeds 10
+            undoStack.shift(); 
         }
         updateUndoButtonUI();
     }
@@ -153,31 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Hook Range Fill Button
-    const applyRangeBtn = document.getElementById('applyRangeBtn');
-    if (applyRangeBtn) {
-        applyRangeBtn.addEventListener('click', () => {
-            saveStateToUndoStack();
-
-            const start = parseInt(document.getElementById('fillStartMonth').value) || 1;
-            const end = parseInt(document.getElementById('fillEndMonth').value) || 360;
-            const val = parseFloat(document.getElementById('fillEmiAmount').value) || 0;
-
-            const rows = document.querySelectorAll('#loanPlanBody tr');
-            rows.forEach((row, idx) => {
-                const monthIdx = idx + 1;
-                if (monthIdx >= start && monthIdx <= end) {
-                    const inputEl = row.querySelector('.planned-emi-input');
-                    if (inputEl) {
-                        inputEl.value = val;
-                    }
-                }
-            });
-            runCalculation();
-        });
-    }
-
-    // 4. Track individual manual inputs in the table for Undo
+    // 3. Track individual manual inputs in the table for Undo
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (loanPlanBody) {
         let typingTimeout;
@@ -475,13 +456,13 @@ function runCalculation() {
     today.setHours(0, 0, 0, 0);
 
     const milestones = Array.from(milestoneRows).map(row => {
-        const dateVal = row.querySelector('.milestone-date').value;
+        const dateVal = row.querySelector('.milestone-date')?.value || '';
         const mData = {
-            name: row.querySelector('.milestone-name').value,
+            name: row.querySelector('.milestone-name')?.value || '',
             date: dateVal,
-            pct: parseFloat(row.querySelector('.milestone-pct').value) || 0,
-            loanAmount: parseFloat(row.querySelector('.milestone-loan-amount').value) || 0,
-            isPartOfLoan: row.querySelector('.part-of-loan-check').checked
+            pct: parseFloat(row.querySelector('.milestone-pct')?.value) || 0,
+            loanAmount: parseFloat(row.querySelector('.milestone-loan-amount')?.value) || 0,
+            isPartOfLoan: row.querySelector('.part-of-loan-check')?.checked ?? true
         };
 
         if (mData.date && mData.isPartOfLoan) {
@@ -557,7 +538,7 @@ function runCalculation() {
         let addedAmt = 0;
         milestones.forEach(m => {
             if (m.date && m.isPartOfLoan) {
-                const mYm = m.date.substring(0, 7); // YYYY-MM
+                const mYm = m.date.substring(0, 7); 
                 if (mYm === yearMonthStr) {
                     addedAmt += m.loanAmount;
                 }
@@ -603,7 +584,7 @@ function runCalculation() {
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
         let userPlannedEmiStr;
         if (window.forceDefaultEmis) {
-            userPlannedEmiStr = defaultPlannedEmi; // Forces pure unadulterated default
+            userPlannedEmiStr = defaultPlannedEmi; 
         } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
             userPlannedEmiStr = window.loadedPlannedEmis[monthIdx];
         } else if (existingPlannedEmis[monthIdx] !== undefined) {
@@ -778,26 +759,29 @@ async function saveCalculatorDataToSupabase() {
         .eq('profile_id', profileId);
 
     const milestoneRows = document.querySelectorAll('#milestoneBody tr');
-    const milestonesPayload = Array.from(milestoneRows).map((row, index) => ({
+    const milestonesPayload = Array.from(milestoneRows).map((row) => ({
         profile_id: profileId,
         milestone_name: row.querySelector('.milestone-name')?.value || '',
         milestone_date: row.querySelector('.milestone-date')?.value || null,
         milestone_pct: parseFloat(row.querySelector('.milestone-pct')?.value) || 0,
         loan_amount: parseFloat(row.querySelector('.milestone-loan-amount')?.value) || 0,
-        is_part_of_loan: row.querySelector('.part-of-loan-check')?.checked ?? true,
-        sort_order: index,
-        updated_at: new Date().toISOString()
-    })).filter(m => m.milestone_name || m.milestone_date);
+        is_part_of_loan: row.querySelector('.part-of-loan-check')?.checked ?? true
+    }));
 
     if (milestonesPayload.length > 0) {
-        const { error: milestoneError } = await activeSupabase
+        const { error: insertMilestonesError } = await activeSupabase
             .from('clhl_milestones')
             .insert(milestonesPayload);
 
-        if (milestoneError) {
-            console.error('Error saving milestones:', milestoneError);
+        if (insertMilestonesError) {
+            console.error('Error inserting milestones:', insertMilestonesError);
+            alert('Failed to save milestones data.');
+            return;
         }
     }
+
+    alert('Data saved successfully!');
+}
 
     // 2. Save Extra Charges
     await activeSupabase
