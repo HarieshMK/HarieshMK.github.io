@@ -905,29 +905,30 @@ async function loadCalculatorDataFromSupabase() {
         }
     }
     // 3. Load Custom Planned EMIs
-    console.log("TRACE [9]: Fetching planned EMIs...");
+    console.log("TRACE [9]: Fetching planned EMIs for profile_id:", profile.id);
     const { data: savedEmis, error: emiError } = await activeSupabase
         .from('clhl_planned_emis')
         .select('*')
         .eq('profile_id', profile.id);
 
+    console.log("TRACE [9b]: Supabase raw response for savedEmis:", savedEmis);
+    console.log("TRACE [9c]: Supabase emiError (if any):", emiError);
+
     if (!emiError && savedEmis && savedEmis.length > 0) {
-        // Build a temporary lookup map: { month_index: planned_emi }
         const emiMap = {};
         savedEmis.forEach(item => {
             emiMap[item.month_index] = item.planned_emi;
         });
-        
-        // Pass this map or store it globally/locally so runCalculation picks it up when rendering
         window.loadedPlannedEmis = emiMap;
+        console.log("TRACE [9d]: Built loadedPlannedEmis map successfully:", window.loadedPlannedEmis);
     } else {
         window.loadedPlannedEmis = {};
+        console.log("TRACE [9e]: No saved EMIs found or error occurred.");
     }
 
     runCalculation();
     console.log("TRACE [9]: Load complete. Hiding loader.");
     hideLoader();
-}
 
 function hideLoader() {
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
