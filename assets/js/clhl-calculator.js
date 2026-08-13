@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- PART 1: PROPERTY ASSET MANAGER ELEMENT BINDINGS ---
+
     const superArea = document.getElementById('superArea');
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- BUTTON LOGIC ---
     const addChargeBtn = document.getElementById('addChargeBtn');
     const container = document.getElementById('extraChargesContainer');
     
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- PART 2: LEDGER ---
     const addBtn = document.getElementById('addRowBtn');
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
     const applyRangeBtn = document.getElementById('applyRangeBtn');
@@ -93,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- UNSAVED CHANGES & SECURE SAVE GUARD LOGIC ---
     let hasUnsavedChanges = false;
 
     document.addEventListener('input', (e) => {
@@ -145,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// --- GLOBAL UTILITIES & CALCULATION ENGINES ---
 
 function getTotalPropertyCostValue() {
     const basicCost = document.getElementById('basicCost');
@@ -394,8 +389,7 @@ function runCalculation() {
     const moroTypeChecked = document.querySelector('input[name="moroType"]:checked');
     const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
     
-    // Determine Moratorium Duration in Months
-    let moratoriumMonths = 18; // default
+    let moratoriumMonths = 18;
     if (moroTypeChecked) {
         if (moroTypeChecked.value === 'custom') {
             moratoriumMonths = parseInt(customMoroMonthsVal) || 0;
@@ -423,9 +417,6 @@ function runCalculation() {
 
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (!loanPlanBody) return;
-
-    // Check if the table already exists. If it does, we update it in-place instead of clearing it,
-    // which prevents the cursor from losing focus when typing!
     const existingRows = loanPlanBody.querySelectorAll('tr');
     const isTableBuilt = existingRows.length === totalMonths;
 
@@ -434,7 +425,7 @@ function runCalculation() {
         const mNum = row.dataset.month;
         const input = row.querySelector('.planned-emi-input');
         if (mNum && input) {
-            existingPlannedEmis[mNum] = input.value; // Keeps even empty strings intact
+            existingPlannedEmis[mNum] = input.value;
         }
     });
 
@@ -446,8 +437,6 @@ function runCalculation() {
     let cumulativeUnpaidInterest = 0;
     let fullEmiCache = 0;
     let fullEmiCalculated = false;
-
-    // Helper to get disbursements falling into a given month (YYYY-MM)
     function getMilestoneDisbursementForMonth(yearMonthStr) {
         let addedAmt = 0;
         milestones.forEach(m => {
@@ -461,30 +450,22 @@ function runCalculation() {
         return addedAmt;
     }
 
-    // Determine starting date object
     let currentMonthDate = loanStartDateVal ? new Date(loanStartDateVal) : new Date();
     currentMonthDate.setDate(1);
 
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
-        // Format the date nicely (e.g., "Apr '26" or change 'short' to 'long' for "April 2026")
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
-        const formattedDate = `${monthName} '${yearShort}`; // e.g., "Apr '26"
-        const displayLabel = `${monthIdx} (${formattedDate})`; // e.g., "1 (Apr '26)"
+        const formattedDate = `${monthName} '${yearShort}`; 
+        const displayLabel = `${monthIdx} (${formattedDate})`;
 
-        const ymStr = currentMonthDate.toISOString().substring(0, 7); // kept for disbursement matching logic
-        
-        // Milestone disbursement for this specific month index
+        const ymStr = currentMonthDate.toISOString().substring(0, 7);
         const milestoneDisbursement = getMilestoneDisbursementForMonth(ymStr);
-
-        // Explicit opening balance logic for Month 1 vs Subsequent Months
         if (monthIdx === 1) {
             openingBalance = cumulativeLoanAmt;
         } else {
             openingBalance = openingBalance + milestoneDisbursement;
         }
-
-        // Accrued Interest Calculation
         let accruedInterest = openingBalance * monthlyRate;
         let isPreEmi = monthIdx <= moratoriumMonths;
 
@@ -504,8 +485,6 @@ function runCalculation() {
         }
 
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
-        
-        // Check window.loadedPlannedEmis first (from Supabase), then fallback to existing DOM values, then default
         let userPlannedEmiStr;
         if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
             userPlannedEmiStr = window.loadedPlannedEmis[monthIdx];
@@ -538,22 +517,16 @@ function runCalculation() {
             
             const inputEl = row.querySelector('.planned-emi-input');
             inputEl.value = userPlannedEmiStr;
-            
-            // Instantly cache what user types so re-renders don't wipe it
             inputEl.addEventListener('input', (e) => {
                 if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
                 window.loadedPlannedEmis[monthIdx] = e.target.value;
                 runCalculation(); 
             });
         }
-
-        // Update row cell text values dynamically
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
-
         const inputEl = row.querySelector('.planned-emi-input');
-        // Only update input value programmatically if this specific input is not currently focused by the user
         if (document.activeElement !== inputEl && inputEl.value !== String(userPlannedEmiStr)) {
             inputEl.value = userPlannedEmiStr;
         }
@@ -589,13 +562,9 @@ function runCalculation() {
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
-
-        // Advance month date by 1 month for next loop iteration
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
         openingBalance = Math.max(0, closingBalance);
     }
-
-    // Update summary card metrics
     const closingPrincipalEl = document.getElementById('closingPrincipal');
     const unpaidInterestEl = document.getElementById('unpaidInterest');
     
