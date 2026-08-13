@@ -904,6 +904,7 @@ async function loadCalculatorDataFromSupabase() {
             });
         }
     }
+
     // 3. Load Custom Planned EMIs
     console.log("TRACE [9]: Fetching planned EMIs for profile_id:", profile.id);
     const { data: savedEmis, error: emiError } = await activeSupabase
@@ -929,6 +930,7 @@ async function loadCalculatorDataFromSupabase() {
     runCalculation();
     console.log("TRACE [9]: Load complete. Hiding loader.");
     hideLoader();
+}
 
 function hideLoader() {
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
