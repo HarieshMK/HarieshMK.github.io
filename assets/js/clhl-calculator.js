@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
     let undoStack = [];
-    const MAX_UNDO_STEPS = 10;
+    const MAX_UNDO_STEPS = 50;
 
     function saveStateToUndoStack() {
         const currentState = {};
@@ -616,15 +616,18 @@ function runCalculation() {
             
             const inputEl = row.querySelector('.planned-emi-input');
             inputEl.value = userPlannedEmiStr;
+            
+            // ✅ Cleaned up input listener for individual row updates
             inputEl.addEventListener('input', (e) => {
                 if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-                window.loadedPlannedEmis[monthIdx] = e.target.value;
-                runCalculation(); 
+                window.loadedPlannedEmis[monthIdx] = parseFloat(inputEl.value) || 0;
             });
         }
+
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
+        
         const inputEl = row.querySelector('.planned-emi-input');
         if (document.activeElement !== inputEl && inputEl.value !== String(userPlannedEmiStr)) {
             inputEl.value = userPlannedEmiStr;
@@ -661,9 +664,11 @@ function runCalculation() {
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
+        
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
         openingBalance = Math.max(0, closingBalance);
     }
+
     const closingPrincipalEl = document.getElementById('closingPrincipal');
     const unpaidInterestEl = document.getElementById('unpaidInterest');
     
@@ -759,13 +764,14 @@ async function saveCalculatorDataToSupabase() {
         .eq('profile_id', profileId);
 
     const milestoneRows = document.querySelectorAll('#milestoneBody tr');
-    const milestonesPayload = Array.from(milestoneRows).map((row) => ({
+    const milestonesPayload = Array.from(milestoneRows).map((row, index) => ({
         profile_id: profileId,
         milestone_name: row.querySelector('.milestone-name')?.value || '',
         milestone_date: row.querySelector('.milestone-date')?.value || null,
         milestone_pct: parseFloat(row.querySelector('.milestone-pct')?.value) || 0,
         loan_amount: parseFloat(row.querySelector('.milestone-loan-amount')?.value) || 0,
-        is_part_of_loan: row.querySelector('.part-of-loan-check')?.checked ?? true
+        is_part_of_loan: row.querySelector('.part-of-loan-check')?.checked ?? true,
+        sort_order: index
     }));
 
     if (milestonesPayload.length > 0) {
@@ -818,7 +824,7 @@ async function saveCalculatorDataToSupabase() {
     loanPlanRows.forEach(row => {
         const mIdx = parseInt(row.dataset.month);
         const inputEl = row.querySelector('.planned-emi-input');
-        if (mIdx && inputEl && inputEl.value !== '') {
+        if (!isNaN(mIdx) && inputEl && inputEl.value !== '') {
             plannedEmisPayload.push({
                 profile_id: profileId,
                 month_index: mIdx,
@@ -984,6 +990,11 @@ async function loadCalculatorDataFromSupabase() {
     runCalculation();
     console.log("TRACE [9]: Load complete. Hiding loader.");
     hideLoader();
+    if (typeof resetUndoStack === 'function') {
+        resetUndoStack(); // Clears old history and pushes this baseline state
+    } else if (typeof pushState === 'function') {
+        pushState(); 
+    }
 }
 
 function hideLoader() {
