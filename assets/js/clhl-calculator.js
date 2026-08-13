@@ -78,60 +78,49 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     // --- COPY ACCRUED TO PLANNED (WITH TOGGLE/UNDO) ---
+    // --- COPY ACCRUED TO PLANNED (PURE ENGINE SYNC) ---
     const syncDefaultEmisBtn = document.getElementById('syncDefaultEmisBtn');
-    let previousPlannedEmisState = null; // Memory for undo
+    let previousPlannedEmisState = null;
 
     if (syncDefaultEmisBtn) {
         syncDefaultEmisBtn.addEventListener('click', () => {
-            const rows = document.querySelectorAll('#loanPlanBody tr');
-            if (rows.length === 0) return;
-
-            // Check if we are currently synced; if so, clicking it again acts as an UNDO
+            // If already synced, toggle back to previous state (Undo)
             if (syncDefaultEmisBtn.dataset.isSynced === 'true') {
                 if (previousPlannedEmisState) {
                     window.loadedPlannedEmis = { ...previousPlannedEmisState };
-                    rows.forEach((row, idx) => {
-                        const monthIdx = idx + 1;
-                        const inputEl = row.querySelector('.planned-emi-input');
-                        if (inputEl) {
-                            inputEl.value = window.loadedPlannedEmis[monthIdx] !== undefined ? window.loadedPlannedEmis[monthIdx] : '';
-                        }
-                    });
                 }
                 syncDefaultEmisBtn.innerText = '📋 Copy Accrued to Planned';
                 syncDefaultEmisBtn.dataset.isSynced = 'false';
+                window.forceDefaultEmis = false;
                 runCalculation();
                 return;
             }
 
-            // 1. Save current state before overwriting (for Undo)
-            previousPlannedEmisState = {};
-            rows.forEach((row, idx) => {
-                const monthIdx = idx + 1;
-                const inputEl = row.querySelector('.planned-emi-input');
-                if (inputEl) {
-                    previousPlannedEmisState[monthIdx] = inputEl.value;
-                }
-            });
+            // 1. Save current state for Undo
+            previousPlannedEmisState = { ...(window.loadedPlannedEmis || {}) };
 
-            // 2. Perform the Copy/Sync
+            // 2. Clear user overrides and force pure engine defaults
             window.loadedPlannedEmis = {};
+            window.forceDefaultEmis = true; // Tells runCalculation to use pure defaults
+
+            // 3. Run calculation to establish pure baseline
+            runCalculation();
+
+            // 4. Capture those pure generated values into loadedPlannedEmis so they persist
+            const rows = document.querySelectorAll('#loanPlanBody tr');
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
-                const defaultText = row.children[2].innerText;
-                const cleanVal = parseFloat(defaultText.replace(/[₹,]/g, '')) || 0;
                 if (inputEl) {
-                    inputEl.value = cleanVal;
-                    window.loadedPlannedEmis[monthIdx] = cleanVal;
+                    window.loadedPlannedEmis[monthIdx] = parseFloat(inputEl.value) || 0;
                 }
             });
 
-            // Switch button text to indicate undo availability
+            window.forceDefaultEmis = false; // Reset flag
+
+            // Update button UI for Undo
             syncDefaultEmisBtn.innerText = '↩️ Undo / Revert Changes';
             syncDefaultEmisBtn.dataset.isSynced = 'true';
-
-            runCalculation();
         });
     }
 
@@ -543,7 +532,9 @@ function runCalculation() {
 
         const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
         let userPlannedEmiStr;
-        if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
+        if (window.forceDefaultEmis) {
+            userPlannedEmiStr = defaultPlannedEmi; // Forces pure unadulterated default
+        } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
             userPlannedEmiStr = window.loadedPlannedEmis[monthIdx];
         } else if (existingPlannedEmis[monthIdx] !== undefined) {
             userPlannedEmiStr = existingPlannedEmis[monthIdx];
