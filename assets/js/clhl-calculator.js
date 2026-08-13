@@ -780,10 +780,6 @@ async function saveCalculatorDataToSupabase() {
         }
     }
 
-    alert('Data saved successfully!');
-}
-
-
     // 2. Save Extra Charges
     await activeSupabase
         .from('clhl_extra_charges')
@@ -972,9 +968,6 @@ async function loadCalculatorDataFromSupabase() {
         .from('clhl_planned_emis')
         .select('*')
         .eq('profile_id', profile.id);
-
-    console.log("TRACE [9b]: Supabase raw response for savedEmis:", savedEmis);
-    console.log("TRACE [9c]: Supabase emiError (if any):", emiError);
 
     if (!emiError && savedEmis && savedEmis.length > 0) {
         const emiMap = {};
