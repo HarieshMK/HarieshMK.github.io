@@ -77,19 +77,45 @@ document.addEventListener('DOMContentLoaded', function() {
             runCalculation();
         });
     }
-    // --- SYNC ALL TO STANDARD SCHEDULE BUTTON ---
+    // --- COPY ACCRUED TO PLANNED (WITH TOGGLE/UNDO) ---
     const syncDefaultEmisBtn = document.getElementById('syncDefaultEmisBtn');
+    let previousPlannedEmisState = null; // Memory for undo
+
     if (syncDefaultEmisBtn) {
         syncDefaultEmisBtn.addEventListener('click', () => {
-            const interestEl = document.getElementById('interestRate');
-            const annualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
-            const monthlyRate = annualRate / 12 / 100;
-            const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
-            const totalMonths = tenureYears * 12;
             const rows = document.querySelectorAll('#loanPlanBody tr');
             if (rows.length === 0) return;
-            window.loadedPlannedEmis = {};
 
+            // Check if we are currently synced; if so, clicking it again acts as an UNDO
+            if (syncDefaultEmisBtn.dataset.isSynced === 'true') {
+                if (previousPlannedEmisState) {
+                    window.loadedPlannedEmis = { ...previousPlannedEmisState };
+                    rows.forEach((row, idx) => {
+                        const monthIdx = idx + 1;
+                        const inputEl = row.querySelector('.planned-emi-input');
+                        if (inputEl) {
+                            inputEl.value = window.loadedPlannedEmis[monthIdx] !== undefined ? window.loadedPlannedEmis[monthIdx] : '';
+                        }
+                    });
+                }
+                syncDefaultEmisBtn.innerText = '📋 Copy Accrued to Planned';
+                syncDefaultEmisBtn.dataset.isSynced = 'false';
+                runCalculation();
+                return;
+            }
+
+            // 1. Save current state before overwriting (for Undo)
+            previousPlannedEmisState = {};
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                const inputEl = row.querySelector('.planned-emi-input');
+                if (inputEl) {
+                    previousPlannedEmisState[monthIdx] = inputEl.value;
+                }
+            });
+
+            // 2. Perform the Copy/Sync
+            window.loadedPlannedEmis = {};
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
@@ -100,6 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.loadedPlannedEmis[monthIdx] = cleanVal;
                 }
             });
+
+            // Switch button text to indicate undo availability
+            syncDefaultEmisBtn.innerText = '↩️ Undo / Revert Changes';
+            syncDefaultEmisBtn.dataset.isSynced = 'true';
 
             runCalculation();
         });
