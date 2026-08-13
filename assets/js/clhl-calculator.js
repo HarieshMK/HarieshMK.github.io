@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
             runCalculation();
         });
     }
-    // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
+ // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
     let undoStack = [];
     const MAX_UNDO_STEPS = 10;
 
@@ -153,10 +153,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Hook Range Fill Button to support Undo as well
+    // 3. Hook Range Fill Button with State Preservation AND Execution Logic
+    const applyRangeBtn = document.getElementById('applyRangeBtn');
     if (applyRangeBtn) {
         applyRangeBtn.addEventListener('click', () => {
             saveStateToUndoStack(); // Save state before range fill modifies rows
+
+            const start = parseInt(document.getElementById('fillStartMonth').value) || 1;
+            const end = parseInt(document.getElementById('fillEndMonth').value) || 360;
+            const val = parseFloat(document.getElementById('fillEmiAmount').value) || 0;
+
+            const rows = document.querySelectorAll('#loanPlanBody tr');
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                if (monthIdx >= start && monthIdx <= end) {
+                    const inputEl = row.querySelector('.planned-emi-input');
+                    if (inputEl) {
+                        inputEl.value = val;
+                    }
+                }
+            });
+            runCalculation();
+        });
+    }
+
+    // 4. Track individual manual inputs in the table so Undo captures them
+    const loanPlanBody = document.getElementById('loanPlanBody');
+    if (loanPlanBody) {
+        let typingTimeout;
+        loanPlanBody.addEventListener('input', (e) => {
+            if (e.target.matches('.planned-emi-input')) {
+                // Debounce state saving slightly while typing so every single keystroke doesn't flood the 10-step stack
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    saveStateToUndoStack();
+                }, 500);
+            }
         });
     }
 
