@@ -77,36 +77,70 @@ document.addEventListener('DOMContentLoaded', function() {
             runCalculation();
         });
     }
-    // --- COPY ACCRUED TO PLANNED (WITH TOGGLE/UNDO) ---
-    // --- COPY ACCRUED TO PLANNED (PURE ENGINE SYNC) ---
-    const syncDefaultEmisBtn = document.getElementById('syncDefaultEmisBtn');
-    let previousPlannedEmisState = null;
+    // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
+    let undoStack = [];
+    const MAX_UNDO_STEPS = 10;
 
-    if (syncDefaultEmisBtn) {
-        syncDefaultEmisBtn.addEventListener('click', () => {
-            // If already synced, toggle back to previous state (Undo)
-            if (syncDefaultEmisBtn.dataset.isSynced === 'true') {
-                if (previousPlannedEmisState) {
-                    window.loadedPlannedEmis = { ...previousPlannedEmisState };
-                }
-                syncDefaultEmisBtn.innerText = '📋 Copy Accrued to Planned';
-                syncDefaultEmisBtn.dataset.isSynced = 'false';
-                window.forceDefaultEmis = false;
-                runCalculation();
-                return;
+    function saveStateToUndoStack() {
+        const currentState = {};
+        document.querySelectorAll('#loanPlanBody tr').forEach((row, idx) => {
+            const monthIdx = idx + 1;
+            const inputEl = row.querySelector('.planned-emi-input');
+            if (inputEl) {
+                currentState[monthIdx] = inputEl.value;
             }
+        });
+        
+        undoStack.push(currentState);
+        if (undoStack.length > MAX_UNDO_STEPS) {
+            undoStack.shift(); // Drop the oldest state if stack exceeds 10
+        }
+        updateUndoButtonUI();
+    }
 
-            // 1. Save current state for Undo
-            previousPlannedEmisState = { ...(window.loadedPlannedEmis || {}) };
+    function updateUndoButtonUI() {
+        const undoBtn = document.getElementById('undoBtn');
+        if (undoBtn) {
+            const canUndo = undoStack.length > 0;
+            undoBtn.disabled = !canUndo;
+            undoBtn.style.opacity = canUndo ? '1' : '0.5';
+            undoBtn.style.cursor = canUndo ? 'pointer' : 'not-allowed';
+        }
+    }
 
-            // 2. Clear user overrides and force pure engine defaults
+    // 1. Hook Undo Button Click
+    const undoBtn = document.getElementById('undoBtn');
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => {
+            if (undoStack.length === 0) return;
+
+            const previousState = undoStack.pop();
+            window.loadedPlannedEmis = { ...previousState };
+
+            const rows = document.querySelectorAll('#loanPlanBody tr');
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                const inputEl = row.querySelector('.planned-emi-input');
+                if (inputEl) {
+                    inputEl.value = previousState[monthIdx] !== undefined ? previousState[monthIdx] : '';
+                }
+            });
+
+            updateUndoButtonUI();
+            runCalculation();
+        });
+    }
+
+    // 2. Hook "Copy Accrued" Button (Separate Action)
+    const copyAccruedBtn = document.getElementById('copyAccruedBtn');
+    if (copyAccruedBtn) {
+        copyAccruedBtn.addEventListener('click', () => {
+            saveStateToUndoStack(); // Save state before modifying so user can undo it
+
             window.loadedPlannedEmis = {};
-            window.forceDefaultEmis = true; // Tells runCalculation to use pure defaults
-
-            // 3. Run calculation to establish pure baseline
+            window.forceDefaultEmis = true;
             runCalculation();
 
-            // 4. Capture those pure generated values into loadedPlannedEmis so they persist
             const rows = document.querySelectorAll('#loanPlanBody tr');
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
@@ -115,12 +149,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.loadedPlannedEmis[monthIdx] = parseFloat(inputEl.value) || 0;
                 }
             });
+            window.forceDefaultEmis = false;
+        });
+    }
 
-            window.forceDefaultEmis = false; // Reset flag
-
-            // Update button UI for Undo
-            syncDefaultEmisBtn.innerText = '↩️ Undo / Revert Changes';
-            syncDefaultEmisBtn.dataset.isSynced = 'true';
+    // 3. Hook Range Fill Button to support Undo as well
+    if (applyRangeBtn) {
+        applyRangeBtn.addEventListener('click', () => {
+            saveStateToUndoStack(); // Save state before range fill modifies rows
         });
     }
 
