@@ -638,6 +638,7 @@ function runCalculation() {
 
         const plannedEmiVal = parseFloat(inputEl.value) || 0;
         let principalPaid = 0;
+        let capitalizedShortfall = 0;
 
         if (isPreEmi) {
             if (plannedEmiVal >= accruedInterest) {
@@ -645,16 +646,18 @@ function runCalculation() {
                 principalPaid = extra; 
             } else {
                 const shortfall = accruedInterest - plannedEmiVal;
+                capitalizedShortfall = shortfall; // Unpaid interest adds to the principal!
                 cumulativeUnpaidInterest += shortfall;
             }
         } else {
             const interestComponent = accruedInterest;
-            const principalComponent = Math.max(0, plannedEmiVal - interestComponent);
             if (plannedEmiVal < interestComponent) {
                 const shortfall = interestComponent - plannedEmiVal;
+                capitalizedShortfall = shortfall; // Unpaid interest adds to the principal!
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
             } else {
+                const principalComponent = plannedEmiVal - interestComponent;
                 principalPaid = principalComponent;
             }
         }
@@ -662,7 +665,8 @@ function runCalculation() {
         const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
 
-        let closingBalance = openingBalance - principalPaid;
+        // Closing balance = Opening Balance - Principal Paid + Capitalized Unpaid Interest Shortfall
+        let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
         
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
