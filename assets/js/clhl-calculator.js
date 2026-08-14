@@ -69,12 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = parseFloat(document.getElementById('fillEmiAmount')?.value) || 0;
 
             const rows = document.querySelectorAll('#loanPlanBody tr');
+            
+            // Ensure the data store exists
+            if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 if (monthIdx >= start && monthIdx <= end) {
                     const inputEl = row.querySelector('.planned-emi-input');
                     if (inputEl) {
                         inputEl.value = val;
+                        window.loadedPlannedEmis[monthIdx] = val;
                     }
                 }
             });
