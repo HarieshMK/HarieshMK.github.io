@@ -614,13 +614,11 @@ function runCalculation() {
             `;
             loanPlanBody.appendChild(row);
             
-            const inputEl = row.querySelector('.planned-emi-input');
-            inputEl.value = userPlannedEmiStr;
-            
-            // ✅ Cleaned up input listener for individual row updates
-            inputEl.addEventListener('input', (e) => {
+           const inputEl = row.querySelector('.planned-emi-input');
+            inputEl.addEventListener('input', () => {
                 if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
                 window.loadedPlannedEmis[monthIdx] = parseFloat(inputEl.value) || 0;
+                runCalculation();
             });
         }
 
@@ -629,7 +627,7 @@ function runCalculation() {
         row.children[2].innerHTML = `₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
         
         const inputEl = row.querySelector('.planned-emi-input');
-        if (document.activeElement !== inputEl && inputEl.value !== String(userPlannedEmiStr)) {
+        if (document.activeElement !== inputEl) {
             inputEl.value = userPlannedEmiStr;
         }
 
