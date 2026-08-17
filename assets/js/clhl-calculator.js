@@ -565,15 +565,6 @@ function runCalculation() {
     const existingRows = loanPlanBody.querySelectorAll('tr');
     const isTableBuilt = existingRows.length === totalMonths;
 
-    const existingPlannedEmis = {};
-    existingRows.forEach(row => {
-        const mNum = row.dataset.month;
-        const input = row.querySelector('.planned-emi-input');
-        if (mNum && input) {
-            existingPlannedEmis[mNum] = input.value;
-        }
-    });
-
     if (!isTableBuilt) {
         loanPlanBody.innerHTML = '';
     }
@@ -635,8 +626,6 @@ function runCalculation() {
             userPlannedEmiStr = defaultPlannedEmi; 
         } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
             userPlannedEmiStr = window.loadedPlannedEmis[monthIdx];
-        } else if (existingPlannedEmis[monthIdx] !== undefined) {
-            userPlannedEmiStr = existingPlannedEmis[monthIdx];
         } else {
             userPlannedEmiStr = defaultPlannedEmi;
         }
