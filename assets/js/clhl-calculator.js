@@ -702,7 +702,7 @@ function runCalculation() {
             }
         } else {
             const interestComponent = accruedInterest;
-            const standardEmiForCalc = window.standardEmiAmount || fullEmiCache; 
+            const standardEmiForCalc = window.standardEmiAmount || plannedEmiVal; 
 
             if (plannedEmiVal < interestComponent) {
                 const shortfall = interestComponent - plannedEmiVal;
