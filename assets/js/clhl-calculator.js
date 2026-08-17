@@ -185,9 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const rows = document.querySelectorAll('#loanPlanBody tr');
             if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
+            // 1. Capture your custom manual entries (e.g., months 1 to 11)
             const userFilledState = {};
-            let maxUserMonth = 0;
-
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
@@ -195,28 +194,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     const val = parseFloat(inputEl.value);
                     if (!isNaN(val) && val > 0) {
                         userFilledState[monthIdx] = val;
-                        window.loadedPlannedEmis[monthIdx] = val;
-                        maxUserMonth = Math.max(maxUserMonth, monthIdx);
+                        window.loadedPlannedEmis[monthIdx] = val; // Lock them in memory
                     }
                 }
             });
 
-            window.forceDefaultEmis = true;
+            // 2. Run calculation WITH your custom entries active 
+            // This ensures the extra payments in months 1-11 reduce the loan balance correctly.
+            window.forceDefaultEmis = false; 
             runCalculation();
 
+            // 3. Now that the balance is lowered, read the fresh accrued interest/EMI 
+            // from column 3 (or the default calculation) for all the remaining rows.
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
 
                 if (userFilledState[monthIdx] !== undefined) {
+                    // Keep your custom manual entry safe
                     window.loadedPlannedEmis[monthIdx] = userFilledState[monthIdx];
                 } else {
-                    const freshDefaultVal = parseFloat(inputEl.value) || parseFloat(inputEl.placeholder) || 0;
-                    window.loadedPlannedEmis[monthIdx] = freshDefaultVal;
+                    // Extract the newly reduced accrued interest/EMI for this row (e.g., 12258)
+                    // We look at the calculated default value or column cell text
+                    const col3Text = row.children[2]?.innerText || '';
+                    const matchedNum = parseFloat(col3Text.replace(/[₹,\s]/g, ''));
+                    
+                    const freshVal = !isNaN(matchedNum) && matchedNum > 0 ? matchedNum : (parseFloat(inputEl.placeholder) || 0);
+                    window.loadedPlannedEmis[monthIdx] = freshVal;
                 }
             });
 
-            window.forceDefaultEmis = false;
+            // 4. Final render with all correct values in place
             runCalculation();
         });
     }
