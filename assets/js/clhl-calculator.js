@@ -703,7 +703,6 @@ function runCalculation() {
         } else {
             const interestComponent = accruedInterest;
             const standardEmiForCalc = window.standardEmiAmount || plannedEmiVal; 
-            const normalPrincipalComponent = Math.max(0, standardEmiForCalc - interestComponent);
 
             if (plannedEmiVal < interestComponent) {
                 const shortfall = interestComponent - plannedEmiVal;
@@ -712,19 +711,22 @@ function runCalculation() {
                 principalPaid = 0;
                 partPaymentColVal = 0;
             } else {
-                const totalPrincipalPaid = plannedEmiVal - interestComponent;
-                principalPaid = totalPrincipalPaid;
-                partPaymentColVal = Math.max(0, totalPrincipalPaid - normalPrincipalComponent);
+                // Proposal 1 Rule: Everything paid above interest goes to principal!
+                principalPaid = plannedEmiVal - interestComponent;
+
+                // Part payment is only the extra amount paid above the standard scheduled EMI
+                partPaymentColVal = Math.max(0, plannedEmiVal - standardEmiForCalc);
             }
         }
 
         const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
+        // Clean closing balance calculation using Proposal 1 logic
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
 
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
-        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`; // Fixed: Uses partPaymentColVal instead of principalPaid!
+        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
         
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
