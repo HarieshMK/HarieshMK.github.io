@@ -683,7 +683,7 @@ function runCalculation() {
             inputEl.value = userPlannedEmiStr;
         }
 
-        let principalPaid = 0;
+  let principalPaid = 0;
         let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
         const plannedEmiVal = parseFloat(inputEl.value) || 0;
@@ -702,8 +702,6 @@ function runCalculation() {
             }
         } else {
             const interestComponent = accruedInterest;
-            
-
             const standardEmiForCalc = window.standardEmiAmount || plannedEmiVal; 
             const normalPrincipalComponent = Math.max(0, standardEmiForCalc - interestComponent);
 
@@ -722,12 +720,11 @@ function runCalculation() {
 
         const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
+        
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
-        const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
-        inputEl.classList.toggle('shortfall-highlight', isShortfall);
-        let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
+
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
-        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
+        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`; // Fixed: Uses partPaymentColVal instead of principalPaid!
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
         
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
