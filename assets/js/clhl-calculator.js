@@ -683,7 +683,6 @@ function runCalculation() {
             inputEl.value = userPlannedEmiStr;
         }
 
-        const plannedEmiVal = parseFloat(inputEl.value) || 0;
         let principalPaid = 0;
         let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
