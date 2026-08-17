@@ -685,36 +685,48 @@ function runCalculation() {
 
         const plannedEmiVal = parseFloat(inputEl.value) || 0;
         let principalPaid = 0;
+        let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
+        const plannedEmiVal = parseFloat(inputEl.value) || 0;
 
         if (isPreEmi) {
             if (plannedEmiVal >= accruedInterest) {
                 const extra = plannedEmiVal - accruedInterest;
                 principalPaid = extra; 
+                partPaymentColVal = extra; 
             } else {
                 const shortfall = accruedInterest - plannedEmiVal;
-                capitalizedShortfall = shortfall; // Unpaid interest adds to the principal!
+                capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
+                principalPaid = 0;
+                partPaymentColVal = 0;
             }
         } else {
             const interestComponent = accruedInterest;
+            
+
+            const standardEmiForCalc = window.standardEmiAmount || plannedEmiVal; 
+            const normalPrincipalComponent = Math.max(0, standardEmiForCalc - interestComponent);
+
             if (plannedEmiVal < interestComponent) {
                 const shortfall = interestComponent - plannedEmiVal;
-                capitalizedShortfall = shortfall; // Unpaid interest adds to the principal!
+                capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
+                partPaymentColVal = 0;
             } else {
-                const principalComponent = plannedEmiVal - interestComponent;
-                principalPaid = principalComponent;
+                const totalPrincipalPaid = plannedEmiVal - interestComponent;
+                principalPaid = totalPrincipalPaid;
+                partPaymentColVal = Math.max(0, totalPrincipalPaid - normalPrincipalComponent);
             }
         }
 
         const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
-
-        // Closing balance = Opening Balance - Principal Paid + Capitalized Unpaid Interest Shortfall
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
-        
+        const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
+        inputEl.classList.toggle('shortfall-highlight', isShortfall);
+        let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
