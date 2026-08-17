@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const rows = document.querySelectorAll('#loanPlanBody tr');
             
-            // Ensure the data store exists
             if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
             rows.forEach((row, idx) => {
@@ -87,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- MULTI-STEP UNDO HISTORY SYSTEM (10 Steps Max) ---
+    // --- MULTI-STEP UNDO HISTORY SYSTEM (50 Steps Max) ---
     let undoStack = [];
     const MAX_UNDO_STEPS = 50;
 
@@ -176,14 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
     // 4. Hook "Copy Accrued (Remaining)" Button
     const copyAccruedRemainingBtn = document.getElementById('copyAccruedRemainingBtn');
     if (copyAccruedRemainingBtn) {
         copyAccruedRemainingBtn.addEventListener('click', () => {
             saveStateToUndoStack();
 
-            // 1. Snapshot the current inputs BEFORE running any forced calculation, 
-            // so we know exactly which rows you manually filled (like rows 1 to 11).
             const rows = document.querySelectorAll('#loanPlanBody tr');
             if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
@@ -193,27 +191,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const inputEl = row.querySelector('.planned-emi-input');
                 if (inputEl) {
                     const val = parseFloat(inputEl.value);
-                    // If you typed something greater than 0, preserve it!
                     if (!isNaN(val) && val > 0) {
                         userFilledState[monthIdx] = val;
                     }
                 }
             });
 
-            // 2. Temporarily flag to get default values from engine for the rest
             window.forceDefaultEmis = true;
             runCalculation();
 
-            // 3. Now build the final loadedPlannedEmis: keep your manual ones, fill the rest with defaults
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
 
                 if (userFilledState[monthIdx] !== undefined) {
-                    // Restore your custom entry (rows 1 to 11)
                     window.loadedPlannedEmis[monthIdx] = userFilledState[monthIdx];
                 } else {
-                    // It was empty/0, so grab the newly calculated default for rows 12 onward
                     const defaultVal = parseFloat(inputEl.placeholder) || parseFloat(inputEl.value) || 0;
                     window.loadedPlannedEmis[monthIdx] = defaultVal;
                 }
@@ -224,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize remaining components
     if (typeof handleMoratoriumUI === 'function') handleMoratoriumUI();
     if (typeof updateBasicCost === 'function') updateBasicCost();
     if (typeof loadCalculatorDataFromSupabase === 'function') loadCalculatorDataFromSupabase();
@@ -683,7 +675,7 @@ function runCalculation() {
             inputEl.value = userPlannedEmiStr;
         }
 
-  let principalPaid = 0;
+        let principalPaid = 0;
         let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
         const plannedEmiVal = parseFloat(inputEl.value) || 0;
@@ -711,10 +703,7 @@ function runCalculation() {
                 principalPaid = 0;
                 partPaymentColVal = 0;
             } else {
-                // Proposal 1 Rule: Everything paid above interest goes to principal!
                 principalPaid = plannedEmiVal - interestComponent;
-
-                // Part payment is only the extra amount paid above the standard scheduled EMI
                 partPaymentColVal = Math.max(0, plannedEmiVal - standardEmiForCalc);
             }
         }
@@ -722,7 +711,6 @@ function runCalculation() {
         const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
-        // Clean closing balance calculation using Proposal 1 logic
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
 
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
