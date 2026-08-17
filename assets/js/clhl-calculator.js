@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rows = document.querySelectorAll('#loanPlanBody tr');
             if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
+            // 1. Snapshot your custom manual entries (e.g., rows 1 to 11)
             const userFilledState = {};
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
@@ -193,22 +194,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     const val = parseFloat(inputEl.value);
                     if (!isNaN(val) && val > 0) {
                         userFilledState[monthIdx] = val;
+                        window.loadedPlannedEmis[monthIdx] = val; // Lock these in immediately
                     }
                 }
             });
 
+            // 2. Temporarily turn on default EMIs and RUN calculation 
+            // This forces the engine to recalculate all future balances based on your early extra payments.
             window.forceDefaultEmis = true;
             runCalculation();
 
+            // 3. Now capture the newly updated, lower accrued/default values for the remaining rows
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
 
                 if (userFilledState[monthIdx] !== undefined) {
+                    // Keep your custom entry
                     window.loadedPlannedEmis[monthIdx] = userFilledState[monthIdx];
                 } else {
-                    const defaultVal = parseFloat(inputEl.placeholder) || parseFloat(inputEl.value) || 0;
-                    window.loadedPlannedEmis[monthIdx] = defaultVal;
+                    // Grab the newly recalculated, correct accrued interest/EMI (e.g. 12,258 instead of 12,317)
+                    const freshDefaultVal = parseFloat(inputEl.value) || parseFloat(inputEl.placeholder) || 0;
+                    window.loadedPlannedEmis[monthIdx] = freshDefaultVal;
                 }
             });
 
