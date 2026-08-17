@@ -176,6 +176,41 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // 4. Hook "Copy Accrued (Remaining)" Button
+    const copyAccruedRemainingBtn = document.getElementById('copyAccruedRemainingBtn');
+    if (copyAccruedRemainingBtn) {
+        copyAccruedRemainingBtn.addEventListener('click', () => {
+            saveStateToUndoStack();
+
+            // 1. Temporarily flag to get default values from engine
+            window.forceDefaultEmis = true;
+            runCalculation();
+
+            // 2. Capture the defaults, but ONLY apply them if the row doesn't already have a manual value
+            const rows = document.querySelectorAll('#loanPlanBody tr');
+            if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                const inputEl = row.querySelector('.planned-emi-input');
+                
+                if (inputEl) {
+                    const currentVal = inputEl.value.trim();
+                    // If the input is currently empty or unassigned, fill it with the newly calculated default from the placeholder/engine
+                    if (currentVal === '' || currentVal === '0') {
+                        const defaultVal = parseFloat(inputEl.placeholder) || parseFloat(inputEl.value) || 0;
+                        window.loadedPlannedEmis[monthIdx] = defaultVal;
+                    } else {
+                        // Otherwise, retain whatever custom value the user already typed
+                        window.loadedPlannedEmis[monthIdx] = parseFloat(currentVal) || 0;
+                    }
+                }
+            });
+
+            window.forceDefaultEmis = false;
+            runCalculation();
+        });
+    }
 
     // Initialize remaining components
     if (typeof handleMoratoriumUI === 'function') handleMoratoriumUI();
