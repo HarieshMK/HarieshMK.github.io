@@ -182,28 +182,40 @@ document.addEventListener('DOMContentLoaded', () => {
         copyAccruedRemainingBtn.addEventListener('click', () => {
             saveStateToUndoStack();
 
-            // 1. Temporarily flag to get default values from engine
-            window.forceDefaultEmis = true;
-            runCalculation();
-
-            // 2. Capture the defaults, but ONLY apply them if the row doesn't already have a manual value
+            // 1. Snapshot the current inputs BEFORE running any forced calculation, 
+            // so we know exactly which rows you manually filled (like rows 1 to 11).
             const rows = document.querySelectorAll('#loanPlanBody tr');
             if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
+            const userFilledState = {};
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
                 const inputEl = row.querySelector('.planned-emi-input');
-                
                 if (inputEl) {
-                    const currentVal = inputEl.value.trim();
-                    // If the input is currently empty or unassigned, fill it with the newly calculated default from the placeholder/engine
-                    if (currentVal === '' || currentVal === '0') {
-                        const defaultVal = parseFloat(inputEl.placeholder) || parseFloat(inputEl.value) || 0;
-                        window.loadedPlannedEmis[monthIdx] = defaultVal;
-                    } else {
-                        // Otherwise, retain whatever custom value the user already typed
-                        window.loadedPlannedEmis[monthIdx] = parseFloat(currentVal) || 0;
+                    const val = parseFloat(inputEl.value);
+                    // If you typed something greater than 0, preserve it!
+                    if (!isNaN(val) && val > 0) {
+                        userFilledState[monthIdx] = val;
                     }
+                }
+            });
+
+            // 2. Temporarily flag to get default values from engine for the rest
+            window.forceDefaultEmis = true;
+            runCalculation();
+
+            // 3. Now build the final loadedPlannedEmis: keep your manual ones, fill the rest with defaults
+            rows.forEach((row, idx) => {
+                const monthIdx = idx + 1;
+                const inputEl = row.querySelector('.planned-emi-input');
+
+                if (userFilledState[monthIdx] !== undefined) {
+                    // Restore your custom entry (rows 1 to 11)
+                    window.loadedPlannedEmis[monthIdx] = userFilledState[monthIdx];
+                } else {
+                    // It was empty/0, so grab the newly calculated default for rows 12 onward
+                    const defaultVal = parseFloat(inputEl.placeholder) || parseFloat(inputEl.value) || 0;
+                    window.loadedPlannedEmis[monthIdx] = defaultVal;
                 }
             });
 
