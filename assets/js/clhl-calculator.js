@@ -648,14 +648,14 @@ function runCalculation() {
             accruedInterest = openingBalance * monthlyRate; 
         }
 
-        const defaultPlannedEmi = Math.round(isPreEmi ? accruedInterest : fullEmiCache);
-        let userPlannedEmiStr;
+        const defaultPlannedEmi = isPreEmi ? accruedInterest : fullEmiCache;
+        let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
-            userPlannedEmiStr = defaultPlannedEmi; 
+            userPlannedEmiVal = defaultPlannedEmi; 
         } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
-            userPlannedEmiStr = window.loadedPlannedEmis[monthIdx];
+            userPlannedEmiVal = window.loadedPlannedEmis[monthIdx];
         } else {
-            userPlannedEmiStr = defaultPlannedEmi;
+            userPlannedEmiVal = defaultPlannedEmi;
         }
 
         let row;
@@ -671,7 +671,7 @@ function runCalculation() {
                 <td class="col-right"></td>
                 <td class="col-right"></td>
                 <td class="col-right">
-                    <input type="number" class="planned-emi-input" placeholder="₹">
+                    <input type="number" step="any" class="planned-emi-input" placeholder="₹">
                 </td>
                 <td class="col-right interest-cell">₹0</td>
                 <td class="col-right principal-paid-cell">₹0</td>
@@ -694,21 +694,26 @@ function runCalculation() {
         
         const inputEl = row.querySelector('.planned-emi-input');
         if (document.activeElement !== inputEl) {
-            inputEl.value = userPlannedEmiStr;
+            inputEl.value = Math.round(userPlannedEmiVal * 100) / 100;
         }
 
         let principalPaid = 0;
         let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
-        const plannedEmiVal = parseFloat(inputEl.value) || 0;
+        const plannedEmiVal = parseFloat(inputEl.value) || userPlannedEmiVal;
+
+        let effectivePlannedEmi = plannedEmiVal;
+        if (monthIdx === totalMonths) {
+            effectivePlannedEmi = openingBalance + accruedInterest;
+        }
 
         if (isPreEmi) {
-            if (plannedEmiVal >= accruedInterest) {
-                const extra = plannedEmiVal - accruedInterest;
+            if (effectivePlannedEmi >= accruedInterest) {
+                const extra = effectivePlannedEmi - accruedInterest;
                 principalPaid = extra; 
                 partPaymentColVal = extra; 
             } else {
-                const shortfall = accruedInterest - plannedEmiVal;
+                const shortfall = accruedInterest - effectivePlannedEmi;
                 capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
@@ -716,21 +721,21 @@ function runCalculation() {
             }
         } else {
             const interestComponent = accruedInterest;
-            const standardEmiForCalc = window.standardEmiAmount || plannedEmiVal; 
+            const standardEmiForCalc = window.standardEmiAmount || effectivePlannedEmi; 
 
-            if (plannedEmiVal < interestComponent) {
-                const shortfall = interestComponent - plannedEmiVal;
+            if (effectivePlannedEmi < interestComponent) {
+                const shortfall = interestComponent - effectivePlannedEmi;
                 capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
                 partPaymentColVal = 0;
             } else {
-                principalPaid = plannedEmiVal - interestComponent;
-                partPaymentColVal = Math.max(0, plannedEmiVal - standardEmiForCalc);
+                principalPaid = effectivePlannedEmi - interestComponent;
+                partPaymentColVal = Math.max(0, effectivePlannedEmi - standardEmiForCalc);
             }
         }
 
-        const isShortfall = plannedEmiVal < Math.round(accruedInterest) && inputEl.value !== '';
+        const isShortfall = effectivePlannedEmi < accruedInterest && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
