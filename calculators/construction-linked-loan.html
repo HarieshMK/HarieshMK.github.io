@@ -10,72 +10,72 @@ permalink: /calculators/clhl/
     <div style="font-size: 0.85rem; color: #64748b; margin-top: 5px;">Fetching your saved numbers from the cloud</div>
 </div>
 
-<div class="calculator-container">
-    <div class="calc-left-col">
-        <!-- ONLY Property Profile stays here -->
-        <div class="post-card calculation-card">
-            <div class="section-card-header"><h3>🏢 Property Profile</h3></div>
-            <div class="section-card-content">
-                <div class="calc-grid-layout" id="propertyProfileContainer">
-                    <div class="charge-row">
-                        <label>Super Built-up Area (sq.ft)</label>
-                        <input type="number" id="superArea" placeholder="e.g. 500">
-                        <div></div> <div>🔒</div> 
-                    </div>
-                    <div class="charge-row">
-                        <label>Price per sq.ft (₹)</label>
-                        <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
-                        <div></div> <div>🔒</div> 
-                    </div>
-                    <div class="charge-row">
-                        <label>Basic Cost of property</label>
-                        <input type="number" id="basicCost" readonly>
-                        <div></div> <div>🔒</div> 
-                    </div>
-                    <div id="extraChargesContainer"></div>
+<!-- TOP ROW: SIDE-BY-SIDE INPUT CARDS -->
+<div class="calculator-top-grid">
+    <!-- Property Profile Card (Left) -->
+    <div class="post-card calculation-card">
+        <div class="section-card-header"><h3>🏢 Property Profile</h3></div>
+        <div class="section-card-content">
+            <div class="calc-grid-layout" id="propertyProfileContainer">
+                <div class="charge-row">
+                    <label>Super Built-up Area (sq.ft)</label>
+                    <input type="number" id="superArea" placeholder="e.g. 500">
+                    <div></div> <div>🔒</div> 
                 </div>
-                <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
+                <div class="charge-row">
+                    <label>Price per sq.ft (₹)</label>
+                    <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
+                    <div></div> <div>🔒</div> 
+                </div>
+                <div class="charge-row">
+                    <label>Basic Cost of property</label>
+                    <input type="number" id="basicCost" readonly>
+                    <div></div> <div>🔒</div> 
+                </div>
+                <div id="extraChargesContainer"></div>
             </div>
-        </div> 
-    </div>
+            <button id="addChargeBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Extra Charge</button>
+        </div>
+    </div> 
 
-    <div class="calc-right-col">
-        <!-- MERGED: Loan Particulars & Moratorium Period together -->
-        <div class="post-card calculation-card">
-            <div class="section-card-header"><h3>🏦 Loan Particulars & Moratorium</h3></div>
-            <div class="section-card-content">
-                <div class="calc-grid-layout">
-                    <div class="calc-custom-row"><label>Loan-to-Value Ratio (%)</label><input type="number" id="ltvRatio" value="80" placeholder="e.g. 80"></div>
-                    <div class="calc-custom-row"><label>Loan Amount (₹)</label><input type="number" id="loanAmount" placeholder="e.g. 4000000"></div>
-                    <div class="calc-custom-row"><label>Interest Rate (%)</label><input type="number" id="interestRate" placeholder="e.g. 8"></div>
-                    <div class="calc-custom-row"><label>Tenure (Years)</label><input type="number" id="tenureYears" placeholder="e.g. 30"></div>
-                    <div class="calc-custom-row"><label>Loan Start Date</label><input type="date" id="loanStartDate"></div>
-                    <div class="calc-custom-row"><label>EMI Start Date</label><input type="date" id="emiStartDate"></div>
-                    
-                    <!-- Moratorium Period integrated side-by-side -->
-                    <div class="calc-custom-row">
-                        <label>Moratorium Period</label>
-                        <div class="radio-group-horizontal" style="display: flex; gap: 20px; align-items: center; flex: 1; flex-wrap: wrap;">
-                            <label style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
-                                <input type="radio" name="moroType" value="milestone" checked> Until Last Milestone
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
-                                <input type="radio" name="moroType" value="custom"> Custom: 
-                                <input type="number" id="customMoroMonths" style="width: 80px; height: 35px; border-radius: 8px; border: 1px solid var(--border-base); padding: 0 5px; font-family: 'JetBrains Mono', monospace;" placeholder="Months">
-                            </label>
-                        </div>
+    <!-- Loan Particulars & Moratorium Card (Right) -->
+    <div class="post-card calculation-card">
+        <div class="section-card-header"><h3>🏦 Loan Particulars & Moratorium</h3></div>
+        <div class="section-card-content">
+            <div class="calc-grid-layout">
+                <div class="calc-custom-row"><label>Loan-to-Value Ratio (%)</label><input type="number" id="ltvRatio" value="80" placeholder="e.g. 80"></div>
+                <div class="calc-custom-row"><label>Loan Amount (₹)</label><input type="number" id="loanAmount" placeholder="e.g. 4000000"></div>
+                <div class="calc-custom-row"><label>Interest Rate (%)</label><input type="number" id="interestRate" placeholder="e.g. 8"></div>
+                <div class="calc-custom-row"><label>Tenure (Years)</label><input type="number" id="tenureYears" placeholder="e.g. 30"></div>
+                <div class="calc-custom-row"><label>Loan Start Date</label><input type="date" id="loanStartDate"></div>
+                <div class="calc-custom-row"><label>EMI Start Date</label><input type="date" id="emiStartDate"></div>
+                
+                <!-- Moratorium Period side-by-side fix -->
+                <div class="calc-custom-row" style="align-items: flex-start !important;">
+                    <label style="padding-top: 8px;">Moratorium Period</label>
+                    <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                            <input type="radio" name="moroType" value="milestone" checked style="width: auto; height: auto;"> Until Last Milestone
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                            <input type="radio" name="moroType" value="custom" style="width: auto; height: auto;"> Custom Months: 
+                            <input type="number" id="customMoroMonths" style="width: 90px; height: 36px; border-radius: 8px; border: 2px solid var(--border-base); padding: 0 8px; font-family: 'JetBrains Mono', monospace;" placeholder="Months">
+                        </label>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="calc-results sticky-score-panel">
-            <div class="sidebar-panel-header-accent"><h3 class="sidebar-panel-heading">Summary</h3></div>
-            <div class="sidebar-stacked-rows-container">
-                <div class="regime-row-card"><span class="regime-row-title">Total Property Cost</span><div class="regime-row-value" id="totalPropertyCost">₹ 0</div></div>
-                <div class="regime-row-card"><span class="regime-row-title">Closing Principal</span><div class="regime-row-value" id="closingPrincipal">₹ 0</div></div>
-                <div class="regime-row-card"><span class="regime-row-title">Unpaid Interest</span><div class="regime-row-value" id="unpaidInterest">₹ 0</div></div>
-            </div>
+<!-- SUMMARY PANEL (Placed below the two top cards cleanly) -->
+<div class="calculator-container full-width-section" style="margin-top: 0 !important;">
+    <div class="post-card calculation-card" style="width: 100%;">
+        <div class="sidebar-panel-header-accent section-card-header"><h3 class="sidebar-panel-heading" style="font-family: 'Lora', serif; font-size: 1.3rem !important; color: var(--text-primary); text-transform: none; letter-spacing: normal;">Summary Breakdown</h3></div>
+        <div class="section-card-content" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+            <div class="regime-row-card" style="flex: 1; min-width: 200px;"><span class="regime-row-title">Total Property Cost</span><div class="regime-row-value" id="totalPropertyCost">₹ 0</div></div>
+            <div class="regime-row-card" style="flex: 1; min-width: 200px;"><span class="regime-row-title">Closing Principal</span><div class="regime-row-value" id="closingPrincipal">₹ 0</div></div>
+            <div class="regime-row-card" style="flex: 1; min-width: 200px;"><span class="regime-row-title">Unpaid Interest</span><div class="regime-row-value" id="unpaidInterest">₹ 0</div></div>
         </div>
     </div>
 </div>
@@ -821,5 +821,26 @@ input[readonly] {
 .plan-table td input[type="number"] {
     width: 100% !important;
     max-width: 110px !important;
+}
+    /* Side-by-Side Top Grid Rule */
+.calculator-top-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+}
+
+@media (max-width: 1100px) {
+    .calculator-top-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Ensure individual cards fill the grid columns neatly */
+.calculator-top-grid .post-card.calculation-card {
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 </style>
