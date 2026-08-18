@@ -274,6 +274,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
+    let totalPrincipalPaid = 0;
+    let hasAnomalies = false;
+    let consoleLogGroup = [];
+
+    consoleLogGroup.push(`%c--- 📊 Loan Calculation Audit Report ---`, 'color: #007bff; font-weight: bold;');
+
+    scheduleData.forEach((row, index) => {
+        if (isNaN(row.closingBalance) || isNaN(row.interest) || isNaN(row.principal)) {
+            hasAnomalies = true;
+            consoleLogGroup.push(`❌ Row ${index + 1}: Contains NaN or invalid numbers.`);
+        }
+        totalPrincipalPaid += (row.principal + (row.partPayment || 0));
+    });
+
+    const finalClosingBalance = scheduleData[scheduleData.length - 1].closingBalance;
+
+    if (Math.abs(finalClosingBalance) <= 5) {
+        consoleLogGroup.push(`✅ Closing Balance Check: Passed (Loan fully amortized to ₹${finalClosingBalance.toFixed(2)})`);
+    } else {
+        hasAnomalies = true;
+        consoleLogGroup.push(`⚠️ Closing Balance Check: Warning! Final balance is ₹${finalClosingBalance.toFixed(2)} (Expected ₹0)`);
+    }
+
+    const principalDifference = Math.abs(totalPrincipalPaid - initialLoanAmount);
+    if (principalDifference <= 10) {
+        consoleLogGroup.push(`✅ Total Principal Match: Passed (Sum matches initial loan amount of ₹${initialLoanAmount})`);
+    } else {
+        hasAnomalies = true;
+        consoleLogGroup.push(`❌ Total Principal Match: Failed! Paid principal sum (₹${totalPrincipalPaid}) differs from loan amount (₹${initialLoanAmount}) by ₹${principalDifference.toFixed(2)}`);
+    }
+
+    consoleLogGroup.forEach(log => console.log(log));
+
+    if (hasAnomalies) {
+        console.warn('⚠️ Audit completed with warnings or errors. Check details above.');
+    } else {
+        console.log('%c🎉 All math invariants passed successfully!', 'color: #28a745; font-weight: bold;');
+    }
+}
 
 function getTotalPropertyCostValue() {
     const basicCost = document.getElementById('basicCost');
@@ -711,6 +751,19 @@ function runCalculation() {
 
     if (closingPrincipalEl) closingPrincipalEl.innerText = `₹${Math.round(finalClosingBal).toLocaleString()}`;
     if (unpaidInterestEl) unpaidInterestEl.innerText = `₹${Math.round(cumulativeUnpaidInterest).toLocaleString()}`;
+
+// --- 📊 AUTOMATED AUDIT TRIGGER ---
+    const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
+        interest: parseFloat(r.querySelector('.interest-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
+        principal: parseFloat(r.querySelector('.principal-paid-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
+        partPayment: parseFloat(r.querySelector('.part-payment-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
+        closingBalance: parseFloat(r.querySelector('.closing-balance-cell')?.innerText.replace(/[₹,]/g, '')) || 0
+    }));
+
+    if (rowsArray.length > 0) {
+        const initialLoan = parseFloat(document.getElementById('loanAmount')?.value) || 0;
+        auditLoanMath(rowsArray, initialLoan, annualRate);
+    }
 }
 
 function handleMoratoriumUI() {
