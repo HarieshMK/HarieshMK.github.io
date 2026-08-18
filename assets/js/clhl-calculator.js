@@ -5,6 +5,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const basicCost = document.getElementById('basicCost');
     const loanAmountInput = document.getElementById('loanAmount');
     const ltvRatioInput = document.getElementById('ltvRatio');
+    const customMonthsInput = document.getElementById('customMoroMonths');
+    const customRadio = document.querySelector('input[name="moroType"][value="custom"]');
+
+    if (customMonthsInput && customRadio) {
+        customMonthsInput.addEventListener('focus', () => {
+            customRadio.checked = true;
+            // Trigger change event if you have listeners tracking state changes
+            customRadio.dispatchEvent(new Event('change'));
+        });
+        
+        customMonthsInput.addEventListener('input', () => {
+            customRadio.checked = true;
+        });
+    }
 
     if(superArea && pricePerSqft) {
         [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
