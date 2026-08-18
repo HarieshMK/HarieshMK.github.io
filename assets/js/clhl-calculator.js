@@ -773,6 +773,7 @@ function runCalculation() {
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden) {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
+}
 
 function handleMoratoriumUI() {
     const moroTypeRadio = document.querySelector('input[name="moroType"]:checked');
