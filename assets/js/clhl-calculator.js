@@ -551,8 +551,8 @@ function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (!loanPlanBody) return;
     const existingRows = loanPlanBody.querySelectorAll('tr');
+    const hasInterestCell = existingRows.length > 0 && existingRows[0].querySelector('.interest-cell');
     const isTableBuilt = existingRows.length === totalMonths;
-
     if (!isTableBuilt) {
         loanPlanBody.innerHTML = '';
     }
