@@ -185,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const rows = document.querySelectorAll('#loanPlanBody tr');
             if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
-            // 1. Find the last row index where you entered a custom value
             let lastUserMonth = 0;
             rows.forEach((row, idx) => {
                 const monthIdx = idx + 1;
@@ -194,23 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const val = parseFloat(inputEl.value);
                     if (!isNaN(val) && val > 0) {
                         lastUserMonth = monthIdx;
-                        window.loadedPlannedEmis[monthIdx] = val; // Lock in user entry
+                        window.loadedPlannedEmis[monthIdx] = val; 
                     }
                 }
             });
 
-            // 2. Clear out all stored memory keys for the remaining rows after your last custom entry.
-            // This forces the engine to stop using stale/zero data and dynamically compute fresh defaults.
             Object.keys(window.loadedPlannedEmis).forEach(m => {
                 const mNum = parseInt(m, 10);
                 if (mNum > lastUserMonth) {
                     delete window.loadedPlannedEmis[mNum];
                 }
             });
-
-            // 3. Run the calculation. 
-            // The early custom rows reduce the balance, and all remaining rows 
-            // will now dynamically calculate and display their fresh updated accrued interest/EMI!
             window.forceDefaultEmis = false;
             runCalculation();
         });
@@ -640,6 +633,7 @@ function runCalculation() {
                 <td class="col-right">
                     <input type="number" class="planned-emi-input" placeholder="₹">
                 </td>
+                <td class="col-right interest-cell">₹0</td>
                 <td class="col-right principal-paid-cell">₹0</td>
                 <td class="col-right part-payment-cell">₹0</td>
                 <td class="col-right closing-balance-cell">₹0</td>
@@ -700,7 +694,7 @@ function runCalculation() {
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
-
+        row.querySelector('.interest-cell').innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
         row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
