@@ -50,16 +50,16 @@ permalink: /calculators/clhl/
                 <div class="calc-custom-row"><label>Loan Start Date</label><input type="date" id="loanStartDate"></div>
                 <div class="calc-custom-row"><label>EMI Start Date</label><input type="date" id="emiStartDate"></div>
                 
-                <!-- Moratorium Period side-by-side fix -->
-                <div class="calc-custom-row" style="align-items: flex-start !important;">
-                    <label style="padding-top: 8px;">Moratorium Period</label>
-                    <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
-                            <input type="radio" name="moroType" value="milestone" checked style="width: auto; height: auto;"> Until Last Milestone
+                <!-- Moratorium Period Clean Layout -->
+                <div class="calc-custom-row" style="align-items: center !important;">
+                    <label>Moratorium Period</label>
+                    <div class="moro-options-wrapper">
+                        <label class="moro-option-item">
+                            <input type="radio" name="moroType" value="milestone" checked> Until Milestone
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
-                            <input type="radio" name="moroType" value="custom" style="width: auto; height: auto;"> Custom Months: 
-                            <input type="number" id="customMoroMonths" style="width: 90px; height: 36px; border-radius: 8px; border: 2px solid var(--border-base); padding: 0 8px; font-family: 'JetBrains Mono', monospace;" placeholder="Months">
+                        <label class="moro-option-item">
+                            <input type="radio" name="moroType" value="custom"> Custom: 
+                            <input type="number" id="customMoroMonths" placeholder="Months">
                         </label>
                     </div>
                 </div>
@@ -829,6 +829,7 @@ input[readonly] {
     gap: 20px !important;
     width: 100% !important;
     margin-top: 20px !important;
+    margin-bottom: 25px !important;
 }
 
 @media (max-width: 1100px) {
@@ -836,11 +837,51 @@ input[readonly] {
         grid-template-columns: 1fr !important;
     }
 }
-
 /* Ensure individual cards fill the grid columns neatly */
 .calculator-top-grid .post-card.calculation-card {
     margin-bottom: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
+}
+
+/* 2. Compact & Clean Moratorium Options Container */
+.moro-options-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.moro-option-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+/* Make radio buttons standard/small size */
+.moro-option-item input[type="radio"] {
+    appearance: auto !important;
+    -webkit-appearance: radio !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0;
+    accent-color: var(--accent-primary, #3b82f6);
+}
+
+/* Custom Months input sizing */
+#customMoroMonths {
+    width: 75px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--border-base) !important;
+    padding: 0 6px !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
 }
 </style>
