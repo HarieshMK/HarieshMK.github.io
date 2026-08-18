@@ -40,8 +40,9 @@ permalink: /calculators/clhl/
     </div>
 
     <div class="calc-right-col">
+        <!-- MERGED: Loan Particulars & Moratorium Period together -->
         <div class="post-card calculation-card">
-            <div class="section-card-header"><h3>🏦 Loan Particulars</h3></div>
+            <div class="section-card-header"><h3>🏦 Loan Particulars & Moratorium</h3></div>
             <div class="section-card-content">
                 <div class="calc-grid-layout">
                     <div class="calc-custom-row"><label>Loan-to-Value Ratio (%)</label><input type="number" id="ltvRatio" value="80" placeholder="e.g. 80"></div>
@@ -50,20 +51,20 @@ permalink: /calculators/clhl/
                     <div class="calc-custom-row"><label>Tenure (Years)</label><input type="number" id="tenureYears" placeholder="e.g. 30"></div>
                     <div class="calc-custom-row"><label>Loan Start Date</label><input type="date" id="loanStartDate"></div>
                     <div class="calc-custom-row"><label>EMI Start Date</label><input type="date" id="emiStartDate"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="post-card calculation-card">
-            <div class="section-card-header"><h3>⏳ Moratorium Period</h3></div>
-            <div class="section-card-content">
-                <div class="radio-group" style="display: flex; flex-direction: column; gap: 10px;">
-                    <label><input type="radio" name="moroType" value="18" checked> 18 Months (Standard)</label>
-                    <label><input type="radio" name="moroType" value="milestone"> Until Last Milestone</label>
-                    <label style="display: flex; align-items: center; gap: 10px;">
-                        <input type="radio" name="moroType" value="custom"> Custom: 
-                        <input type="number" id="customMoroMonths" style="width: 80px; height: 35px; border-radius: 8px; border: 1px solid var(--border-base); padding: 0 5px;" placeholder="Months">
-                    </label>
+                    
+                    <!-- Moratorium Period integrated side-by-side -->
+                    <div class="calc-custom-row">
+                        <label>Moratorium Period</label>
+                        <div class="radio-group-horizontal" style="display: flex; gap: 20px; align-items: center; flex: 1; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                                <input type="radio" name="moroType" value="milestone" checked> Until Last Milestone
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                                <input type="radio" name="moroType" value="custom"> Custom: 
+                                <input type="number" id="customMoroMonths" style="width: 80px; height: 35px; border-radius: 8px; border: 1px solid var(--border-base); padding: 0 5px; font-family: 'JetBrains Mono', monospace;" placeholder="Months">
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -208,7 +209,7 @@ permalink: /calculators/clhl/
 
 <style>
 /* ==========================================================================
-   LOAN CALCULATOR - INTEGRATED DESIGN SYSTEM STYLING
+    LOAN CALCULATOR - INTEGRATED DESIGN SYSTEM STYLING
    ========================================================================== */
 
 /* Main Container & Layout */
@@ -498,10 +499,15 @@ input[readonly] {
     .calc-custom-row input {
         width: 100% !important;
     }
+    .radio-group-horizontal {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
 }
 
 /* ==========================================================================
-   UNIFIED PLAN TOOLBAR & BUTTON STYLING
+    UNIFIED PLAN TOOLBAR & BUTTON STYLING
    ========================================================================== */
 .plan-toolbar {
     display: flex;
@@ -616,7 +622,7 @@ input[readonly] {
 }
 
 /* ==========================================================================
-   BOTTOM-RIGHT FLOATING SAVE ICON & TOOLTIP
+    BOTTOM-RIGHT FLOATING SAVE ICON & TOOLTIP
    ========================================================================== */
 .calculator-card-container {
     position: relative; 
@@ -692,7 +698,7 @@ input[readonly] {
 }
 
 /* ==========================================================================
-   MODERN AMORTIZATION TABLE STYLING
+    MODERN AMORTIZATION TABLE STYLING
    ========================================================================== */
 
 .plan-table-wrapper {
@@ -773,16 +779,14 @@ input[readonly] {
     background: var(--bg-container);
 }
     /* ==========================================================================
-   FIXED AMORTIZATION TABLE COLUMN WIDTHS
+    FIXED AMORTIZATION TABLE COLUMN WIDTHS
    ========================================================================== */
 
-/* Force fixed layout so column widths are strictly respected */
 .plan-table {
     table-layout: fixed !important;
     width: 100% !important;
 }
 
-/* 1. Month / Index Column: Give it breathing room so dates don't wrap awkwardly */
 .plan-table th:nth-child(1), 
 .plan-table td:nth-child(1) {
     width: 110px !important;
@@ -790,35 +794,30 @@ input[readonly] {
     max-width: 110px !important;
 }
 
-/* 2. Opening Balance: Extra wide for large loan amounts (Cr / 100Cr+) */
 .plan-table th:nth-child(2), 
 .plan-table td:nth-child(2) {
     width: 160px !important;
     min-width: 160px !important;
 }
 
-/* 3. Standard columns (EMI, Interest, Principal, Extra Payments, etc.) */
 .plan-table th:nth-child(n+3):not(:last-child), 
 .plan-table td:nth-child(n+3):not(:last-child) {
     width: 130px !important;
     min-width: 130px !important;
 }
 
-/* 4. Closing Balance: Extra wide like Opening Balance */
 .plan-table th:last-child, 
 .plan-table td:last-child {
     width: 160px !important;
     min-width: 160px !important;
 }
 
-/* Ensure long text values inside cells truncate or wrap cleanly instead of breaking layout */
-.plan-table th, .plan-table td {
+.plan-table th, .plan-table td:not(:has(input)) {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
 
-/* Allow inputs inside table cells to fit nicely within the fixed column constraints */
 .plan-table td input[type="number"] {
     width: 100% !important;
     max-width: 110px !important;
