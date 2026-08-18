@@ -766,11 +766,13 @@ function runCalculation() {
         closingBalance: parseFloat(r.querySelector('.closing-balance-cell')?.innerText.replace(/[₹,]/g, '')) || 0
     }));
 
-    if (rowsArray.length > 0) {
-        const initialLoan = parseFloat(document.getElementById('loanAmount')?.value) || 0;
+    const initialLoan = parseFloat(document.getElementById('loanAmount')?.value) || 0;
+    const loaderEl = document.getElementById('appLoader');
+    const isLoaderHidden = !loaderEl || loaderEl.style.display === 'none';
+
+    if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden) {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
-}
 
 function handleMoratoriumUI() {
     const moroTypeRadio = document.querySelector('input[name="moroType"]:checked');
