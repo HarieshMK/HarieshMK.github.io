@@ -286,7 +286,8 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
             hasAnomalies = true;
             consoleLogGroup.push(`❌ Row ${index + 1}: Contains NaN or invalid numbers.`);
         }
-        totalPrincipalPaid += (row.principal + (row.partPayment || 0));
+        // FIX: Only add row.principal, since it already encompasses the total principal reduction for that row
+        totalPrincipalPaid += row.principal;
     });
 
     const finalClosingBalance = scheduleData[scheduleData.length - 1].closingBalance;
@@ -303,7 +304,7 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
         consoleLogGroup.push(`✅ Total Principal Match: Passed (Sum matches initial loan amount of ₹${initialLoanAmount})`);
     } else {
         hasAnomalies = true;
-        consoleLogGroup.push(`❌ Total Principal Match: Failed! Paid principal sum (₹${totalPrincipalPaid}) differs from loan amount (₹${initialLoanAmount}) by ₹${principalDifference.toFixed(2)}`);
+        consoleLogGroup.push(`❌ Total Principal Match: Failed! Paid principal sum (₹${Math.round(totalPrincipalPaid).toLocaleString()}) differs from loan amount (₹${initialLoanAmount}) by ₹${principalDifference.toFixed(2)}`);
     }
 
     consoleLogGroup.forEach(log => console.log(log));
