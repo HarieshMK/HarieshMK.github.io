@@ -1104,4 +1104,3 @@ function hideLoader() {
         console.log("Hidden loader element:", loader.id || loader.className);
     });
 }
-};
