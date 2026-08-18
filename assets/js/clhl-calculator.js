@@ -1096,7 +1096,6 @@ async function loadCalculatorDataFromSupabase() {
         pushState(); 
     }
 }
-
 function hideLoader() {
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
     loaders.forEach(loader => {
