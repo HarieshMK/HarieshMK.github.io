@@ -1007,6 +1007,11 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     updateBasicCost();
+    const loanInput = document.getElementById('loanAmount');
+    if (loanInput && profile.loan_amount !== null && profile.loan_amount !== undefined) {
+        loanInput.dataset.manual = 'true'; // Lock it so subsequent updates don't overwrite it immediately
+        loanInput.value = profile.loan_amount;
+    }
 
     // 1. Load Extra Charges
     console.log("TRACE [7.5]: Fetching extra charges...");
@@ -1078,7 +1083,7 @@ async function loadCalculatorDataFromSupabase() {
     console.log("TRACE [9]: Load complete. Hiding loader.");
     hideLoader();
     if (typeof resetUndoStack === 'function') {
-        resetUndoStack(); // Clears old history and pushes this baseline state
+        resetUndoStack();
     } else if (typeof pushState === 'function') {
         pushState(); 
     }
