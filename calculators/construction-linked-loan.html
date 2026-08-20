@@ -534,10 +534,11 @@ input[readonly] {
     gap: 15px;
     align-items: flex-end;
     margin-bottom: 20px;
-    padding: 20px;
+    padding: 24px;
     background: var(--bg-offset);
-    border-radius: 12px;
-    border: 1px solid var(--border-base);
+    border-radius: 14px;
+    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 20%, var(--border-base));
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
 }
 .toolbar-group {
     display: flex;
@@ -558,12 +559,14 @@ input[readonly] {
     color: var(--text-primary);
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
 .plan-toolbar input:focus {
     border-color: var(--brand-primary);
     outline: none;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 15%, transparent);
 }
+
 #fillStartMonth, #fillEndMonth {
     width: 90px;
 }
@@ -601,12 +604,12 @@ input[readonly] {
     color: var(--text-on-brand);
     box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 25%, transparent);
 }
-.btn-primary-solid:hover {
+.btn-primary-solid:hover:not(:disabled) {
     filter: brightness(1.1);
     transform: translateY(-1px);
 }
 
-/* Secondary Outline Style (Copy Accrued & Undo) */
+/* Secondary Outline Style */
 .toolbar-btn.btn-secondary-outline {
     background-color: transparent;
     color: var(--brand-primary);
@@ -619,11 +622,14 @@ input[readonly] {
     transform: translateY(-1px);
 }
 
-/* Disabled State Handling */
-.toolbar-btn:disabled {
-    opacity: 0.4;
+/* Hybrid Approach: Explicit Dimmed / Disabled State Styling */
+.toolbar-btn:disabled, 
+.plan-toolbar input:disabled ~ .toolbar-actions .toolbar-btn {
+    opacity: 0.35;
     cursor: not-allowed;
     transform: none !important;
+    box-shadow: none !important;
+    filter: grayscale(30%);
 }
 
 @media (max-width: 992px) {
