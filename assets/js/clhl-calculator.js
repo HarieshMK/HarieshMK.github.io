@@ -916,9 +916,6 @@ function handleCopyAccrued() {
     if (typeof runCalculation === 'function') runCalculation();
 }
 
-    if (typeof runCalculation === 'function') runCalculation();
-}
-
 function handleClearRange() {
     if (typeof pushState === 'function') pushState();
     const fromVal = parseInt(document.getElementById('fillStartMonth').value);
