@@ -375,6 +375,47 @@ function updateBasicCost() {
     calculateTotalPropertyCost();
     runCalculation();
 }
+// --- TOOLBAR RANGE-FILL LOGIC (Placed inside the main script scope) ---
+    function handleApplyRange() {
+        saveStateToUndoStack(); // Now it can finally see this!
+
+        const fromVal = parseInt(document.getElementById('fillStartMonth').value);
+        const toVal = parseInt(document.getElementById('fillEndMonth').value);
+        const amtVal = parseFloat(document.getElementById('fillEmiAmount').value);
+
+        if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+
+        for (let m = fromVal; m <= toVal; m++) {
+            window.loadedPlannedEmis[m] = amtVal;
+        }
+
+        if (typeof runCalculation === 'function') runCalculation();
+    }
+
+    function handleCopyAccrued() {
+        saveStateToUndoStack();
+
+        const fromVal = parseInt(document.getElementById('fillStartMonth').value);
+        const toVal = parseInt(document.getElementById('fillEndMonth').value);
+
+        if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+        for (let m = fromVal; m <= toVal; m++) {
+            delete window.loadedPlannedEmis[m];
+        }
+
+        if (typeof runCalculation === 'function') runCalculation();
+    }
+
+    function handleClearRange() {
+        saveStateToUndoStack();
+        const fromVal = parseInt(document.getElementById('fillStartMonth').value);
+        const toVal = parseInt(document.getElementById('fillEndMonth').value);
+        if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+        for (let m = fromVal; m <= toVal; m++) {
+            window.loadedPlannedEmis[m] = ""; 
+        }
+        if (typeof runCalculation === 'function') runCalculation();
+    }
 
 function createRow(name = '', amount = '', isDefault = false) {
     const row = document.createElement('div');
@@ -890,48 +931,6 @@ function updateToolbarButtonStates() {
     if (applyBtn) {
         applyBtn.disabled = !(isRangeValid && isAmtValid);
     }
-}
-
-function handleApplyRange() {
-    saveStateToUndoStack(); // Undo snapshot support
-
-    const fromVal = parseInt(document.getElementById('fillStartMonth').value);
-    const toVal = parseInt(document.getElementById('fillEndMonth').value);
-    const amtVal = parseFloat(document.getElementById('fillEmiAmount').value);
-
-    if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-
-    // 2. Put the entered number into the requested month ranges
-    for (let m = fromVal; m <= toVal; m++) {
-        window.loadedPlannedEmis[m] = amtVal;
-    }
-
-    if (typeof runCalculation === 'function') runCalculation();
-}
-
-function handleCopyAccrued() {
-    saveStateToUndoStack();
-
-    const fromVal = parseInt(document.getElementById('fillStartMonth').value);
-    const toVal = parseInt(document.getElementById('fillEndMonth').value);
-
-    if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-    for (let m = fromVal; m <= toVal; m++) {
-        delete window.loadedPlannedEmis[m];
-    }
-
-    if (typeof runCalculation === 'function') runCalculation();
-}
-
-function handleClearRange() {
-    saveStateToUndoStack();
-    const fromVal = parseInt(document.getElementById('fillStartMonth').value);
-    const toVal = parseInt(document.getElementById('fillEndMonth').value);
-    if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-    for (let m = fromVal; m <= toVal; m++) {
-        window.loadedPlannedEmis[m] = ""; 
-    }
-    if (typeof runCalculation === 'function') runCalculation();
 }
 
 // --- BIND LISTENERS ON DOM LOAD ---
