@@ -74,31 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(addBtn) addBtn.addEventListener('click', () => addRow());
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
     
-    if(applyRangeBtn) {
-        applyRangeBtn.addEventListener('click', () => {
-            saveStateToUndoStack();
-
-            const start = parseInt(document.getElementById('fillStartMonth')?.value) || 1;
-            const end = parseInt(document.getElementById('fillEndMonth')?.value) || 360;
-            const val = parseFloat(document.getElementById('fillEmiAmount')?.value) || 0;
-
-            const rows = document.querySelectorAll('#loanPlanBody tr');
-            
-            if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-
-            rows.forEach((row, idx) => {
-                const monthIdx = idx + 1;
-                if (monthIdx >= start && monthIdx <= end) {
-                    const inputEl = row.querySelector('.planned-emi-input');
-                    if (inputEl) {
-                        inputEl.value = val;
-                        window.loadedPlannedEmis[monthIdx] = val;
-                    }
-                }
-            });
-            runCalculation();
-        });
-    }
 
     // --- MULTI-STEP UNDO HISTORY SYSTEM (50 Steps Max) ---
     let undoStack = [];
@@ -785,6 +760,7 @@ function runCalculation() {
                 <td class="col-right closing-balance-cell">₹0</td>
             `;
             loanPlanBody.appendChild(row);
+            row.dataset.standardEmi = standardEmiForMonth;
             
            const inputEl = row.querySelector('.planned-emi-input');
             inputEl.addEventListener('input', () => {
@@ -875,6 +851,116 @@ function runCalculation() {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
 }
+
+// --- TOOLBAR RANGE-FILL LOGIC ---
+
+function updateToolbarButtonStates() {
+    const fromInput = document.getElementById('fillStartMonth');
+    const toInput = document.getElementById('fillEndMonth');
+    const amtInput = document.getElementById('fillEmiAmount');
+
+    const applyBtn = document.getElementById('applyRangeBtn');
+    const copyBtn = document.getElementById('copyAccruedRangeBtn');
+    const clearBtn = document.getElementById('clearRangeBtn');
+
+    if (!fromInput || !toInput) return;
+
+    const fromVal = parseInt(fromInput.value);
+    const toVal = parseInt(toInput.value);
+    const amtVal = parseFloat(amtInput?.value);
+
+    // Validate range: integers, from > 0, and to >= from
+    const isRangeValid = !isNaN(fromVal) && !isNaN(toVal) && fromVal > 0 && toVal >= fromVal;
+    const isAmtValid = !isNaN(amtVal) && amtVal >= 0;
+
+    // 5. Enablement rules:
+    // Copy Accrued and Clear Range require valid 'From' and 'To' months
+    if (copyBtn) copyBtn.disabled = !isRangeValid;
+    if (clearBtn) clearBtn.disabled = !isRangeValid;
+
+    // Apply to Range requires valid 'From', 'To', and an amount
+    if (applyBtn) {
+        applyBtn.disabled = !(isRangeValid && isAmtValid);
+    }
+}
+
+function handleApplyRange() {
+    if (typeof pushState === 'function') pushState(); // Undo snapshot support
+
+    const fromVal = parseInt(document.getElementById('fillStartMonth').value);
+    const toVal = parseInt(document.getElementById('fillEndMonth').value);
+    const amtVal = parseFloat(document.getElementById('fillEmiAmount').value);
+
+    if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+
+    // 2. Put the entered number into the requested month ranges
+    for (let m = fromVal; m <= toVal; m++) {
+        window.loadedPlannedEmis[m] = amtVal;
+    }
+
+    if (typeof runCalculation === 'function') runCalculation();
+}
+
+function handleCopyAccrued() {
+    if (typeof pushState === 'function') pushState(); // Undo snapshot support
+
+    const fromVal = parseInt(document.getElementById('fillStartMonth').value);
+    const toVal = parseInt(document.getElementById('fillEndMonth').value);
+
+    if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+
+    // 3. Copy post-calculation accrued interest/EMI column into planned EMI
+    for (let m = fromVal; m <= toVal; m++) {
+        const row = document.querySelector(`tr[data-month="${m}"]`) || document.querySelector(`#loanPlanBody tr:nth-child(${m})`);
+        if (row && row.dataset.standardEmi) {
+            window.loadedPlannedEmis[m] = parseFloat(row.dataset.standardEmi);
+        }
+    }
+
+    if (typeof runCalculation === 'function') runCalculation();
+}
+
+function handleClearRange() {
+    if (typeof pushState === 'function') pushState(); // Undo snapshot support
+
+    const fromVal = parseInt(document.getElementById('fillStartMonth').value);
+    const toVal = parseInt(document.getElementById('fillEndMonth').value);
+
+    if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+
+    // 4. Erase planned EMI overrides for the selected range
+    for (let m = fromVal; m <= toVal; m++) {
+        delete window.loadedPlannedEmis[m];
+    }
+
+    if (typeof runCalculation === 'function') runCalculation();
+}
+
+// --- BIND LISTENERS ON DOM LOAD ---
+document.addEventListener('DOMContentLoaded', () => {
+    const fromInput = document.getElementById('fillStartMonth');
+    const toInput = document.getElementById('fillEndMonth');
+    const amtInput = document.getElementById('fillEmiAmount');
+
+    const applyBtn = document.getElementById('applyRangeBtn');
+    const copyBtn = document.getElementById('copyAccruedRangeBtn');
+    const clearBtn = document.getElementById('clearRangeBtn');
+
+    // Monitor input changes to dynamically toggle button states
+    [fromInput, toInput, amtInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', updateToolbarButtonStates);
+        }
+    });
+
+    // Attach click events
+    if (applyBtn) applyBtn.addEventListener('click', handleApplyRange);
+    if (copyBtn) copyBtn.addEventListener('click', handleCopyAccrued);
+    if (clearBtn) clearBtn.addEventListener('click', handleClearRange);
+
+    // Initial check on load
+    updateToolbarButtonStates();
+});
 function handleMoratoriumUI() {
     const moroTypeRadio = document.querySelector('input[name="moroType"]:checked');
     if (!moroTypeRadio) return;
