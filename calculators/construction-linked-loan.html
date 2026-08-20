@@ -178,12 +178,12 @@ permalink: /calculators/clhl/
                         <input type="number" id="fillEmiAmount" placeholder="e.g. 35000" style="width: 100%;">
                     </div>
                     <div class="toolbar-actions">
-                        <button id="applyRangeBtn" class="toolbar-btn btn-primary-solid">Apply to Range</button>
-                        <button type="button" id="copyAccruedBtn" class="toolbar-btn btn-secondary-outline" title="Copy interest accrued into planned EMI for the entire tenure">
-                            <span>📋</span> <span>Copy EMI to plan</span>
+                        <button id="applyRangeBtn" class="toolbar-btn btn-primary-solid" disabled>Apply to Range</button>
+                        <button type="button" id="copyAccruedRangeBtn" class="toolbar-btn btn-secondary-outline" title="Copy standard accrued interest or full EMI into the selected range" disabled>
+                            <span>📋</span> <span>Copy Accrued</span>
                         </button>
-                        <button type="button" id="copyAccruedRemainingBtn" class="toolbar-btn btn-secondary-outline" title="Fill remaining or empty months with standard accrued/full EMI without touching customized rows">
-                            <span>📋⏳</span> <span>Copy EMI to plan (Remaining)</span>
+                        <button type="button" id="clearRangeBtn" class="toolbar-btn btn-secondary-outline" title="Clear custom overrides for the selected range" disabled>
+                            <span>🧹</span> <span>Clear Range</span>
                         </button>
                         <button type="button" id="undoBtn" class="toolbar-btn btn-secondary-outline" title="Undo your last action or change" disabled>
                             <span>↩️</span> <span>Undo</span>
