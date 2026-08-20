@@ -616,6 +616,7 @@ function runCalculation() {
     let cumulativeUnpaidInterest = 0;
     let fullEmiCache = 0;
     let fullEmiCalculated = false;
+
     function getMilestoneDisbursementForMonth(yearMonthStr) {
         let addedAmt = 0;
         milestones.forEach(m => {
@@ -717,10 +718,8 @@ function runCalculation() {
         let capitalizedShortfall = 0;
         const plannedEmiVal = parseFloat(inputEl.value) || userPlannedEmiVal;
 
+        // FIXED: Using plannedEmiVal directly without any final-month force overrides
         let effectivePlannedEmi = plannedEmiVal;
-        if (monthIdx === totalMonths) {
-            effectivePlannedEmi = openingBalance + accruedInterest;
-        }
 
         if (isPreEmi) {
             if (effectivePlannedEmi >= accruedInterest) {
@@ -772,7 +771,7 @@ function runCalculation() {
     if (closingPrincipalEl) closingPrincipalEl.innerText = `₹${Math.round(finalClosingBal).toLocaleString()}`;
     if (unpaidInterestEl) unpaidInterestEl.innerText = `₹${Math.round(cumulativeUnpaidInterest).toLocaleString()}`;
 
-// --- 📊 AUTOMATED AUDIT TRIGGER ---
+    // --- 📊 AUTOMATED AUDIT TRIGGER ---
     const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
         interest: parseFloat(r.querySelector('.interest-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
         principal: parseFloat(r.querySelector('.principal-paid-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
