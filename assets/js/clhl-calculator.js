@@ -67,8 +67,6 @@ if (clearRangeBtn) {
 }
     const addBtn = document.getElementById('addRowBtn');
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
-    const applyRangeBtn = document.getElementById('applyRangeBtn');
-
     document.querySelectorAll('input[name="moroType"]').forEach(radio => {
         radio.addEventListener('change', () => {
             handleMoratoriumUI();
