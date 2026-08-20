@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (customMonthsInput && customRadio) {
         customMonthsInput.addEventListener('focus', () => {
             customRadio.checked = true;
-            // Trigger change event if you have listeners tracking state changes
             customRadio.dispatchEvent(new Event('change'));
         });
         
@@ -894,7 +893,7 @@ function updateToolbarButtonStates() {
 }
 
 function handleApplyRange() {
-    if (typeof pushState === 'function') pushState(); // Undo snapshot support
+    saveStateToUndoStack(); // Undo snapshot support
 
     const fromVal = parseInt(document.getElementById('fillStartMonth').value);
     const toVal = parseInt(document.getElementById('fillEndMonth').value);
@@ -911,7 +910,7 @@ function handleApplyRange() {
 }
 
 function handleCopyAccrued() {
-    if (typeof pushState === 'function') pushState();
+    saveStateToUndoStack();
 
     const fromVal = parseInt(document.getElementById('fillStartMonth').value);
     const toVal = parseInt(document.getElementById('fillEndMonth').value);
@@ -925,7 +924,7 @@ function handleCopyAccrued() {
 }
 
 function handleClearRange() {
-    if (typeof pushState === 'function') pushState();
+    saveStateToUndoStack();
     const fromVal = parseInt(document.getElementById('fillStartMonth').value);
     const toVal = parseInt(document.getElementById('fillEndMonth').value);
     if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
