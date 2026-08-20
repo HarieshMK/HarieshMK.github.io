@@ -48,21 +48,23 @@ document.addEventListener('DOMContentLoaded', () => {
             runCalculation();
         });
     }
-// Hook up the range toolbar buttons
-    const applyBtn = document.getElementById('applyRangeBtn');
-    if (applyBtn) {
-        applyBtn.addEventListener('click', handleApplyRange);
-    }
+    
+// --- HOOK RANGE TOOLBAR BUTTONS ---
+const applyRangeBtn = document.getElementById('applyRangeBtn');
+const copyAccruedBtn = document.getElementById('copyAccruedRangeBtn');
+const clearRangeBtn = document.getElementById('clearRangeBtn');
 
-    const copyBtn = document.getElementById('copyAccruedBtn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', handleCopyAccrued);
-    }
+if (applyRangeBtn) {
+    applyRangeBtn.addEventListener('click', handleApplyRange);
+}
 
-    const clearBtn = document.getElementById('clearRangeBtn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', handleClearRange);
-    }
+if (copyAccruedBtn) {
+    copyAccruedBtn.addEventListener('click', handleCopyAccrued);
+}
+
+if (clearRangeBtn) {
+    clearRangeBtn.addEventListener('click', handleClearRange);
+}
     const addBtn = document.getElementById('addRowBtn');
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
     const applyRangeBtn = document.getElementById('applyRangeBtn');
