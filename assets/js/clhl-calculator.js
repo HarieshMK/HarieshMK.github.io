@@ -953,23 +953,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const toInput = document.getElementById('fillEndMonth');
     const amtInput = document.getElementById('fillEmiAmount');
 
-    const applyBtn = document.getElementById('applyRangeBtn');
-    const copyBtn = document.getElementById('copyAccruedRangeBtn');
-    const clearBtn = document.getElementById('clearRangeBtn');
-
-    // Monitor input changes to dynamically toggle button states
     [fromInput, toInput, amtInput].forEach(input => {
         if (input) {
             input.addEventListener('input', updateToolbarButtonStates);
         }
     });
 
+    updateToolbarButtonStates();
+});
+
     // Attach click events
     if (applyBtn) applyBtn.addEventListener('click', handleApplyRange);
     if (copyBtn) copyBtn.addEventListener('click', handleCopyAccrued);
     if (clearBtn) clearBtn.addEventListener('click', handleClearRange);
 
-    // Initial check on load
     updateToolbarButtonStates();
 });
 function handleMoratoriumUI() {
