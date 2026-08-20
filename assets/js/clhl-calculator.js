@@ -620,6 +620,7 @@ function runCalculation() {
         
         return; // Halt calculation completely
     }
+
     const basicCost = document.getElementById('basicCost');
     if (!basicCost) return;
 
@@ -627,7 +628,6 @@ function runCalculation() {
     const totalPropCost = document.getElementById('totalPropertyCost');
     if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
     
-    const milestoneRows = document.querySelectorAll('#milestoneBody tr');
     let cumulativePct = 0;
     let cumulativeLoanAmt = 0;
     const today = new Date();
@@ -660,19 +660,19 @@ function runCalculation() {
     if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
     if (totalLoanEl) totalLoanEl.innerText = `₹${Math.round(cumulativeLoanAmt).toLocaleString()}`;
 
-    const loanStartDateVal = document.getElementById('loanStartDate')?.value;
-    const moroTypeChecked = document.querySelector('input[name="moroType"]:checked');
+    const loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
+    const moroTypeChecked2 = document.querySelector('input[name="moroType"]:checked');
     const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
     
     let moratoriumMonths = 18;
-    if (moroTypeChecked) {
-        if (moroTypeChecked.value === 'custom') {
+    if (moroTypeChecked2) {
+        if (moroTypeChecked2.value === 'custom') {
             moratoriumMonths = parseInt(customMoroMonthsVal) || 0;
-        } else if (moroTypeChecked.value === 'milestone') {
-            if (milestones.length > 0 && loanStartDateVal) {
+        } else if (moroTypeChecked2.value === 'milestone') {
+            if (milestones.length > 0 && loanStartDateVal2) {
                 const sortedMilestones = [...milestones].sort((a, b) => new Date(a.date) - new Date(b.date));
                 const lastMDate = new Date(sortedMilestones[sortedMilestones.length - 1].date);
-                const startD = new Date(loanStartDateVal);
+                const startD = new Date(loanStartDateVal2);
                 const diffTime = lastMDate - startD;
                 const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44));
                 moratoriumMonths = Math.max(0, diffMonths);
@@ -680,7 +680,7 @@ function runCalculation() {
                 moratoriumMonths = 0;
             }
         } else {
-            moratoriumMonths = parseInt(moroTypeChecked.value) || 18;
+            moratoriumMonths = parseInt(moroTypeChecked2.value) || 18;
         }
     }
 
@@ -690,10 +690,8 @@ function runCalculation() {
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
     const totalMonths = tenureYears * 12;
 
-    const loanPlanBody = document.getElementById('loanPlanBody');
     if (!loanPlanBody) return;
     const existingRows = loanPlanBody.querySelectorAll('tr');
-    const hasInterestCell = existingRows.length > 0 && existingRows[0].querySelector('.interest-cell');
     const isTableBuilt = existingRows.length === totalMonths;
     if (!isTableBuilt) {
         loanPlanBody.innerHTML = '';
@@ -701,8 +699,6 @@ function runCalculation() {
 
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
-    let fullEmiCache = 0;
-    let fullEmiCalculated = false;
 
     function getMilestoneDisbursementForMonth(yearMonthStr) {
         let addedAmt = 0;
@@ -736,22 +732,20 @@ function runCalculation() {
         let accruedInterest = openingBalance * monthlyRate;
         let isPreEmi = monthIdx <= moratoriumMonths;
 
-        let benchmarkEmi = accruedInterest;
+        let remainingTenureMonths = totalMonths - monthIdx + 1;
+        let standardEmiForMonth = accruedInterest;
+
         if (!isPreEmi) {
-            if (!fullEmiCalculated) {
-                const remainingTenureMonths = totalMonths - moratoriumMonths; 
-                if (monthlyRate > 0) {
-                    fullEmiCache = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                } else {
-                    fullEmiCache = openingBalance / remainingTenureMonths;
-                }
-                fullEmiCalculated = true;
+            if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                standardEmiForMonth = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+            } else if (remainingTenureMonths > 0) {
+                standardEmiForMonth = openingBalance / remainingTenureMonths;
             }
-            benchmarkEmi = fullEmiCache;
-            accruedInterest = openingBalance * monthlyRate; 
+        } else {
+            standardEmiForMonth = accruedInterest;
         }
 
-        const defaultPlannedEmi = isPreEmi ? accruedInterest : fullEmiCache;
+        const defaultPlannedEmi = standardEmiForMonth;
         let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
             userPlannedEmiVal = defaultPlannedEmi; 
@@ -793,7 +787,7 @@ function runCalculation() {
 
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
-        row.children[2].innerHTML = `₹${Math.round(isPreEmi ? accruedInterest : fullEmiCache).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
+        row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
         
         const inputEl = row.querySelector('.planned-emi-input');
         if (document.activeElement !== inputEl) {
@@ -804,8 +798,6 @@ function runCalculation() {
         let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
         const plannedEmiVal = parseFloat(inputEl.value) || userPlannedEmiVal;
-
-        // FIXED: Using plannedEmiVal directly without any final-month force overrides
         let effectivePlannedEmi = plannedEmiVal;
 
         if (isPreEmi) {
@@ -832,7 +824,7 @@ function runCalculation() {
                 partPaymentColVal = 0;
             } else {
                 principalPaid = effectivePlannedEmi - interestComponent;
-                partPaymentColVal = Math.max(0, effectivePlannedEmi - standardEmiForCalc);
+                partPaymentColVal = Math.max(0, effectivePlannedEmi - standardEmiForMonth);
             }
         }
 
@@ -874,7 +866,6 @@ function runCalculation() {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
 }
-
 function handleMoratoriumUI() {
     const moroTypeRadio = document.querySelector('input[name="moroType"]:checked');
     if (!moroTypeRadio) return;
