@@ -48,7 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
             runCalculation();
         });
     }
+// Hook up the range toolbar buttons
+    const applyBtn = document.getElementById('applyRangeBtn');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', handleApplyRange);
+    }
 
+    const copyBtn = document.getElementById('copyAccruedBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', handleCopyAccrued);
+    }
+
+    const clearBtn = document.getElementById('clearRangeBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', handleClearRange);
+    }
     const addBtn = document.getElementById('addRowBtn');
     const addMilestoneBtn = document.getElementById('addMilestoneBtn');
     const applyRangeBtn = document.getElementById('applyRangeBtn');
