@@ -699,6 +699,10 @@ function runCalculation() {
 
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
+    
+    // --- ADD THESE VARIABLES TO CACHE FIXED FULL EMI ---
+    let lockedFullEmi = 0;
+    let fullEmiLockedMonth = null;
 
     function getMilestoneDisbursementForMonth(yearMonthStr) {
         let addedAmt = 0;
@@ -736,11 +740,16 @@ function runCalculation() {
         let standardEmiForMonth = accruedInterest;
 
         if (!isPreEmi) {
-            if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                standardEmiForMonth = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-            } else if (remainingTenureMonths > 0) {
-                standardEmiForMonth = openingBalance / remainingTenureMonths;
+            // Lock the Full EMI the very first month we step out of pre-EMI
+            if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+                if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                    lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                } else if (remainingTenureMonths > 0) {
+                    lockedFullEmi = openingBalance / remainingTenureMonths;
+                }
+                fullEmiLockedMonth = monthIdx;
             }
+            standardEmiForMonth = lockedFullEmi;
         } else {
             standardEmiForMonth = accruedInterest;
         }
