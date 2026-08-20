@@ -903,20 +903,31 @@ function handleApplyRange() {
 }
 
 function handleCopyAccrued() {
-    if (typeof pushState === 'function') pushState(); // Undo snapshot support
+    if (typeof pushState === 'function') pushState();
 
     const fromVal = parseInt(document.getElementById('fillStartMonth').value);
     const toVal = parseInt(document.getElementById('fillEndMonth').value);
 
     if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
 
-    // 3. Copy post-calculation accrued interest/EMI column into planned EMI
-    for (let m = fromVal; m <= toVal; m++) {
-        const row = document.querySelector(`tr[data-month="${m}"]`) || document.querySelector(`#loanPlanBody tr:nth-child(${m})`);
-        if (row && row.dataset.standardEmi) {
-            window.loadedPlannedEmis[m] = parseFloat(row.dataset.standardEmi);
+    const rows = document.querySelectorAll('#loanPlanBody tr');
+    rows.forEach(row => {
+        const m = parseInt(row.dataset.month);
+        if (m >= fromVal && m <= toVal) {
+            // Find the cell displaying the standard/accrued EMI
+            // Adjust the selector based on your actual table column structure (e.g., 3rd or 4th column)
+            const standardEmiCell = row.querySelectorAll('td')[2]; // Adjust index if needed
+            if (standardEmiCell) {
+                // Strip out currency symbols, commas, and text like "(Pre-EMI)"
+                const rawText = standardEmiCell.innerText.replace(/[₹,]/g, '').replace(/\([^)]*\)/g, '').trim();
+                const exactVal = parseFloat(rawText);
+                
+                if (!isNaN(exactVal)) {
+                    window.loadedPlannedEmis[m] = exactVal;
+                }
+            }
         }
-    }
+    });
 
     if (typeof runCalculation === 'function') runCalculation();
 }
