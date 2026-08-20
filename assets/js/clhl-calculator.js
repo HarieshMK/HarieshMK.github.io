@@ -154,13 +154,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Track individual manual inputs in the table for Undo
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (loanPlanBody) {
-        let typingTimeout;
+        loanPlanBody.addEventListener('focusin', (e) => {
+            if (e.target.matches('.planned-emi-input')) {
+                saveStateToUndoStack();
+            }
+        });
         loanPlanBody.addEventListener('input', (e) => {
             if (e.target.matches('.planned-emi-input')) {
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    saveStateToUndoStack();
-                }, 500);
+                if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+                const row = e.target.closest('tr');
+                const monthIdx = parseInt(row.dataset.month, 10);
+                
+                window.loadedPlannedEmis[monthIdx] = parseFloat(e.target.value) || 0;
+                if (typeof runCalculation === 'function') {
+                    runCalculation();
+                }
             }
         });
     }
