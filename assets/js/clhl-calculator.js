@@ -533,6 +533,93 @@ function addRow(date = '', type = 'payment', amount = '') {
 }
 
 function runCalculation() {
+    const loanPlanBody = document.getElementById('loanPlanBody');
+    const amortizationContainer = document.getElementById('loanPlanContainer') || loanPlanBody?.parentElement; 
+    
+    // --- 1. GATHER ALL INPUTS FOR VALIDATION ---
+    let missingErrors = [];
+
+    const interestRateVal = document.getElementById('interestRate')?.value;
+    if (!interestRateVal || parseFloat(interestRateVal) <= 0) {
+        missingErrors.push("• Enter a valid annual interest rate.");
+    }
+
+    const tenureYearsVal = document.getElementById('tenureYears')?.value;
+    if (!tenureYearsVal || parseInt(tenureYearsVal) <= 0) {
+        missingErrors.push("• Enter a valid loan tenure in years.");
+    }
+
+    const loanStartDateVal = document.getElementById('loanStartDate')?.value;
+    if (!loanStartDateVal) {
+        missingErrors.push("• Select a loan start date.");
+    }
+
+    const moroTypeChecked = document.querySelector('input[name="moroType"]:checked');
+    if (!moroTypeChecked) {
+        missingErrors.push("• Select or configure a Moratorium Period option.");
+    } else if (moroTypeChecked.value === 'custom') {
+        const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
+        if (customMoroMonthsVal === '' || parseInt(customMoroMonthsVal) < 0) {
+            missingErrors.push("• Specify the custom moratorium duration in months.");
+        }
+    }
+
+    // --- 2. VALIDATE PROJECT MILESTONES & 100% TOTAL MATCH ---
+    const milestoneRows = document.querySelectorAll('#milestoneBody tr');
+    if (milestoneRows.length === 0) {
+        missingErrors.push("• Add at least one project milestone.");
+    }
+
+    let totalMilestonePct = 0;
+    milestoneRows.forEach((row, index) => {
+        const name = row.querySelector('.milestone-name')?.value.trim();
+        const pct = parseFloat(row.querySelector('.milestone-pct')?.value) || 0;
+        const date = row.querySelector('.milestone-date')?.value;
+        const loanAmt = parseFloat(row.querySelector('.milestone-loan-amount')?.value) || 0;
+
+        totalMilestonePct += pct;
+
+        if (!name) {
+            missingErrors.push(`• Milestone #${index + 1}: Name is missing.`);
+        }
+        if (pct <= 0) {
+            missingErrors.push(`• Milestone #${index + 1} (${name || 'Unnamed'}): Percentage must be greater than 0%.`);
+        }
+        if (!date) {
+            missingErrors.push(`• Milestone #${index + 1} (${name || 'Unnamed'}): Date is missing.`);
+        }
+        if (loanAmt < 0) {
+            missingErrors.push(`• Milestone #${index + 1} (${name || 'Unnamed'}): Loan amount cannot be negative.`);
+        }
+    });
+
+    if (milestoneRows.length > 0 && Math.abs(totalMilestonePct - 100) > 0.01) {
+        missingErrors.push(`• Project milestone percentages total ${totalMilestonePct.toFixed(2)}%. They must equal exactly 100%.`);
+    }
+
+    // --- 3. HANDLE ERRORS / RENDER WARNING MESSAGE ---
+    if (missingErrors.length > 0) {
+        if (loanPlanBody) {
+            loanPlanBody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align: left; padding: 25px; color: #ff6b6b; background: rgba(255, 107, 107, 0.05);">
+                        <strong style="font-size: 1.05rem; display: block; margin-bottom: 10px;">⚠️ Amortization Table Locked: Complete the following requirements:</strong>
+                        <div style="line-height: 1.6; font-size: 0.95rem;">
+                            ${missingErrors.join('<br>')}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Clear summary output numbers
+        const closingPrincipalEl = document.getElementById('closingPrincipal');
+        const unpaidInterestEl = document.getElementById('unpaidInterest');
+        if (closingPrincipalEl) closingPrincipalEl.innerText = `₹0`;
+        if (unpaidInterestEl) unpaidInterestEl.innerText = `₹0`;
+        
+        return; // Halt calculation completely
+    }
     const basicCost = document.getElementById('basicCost');
     if (!basicCost) return;
 
