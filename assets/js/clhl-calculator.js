@@ -734,7 +734,8 @@ function runCalculation() {
         if (window.forceDefaultEmis) {
             userPlannedEmiVal = defaultPlannedEmi; 
         } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
-            userPlannedEmiVal = window.loadedPlannedEmis[monthIdx];
+            const rawVal = window.loadedPlannedEmis[monthIdx];
+            userPlannedEmiVal = (rawVal === "" ? "" : rawVal);
         } else {
             userPlannedEmiVal = defaultPlannedEmi;
         }
@@ -776,13 +777,13 @@ function runCalculation() {
         
         const inputEl = row.querySelector('.planned-emi-input');
         if (document.activeElement !== inputEl) {
-            inputEl.value = Math.round(userPlannedEmiVal * 100) / 100;
+            inputEl.value = (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) ? "" : Math.round(userPlannedEmiVal * 100) / 100;
         }
 
         let principalPaid = 0;
         let partPaymentColVal = 0;
         let capitalizedShortfall = 0;
-        const plannedEmiVal = parseFloat(inputEl.value) || userPlannedEmiVal;
+        const plannedEmiVal = inputEl.value === '' ? 0 : (parseFloat(inputEl.value) || userPlannedEmiVal || 0);
         let effectivePlannedEmi = plannedEmiVal;
 
         if (isPreEmi) {
@@ -921,18 +922,13 @@ function handleCopyAccrued() {
 }
 
 function handleClearRange() {
-    if (typeof pushState === 'function') pushState(); // Undo snapshot support
-
+    if (typeof pushState === 'function') pushState();
     const fromVal = parseInt(document.getElementById('fillStartMonth').value);
     const toVal = parseInt(document.getElementById('fillEndMonth').value);
-
     if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-
-    // 4. Erase planned EMI overrides for the selected range
     for (let m = fromVal; m <= toVal; m++) {
-        delete window.loadedPlannedEmis[m];
+        window.loadedPlannedEmis[m] = ""; 
     }
-
     if (typeof runCalculation === 'function') runCalculation();
 }
 
@@ -1094,27 +1090,27 @@ async function saveCalculatorDataToSupabase() {
         }
     }
 
-    // 3. Save Custom Planned EMIs
+    // 3. Save Custom Planned EMIs (Only save explicit user overrides)
     await activeSupabase
         .from('clhl_planned_emis')
         .delete()
         .eq('profile_id', profileId);
 
-    const loanPlanRows = document.querySelectorAll('#loanPlanBody tr');
     const plannedEmisPayload = [];
 
-    loanPlanRows.forEach(row => {
-        const mIdx = parseInt(row.dataset.month);
-        const inputEl = row.querySelector('.planned-emi-input');
-        if (!isNaN(mIdx) && inputEl && inputEl.value !== '') {
-            plannedEmisPayload.push({
-                profile_id: profileId,
-                month_index: mIdx,
-                planned_emi: parseFloat(inputEl.value) || 0,
-                updated_at: new Date().toISOString()
-            });
-        }
-    });
+    if (window.loadedPlannedEmis) {
+        Object.keys(window.loadedPlannedEmis).forEach(mIdx => {
+            const val = window.loadedPlannedEmis[mIdx];
+            if (val !== undefined) {
+                plannedEmisPayload.push({
+                    profile_id: profileId,
+                    month_index: parseInt(mIdx, 10),
+                    planned_emi: val === "" ? 0 : parseFloat(val) || 0,
+                    updated_at: new Date().toISOString()
+                });
+            }
+        });
+    }
 
     if (plannedEmisPayload.length > 0) {
         const { error: emiError } = await activeSupabase
