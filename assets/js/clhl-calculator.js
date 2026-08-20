@@ -909,25 +909,12 @@ function handleCopyAccrued() {
     const toVal = parseInt(document.getElementById('fillEndMonth').value);
 
     if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+    for (let m = fromVal; m <= toVal; m++) {
+        delete window.loadedPlannedEmis[m];
+    }
 
-    const rows = document.querySelectorAll('#loanPlanBody tr');
-    rows.forEach(row => {
-        const m = parseInt(row.dataset.month);
-        if (m >= fromVal && m <= toVal) {
-            // Find the cell displaying the standard/accrued EMI
-            // Adjust the selector based on your actual table column structure (e.g., 3rd or 4th column)
-            const standardEmiCell = row.querySelectorAll('td')[2]; // Adjust index if needed
-            if (standardEmiCell) {
-                // Strip out currency symbols, commas, and text like "(Pre-EMI)"
-                const rawText = standardEmiCell.innerText.replace(/[₹,]/g, '').replace(/\([^)]*\)/g, '').trim();
-                const exactVal = parseFloat(rawText);
-                
-                if (!isNaN(exactVal)) {
-                    window.loadedPlannedEmis[m] = exactVal;
-                }
-            }
-        }
-    });
+    if (typeof runCalculation === 'function') runCalculation();
+}
 
     if (typeof runCalculation === 'function') runCalculation();
 }
@@ -1101,27 +1088,30 @@ async function saveCalculatorDataToSupabase() {
         }
     }
 
-    // 3. Save Custom Planned EMIs (Only save explicit user overrides)
+    // 3. Save Custom Planned EMIs (Read directly from the visible table inputs)
     await activeSupabase
         .from('clhl_planned_emis')
         .delete()
         .eq('profile_id', profileId);
 
     const plannedEmisPayload = [];
+    const rows = document.querySelectorAll('#loanPlanBody tr');
 
-    if (window.loadedPlannedEmis) {
-        Object.keys(window.loadedPlannedEmis).forEach(mIdx => {
-            const val = window.loadedPlannedEmis[mIdx];
-            if (val !== undefined) {
-                plannedEmisPayload.push({
-                    profile_id: profileId,
-                    month_index: parseInt(mIdx, 10),
-                    planned_emi: val === "" ? 0 : parseFloat(val) || 0,
-                    updated_at: new Date().toISOString()
-                });
-            }
-        });
-    }
+    rows.forEach(row => {
+        const mIdx = parseInt(row.dataset.month, 10);
+        const inputEl = row.querySelector('.planned-emi-input');
+        
+        if (!isNaN(mIdx) && inputEl) {
+            const val = inputEl.value.trim();
+            // Save whatever the user entered, or 0 if empty/cleared
+            plannedEmisPayload.push({
+                profile_id: profileId,
+                month_index: mIdx,
+                planned_emi: val === "" ? 0 : parseFloat(val) || 0,
+                updated_at: new Date().toISOString()
+            });
+        }
+    });
 
     if (plannedEmisPayload.length > 0) {
         const { error: emiError } = await activeSupabase
