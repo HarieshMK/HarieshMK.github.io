@@ -212,6 +212,42 @@ permalink: /calculators/clhl/
                         </tbody>
                     </table>
                 </div>
+
+                <!-- 🚀 NEW STICKY SUMMARY FOOTER BAR -->
+                <div class="loan-summary-footer-bar" id="loanSummaryFooter">
+                    <!-- Top Tier: Core Financial Totals -->
+                    <div class="summary-grid-row">
+                        <div class="summary-metric">
+                            <span class="metric-label">Total Principal</span>
+                            <span class="metric-value" id="summaryTotalPrincipal">₹ 0</span>
+                        </div>
+                        <div class="summary-metric">
+                            <span class="metric-label">Total Interest Paid</span>
+                            <span class="metric-value" id="summaryTotalInterest">₹ 0</span>
+                        </div>
+                        <div class="summary-metric">
+                            <span class="metric-label">Extra Prepayments</span>
+                            <span class="metric-value" id="summaryExtraPaid">₹ 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider Line -->
+                    <div class="summary-divider"></div>
+
+                    <!-- Bottom Tier: The Big Wins -->
+                    <div class="summary-grid-row highlight-tier">
+                        <div class="summary-metric hero-metric">
+                            <span class="metric-label">✨ Total Interest Saved</span>
+                            <span class="metric-value text-success" id="summaryInterestSaved">₹ 0</span>
+                        </div>
+                        <div class="summary-metric hero-metric">
+                            <span class="metric-label">🚀 Est. Loan Closure</span>
+                            <span class="metric-value text-primary" id="summaryCloseDate">--</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- END OF FOOTER BAR -->
+
             </div>
         </details>
     </div>
@@ -970,5 +1006,87 @@ details[open] summary::after {
 .sticky-toolbar-wrapper.is-stuck {
     box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
+}
+    /* ==========================================================================
+    LOAN SUMMARY FOOTER BAR STYLING
+   ========================================================================== */
+.loan-summary-footer-bar {
+    margin-top: 20px;
+    background: var(--bg-offset);
+    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 25%, var(--border-base));
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: sticky;
+    bottom: 15px; /* Stays locked nicely at the bottom of the viewport when scrolling past the table */
+    z-index: 15;
+}
+
+.summary-grid-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.summary-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Subtle divider line separating standard totals from hero metrics */
+.summary-divider {
+    height: 1px;
+    background-color: var(--border-base);
+    width: 100%;
+}
+
+/* Hero Tier Accent Styling */
+.highlight-tier {
+    background: color-mix(in srgb, var(--brand-primary) 4%, var(--bg-offset));
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px dashed color-mix(in srgb, var(--brand-primary) 30%, var(--border-base));
+}
+
+.text-success {
+    color: #10b981 !important; /* Vibrant green to indicate financial savings */
+}
+
+.text-primary {
+    color: var(--brand-primary) !important;
+}
+
+/* Mobile responsiveness adjustments */
+@media (max-width: 768px) {
+    .summary-grid-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .summary-metric {
+        width: 100%;
+    }
 }
 </style>
