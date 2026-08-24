@@ -719,6 +719,7 @@ function runCalculation() {
     let stdOpeningBalance = 0;
     let loanClosureMonthIndex = null;
     let previousClosingBalance = 0;
+
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
@@ -732,47 +733,6 @@ function runCalculation() {
             openingBalance = cumulativeLoanAmt;
         } else {
             openingBalance = previousClosingBalance + milestoneDisbursement;
-        }
-       if (openingBalance <= 0 && milestoneDisbursement === 0) {
-            // Loan is closed. Clear out the calculated text columns to ₹0
-            openingBalance = 0; // ensure it stays 0
-            row.children[1].innerText = `₹0`; // Opening Balance
-            row.children[2].innerText = `₹0`; // EMI
-            row.children[4].innerText = `₹0`; // Interest component
-            row.children[5].innerText = `₹0`; // Principal component
-            row.children[6].innerText = `₹0`; // Part Payment
-            row.children[7].innerText = `₹0`; // Closing Balance
-            continue; 
-        }
-        let accruedInterest = openingBalance * monthlyRate;
-        let isPreEmi = monthIdx <= moratoriumMonths;
-
-        let remainingTenureMonths = totalMonths - monthIdx + 1;
-        let standardEmiForMonth = accruedInterest;
-
-        if (!isPreEmi) {
-            if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
-                if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                    lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                } else if (remainingTenureMonths > 0) {
-                    lockedFullEmi = openingBalance / remainingTenureMonths;
-                }
-                fullEmiLockedMonth = monthIdx;
-            }
-            standardEmiForMonth = lockedFullEmi;
-        } else {
-            standardEmiForMonth = accruedInterest;
-        }
-
-        const defaultPlannedEmi = standardEmiForMonth;
-        let userPlannedEmiVal;
-        if (window.forceDefaultEmis) {
-            userPlannedEmiVal = defaultPlannedEmi; 
-        } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
-            const rawVal = window.loadedPlannedEmis[monthIdx];
-            userPlannedEmiVal = (rawVal === "" ? "" : rawVal);
-        } else {
-            userPlannedEmiVal = defaultPlannedEmi;
         }
 
         let row;
@@ -796,9 +756,8 @@ function runCalculation() {
                 <td class="col-right closing-balance-cell">₹0</td>
             `;
             loanPlanBody.appendChild(row);
-            row.dataset.standardEmi = standardEmiForMonth;
             
-           const inputEl = row.querySelector('.planned-emi-input');
+            const inputEl = row.querySelector('.planned-emi-input');
             inputEl.addEventListener('input', () => {
                 if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
                 window.loadedPlannedEmis[monthIdx] = parseFloat(inputEl.value) || 0;
@@ -806,42 +765,73 @@ function runCalculation() {
             });
         }
 
-        // ==========================================
-        // PUT THE ZERO-BALANCE GUARD CHECK HERE 
-        // (Now that 'row' safely exists):
-        // ==========================================
+        let accruedInterest = 0;
+        let principalPaid = 0;
+        let partPaymentColVal = 0;
+        let capitalizedShortfall = 0;
+        let standardEmiForMonth = 0;
+        let isPreEmi = monthIdx <= moratoriumMonths;
+        const inputEl = row.querySelector('.planned-emi-input');
+
+        // --- SINGLE CLEAN ZERO-BALANCE GUARD (No 'continue') ---
         if (openingBalance <= 0 && milestoneDisbursement === 0) {
             openingBalance = 0; 
+            row.children[0].innerText = displayLabel;
             row.children[1].innerText = `₹0`; // Opening Balance
             row.children[2].innerText = `₹0`; // EMI
-            // Do not touch row.children[3] (Planned EMI input)
             row.children[4].innerText = `₹0`; // Interest component
             row.children[5].innerText = `₹0`; // Principal component
             row.children[6].innerText = `₹0`; // Part Payment
             row.children[7].innerText = `₹0`; // Closing Balance
             
+            if (loanClosureMonthIndex === null) {
+                loanClosureMonthIndex = monthIdx;
+            }
+
             previousClosingBalance = 0;
-            continue; 
+            currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
+            continue; // Safe to continue here because we are past row creation and summary collection can handle zero rows natively if tracked, or we let it fall through.
         }
-        // ==========================================
+
+        accruedInterest = openingBalance * monthlyRate;
+        let remainingTenureMonths = totalMonths - monthIdx + 1;
+        standardEmiForMonth = accruedInterest;
+
+        if (!isPreEmi) {
+            if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+                if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                    lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                } else if (remainingTenureMonths > 0) {
+                    lockedFullEmi = openingBalance / remainingTenureMonths;
+                }
+                fullEmiLockedMonth = monthIdx;
+            }
+            standardEmiForMonth = lockedFullEmi;
+        }
+
+        const defaultPlannedEmi = standardEmiForMonth;
+        let userPlannedEmiVal;
+        if (window.forceDefaultEmis) {
+            userPlannedEmiVal = defaultPlannedEmi; 
+        } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
+            const rawVal = window.loadedPlannedEmis[monthIdx];
+            userPlannedEmiVal = (rawVal === "" ? "" : rawVal);
+        } else {
+            userPlannedEmiVal = defaultPlannedEmi;
+        }
 
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
         
-        const inputEl = row.querySelector('.planned-emi-input');
         if (document.activeElement !== inputEl) {
             inputEl.value = (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) ? "" : Math.round(userPlannedEmiVal * 100) / 100;
         }
 
-        let principalPaid = 0;
-        let partPaymentColVal = 0;
-        let capitalizedShortfall = 0;
         const plannedEmiVal = inputEl.value === '' ? 0 : (parseFloat(inputEl.value) || userPlannedEmiVal || 0);
         let effectivePlannedEmi = plannedEmiVal;
 
         if (isPreEmi) {
-            // Pre-EMI: Obligated principal is ALWAYS 0. Anything above accrued interest goes to part payment.
             principalPaid = 0;
             if (effectivePlannedEmi >= accruedInterest) {
                 partPaymentColVal = effectivePlannedEmi - accruedInterest;
@@ -852,22 +842,17 @@ function runCalculation() {
                 partPaymentColVal = 0;
             }
         } else {
-            // Full EMI Period Logic
             const interestComponent = accruedInterest;
-
             if (effectivePlannedEmi < interestComponent) {
-                // Shortfall case
                 const shortfall = interestComponent - effectivePlannedEmi;
-                capitalizedShortfall = shortfall; 
+                capitalizedStartfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
                 partPaymentColVal = 0;
             } else if (effectivePlannedEmi >= standardEmiForMonth) {
-                // Paid standard full EMI or higher (extra goes to part payment)
                 principalPaid = standardEmiForMonth - interestComponent;
                 partPaymentColVal = effectivePlannedEmi - standardEmiForMonth;
             } else {
-                // Paid between accrued interest and standard full EMI
                 principalPaid = effectivePlannedEmi - interestComponent;
                 partPaymentColVal = 0;
             }
@@ -889,13 +874,15 @@ function runCalculation() {
         let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
         baselineInterestSum += stdAccruedInterest;
         stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
+        
         const isShortfall = effectivePlannedEmi < accruedInterest && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
         let closingBalance = openingBalance - (principalPaid + partPaymentColVal) + capitalizedShortfall;
-        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
-            loanClosureMonthIndex = monthIdx;
-        }
+        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
+            loanClosureMonthIndex = monthIdx;
+        }
+        
         row.querySelector('.interest-cell').innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
