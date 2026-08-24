@@ -861,10 +861,6 @@ function runCalculation() {
         }
         
         // --- ACCUMULATE ACTUAL METRICS ---
-        totalPrincipalPaidSum += (principalPaid + partPaymentColVal);
-        totalInterestPaidSum += accruedInterest;
-        totalExtraPaidSum += partPaymentColVal;
-
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
             stdOpeningBalance = cumulativeLoanAmt;
