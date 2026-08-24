@@ -223,7 +223,6 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
             hasAnomalies = true;
             consoleLogGroup.push(`❌ Row ${index + 1}: Contains NaN or invalid numbers.`);
         }
-        // FIX: Only add row.principal, since it already encompasses the total principal reduction for that row
         totalPrincipalPaid += row.principal;
     });
 
@@ -317,8 +316,8 @@ function updateBasicCost() {
     runCalculation();
 }
 // --- MULTI-STEP UNDO HISTORY SYSTEM (50 Steps Max) ---
-    let undoStack = [];
-    const MAX_UNDO_STEPS = 50;
+let undoStack = [];
+const MAX_UNDO_STEPS = 50;
 
     function saveStateToUndoStack() {
         const currentState = {};
@@ -713,6 +712,12 @@ function runCalculation() {
 
     let currentMonthDate = loanStartDateVal ? new Date(loanStartDateVal) : new Date();
     currentMonthDate.setDate(1);
+    let totalPrincipalPaidSum = 0;
+    let totalInterestPaidSum = 0;
+    let totalExtraPaidSum = 0;
+    let baselineInterestSum = 0;
+    let stdOpeningBalance = 0;
+    let loanClosureMonthIndex = null;
 
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
@@ -832,11 +837,29 @@ function runCalculation() {
                 partPaymentColVal = Math.max(0, effectivePlannedEmi - standardEmiForMonth);
             }
         }
+        // --- ACCUMULATE ACTUAL METRICS ---
+        totalPrincipalPaidSum += principalPaid;
+        totalInterestPaidSum += accruedInterest;
+        totalExtraPaidSum += partPaymentColVal;
 
+        let stdDisbursement = milestoneDisbursement;
+        if (monthIdx === 1) {
+            stdOpeningBalance = cumulativeLoanAmt;
+        } else {
+            stdOpeningBalance = stdOpeningBalance + stdDisbursement;
+        }
+        let stdAccruedInterest = stdOpeningBalance * monthlyRate;
+        let stdStandardEmi = isPreEmi ? stdAccruedInterest : lockedFullEmi;
+        let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
+        baselineInterestSum += stdAccruedInterest;
+        stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
         const isShortfall = effectivePlannedEmi < accruedInterest && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
         let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
+        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
+            loanClosureMonthIndex = monthIdx;
+        }
         row.querySelector('.interest-cell').innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
         row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
@@ -869,6 +892,45 @@ function runCalculation() {
 
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden) {
         auditLoanMath(rowsArray, initialLoan, annualRate);
+    }
+    // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
+    const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
+    const sumInterestEl = document.getElementById('summaryTotalInterest');
+    const sumExtraEl = document.getElementById('summaryExtraPaid');
+    const sumSavedEl = document.getElementById('summaryInterestSaved');
+    const sumCloseDateEl = document.getElementById('summaryCloseDate');
+
+    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
+    if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
+    if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
+    
+    // Calculate Interest Saved
+    const interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
+    if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
+
+    // Determine Est. Loan Closure Date
+    if (loanClosureMonthIndex !== null) {
+        if (loanStartDateVal) {
+            let closureDate = new Date(loanStartDateVal);
+            closureDate.setDate(1);
+            closureDate.setMonth(closureDate.getMonth() + (loanClosureMonthIndex - 1));
+            const cMonth = closureDate.toLocaleString('en-US', { month: 'short' });
+            const cYear = closureDate.getFullYear();
+            if (sumCloseDateEl) sumCloseDateEl.innerText = `${cMonth} ${cYear} 🎉`;
+        } else {
+            if (sumCloseDateEl) sumCloseDateEl.innerText = `Month ${loanClosureMonthIndex}`;
+        }
+    } else {
+        if (loanStartDateVal && totalMonths > 0) {
+            let finalDate = new Date(loanStartDateVal);
+            finalDate.setDate(1);
+            finalDate.setMonth(finalDate.getMonth() + (totalMonths - 1));
+            const fMonth = finalDate.toLocaleString('en-US', { month: 'short' });
+            const fYear = finalDate.getFullYear();
+            if (sumCloseDateEl) sumCloseDateEl.innerText = `${fMonth} ${fYear} (Full Tenure)`;
+        } else {
+            if (sumCloseDateEl) sumCloseDateEl.innerText = `--`;
+        }
     }
 }
 
