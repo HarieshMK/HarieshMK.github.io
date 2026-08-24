@@ -718,7 +718,7 @@ function runCalculation() {
     let baselineInterestSum = 0;
     let stdOpeningBalance = 0;
     let loanClosureMonthIndex = null;
-
+    let previousClosingBalance = 0;
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
@@ -806,6 +806,25 @@ function runCalculation() {
             });
         }
 
+        // ==========================================
+        // PUT THE ZERO-BALANCE GUARD CHECK HERE 
+        // (Now that 'row' safely exists):
+        // ==========================================
+        if (openingBalance <= 0 && milestoneDisbursement === 0) {
+            openingBalance = 0; 
+            row.children[1].innerText = `₹0`; // Opening Balance
+            row.children[2].innerText = `₹0`; // EMI
+            // Do not touch row.children[3] (Planned EMI input)
+            row.children[4].innerText = `₹0`; // Interest component
+            row.children[5].innerText = `₹0`; // Principal component
+            row.children[6].innerText = `₹0`; // Part Payment
+            row.children[7].innerText = `₹0`; // Closing Balance
+            
+            previousClosingBalance = 0;
+            continue; 
+        }
+        // ==========================================
+
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
@@ -884,6 +903,7 @@ function runCalculation() {
         
         currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
         openingBalance = Math.max(0, closingBalance);
+        previousClosingBalance = closingBalance;
     }
 
     const closingPrincipalEl = document.getElementById('closingPrincipal');
