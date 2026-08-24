@@ -786,13 +786,13 @@ function runCalculation() {
 
             previousClosingBalance = 0;
             currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
-            continue;
         }
 
         accruedInterest = openingBalance * monthlyRate;
         let remainingTenureMonths = totalMonths - monthIdx + 1;
         standardEmiForMonth = accruedInterest;
 
+        // --- SEPARATE BASELINE VS USER FULL EMI ---
         if (!isPreEmi) {
             if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
                 if (monthlyRate > 0 && remainingTenureMonths > 0) {
@@ -804,6 +804,31 @@ function runCalculation() {
             }
             standardEmiForMonth = lockedFullEmi;
         }
+
+        // --- INDEPENDENT BASELINE METRIC CALCULATION ---
+        let stdDisbursement = milestoneDisbursement;
+        if (monthIdx === 1) {
+            stdOpeningBalance = cumulativeLoanAmt;
+        } else {
+            stdOpeningBalance = stdOpeningBalance + stdDisbursement;
+        }
+        
+        let stdAccruedInterest = stdOpeningBalance * monthlyRate;
+        let stdRemainingTenure = totalMonths - monthIdx + 1;
+        
+        // Use the clean standard opening balance to lock baseline EMI once
+        if (!isPreEmi && window.baselineLockedEmi === undefined) {
+            if (monthlyRate > 0 && stdRemainingTenure > 0) {
+                window.baselineLockedEmi = (stdOpeningBalance * monthlyRate * Math.pow(1 + monthlyRate, stdRemainingTenure)) / (Math.pow(1 + monthlyRate, stdRemainingTenure) - 1);
+            } else {
+                window.baselineLockedEmi = stdOpeningBalance / Math.max(1, stdRemainingTenure);
+            }
+        }
+        let stdStandardEmi = isPreEmi ? stdAccruedInterest : (window.baselineLockedEmi || stdAccruedInterest);
+        let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
+        
+        baselineInterestSum += stdAccruedInterest;
+        stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
 
         const defaultPlannedEmi = standardEmiForMonth;
         let userPlannedEmiVal;
@@ -853,23 +878,8 @@ function runCalculation() {
                 partPaymentColVal = 0;
             }
         }
-        
-        // --- ACCUMULATE ACTUAL METRICS ---
-        let stdDisbursement = milestoneDisbursement;
-        if (monthIdx === 1) {
-            stdOpeningBalance = cumulativeLoanAmt;
-        } else {
-            stdOpeningBalance = stdOpeningBalance + stdDisbursement;
-        }
-        let stdAccruedInterest = stdOpeningBalance * monthlyRate;
-        let stdStandardEmi = isPreEmi ? stdAccruedInterest : lockedFullEmi;
-        let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
-        baselineInterestSum += stdAccruedInterest;
-        stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
-        
         const isShortfall = effectivePlannedEmi < accruedInterest && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
-        // --- PRECISION CLAMP: Ensure we never pay more principal than what is actually owed ---
         let totalPrincipalReduction = principalPaid + partPaymentColVal;
         if (totalPrincipalReduction > openingBalance) {
             let excess = totalPrincipalReduction - openingBalance;
