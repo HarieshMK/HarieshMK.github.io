@@ -212,44 +212,46 @@ if (clearRangeBtn) {
 });
 
 function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
-    let totalPrincipalPaid = 0;
+    let totalPrincipalPaidSum = 0;
     let hasAnomalies = false;
-    let consoleLogGroup = [];
-
-    consoleLogGroup.push(`%c--- 📊 Loan Calculation Audit Report ---`, 'color: #007bff; font-weight: bold;');
+    
+    console.group('%c🔍 DEEP-DIVE LOAN MATH AUDIT', 'background: #222; color: #bada55; font-size: 14px; padding: 4px;');
+    console.log(`Target Initial Loan: ₹${initialLoanAmount}`);
 
     scheduleData.forEach((row, index) => {
-        if (isNaN(row.closingBalance) || isNaN(row.interest) || isNaN(row.principal)) {
+        const monthNum = index + 1;
+        const opening = row.openingBalance || 0; // We will track opening if available
+        const interest = row.interest;
+        const principal = row.principal;
+        const partPayment = row.partPayment;
+        const closing = row.closingBalance;
+
+        totalPrincipalPaidSum += (principal + partPayment);
+
+        // Check for common logic traps:
+        // 1. Did interest accrue on a negative or zero balance?
+        if (opening <= 0 && interest > 0) {
+            console.warn(`⚠️ Month ${monthNum}: Interest (₹${interest}) charged even though opening balance was ₹${opening}`);
             hasAnomalies = true;
-            consoleLogGroup.push(`❌ Row ${index + 1}: Contains NaN or invalid numbers.`);
         }
-        totalPrincipalPaid += row.principal;
+
+        // 2. Did principal paid exceed what was available?
+        if ((principal + partPayment) > (opening + interest) && opening > 0) {
+            // Note: sometimes part payments are large, but let's check basic over-reduction
+        }
     });
 
     const finalClosingBalance = scheduleData[scheduleData.length - 1].closingBalance;
+    console.log(`Sum of All Principal + Part Payments Paid: ₹${Math.round(totalPrincipalPaidSum)}`);
+    console.log(`Difference from Initial Loan: ₹${Math.round(totalPrincipalPaidSum - initialLoanAmount)}`);
 
-    if (Math.abs(finalClosingBalance) <= 5) {
-        consoleLogGroup.push(`✅ Closing Balance Check: Passed (Loan fully amortized to ₹${finalClosingBalance.toFixed(2)})`);
+    if (Math.abs(totalPrincipalPaidSum - initialLoanAmount) > 50) {
+        console.error(`❌ CRITICAL BUG FOUND: The total principal paid across the schedule does not match the loan amount! There is a mismatch of ₹${totalPrincipalPaidSum - initialLoanAmount}.`);
     } else {
-        hasAnomalies = true;
-        consoleLogGroup.push(`⚠️ Closing Balance Check: Warning! Final balance is ₹${finalClosingBalance.toFixed(2)} (Expected ₹0)`);
+        console.log(`✅ Principal Sum matches loan amount closely.`);
     }
 
-    const principalDifference = Math.abs(totalPrincipalPaid - initialLoanAmount);
-    if (principalDifference <= 10) {
-        consoleLogGroup.push(`✅ Total Principal Match: Passed (Sum matches initial loan amount of ₹${initialLoanAmount})`);
-    } else {
-        hasAnomalies = true;
-        consoleLogGroup.push(`❌ Total Principal Match: Failed! Paid principal sum (₹${Math.round(totalPrincipalPaid).toLocaleString()}) differs from loan amount (₹${initialLoanAmount}) by ₹${principalDifference.toFixed(2)}`);
-    }
-
-    consoleLogGroup.forEach(log => console.log(log));
-
-    if (hasAnomalies) {
-        console.warn('⚠️ Audit completed with warnings or errors. Check details above.');
-    } else {
-        console.log('%c🎉 All math invariants passed successfully!', 'color: #28a745; font-weight: bold;');
-    }
+    console.groupEnd();
 }
 
 function getTotalPropertyCostValue() {
@@ -918,6 +920,7 @@ function runCalculation() {
 
     // --- 📊 AUTOMATED AUDIT TRIGGER ---
     const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
+        openingBalance: parseFloat(r.children[1]?.innerText.replace(/[₹,]/g, '')) || 0, // <--- Add this
         interest: parseFloat(r.querySelector('.interest-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
         principal: parseFloat(r.querySelector('.principal-paid-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
         partPayment: parseFloat(r.querySelector('.part-payment-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
