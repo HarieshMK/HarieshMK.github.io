@@ -862,7 +862,7 @@ function runCalculation() {
         const isShortfall = effectivePlannedEmi < accruedInterest && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
         
-        let closingBalance = openingBalance - principalPaid + capitalizedShortfall;
+        let closingBalance = openingBalance - (principalPaid + partPaymentColVal) + capitalizedShortfall;
         if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
             loanClosureMonthIndex = monthIdx;
         }
