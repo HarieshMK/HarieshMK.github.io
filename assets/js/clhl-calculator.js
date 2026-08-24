@@ -877,21 +877,26 @@ function runCalculation() {
         
         const isShortfall = effectivePlannedEmi < accruedInterest && inputEl.value !== '';
         inputEl.classList.toggle('shortfall-highlight', isShortfall);
-        
-        let closingBalance = openingBalance - (principalPaid + partPaymentColVal) + capitalizedShortfall;
-        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
-            loanClosureMonthIndex = monthIdx;
+        // --- PRECISION CLAMP: Ensure we never pay more principal than what is actually owed ---
+        let totalPrincipalReduction = principalPaid + partPaymentColVal;
+        if (totalPrincipalReduction > openingBalance) {
+            let excess = totalPrincipalReduction - openingBalance;
+            if (partPaymentColVal >= excess) {
+                partPaymentColVal -= excess;
+            } else {
+                excess -= partPaymentColVal;
+                partPaymentColVal = 0;
+                principalPaid = Math.max(0, principalPaid - excess);
+            }
+            totalPrincipalReduction = openingBalance;
         }
-        
-        row.querySelector('.interest-cell').innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
-        row.querySelector('.principal-paid-cell').innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
-        row.querySelector('.part-payment-cell').innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
-        row.querySelector('.closing-balance-cell').innerText = `₹${Math.round(Math.max(0, closingBalance)).toLocaleString()}`;
-        
-        currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
-        openingBalance = Math.max(0, closingBalance);
-        previousClosingBalance = closingBalance;
-    }
+        let closingBalance = openingBalance - totalPrincipalReduction + capitalizedShortfall;
+        if (Math.abs(closingBalance) < 0.01) closingBalance = 0;
+        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {loanClosureMonthIndex = monthIdx;
+        }
+        totalPrincipalPaidSum += totalPrincipalReduction;
+        totalInterestPaidSum += accruedInterest;
+        totalExtraPaidSum += partPaymentColVal; //
 
     const closingPrincipalEl = document.getElementById('closingPrincipal');
     const unpaidInterestEl = document.getElementById('unpaidInterest');
@@ -900,6 +905,7 @@ function runCalculation() {
     const finalClosingBal = finalRow ? parseFloat(finalRow.querySelector('.closing-balance-cell').innerText.replace(/[₹,]/g, '')) || 0 : 0;
 
     if (closingPrincipalEl) closingPrincipalEl.innerText = `₹${Math.round(finalClosingBal).toLocaleString()}`;
+    if (Math.abs(cumulativeUnpaidInterest) < 0.01) cumulativeUnpaidInterest = 0;
     if (unpaidInterestEl) unpaidInterestEl.innerText = `₹${Math.round(cumulativeUnpaidInterest).toLocaleString()}`;
 
     // --- 📊 AUTOMATED AUDIT TRIGGER ---
@@ -928,8 +934,9 @@ function runCalculation() {
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
     
-    // Calculate Interest Saved
-    const interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
+    // Calculate Interest Saved (ignoring sub-rupee floating-point drift)
+    let interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
+    if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
 
     // Determine Est. Loan Closure Date
