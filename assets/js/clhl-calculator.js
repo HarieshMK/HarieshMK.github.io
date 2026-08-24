@@ -811,32 +811,38 @@ function runCalculation() {
         let effectivePlannedEmi = plannedEmiVal;
 
         if (isPreEmi) {
+            // Pre-EMI: Obligated principal is ALWAYS 0. Anything above accrued interest goes to part payment.
+            principalPaid = 0;
             if (effectivePlannedEmi >= accruedInterest) {
-                const extra = effectivePlannedEmi - accruedInterest;
-                principalPaid = extra; 
-                partPaymentColVal = extra; 
+                partPaymentColVal = effectivePlannedEmi - accruedInterest;
             } else {
                 const shortfall = accruedInterest - effectivePlannedEmi;
                 capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
-                principalPaid = 0;
                 partPaymentColVal = 0;
             }
         } else {
+            // Full EMI Period Logic
             const interestComponent = accruedInterest;
-            const standardEmiForCalc = window.standardEmiAmount || effectivePlannedEmi; 
 
             if (effectivePlannedEmi < interestComponent) {
+                // Shortfall case
                 const shortfall = interestComponent - effectivePlannedEmi;
                 capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
                 partPaymentColVal = 0;
+            } else if (effectivePlannedEmi >= standardEmiForMonth) {
+                // Paid standard full EMI or higher (extra goes to part payment)
+                principalPaid = standardEmiForMonth - interestComponent;
+                partPaymentColVal = effectivePlannedEmi - standardEmiForMonth;
             } else {
+                // Paid between accrued interest and standard full EMI
                 principalPaid = effectivePlannedEmi - interestComponent;
-                partPaymentColVal = Math.max(0, effectivePlannedEmi - standardEmiForMonth);
+                partPaymentColVal = 0;
             }
         }
+        
         // --- ACCUMULATE ACTUAL METRICS ---
         totalPrincipalPaidSum += principalPaid;
         totalInterestPaidSum += accruedInterest;
