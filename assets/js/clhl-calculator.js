@@ -99,36 +99,7 @@ if (clearRangeBtn) {
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
     
 
-    // --- MULTI-STEP UNDO HISTORY SYSTEM (50 Steps Max) ---
-    let undoStack = [];
-    const MAX_UNDO_STEPS = 50;
-
-    function saveStateToUndoStack() {
-        const currentState = {};
-        document.querySelectorAll('#loanPlanBody tr').forEach((row, idx) => {
-            const monthIdx = idx + 1;
-            const inputEl = row.querySelector('.planned-emi-input');
-            if (inputEl) {
-                currentState[monthIdx] = inputEl.value;
-            }
-        });
-        
-        undoStack.push(currentState);
-        if (undoStack.length > MAX_UNDO_STEPS) {
-            undoStack.shift(); 
-        }
-        updateUndoButtonUI();
-    }
-
-    function updateUndoButtonUI() {
-        const undoBtnEl = document.getElementById('undoBtn');
-        if (undoBtnEl) {
-            const canUndo = undoStack.length > 0;
-            undoBtnEl.disabled = !canUndo;
-            undoBtnEl.style.opacity = canUndo ? '1' : '0.5';
-            undoBtnEl.style.cursor = canUndo ? 'pointer' : 'not-allowed';
-        }
-    }
+    
 
     // 1. Hook Undo Button Click
     const undoBtn = document.getElementById('undoBtn');
@@ -345,6 +316,36 @@ function updateBasicCost() {
     calculateTotalPropertyCost();
     runCalculation();
 }
+// --- MULTI-STEP UNDO HISTORY SYSTEM (50 Steps Max) ---
+    let undoStack = [];
+    const MAX_UNDO_STEPS = 50;
+
+    function saveStateToUndoStack() {
+        const currentState = {};
+        document.querySelectorAll('#loanPlanBody tr').forEach((row, idx) => {
+            const monthIdx = idx + 1;
+            const inputEl = row.querySelector('.planned-emi-input');
+            if (inputEl) {
+                currentState[monthIdx] = inputEl.value;
+            }
+        });
+        
+        undoStack.push(currentState);
+        if (undoStack.length > MAX_UNDO_STEPS) {
+            undoStack.shift(); 
+        }
+        updateUndoButtonUI();
+    }
+
+    function updateUndoButtonUI() {
+        const undoBtnEl = document.getElementById('undoBtn');
+        if (undoBtnEl) {
+            const canUndo = undoStack.length > 0;
+            undoBtnEl.disabled = !canUndo;
+            undoBtnEl.style.opacity = canUndo ? '1' : '0.5';
+            undoBtnEl.style.cursor = canUndo ? 'pointer' : 'not-allowed';
+        }
+    }
 // --- TOOLBAR RANGE-FILL LOGIC (Placed inside the main script scope) ---
     function handleApplyRange() {
         saveStateToUndoStack(); // Now it can finally see this!
