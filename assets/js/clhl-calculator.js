@@ -220,24 +220,18 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
 
     scheduleData.forEach((row, index) => {
         const monthNum = index + 1;
-        const opening = row.openingBalance || 0; // We will track opening if available
+        const opening = row.openingBalance || 0;
         const interest = row.interest;
         const principal = row.principal;
         const partPayment = row.partPayment;
         const closing = row.closingBalance;
 
         totalPrincipalPaidSum += (principal + partPayment);
-
-        // Check for common logic traps:
-        // 1. Did interest accrue on a negative or zero balance?
         if (opening <= 0 && interest > 0) {
             console.warn(`⚠️ Month ${monthNum}: Interest (₹${interest}) charged even though opening balance was ₹${opening}`);
             hasAnomalies = true;
         }
-
-        // 2. Did principal paid exceed what was available?
         if ((principal + partPayment) > (opening + interest) && opening > 0) {
-            // Note: sometimes part payments are large, but let's check basic over-reduction
         }
     });
 
@@ -847,7 +841,7 @@ function runCalculation() {
             const interestComponent = accruedInterest;
             if (effectivePlannedEmi < interestComponent) {
                 const shortfall = interestComponent - effectivePlannedEmi;
-                capitalizedStartfall = shortfall; 
+                capitalizedShortfall = shortfall; 
                 cumulativeUnpaidInterest += shortfall;
                 principalPaid = 0;
                 partPaymentColVal = 0;
@@ -893,7 +887,9 @@ function runCalculation() {
         if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
             loanClosureMonthIndex = monthIdx;
         }
-        
+        totalPrincipalPaidSum += totalPrincipalReduction;
+        totalInterestPaidSum += accruedInterest;
+        totalExtraPaidSum += partPaymentColVal;
         row.children[5].innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.children[6].innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
         row.children[4].innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
