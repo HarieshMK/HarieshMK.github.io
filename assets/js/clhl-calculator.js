@@ -790,7 +790,7 @@ function runCalculation() {
 
             previousClosingBalance = 0;
             currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
-            continue; // Safe to continue here because we are past row creation and summary collection can handle zero rows natively if tracked, or we let it fall through.
+            continue;
         }
 
         accruedInterest = openingBalance * monthlyRate;
@@ -892,11 +892,19 @@ function runCalculation() {
         }
         let closingBalance = openingBalance - totalPrincipalReduction + capitalizedShortfall;
         if (Math.abs(closingBalance) < 0.01) closingBalance = 0;
-        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {loanClosureMonthIndex = monthIdx;
+        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
+            loanClosureMonthIndex = monthIdx;
         }
-        totalPrincipalPaidSum += totalPrincipalReduction;
-        totalInterestPaidSum += accruedInterest;
-        totalExtraPaidSum += partPaymentColVal; //
+        
+        row.children[5].innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
+        row.children[6].innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
+        row.children[4].innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
+        row.children[7].innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
+
+        currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
+        openingBalance = Math.max(0, closingBalance);
+        previousClosingBalance = closingBalance;
+    }
 
     const closingPrincipalEl = document.getElementById('closingPrincipal');
     const unpaidInterestEl = document.getElementById('unpaidInterest');
@@ -923,6 +931,7 @@ function runCalculation() {
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden) {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
+    
     // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
     const sumInterestEl = document.getElementById('summaryTotalInterest');
