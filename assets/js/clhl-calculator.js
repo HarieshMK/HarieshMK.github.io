@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const ltvRatioInput = document.getElementById('ltvRatio');
     const customMonthsInput = document.getElementById('customMoroMonths');
     const customRadio = document.querySelector('input[name="moroType"][value="custom"]');
+    const fromInput = document.getElementById('fillStartMonth');
+    const toInput = document.getElementById('fillEndMonth');
+    const amtInput = document.getElementById('fillEmiAmount');
+
+    [fromInput, toInput, amtInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', updateToolbarButtonStates);
+        }
+    });
+
+    updateToolbarButtonStates();
 
     if (customMonthsInput && customRadio) {
         customMonthsInput.addEventListener('focus', () => {
@@ -51,15 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
 // --- HOOK RANGE TOOLBAR BUTTONS ---
 const applyRangeBtn = document.getElementById('applyRangeBtn');
-const copyAccruedBtn = document.getElementById('copyAccruedRangeBtn');
+const copyAccruedRangeBtn = document.getElementById('copyAccruedRangeBtn');
 const clearRangeBtn = document.getElementById('clearRangeBtn');
 
 if (applyRangeBtn) {
     applyRangeBtn.addEventListener('click', handleApplyRange);
 }
 
-if (copyAccruedBtn) {
-    copyAccruedBtn.addEventListener('click', handleCopyAccrued);
+if (copyAccruedRangeBtn) {
+    copyAccruedRangeBtn.addEventListener('click', handleCopyAccrued);
 }
 
 if (clearRangeBtn) {
@@ -161,39 +172,6 @@ if (clearRangeBtn) {
                     runCalculation();
                 }
             }
-        });
-    }
-
-    /// 3. Hook "Copy Accrued (Remaining)" Button
-    const copyAccruedRemainingBtn = document.getElementById('copyAccruedRemainingBtn');
-    if (copyAccruedRemainingBtn) {
-        copyAccruedRemainingBtn.addEventListener('click', () => {
-            saveStateToUndoStack();
-
-            const rows = document.querySelectorAll('#loanPlanBody tr');
-            if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
-
-            let lastUserMonth = 0;
-            rows.forEach((row, idx) => {
-                const monthIdx = idx + 1;
-                const inputEl = row.querySelector('.planned-emi-input');
-                if (inputEl) {
-                    const val = parseFloat(inputEl.value);
-                    if (!isNaN(val) && val > 0) {
-                        lastUserMonth = monthIdx;
-                        window.loadedPlannedEmis[monthIdx] = val; 
-                    }
-                }
-            });
-
-            Object.keys(window.loadedPlannedEmis).forEach(m => {
-                const mNum = parseInt(m, 10);
-                if (mNum > lastUserMonth) {
-                    delete window.loadedPlannedEmis[mNum];
-                }
-            });
-            window.forceDefaultEmis = false;
-            runCalculation();
         });
     }
 
@@ -925,28 +903,6 @@ function updateToolbarButtonStates() {
     }
 }
 
-// --- BIND LISTENERS ON DOM LOAD ---
-document.addEventListener('DOMContentLoaded', () => {
-    const fromInput = document.getElementById('fillStartMonth');
-    const toInput = document.getElementById('fillEndMonth');
-    const amtInput = document.getElementById('fillEmiAmount');
-
-    [fromInput, toInput, amtInput].forEach(input => {
-        if (input) {
-            input.addEventListener('input', updateToolbarButtonStates);
-        }
-    });
-
-    updateToolbarButtonStates();
-});
-
-    // Attach click events
-    if (applyBtn) applyBtn.addEventListener('click', handleApplyRange);
-    if (copyBtn) copyBtn.addEventListener('click', handleCopyAccrued);
-    if (clearBtn) clearBtn.addEventListener('click', handleClearRange);
-
-    updateToolbarButtonStates();
-});
 function handleMoratoriumUI() {
     const moroTypeRadio = document.querySelector('input[name="moroType"]:checked');
     if (!moroTypeRadio) return;
