@@ -142,29 +142,7 @@ if (clearRangeBtn) {
         });
     }
 
-    // 2. Hook "Copy Accrued" Button
-    const copyAccruedBtn = document.getElementById('copyAccruedBtn');
-    if (copyAccruedBtn) {
-        copyAccruedBtn.addEventListener('click', () => {
-            saveStateToUndoStack();
-
-            window.loadedPlannedEmis = {};
-            window.forceDefaultEmis = true;
-            runCalculation();
-
-            const rows = document.querySelectorAll('#loanPlanBody tr');
-            rows.forEach((row, idx) => {
-                const monthIdx = idx + 1;
-                const inputEl = row.querySelector('.planned-emi-input');
-                if (inputEl) {
-                    window.loadedPlannedEmis[monthIdx] = parseFloat(inputEl.value) || 0;
-                }
-            });
-            window.forceDefaultEmis = false;
-        });
-    }
-
-    // 3. Track individual manual inputs in the table for Undo
+    // 2. Track individual manual inputs in the table for Undo
     const loanPlanBody = document.getElementById('loanPlanBody');
     if (loanPlanBody) {
         loanPlanBody.addEventListener('focusin', (e) => {
@@ -186,7 +164,7 @@ if (clearRangeBtn) {
         });
     }
 
-    /// 4. Hook "Copy Accrued (Remaining)" Button
+    /// 3. Hook "Copy Accrued (Remaining)" Button
     const copyAccruedRemainingBtn = document.getElementById('copyAccruedRemainingBtn');
     if (copyAccruedRemainingBtn) {
         copyAccruedRemainingBtn.addEventListener('click', () => {
