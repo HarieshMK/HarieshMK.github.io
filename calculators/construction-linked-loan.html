@@ -164,6 +164,7 @@ permalink: /calculators/clhl/
                 <h3>📈 Home Loan Plan (Amortization Projection)</h3>
             </summary>
             <div class="section-card-content">
+                <div class="sticky-toolbar-wrapper" id="stickyPlanToolbar">
                 <div class="plan-toolbar">
                     <div class="toolbar-group">
                         <label>From Month</label>
@@ -189,7 +190,9 @@ permalink: /calculators/clhl/
                             <span>↩️</span> <span>Undo</span>
                         </button>
                     </div>
+                    </div>
                 </div>
+                    
 
                 <div class="table-wrapper plan-table-wrapper">
                     <table class="plan-table">
@@ -949,5 +952,23 @@ details summary::after {
 
 details[open] summary::after {
     transform: rotate(180deg);
+}
+    /* ==========================================================================
+    STICKY PLAN TOOLBAR BEHAVIOR
+   ========================================================================== */
+.sticky-toolbar-wrapper {
+    position: sticky;
+    top: 15px;
+    z-index: 20; 
+    background-color: var(--bg-container);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.2s ease;
+}
+
+.sticky-toolbar-wrapper.is-stuck {
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
 }
 </style>
