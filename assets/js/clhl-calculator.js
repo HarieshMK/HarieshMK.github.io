@@ -727,10 +727,22 @@ function runCalculation() {
 
         const ymStr = currentMonthDate.toISOString().substring(0, 7);
         const milestoneDisbursement = getMilestoneDisbursementForMonth(ymStr);
+        
         if (monthIdx === 1) {
             openingBalance = cumulativeLoanAmt;
         } else {
-            openingBalance = openingBalance + milestoneDisbursement;
+            openingBalance = previousClosingBalance + milestoneDisbursement;
+        }
+       if (openingBalance <= 0 && milestoneDisbursement === 0) {
+            // Loan is closed. Clear out the calculated text columns to ₹0
+            openingBalance = 0; // ensure it stays 0
+            row.children[1].innerText = `₹0`; // Opening Balance
+            row.children[2].innerText = `₹0`; // EMI
+            row.children[4].innerText = `₹0`; // Interest component
+            row.children[5].innerText = `₹0`; // Principal component
+            row.children[6].innerText = `₹0`; // Part Payment
+            row.children[7].innerText = `₹0`; // Closing Balance
+            continue; 
         }
         let accruedInterest = openingBalance * monthlyRate;
         let isPreEmi = monthIdx <= moratoriumMonths;
@@ -739,7 +751,6 @@ function runCalculation() {
         let standardEmiForMonth = accruedInterest;
 
         if (!isPreEmi) {
-            // Lock the Full EMI the very first month we step out of pre-EMI
             if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
                 if (monthlyRate > 0 && remainingTenureMonths > 0) {
                     lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
