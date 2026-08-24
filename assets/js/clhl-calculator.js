@@ -900,6 +900,10 @@ function runCalculation() {
         totalPrincipalPaidSum += totalPrincipalReduction;
         totalInterestPaidSum += accruedInterest;
         totalExtraPaidSum += partPaymentColVal;
+        // --- PLACE THE TRACE HERE INSIDE THE LOOP ---
+        if (monthIdx <= 15) {
+            console.log(`Month ${monthIdx}: Opening=₹${Math.round(openingBalance)}, PlannedEMI=₹${effectivePlannedEmi}, PrincipalPaid=₹${Math.round(principalPaid)}, PartPaid=₹${Math.round(partPaymentColVal)}, RunningTotal=₹${Math.round(totalPrincipalPaidSum)}`);
+        }
         row.children[5].innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.children[6].innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
         row.children[4].innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
