@@ -859,7 +859,7 @@ function runCalculation() {
         }
         
         // --- ACCUMULATE ACTUAL METRICS ---
-        totalPrincipalPaidSum += principalPaid;
+        totalPrincipalPaidSum += (principalPaid + partPaymentColVal);
         totalInterestPaidSum += accruedInterest;
         totalExtraPaidSum += partPaymentColVal;
 
