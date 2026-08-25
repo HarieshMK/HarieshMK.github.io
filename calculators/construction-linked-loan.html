@@ -778,7 +778,7 @@ input[readonly] {
     /* ==========================================================================
     EXPANDED TRANSACTION LEDGER TABLE STYLING (NO SCROLLBAR)
    ========================================================================== */
-.ledger-table {
+.finance-table {
     width: 100% !important;
     border-collapse: collapse !important;
     table-layout: fixed !important; /* Forces columns to respect explicit widths */
@@ -787,23 +787,23 @@ input[readonly] {
 }
 
 /* Ensure fixed table layout is enforced */
-.ledger-table {
+.finance-table {
     table-layout: fixed !important;
     width: 100% !important;
 }
 
-.ledger-table th:nth-child(1), .ledger-table td:nth-child(1) { width: 110px !important; }  /* Date */
-.ledger-table th:nth-child(2), .ledger-table td:nth-child(2) { width: 55px !important; }   /* Days */
-.ledger-table th:nth-child(3), .ledger-table td:nth-child(3) { width: 85px !important; }   /* Interest Rate */
-.ledger-table th:nth-child(4), .ledger-table td:nth-child(4) { width: 100px !important; }  /* Interest Accrued */
-.ledger-table th:nth-child(5), .ledger-table td:nth-child(5) { width: 140px !important; }  /* Transaction Type */
-.ledger-table th:nth-child(6), .ledger-table td:nth-child(6) { width: 120px !important; }  /* Transaction Amount */
-.ledger-table th:nth-child(7), .ledger-table td:nth-child(7) { width: 90px !important; }   /* Interest Paid */
-.ledger-table th:nth-child(8), .ledger-table td:nth-child(8) { width: 90px !important; }   /* Principal Paid */
-.ledger-table th:nth-child(9), .ledger-table td:nth-child(9) { width: 110px !important; }  /* Closing Balance */
-.ledger-table th:nth-child(10), .ledger-table td:nth-child(10) { width: 60px !important; text-align: center !important; } /* Actions */
+.finance-table th:nth-child(1), .finance-table td:nth-child(1) { width: 110px !important; }  /* Date */
+.finance-table th:nth-child(2), .finance-table td:nth-child(2) { width: 55px !important; }   /* Days */
+.finance-table th:nth-child(3), .finance-table td:nth-child(3) { width: 85px !important; }   /* Interest Rate */
+.finance-table th:nth-child(4), .finance-table td:nth-child(4) { width: 100px !important; }  /* Interest Accrued */
+.finance-table th:nth-child(5), .finance-table td:nth-child(5) { width: 140px !important; }  /* Transaction Type */
+.finance-table th:nth-child(6), .finance-table td:nth-child(6) { width: 120px !important; }  /* Transaction Amount */
+.finance-table th:nth-child(7), .finance-table td:nth-child(7) { width: 90px !important; }   /* Interest Paid */
+.finance-table th:nth-child(8), .finance-table td:nth-child(8) { width: 90px !important; }   /* Principal Paid */
+.finance-table th:nth-child(9), .finance-table td:nth-child(9) { width: 110px !important; }  /* Closing Balance */
+.finance-table th:nth-child(10), .finance-table td:nth-child(10) { width: 60px !important; text-align: center !important; } /* Actions */
 
-.ledger-table th {
+.finance-table th {
     background: var(--bg-offset) !important;
     color: var(--text-primary) !important;
     font-weight: 700 !important;
@@ -818,7 +818,7 @@ input[readonly] {
     text-align: center !important;
 }
 
-.ledger-table td {
+.finance-table td {
     padding: 8px !important;
     border-bottom: 1px solid var(--border-base) !important;
     border-right: 1px solid var(--border-base) !important;
@@ -826,15 +826,15 @@ input[readonly] {
     color: var(--text-primary) !important;
     overflow: visible !important; /* Ensures dropdowns/inputs don't clip */
 }
-.ledger-table th:nth-child(2),
-.ledger-table th:nth-child(6) {
+.finance-table th:nth-child(2),
+.finance-table th:nth-child(6) {
     text-align: left !important;
 }
 
 /* Compact input controls inside the widened table */
-.ledger-table input[type="date"],
-.ledger-table input[type="number"],
-.ledger-table select {
+.finance-table input[type="date"],
+.finance-table input[type="number"],
+.finance-table select {
     width: 100% !important;
     height: 36px !important;
     padding: 0 6px !important;
@@ -846,16 +846,16 @@ input[readonly] {
     color: var(--text-primary) !important;
     box-sizing: border-box !important;
 }
-.ledger-table td input[type="date"],
-.ledger-table td input[type="number"],
-.ledger-table td select {
+.finance-table td input[type="date"],
+.finance-table td input[type="number"],
+.finance-table td select {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
 }
-.ledger-table input,
-.ledger-table select {
+.finance-table input,
+.finance-table select {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
