@@ -610,15 +610,14 @@ function runActualLedgerCalculation() {
             } else if (['Bank Disbursement', 'Charges', 'Interest Deposit'].includes(typeSelect)) {
                 closingBalance = previousClosingBalance + amountInput;
             }
+        }
 
-        // Update DOM cells
         daysCell.innerText = days;
         accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
         interestPaidCell.innerText = `₹${Math.round(interestPaid).toLocaleString()}`;
         principalPaidCell.innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         closingCell.innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
 
-        // Carry forward for next iteration
         previousClosingBalance = closingBalance;
         if (dateInput) previousDate = dateInput;
     });
