@@ -1280,10 +1280,7 @@ async function saveCalculatorDataToSupabase() {
             console.error('Error saving planned EMIs:', emiError);
         }
     }
-
-    alert('Calculator progress successfully saved! 🚀');
-}
-// 4. Save Actual Transaction Ledger Rows
+    // 4. Save Actual Transaction Ledger Rows (CORRECTLY PLACED HERE)
     await activeSupabase
         .from('clhl_actual_transactions')
         .delete()
@@ -1309,6 +1306,9 @@ async function saveCalculatorDataToSupabase() {
             console.error('Error saving actual transactions:', transError);
         }
     }
+
+    alert('Calculator progress successfully saved! 🚀');
+}
 
 async function loadCalculatorDataFromSupabase() {
     console.log("TRACE [1]: Starting loadCalculatorDataFromSupabase...");
@@ -1437,6 +1437,7 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     // 3. Load Custom Planned EMIs
+    // 3. Load Custom Planned EMIs
     console.log("TRACE [9]: Fetching planned EMIs for profile_id:", profile.id);
     const { data: savedEmis, error: emiError } = await activeSupabase
         .from('clhl_planned_emis')
@@ -1455,16 +1456,7 @@ async function loadCalculatorDataFromSupabase() {
         console.log("TRACE [9e]: No saved EMIs found or error occurred.");
     }
 
-    runCalculation();
-    console.log("TRACE [9]: Load complete. Hiding loader.");
-    hideLoader();
-    if (typeof resetUndoStack === 'function') {
-        resetUndoStack();
-    } else if (typeof pushState === 'function') {
-        pushState(); 
-    }
-}
-// 4. Load Actual Transaction Ledger Rows
+    // 4. Load Actual Transaction Ledger Rows (CORRECTLY PLACED HERE)
     console.log("TRACE [10]: Fetching actual transaction ledger rows...");
     const { data: savedTransactions, error: transLoadError } = await activeSupabase
         .from('clhl_actual_transactions')
@@ -1481,6 +1473,17 @@ async function loadCalculatorDataFromSupabase() {
             });
         }
     }
+
+    runCalculation();
+    console.log("TRACE [9]: Load complete. Hiding loader.");
+    hideLoader();
+    if (typeof resetUndoStack === 'function') {
+        resetUndoStack();
+    } else if (typeof pushState === 'function') {
+        pushState(); 
+    }
+}
+
 function hideLoader() {
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
     loaders.forEach(loader => {
