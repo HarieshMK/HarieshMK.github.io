@@ -1283,6 +1283,32 @@ async function saveCalculatorDataToSupabase() {
 
     alert('Calculator progress successfully saved! 🚀');
 }
+// 4. Save Actual Transaction Ledger Rows
+    await activeSupabase
+        .from('clhl_actual_transactions')
+        .delete()
+        .eq('profile_id', profileId);
+
+    const transactionRows = document.querySelectorAll('#transactionBody tr');
+    const transactionsPayload = Array.from(transactionRows).map((row, index) => ({
+        profile_id: profileId,
+        trans_date: row.querySelector('.trans-date')?.value || null,
+        trans_type: row.querySelector('.trans-type')?.value || 'EMI payment',
+        interest_rate: parseFloat(row.querySelector('.trans-rate')?.value) || 0,
+        amount: parseFloat(row.querySelector('.trans-amount')?.value) || 0,
+        sort_order: index,
+        updated_at: new Date().toISOString()
+    })).filter(t => t.trans_date || t.amount > 0);
+
+    if (transactionsPayload.length > 0) {
+        const { error: transError } = await activeSupabase
+            .from('clhl_actual_transactions')
+            .insert(transactionsPayload);
+
+        if (transError) {
+            console.error('Error saving actual transactions:', transError);
+        }
+    }
 
 async function loadCalculatorDataFromSupabase() {
     console.log("TRACE [1]: Starting loadCalculatorDataFromSupabase...");
@@ -1438,6 +1464,23 @@ async function loadCalculatorDataFromSupabase() {
         pushState(); 
     }
 }
+// 4. Load Actual Transaction Ledger Rows
+    console.log("TRACE [10]: Fetching actual transaction ledger rows...");
+    const { data: savedTransactions, error: transLoadError } = await activeSupabase
+        .from('clhl_actual_transactions')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .order('sort_order', { ascending: true });
+
+    if (!transLoadError && savedTransactions && savedTransactions.length > 0) {
+        const tableBody = document.getElementById('transactionBody');
+        if (tableBody) {
+            tableBody.innerHTML = ''; 
+            savedTransactions.forEach(t => {
+                addRow(t.trans_date, t.trans_type, t.interest_rate, t.amount);
+            });
+        }
+    }
 function hideLoader() {
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
     loaders.forEach(loader => {
