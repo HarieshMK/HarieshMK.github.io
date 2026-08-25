@@ -302,36 +302,6 @@ permalink: /calculators/clhl/
     border: 1px solid var(--border-base) !important; 
 }
 
-.calc-inputs { 
-    flex: 1.2 !important; 
-    min-width: 300px !important; 
-}
-
-.full-width-section { 
-    margin-top: 20px !important; 
-    grid-template-columns: 1fr !important; 
-}
-
-.calculator-top-grid {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 20px !important;
-    width: 100% !important;
-    margin-top: 20px !important;
-    margin-bottom: 25px !important;
-    align-items: start !important;
-}
-
-.calculator-top-grid .post-card.calculation-card {
-    margin-bottom: 0 !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.calculator-card-container {
-    position: relative; 
-}
-
 /* Card Styling */
 .post-card.calculation-card { 
     background: var(--bg-container) !important; 
@@ -352,21 +322,6 @@ permalink: /calculators/clhl/
 }
 .section-card-content { 
     padding: 20px 25px; 
-}
-
-/* Results Sidebar */
-.calc-results.sticky-score-panel { 
-    display: flex !important; 
-    flex-direction: column !important;
-    background: var(--bg-offset) !important; 
-    padding: 25px !important; 
-    border-radius: 20px !important; 
-    border: 1px solid var(--border-base) !important; 
-    flex: 1 !important;
-    min-width: 300px !important;
-    position: sticky !important; 
-    top: 20px !important; 
-    box-sizing: border-box !important;
 }
 .sidebar-panel-header-accent { 
     border-bottom: 1px solid var(--border-base); 
@@ -424,6 +379,7 @@ permalink: /calculators/clhl/
     border-radius: 8px !important;
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
+    max-width: 110px !important;
 }
 
 /* Focus States Commonization */
@@ -492,13 +448,6 @@ permalink: /calculators/clhl/
     color: var(--text-primary);
     font-weight: 600;
 }
-.btn-delete, .btn-save { 
-    cursor: pointer; 
-    border: none; 
-    background: none; 
-    font-size: 1.2rem; 
-}
-
 /* Readonly Styling for Locked Rows */
 input[readonly] { 
     background-color: var(--bg-offset) !important; 
@@ -686,11 +635,6 @@ input[readonly] {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
-
-.plan-table td input[type="number"] {
-    max-width: 110px !important;
-}
-
 
 /* --------------------------------------------------------------------------
    4. TOOLBARS & BUTTONS
@@ -1081,12 +1025,6 @@ details[open] summary::after {
 /* --------------------------------------------------------------------------
    8. MEDIA QUERIES (RESPONSIVE)
    -------------------------------------------------------------------------- */
-@media (max-width: 1100px) {
-    .calculator-top-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
-
 @media (max-width: 992px) {
     .plan-toolbar {
         flex-direction: column;
@@ -1108,10 +1046,6 @@ details[open] summary::after {
         padding: 15px !important;
         overflow-x: hidden !important;
     }
-    .calc-inputs, .calc-results { 
-        width: 100% !important; 
-        min-width: 0 !important; 
-    }
     .calc-custom-row, .charge-row { 
         flex-direction: column !important; 
         align-items: flex-start !important; 
@@ -1123,11 +1057,6 @@ details[open] summary::after {
     }
     .calc-custom-row input {
         width: 100% !important;
-    }
-    .radio-group-horizontal {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 10px !important;
     }
     .summary-grid-row {
         flex-direction: column;
