@@ -596,8 +596,6 @@ function runActualLedgerCalculation() {
                 const prevDateObj = new Date(previousDate);
                 const diffTime = currDateObj - prevDateObj;
                 days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-                
-                // 💡 Add + 1 inclusive of the start day specifically for the 2nd row (index 1)
                 if (index === 1) {
                     days += 1;
                 }
@@ -610,9 +608,8 @@ function runActualLedgerCalculation() {
                 const unpaidInterest = Math.max(0, interestAccrued - interestPaid);
                 closingBalance = previousClosingBalance - principalPaid + unpaidInterest;
             } else if (['Bank Disbursement', 'Charges', 'Interest Deposit'].includes(typeSelect)) {
-                closingBalance = previousClosingBalance + amountInput + interestAccrued;
+                closingBalance = previousClosingBalance + amountInput;
             }
-        }
 
         // Update DOM cells
         daysCell.innerText = days;
