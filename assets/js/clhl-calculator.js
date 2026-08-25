@@ -503,22 +503,128 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
     return row;
 }
 
-function addRow(date = '', type = 'payment', amount = '') {
+// --- UPGRADED ACTUAL TRANSACTION LEDGER ENGINE ---
+
+function addRow(date = '', transType = 'Loan Payment by User', interestRate = '', amount = '') {
     const tableBody = document.getElementById('transactionBody');
     if (!tableBody) return;
+
+    const rowCount = tableBody.querySelectorAll('tr').length + 1;
     const row = document.createElement('tr');
+    row.className = 'actual-ledger-row';
+    
     row.innerHTML = `
+        <td class="col-sno">${rowCount}</td>
         <td><input type="date" class="trans-date" value="${date}"></td>
+        <td class="col-days">0</td>
+        <td><input type="number" step="any" class="trans-rate" value="${interestRate}" placeholder="%"></td>
+        <td class="col-accrued">₹0</td>
         <td>
             <select class="trans-type">
-                <option value="disbursement">Disbursement</option>
-                <option value="payment" selected>Payment</option>
+                <option value="Loan Payment by User" ${transType === 'Loan Payment by User' ? 'selected' : ''}>Loan Payment by User</option>
+                <option value="Bank Disbursement" ${transType === 'Bank Disbursement' ? 'selected' : ''}>Bank Disbursement</option>
+                <option value="Charges" ${transType === 'Charges' ? 'selected' : ''}>Charges</option>
+                <option value="Interest Deposited by Bank" ${transType === 'Interest Deposited by Bank' ? 'selected' : ''}>Interest Deposited by Bank</option>
             </select>
         </td>
-        <td><input type="number" class="trans-amount" value="${amount}"></td>
+        <td><input type="number" step="any" class="trans-amount" value="${amount}" placeholder="₹"></td>
+        <td class="col-interest-paid">₹0</td>
+        <td class="col-principal-paid">₹0</td>
+        <td class="col-closing-balance">₹0</td>
+        <td style="text-align: center;"><button type="button" class="btn-delete-trans"><i class="fas fa-trash"></i></button></td>
     `;
+
     tableBody.appendChild(row);
-    row.addEventListener('input', runCalculation);
+
+    // Bind event listeners for real-time recalculation when user edits any field
+    row.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', runActualLedgerCalculation);
+    });
+
+    // Bind delete button
+    row.querySelector('.btn-delete-trans').addEventListener('click', () => {
+        row.remove();
+        reindexLedgerRows();
+        runActualLedgerCalculation();
+    });
+
+    runActualLedgerCalculation();
+}
+
+function reindexLedgerRows() {
+    const rows = document.querySelectorAll('#transactionBody tr');
+    rows.forEach((row, index) => {
+        const sNoEl = row.querySelector('.col-sno');
+        if (sNoEl) sNoEl.innerText = index + 1;
+    });
+}
+
+function runActualLedgerCalculation() {
+    const rows = document.querySelectorAll('#transactionBody tr');
+    if (rows.length === 0) return;
+
+    let previousClosingBalance = 0;
+    let previousDate = null;
+
+    rows.forEach((row, index) => {
+        const dateInput = row.querySelector('.trans-date').value;
+        const rateInput = parseFloat(row.querySelector('.trans-rate').value) || 0;
+        const typeSelect = row.querySelector('.trans-type').value;
+        const amountInput = parseFloat(row.querySelector('.trans-amount').value) || 0;
+
+        const daysCell = row.querySelector('.col-days');
+        const accruedCell = row.querySelector('.col-accrued');
+        const interestPaidCell = row.querySelector('.col-interest-paid');
+        const principalPaidCell = row.querySelector('.col-principal-paid');
+        const closingCell = row.querySelector('.col-closing-balance');
+
+        let days = 0;
+        let interestAccrued = 0;
+        let interestPaid = 0;
+        let principalPaid = 0;
+        let closingBalance = previousClosingBalance;
+
+        if (index === 0) {
+            days = 0;
+            interestAccrued = 0;
+            interestPaid = 0;
+            principalPaid = 0;
+            
+            if (['Bank Disbursement', 'Charges', 'Interest Deposited by Bank'].includes(typeSelect)) {
+                closingBalance = amountInput;
+            } else {
+                closingBalance = amountInput;
+            }
+        } else {
+            if (dateInput && previousDate) {
+                const currDateObj = new Date(dateInput);
+                const prevDateObj = new Date(previousDate);
+                const diffTime = currDateObj - prevDateObj;
+                days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+            }
+            interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
+
+            if (typeSelect === 'Loan Payment by User') {
+                interestPaid = Math.min(amountInput, interestAccrued);
+                principalPaid = Math.max(0, amountInput - interestPaid);
+                const unpaidInterest = Math.max(0, interestAccrued - interestPaid);
+                closingBalance = previousClosingBalance - principalPaid + unpaidInterest;
+            } else if (['Bank Disbursement', 'Charges', 'Interest Deposited by Bank'].includes(typeSelect)) {
+                closingBalance = previousClosingBalance + amountInput + interestAccrued;
+            }
+        }
+
+        // Update DOM cells
+        daysCell.innerText = days;
+        accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
+        interestPaidCell.innerText = `₹${Math.round(interestPaid).toLocaleString()}`;
+        principalPaidCell.innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
+        closingCell.innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
+
+        // Carry forward for next iteration
+        previousClosingBalance = closingBalance;
+        if (dateInput) previousDate = dateInput;
+    });
 }
 
 function runCalculation() {
