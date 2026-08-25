@@ -509,6 +509,19 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
     const tableBody = document.getElementById('transactionBody');
     if (!tableBody) return;
 
+    // 💡 Carry forward the interest rate from the previous row if none is explicitly provided
+    let finalRate = interestRate;
+    if (finalRate === '' || finalRate === null || finalRate === undefined) {
+        const existingRows = tableBody.querySelectorAll('tr');
+        if (existingRows.length > 0) {
+            const lastRow = existingRows[existingRows.length - 1];
+            const lastRateInput = lastRow.querySelector('.trans-rate');
+            if (lastRateInput) {
+                finalRate = lastRateInput.value;
+            }
+        }
+    }
+
     const rowCount = tableBody.querySelectorAll('tr').length + 1;
     const row = document.createElement('tr');
     row.className = 'actual-ledger-row';
@@ -516,7 +529,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
     row.innerHTML = `
         <td><input type="date" class="trans-date" value="${date}"></td>
         <td class="col-days">0</td>
-        <td><input type="number" step="any" class="trans-rate" value="${interestRate}" placeholder="%"></td>
+        <td><input type="number" step="any" class="trans-rate" value="${finalRate}" placeholder="%"></td>
         <td class="col-accrued">₹0</td>
         <td>
             <select class="trans-type">
@@ -546,6 +559,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
 
     runActualLedgerCalculation();
 }
+
 function reindexLedgerRows() {
     const rows = document.querySelectorAll('#transactionBody tr');
     rows.forEach((row, index) => {
