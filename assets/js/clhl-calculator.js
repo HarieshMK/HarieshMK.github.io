@@ -844,13 +844,10 @@ function runCalculation() {
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
-        
         if (document.activeElement !== inputEl) {
             inputEl.value = (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) ? "" : Math.round(userPlannedEmiVal * 100) / 100;
         }
-
-        const plannedEmiVal = inputEl.value === '' ? 0 : (parseFloat(inputEl.value) || userPlannedEmiVal || 0);
-        let effectivePlannedEmi = plannedEmiVal;
+        let effectivePlannedEmi = (inputEl.value === '') ? 0 : (userPlannedEmiVal !== undefined && userPlannedEmiVal !== "" ? userPlannedEmiVal : (parseFloat(inputEl.value) || 0));
 
         if (isPreEmi) {
             principalPaid = 0;
