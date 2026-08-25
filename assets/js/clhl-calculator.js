@@ -505,7 +505,7 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
 
 // --- UPGRADED ACTUAL TRANSACTION LEDGER ENGINE ---
 
-function addRow(date = '', transType = 'Loan Payment by User', interestRate = '', amount = '') {
+function addRow(date = '', transType = 'EMI payment', interestRate = '', amount = '') {
     const tableBody = document.getElementById('transactionBody');
     if (!tableBody) return;
 
@@ -520,10 +520,10 @@ function addRow(date = '', transType = 'Loan Payment by User', interestRate = ''
         <td class="col-accrued">₹0</td>
         <td>
             <select class="trans-type">
-                <option value="Loan Payment by User" ${transType === 'Loan Payment by User' ? 'selected' : ''}>Loan Payment by User</option>
+                <option value="EMI payment" ${transType === 'EMI payment' ? 'selected' : ''}>EMI payment</option>
                 <option value="Bank Disbursement" ${transType === 'Bank Disbursement' ? 'selected' : ''}>Bank Disbursement</option>
                 <option value="Charges" ${transType === 'Charges' ? 'selected' : ''}>Charges</option>
-                <option value="Interest Deposited by Bank" ${transType === 'Interest Deposited by Bank' ? 'selected' : ''}>Interest Deposited by Bank</option>
+                <option value="Interest Deposit" ${transType === 'Interest Deposit' ? 'selected' : ''}>Interest Deposit</option>
             </select>
         </td>
         <td><input type="number" step="any" class="trans-amount" value="${amount}" placeholder="₹"></td>
@@ -534,13 +534,10 @@ function addRow(date = '', transType = 'Loan Payment by User', interestRate = ''
     `;
 
     tableBody.appendChild(row);
-
-    // Bind event listeners for real-time recalculation when user edits any field
     row.querySelectorAll('input, select').forEach(el => {
         el.addEventListener('input', runActualLedgerCalculation);
     });
 
-    // Bind delete button
     row.querySelector('.btn-delete-trans').addEventListener('click', () => {
         row.remove();
         reindexLedgerRows();
@@ -589,7 +586,7 @@ function runActualLedgerCalculation() {
             interestPaid = 0;
             principalPaid = 0;
             
-            if (['Bank Disbursement', 'Charges', 'Interest Deposited by Bank'].includes(typeSelect)) {
+            if (['Bank Disbursement', 'Charges', 'Interest Deposit'].includes(typeSelect)) {
                 closingBalance = amountInput;
             } else {
                 closingBalance = amountInput;
@@ -603,12 +600,12 @@ function runActualLedgerCalculation() {
             }
             interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
 
-            if (typeSelect === 'Loan Payment by User') {
+            if (typeSelect === 'EMI payment') {
                 interestPaid = Math.min(amountInput, interestAccrued);
                 principalPaid = Math.max(0, amountInput - interestPaid);
                 const unpaidInterest = Math.max(0, interestAccrued - interestPaid);
                 closingBalance = previousClosingBalance - principalPaid + unpaidInterest;
-            } else if (['Bank Disbursement', 'Charges', 'Interest Deposited by Bank'].includes(typeSelect)) {
+            } else if (['Bank Disbursement', 'Charges', 'Interest Deposit'].includes(typeSelect)) {
                 closingBalance = previousClosingBalance + amountInput + interestAccrued;
             }
         }
