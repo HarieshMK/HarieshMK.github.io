@@ -514,7 +514,6 @@ function addRow(date = '', transType = 'Loan Payment by User', interestRate = ''
     row.className = 'actual-ledger-row';
     
     row.innerHTML = `
-        <td class="col-sno">${rowCount}</td>
         <td><input type="date" class="trans-date" value="${date}"></td>
         <td class="col-days">0</td>
         <td><input type="number" step="any" class="trans-rate" value="${interestRate}" placeholder="%"></td>
