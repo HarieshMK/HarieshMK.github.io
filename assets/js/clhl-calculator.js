@@ -530,7 +530,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
         <td class="col-interest-paid">₹0</td>
         <td class="col-principal-paid">₹0</td>
         <td class="col-closing-balance">₹0</td>
-        <td style="text-align: center;"><button type="button" class="btn-delete-trans"><i class="fas fa-trash"></i></button></td>
+        <td style="text-align: center;"><button type="button" class="btn-delete"><i class="fas fa-trash"></i></button></td>
     `;
 
     tableBody.appendChild(row);
@@ -538,7 +538,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
         el.addEventListener('input', runActualLedgerCalculation);
     });
 
-    row.querySelector('.btn-delete-trans').addEventListener('click', () => {
+    row.querySelector('.btn-delete').addEventListener('click', () => {
         row.remove();
         reindexLedgerRows();
         runActualLedgerCalculation();
@@ -546,7 +546,6 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
 
     runActualLedgerCalculation();
 }
-
 function reindexLedgerRows() {
     const rows = document.querySelectorAll('#transactionBody tr');
     rows.forEach((row, index) => {
