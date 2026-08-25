@@ -278,10 +278,12 @@ permalink: /calculators/clhl/
 
 <style>
 /* ==========================================================================
-    LOAN CALCULATOR - INTEGRATED DESIGN SYSTEM STYLING
+   LOAN CALCULATOR - INTEGRATED DESIGN SYSTEM STYLING (CONSOLIDATED)
    ========================================================================== */
 
-/* Main Container & Layout */
+/* --------------------------------------------------------------------------
+   1. GLOBAL & CONTAINER LAYOUTS
+   -------------------------------------------------------------------------- */
 .calculator-container { 
     display: flex !important; 
     flex-wrap: wrap !important; 
@@ -305,10 +307,29 @@ permalink: /calculators/clhl/
     min-width: 300px !important; 
 }
 
-/* Clean Full-Width Section Helper */
 .full-width-section { 
     margin-top: 20px !important; 
     grid-template-columns: 1fr !important; 
+}
+
+.calculator-top-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+    margin-bottom: 25px !important;
+    align-items: start !important;
+}
+
+.calculator-top-grid .post-card.calculation-card {
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.calculator-card-container {
+    position: relative; 
 }
 
 /* Card Styling */
@@ -331,45 +352,6 @@ permalink: /calculators/clhl/
 }
 .section-card-content { 
     padding: 20px 25px; 
-}
-
-/* Standard Row Input Layout */
-.calc-grid-layout { 
-    display: flex !important; 
-    flex-direction: column !important; 
-    gap: 20px !important; 
-}
-.calc-custom-row { 
-    display: flex !important; 
-    flex-direction: row !important; 
-    align-items: center !important; 
-    justify-content: space-between !important; 
-    gap: 20px !important; 
-}
-.calc-custom-row label { 
-    flex: 0 0 40% !important; 
-    font-size: 0.95rem !important; 
-    font-weight: 700 !important; 
-    color: var(--text-primary); 
-    margin: 0 !important; 
-}
-.calc-custom-row input { 
-    flex: 1 !important; 
-    height: 45px !important; 
-    padding: 0 12px !important; 
-    border-radius: 10px !important; 
-    font-family: 'JetBrains Mono', monospace !important; 
-    font-size: 0.95rem !important; 
-    font-weight: 700 !important; 
-    background-color: var(--bg-container) !important; 
-    border: 2px solid var(--border-base) !important; 
-    color: var(--brand-primary) !important; 
-    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-}
-.calc-custom-row input:focus { 
-    border-color: var(--brand-primary) !important; 
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 15%, transparent) !important;
-    outline: none; 
 }
 
 /* Results Sidebar */
@@ -423,6 +405,67 @@ permalink: /calculators/clhl/
     color: var(--text-primary); 
 }
 
+
+/* --------------------------------------------------------------------------
+   2. COMMONIZED INPUTS, CONTROLS & FORMS
+   -------------------------------------------------------------------------- */
+/* Global Base Inputs & Selects Commonization */
+.calc-custom-row input,
+.charge-row input,
+.plan-toolbar input,
+.finance-table input[type="date"],
+.finance-table input[type="number"],
+.finance-table select,
+.plan-table input[type="number"] {
+    font-family: 'JetBrains Mono', monospace !important;
+    background-color: var(--bg-container) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-base) !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Focus States Commonization */
+.calc-custom-row input:focus,
+.plan-toolbar input:focus,
+.plan-table input[type="number"]:focus {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 15%, transparent) !important;
+    outline: none; 
+}
+
+/* Specific Context Sizing & Overrides */
+.calc-grid-layout { 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 20px !important; 
+}
+.calc-custom-row { 
+    display: flex !important; 
+    flex-direction: row !important; 
+    align-items: center !important; 
+    justify-content: space-between !important; 
+    gap: 20px !important; 
+}
+.calc-custom-row label { 
+    flex: 0 0 40% !important; 
+    font-size: 0.95rem !important; 
+    font-weight: 700 !important; 
+    color: var(--text-primary); 
+    margin: 0 !important; 
+}
+.calc-custom-row input { 
+    flex: 1 !important; 
+    height: 45px !important; 
+    padding: 0 12px !important; 
+    border-radius: 10px !important; 
+    font-size: 0.95rem !important; 
+    font-weight: 700 !important; 
+    color: var(--brand-primary) !important; 
+    border-width: 2px !important;
+}
+
 /* Extra Charges - Row Grid Layout */
 #extraChargesContainer { 
     margin-top: 20px; 
@@ -439,11 +482,6 @@ permalink: /calculators/clhl/
 .charge-row input { 
     height: 40px !important; 
     padding: 0 10px !important; 
-    border: 2px solid var(--border-base) !important; 
-    border-radius: 8px !important; 
-    font-family: 'JetBrains Mono', monospace !important;
-    background: var(--bg-container) !important;
-    color: var(--text-primary) !important;
 }
 .charge-row label { 
     display: flex; 
@@ -468,7 +506,18 @@ input[readonly] {
     color: var(--text-secondary) !important; 
 }
 
-/* Milestone Table Styling */
+
+/* --------------------------------------------------------------------------
+   3. UNIFIED TABLES & LEDGERS
+   -------------------------------------------------------------------------- */
+/* Common Table Wrapper / Overflows */
+.table-wrapper, 
+.milestone-table, 
+.milestone-table tr, 
+.milestone-table td {
+    overflow: visible !important;
+}
+
 .milestone-table input {
     width: 100%;
     height: 35px;
@@ -480,15 +529,281 @@ input[readonly] {
     color: var(--text-primary);
 }
 
-/* Ensure the table cell doesn't clip the dropdown */
-.table-wrapper, 
-.milestone-table, 
-.milestone-table tr, 
-.milestone-table td {
-    overflow: visible !important;
+/* Expanded Transaction Ledger Table Styling */
+.finance-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important; 
+    font-size: 0.85rem !important;
+    background: var(--bg-container);
 }
 
-/* Action Menu Styling */
+.finance-table th:nth-child(1), .finance-table td:nth-child(1) { width: 110px !important; }  /* Date */
+.finance-table th:nth-child(2), .finance-table td:nth-child(2) { width: 55px !important; }    /* Days */
+.finance-table th:nth-child(3), .finance-table td:nth-child(3) { width: 85px !important; }    /* Interest Rate */
+.finance-table th:nth-child(4), .finance-table td:nth-child(4) { width: 100px !important; }  /* Interest Accrued */
+.finance-table th:nth-child(5), .finance-table td:nth-child(5) { width: 140px !important; }  /* Transaction Type */
+.finance-table th:nth-child(6), .finance-table td:nth-child(6) { width: 120px !important; }  /* Transaction Amount */
+.finance-table th:nth-child(7), .finance-table td:nth-child(7) { width: 90px !important; }    /* Interest Paid */
+.finance-table th:nth-child(8), .finance-table td:nth-child(8) { width: 90px !important; }    /* Principal Paid */
+.finance-table th:nth-child(9), .finance-table td:nth-child(9) { width: 110px !important; }  /* Closing Balance */
+.finance-table th:nth-child(10), .finance-table td:nth-child(10) { width: 60px !important; text-align: center !important; } /* Actions */
+
+.finance-table th {
+    background: var(--bg-offset) !important;
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    font-size: 0.72rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+    padding: 10px 6px !important;
+    border-bottom: 2px solid var(--border-base) !important;
+    border-right: 1px solid var(--border-base) !important;
+    white-space: normal !important; 
+    line-height: 1.2 !important;
+    text-align: center !important;
+}
+
+.finance-table td {
+    padding: 8px !important;
+    border-bottom: 1px solid var(--border-base) !important;
+    border-right: 1px solid var(--border-base) !important;
+    vertical-align: middle !important;
+    color: var(--text-primary) !important;
+    overflow: visible !important; 
+}
+.finance-table th:nth-child(2),
+.finance-table th:nth-child(6) {
+    text-align: left !important;
+}
+
+.finance-table input[type="date"],
+.finance-table input[type="number"],
+.finance-table select {
+    width: 100% !important;
+    height: 36px !important;
+    padding: 0 6px !important;
+    font-size: 0.82rem !important;
+}
+.finance-table td input[type="date"],
+.finance-table td input[type="number"],
+.finance-table td select,
+.finance-table input,
+.finance-table select {
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* Modern Amortization Table Styling */
+.plan-table-wrapper {
+    background: var(--bg-container);
+    border: 1px solid var(--border-base);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.plan-table {
+    width: 100% !important;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+    background: var(--bg-container);
+    table-layout: fixed !important;
+}
+
+.plan-table .plan-sticky-header th {
+    position: sticky;
+    top: 0;
+    background: var(--bg-offset);
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 15px;
+    border: 1px solid var(--border-base);
+    border-bottom: 2px solid var(--border-base);
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.plan-table td {
+    padding: 12px 15px;
+    border: 1px solid var(--border-base);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.plan-table tbody tr:nth-child(even) {
+    background-color: var(--bg-offset);
+}
+
+.plan-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--brand-primary) 5%, var(--bg-offset));
+    transition: background-color 0.15s ease;
+}
+
+.plan-table .col-left { text-align: left; }
+.plan-table .col-right { text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+.plan-table input[type="number"] {
+    width: 110px !important;
+    height: 36px;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: right;
+}
+
+.plan-table th:nth-child(1), 
+.plan-table td:nth-child(1) {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+}
+
+.plan-table th:nth-child(2), 
+.plan-table td:nth-child(2) {
+    width: 160px !important;
+    min-width: 160px !important;
+}
+
+.plan-table th:nth-child(n+3):not(:last-child), 
+.plan-table td:nth-child(n+3):not(:last-child) {
+    width: 130px !important;
+    min-width: 130px !important;
+}
+
+.plan-table th:last-child, 
+.plan-table td:last-child {
+    width: 160px !important;
+    min-width: 160px !important;
+}
+
+.plan-table th, .plan-table td:not(:has(input)) {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.plan-table td input[type="number"] {
+    max-width: 110px !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   4. TOOLBARS & BUTTONS
+   -------------------------------------------------------------------------- */
+.plan-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding: 24px;
+    background: var(--bg-offset);
+    border-radius: 14px;
+    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 20%, var(--border-base));
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
+}
+.toolbar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.toolbar-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.plan-toolbar input {
+    height: 42px;
+    padding: 0 12px;
+    font-size: 0.9rem;
+}
+
+#fillStartMonth, #fillEndMonth {
+    width: 90px;
+}
+#fillEmiAmount {
+    width: 140px;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    border: none;
+}
+
+.btn-primary-solid {
+    background-color: var(--brand-primary);
+    color: var(--text-on-brand);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 25%, transparent);
+}
+.btn-primary-solid:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.toolbar-btn.btn-secondary-outline {
+    background-color: transparent;
+    color: var(--brand-primary);
+    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 40%, var(--border-base));
+}
+.toolbar-btn.btn-secondary-outline:hover:not(:disabled) {
+    background-color: var(--brand-primary);
+    color: var(--text-on-brand);
+    border-color: var(--brand-primary);
+    transform: translateY(-1px);
+}
+
+.toolbar-btn:disabled, 
+.plan-toolbar input:disabled ~ .toolbar-actions .toolbar-btn {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    filter: grayscale(30%);
+}
+
+.sticky-toolbar-wrapper {
+    position: sticky;
+    top: 15px;
+    z-index: 20; 
+    background-color: var(--bg-container);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.2s ease;
+}
+
+.sticky-toolbar-wrapper.is-stuck {
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+}
+
+
+/* --------------------------------------------------------------------------
+   5. MENUS, ACTIONS & FLOATING COMPONENTS
+   -------------------------------------------------------------------------- */
 .milestone-actions { 
     position: relative; 
     text-align: right;
@@ -547,165 +862,7 @@ input[readonly] {
     background: var(--bg-offset); 
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .calculator-container { 
-        flex-direction: column !important; 
-        width: 100% !important; 
-        padding: 15px !important;
-        overflow-x: hidden !important;
-    }
-    .calc-inputs, .calc-results { 
-        width: 100% !important; 
-        min-width: 0 !important; 
-    }
-    .calc-custom-row, .charge-row { 
-        flex-direction: column !important; 
-        align-items: flex-start !important; 
-        grid-template-columns: 1fr !important;
-    }
-    .calc-custom-row label { 
-        flex: 0 0 100% !important; 
-        margin-bottom: 8px !important; 
-    }
-    .calc-custom-row input {
-        width: 100% !important;
-    }
-    .radio-group-horizontal {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 10px !important;
-    }
-}
-
-/* ==========================================================================
-    UNIFIED PLAN TOOLBAR & BUTTON STYLING
-   ========================================================================== */
-.plan-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-end;
-    margin-bottom: 20px;
-    padding: 24px;
-    background: var(--bg-offset);
-    border-radius: 14px;
-    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 20%, var(--border-base));
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
-}
-.toolbar-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.toolbar-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-.plan-toolbar input {
-    height: 42px;
-    padding: 0 12px;
-    border-radius: 8px;
-    border: 2px solid var(--border-base);
-    background-color: var(--bg-container);
-    color: var(--text-primary);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-}
-.plan-toolbar input:focus {
-    border-color: var(--brand-primary);
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 15%, transparent);
-}
-
-#fillStartMonth, #fillEndMonth {
-    width: 90px;
-}
-#fillEmiAmount {
-    width: 140px;
-}
-
-/* Toolbar Action Buttons Group */
-.toolbar-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.toolbar-btn {
-    height: 42px;
-    padding: 0 18px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    border: none;
-}
-
-/* Primary Action Style (Apply to Range) */
-.btn-primary-solid {
-    background-color: var(--brand-primary);
-    color: var(--text-on-brand);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 25%, transparent);
-}
-.btn-primary-solid:hover:not(:disabled) {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-}
-
-/* Secondary Outline Style */
-.toolbar-btn.btn-secondary-outline {
-    background-color: transparent;
-    color: var(--brand-primary);
-    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 40%, var(--border-base));
-}
-.toolbar-btn.btn-secondary-outline:hover:not(:disabled) {
-    background-color: var(--brand-primary);
-    color: var(--text-on-brand);
-    border-color: var(--brand-primary);
-    transform: translateY(-1px);
-}
-
-/* Hybrid Approach: Explicit Dimmed / Disabled State Styling */
-.toolbar-btn:disabled, 
-.plan-toolbar input:disabled ~ .toolbar-actions .toolbar-btn {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-    filter: grayscale(30%);
-}
-
-@media (max-width: 992px) {
-    .plan-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .plan-toolbar input, .toolbar-btn {
-        width: 100% !important;
-    }
-    .toolbar-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-}
-
-/* ==========================================================================
-    BOTTOM-RIGHT FLOATING SAVE ICON & TOOLTIP
-   ========================================================================== */
-.calculator-card-container {
-    position: relative; 
-}
-
+/* Bottom-Right Floating Save Icon */
 .bottom-right-save-wrapper {
     position: sticky; 
     float: right;     
@@ -775,241 +932,10 @@ input[readonly] {
     border-radius: 50%;
 }
 
-    /* ==========================================================================
-    EXPANDED TRANSACTION LEDGER TABLE STYLING (NO SCROLLBAR)
-   ========================================================================== */
-.finance-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    table-layout: fixed !important; /* Forces columns to respect explicit widths */
-    font-size: 0.85rem !important;
-    background: var(--bg-container);
-}
 
-/* Ensure fixed table layout is enforced */
-.finance-table {
-    table-layout: fixed !important;
-    width: 100% !important;
-}
-
-.finance-table th:nth-child(1), .finance-table td:nth-child(1) { width: 110px !important; }  /* Date */
-.finance-table th:nth-child(2), .finance-table td:nth-child(2) { width: 55px !important; }   /* Days */
-.finance-table th:nth-child(3), .finance-table td:nth-child(3) { width: 85px !important; }   /* Interest Rate */
-.finance-table th:nth-child(4), .finance-table td:nth-child(4) { width: 100px !important; }  /* Interest Accrued */
-.finance-table th:nth-child(5), .finance-table td:nth-child(5) { width: 140px !important; }  /* Transaction Type */
-.finance-table th:nth-child(6), .finance-table td:nth-child(6) { width: 120px !important; }  /* Transaction Amount */
-.finance-table th:nth-child(7), .finance-table td:nth-child(7) { width: 90px !important; }   /* Interest Paid */
-.finance-table th:nth-child(8), .finance-table td:nth-child(8) { width: 90px !important; }   /* Principal Paid */
-.finance-table th:nth-child(9), .finance-table td:nth-child(9) { width: 110px !important; }  /* Closing Balance */
-.finance-table th:nth-child(10), .finance-table td:nth-child(10) { width: 60px !important; text-align: center !important; } /* Actions */
-
-.finance-table th {
-    background: var(--bg-offset) !important;
-    color: var(--text-primary) !important;
-    font-weight: 700 !important;
-    font-size: 0.72rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.3px !important;
-    padding: 10px 6px !important;
-    border-bottom: 2px solid var(--border-base) !important;
-    border-right: 1px solid var(--border-base) !important;
-    white-space: normal !important; 
-    line-height: 1.2 !important;
-    text-align: center !important;
-}
-
-.finance-table td {
-    padding: 8px !important;
-    border-bottom: 1px solid var(--border-base) !important;
-    border-right: 1px solid var(--border-base) !important;
-    vertical-align: middle !important;
-    color: var(--text-primary) !important;
-    overflow: visible !important; /* Ensures dropdowns/inputs don't clip */
-}
-.finance-table th:nth-child(2),
-.finance-table th:nth-child(6) {
-    text-align: left !important;
-}
-
-/* Compact input controls inside the widened table */
-.finance-table input[type="date"],
-.finance-table input[type="number"],
-.finance-table select {
-    width: 100% !important;
-    height: 36px !important;
-    padding: 0 6px !important;
-    background: var(--bg-container) !important;
-    border: 1.5px solid var(--border-base) !important;
-    border-radius: 8px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.82rem !important;
-    color: var(--text-primary) !important;
-    box-sizing: border-box !important;
-}
-.finance-table td input[type="date"],
-.finance-table td input[type="number"],
-.finance-table td select {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-}
-.finance-table input,
-.finance-table select {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-}
-/* ==========================================================================
-    MODERN AMORTIZATION TABLE STYLING
-   ========================================================================== */
-
-.plan-table-wrapper {
-    background: var(--bg-container);
-    border: 1px solid var(--border-base);
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-}
-
-.plan-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 0.9rem;
-    background: var(--bg-container);
-}
-
-/* Sticky Header styling */
-.plan-table .plan-sticky-header th {
-    position: sticky;
-    top: 0;
-    background: var(--bg-offset);
-    color: var(--text-primary);
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 12px 15px;
-    border: 1px solid var(--border-base);
-    border-bottom: 2px solid var(--border-base);
-    z-index: 10;
-    white-space: nowrap;
-}
-
-/* Table Body Rows */
-.plan-table td {
-    padding: 12px 15px;
-    border: 1px solid var(--border-base);
-    color: var(--text-primary);
-    vertical-align: middle;
-}
-
-/* Subtle Zebra Striping for Readability */
-.plan-table tbody tr:nth-child(even) {
-    background-color: var(--bg-offset);
-}
-
-.plan-table tbody tr:hover {
-    background-color: color-mix(in srgb, var(--brand-primary) 5%, var(--bg-offset));
-    transition: background-color 0.15s ease;
-}
-
-/* Alignments */
-.plan-table .col-left { text-align: left; }
-.plan-table .col-right { text-align: right; font-family: 'JetBrains Mono', monospace; }
-
-/* Modernizing the Planned EMI Input inside the table */
-.plan-table input[type="number"] {
-    width: 110px;
-    height: 36px;
-    padding: 0 10px;
-    background: var(--bg-container);
-    border: 2px solid var(--border-base);
-    border-radius: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    text-align: right;
-    transition: all 0.2s ease;
-}
-
-.plan-table input[type="number"]:focus {
-    border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 15%, transparent);
-    outline: none;
-    background: var(--bg-container);
-}
-    /* ==========================================================================
-    FIXED AMORTIZATION TABLE COLUMN WIDTHS
-   ========================================================================== */
-
-.plan-table {
-    table-layout: fixed !important;
-    width: 100% !important;
-}
-
-.plan-table th:nth-child(1), 
-.plan-table td:nth-child(1) {
-    width: 110px !important;
-    min-width: 110px !important;
-    max-width: 110px !important;
-}
-
-.plan-table th:nth-child(2), 
-.plan-table td:nth-child(2) {
-    width: 160px !important;
-    min-width: 160px !important;
-}
-
-.plan-table th:nth-child(n+3):not(:last-child), 
-.plan-table td:nth-child(n+3):not(:last-child) {
-    width: 130px !important;
-    min-width: 130px !important;
-}
-
-.plan-table th:last-child, 
-.plan-table td:last-child {
-    width: 160px !important;
-    min-width: 160px !important;
-}
-
-.plan-table th, .plan-table td:not(:has(input)) {
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
-
-.plan-table td input[type="number"] {
-    width: 100% !important;
-    max-width: 110px !important;
-}
-    /* Side-by-Side Top Grid Rule */
-.calculator-top-grid {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 20px !important;
-    width: 100% !important;
-    margin-top: 20px !important;
-    margin-bottom: 25px !important;
-    align-items: start !important;
-}
-
-@media (max-width: 1100px) {
-    .calculator-top-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
-/* Ensure individual cards fill the grid columns neatly */
-.calculator-top-grid .post-card.calculation-card {
-    margin-bottom: 0 !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* 2. Compact & Clean Moratorium Options Container */
+/* --------------------------------------------------------------------------
+   6. MISC OPTIONS & COLLAPSIBLES
+   -------------------------------------------------------------------------- */
 .moro-options-wrapper {
     display: flex;
     flex-direction: row;
@@ -1029,7 +955,6 @@ input[readonly] {
     color: var(--text-primary);
 }
 
-/* Make radio buttons standard/small size */
 .moro-option-item input[type="radio"] {
     appearance: auto !important;
     -webkit-appearance: radio !important;
@@ -1039,7 +964,6 @@ input[readonly] {
     accent-color: var(--accent-primary, #3b82f6);
 }
 
-/* Custom Months input sizing */
 #customMoroMonths {
     width: 75px !important;
     height: 32px !important;
@@ -1049,14 +973,13 @@ input[readonly] {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.85rem;
 }
-    /* Collapsible Section Styling */
+
 details summary::-webkit-details-marker {
     display: none; 
 }
 details {
     width: 100%;
 }
-
 details summary {
     display: flex !important;
     align-items: center !important;
@@ -1068,16 +991,10 @@ details summary {
     box-sizing: border-box;
     transition: background-color 0.2s ease;
 }
-
-details summary::-webkit-details-marker {
-    display: none; 
-}
-
 details summary:hover {
     background-color: var(--bg-offset);
     border-radius: 8px;
 }
-
 details summary::after {
     content: ' ▼';
     font-size: 0.75rem;
@@ -1085,31 +1002,14 @@ details summary::after {
     transition: transform 0.2s ease;
     margin-left: auto;
 }
-
 details[open] summary::after {
     transform: rotate(180deg);
 }
-    /* ==========================================================================
-    STICKY PLAN TOOLBAR BEHAVIOR
-   ========================================================================== */
-.sticky-toolbar-wrapper {
-    position: sticky;
-    top: 15px;
-    z-index: 20; 
-    background-color: var(--bg-container);
-    padding-top: 5px;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-    transition: box-shadow 0.2s ease;
-}
 
-.sticky-toolbar-wrapper.is-stuck {
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-}
-    /* ==========================================================================
-    LOAN SUMMARY FOOTER BAR STYLING
-   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   7. FOOTER SUMMARY BAR & UTILITY TEXT
+   -------------------------------------------------------------------------- */
 .loan-summary-footer-bar {
     margin-top: 20px;
     background: var(--bg-offset);
@@ -1121,7 +1021,7 @@ details[open] summary::after {
     flex-direction: column;
     gap: 15px;
     position: sticky;
-    bottom: 15px; /* Stays locked nicely at the bottom of the viewport when scrolling past the table */
+    bottom: 15px; 
     z-index: 15;
 }
 
@@ -1156,14 +1056,12 @@ details[open] summary::after {
     color: var(--text-primary);
 }
 
-/* Subtle divider line separating standard totals from hero metrics */
 .summary-divider {
     height: 1px;
     background-color: var(--border-base);
     width: 100%;
 }
 
-/* Hero Tier Accent Styling */
 .highlight-tier {
     background: color-mix(in srgb, var(--brand-primary) 4%, var(--bg-offset));
     padding: 10px 14px;
@@ -1172,15 +1070,65 @@ details[open] summary::after {
 }
 
 .text-success {
-    color: #10b981 !important; /* Vibrant green to indicate financial savings */
+    color: #10b981 !important; 
 }
 
 .text-primary {
     color: var(--brand-primary) !important;
 }
 
-/* Mobile responsiveness adjustments */
+
+/* --------------------------------------------------------------------------
+   8. MEDIA QUERIES (RESPONSIVE)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+    .calculator-top-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .plan-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .plan-toolbar input, .toolbar-btn {
+        width: 100% !important;
+    }
+    .toolbar-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
+    .calculator-container { 
+        flex-direction: column !important; 
+        width: 100% !important; 
+        padding: 15px !important;
+        overflow-x: hidden !important;
+    }
+    .calc-inputs, .calc-results { 
+        width: 100% !important; 
+        min-width: 0 !important; 
+    }
+    .calc-custom-row, .charge-row { 
+        flex-direction: column !important; 
+        align-items: flex-start !important; 
+        grid-template-columns: 1fr !important;
+    }
+    .calc-custom-row label { 
+        flex: 0 0 100% !important; 
+        margin-bottom: 8px !important; 
+    }
+    .calc-custom-row input {
+        width: 100% !important;
+    }
+    .radio-group-horizontal {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
     .summary-grid-row {
         flex-direction: column;
         align-items: stretch;
