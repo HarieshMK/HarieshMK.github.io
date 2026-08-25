@@ -290,10 +290,13 @@ permalink: /calculators/clhl/
     padding: 40px !important; 
     border-radius: 24px !important; 
     margin-top: 20px !important; 
+    margin-left: auto !important;
+    margin-right: auto !important;
     align-items: start !important; 
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important; 
     box-sizing: border-box !important; 
     width: 100% !important; 
+    max-width: 1440px !important;
     background: var(--bg-container) !important; 
     border: 1px solid var(--border-base) !important; 
 }
@@ -773,6 +776,69 @@ input[readonly] {
     border-radius: 50%;
 }
 
+    /* ==========================================================================
+    EXPANDED TRANSACTION LEDGER TABLE STYLING (NO SCROLLBAR)
+   ========================================================================== */
+.ledger-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important; /* Forces columns to respect explicit widths */
+    font-size: 0.85rem !important;
+    background: var(--bg-container);
+}
+
+/* Explicit column sizing for all 11 columns */
+.ledger-table th:nth-child(1), .ledger-table td:nth-child(1) { width: 55px !important; }   /* S.No */
+.ledger-table th:nth-child(2), .ledger-table td:nth-child(2) { width: 135px !important; }  /* Date */
+.ledger-table th:nth-child(3), .ledger-table td:nth-child(3) { width: 65px !important; }   /* Days */
+.ledger-table th:nth-child(4), .ledger-table td:nth-child(4) { width: 105px !important; }  /* Interest Rate (%) */
+.ledger-table th:nth-child(5), .ledger-table td:nth-child(5) { width: 120px !important; }  /* Interest Accrued */
+.ledger-table th:nth-child(6), .ledger-table td:nth-child(6) { width: 180px !important; }  /* Transaction Type */
+.ledger-table th:nth-child(7), .ledger-table td:nth-child(7) { width: 145px !important; }  /* Transaction Amount */
+.ledger-table th:nth-child(8), .ledger-table td:nth-child(8) { width: 115px !important; }  /* Interest Paid */
+.ledger-table th:nth-child(9), .ledger-table td:nth-child(9) { width: 115px !important; }  /* Principal Paid */
+.ledger-table th:nth-child(10), .ledger-table td:nth-child(10) { width: 145px !important; } /* Closing Balance */
+.ledger-table th:nth-child(11), .ledger-table td:nth-child(11) { width: 70px !important; text-align: center; } /* Actions */
+
+.ledger-table th {
+    background: var(--bg-offset) !important;
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 8px !important;
+    border-bottom: 2px solid var(--border-base) !important;
+    border-right: 1px solid var(--border-base) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.ledger-table td {
+    padding: 8px !important;
+    border-bottom: 1px solid var(--border-base) !important;
+    border-right: 1px solid var(--border-base) !important;
+    vertical-align: middle !important;
+    color: var(--text-primary) !important;
+    overflow: visible !important; /* Ensures dropdowns/inputs don't clip */
+}
+
+/* Compact input controls inside the widened table */
+.ledger-table input[type="date"],
+.ledger-table input[type="number"],
+.ledger-table select {
+    width: 100% !important;
+    height: 36px !important;
+    padding: 0 6px !important;
+    background: var(--bg-container) !important;
+    border: 1.5px solid var(--border-base) !important;
+    border-radius: 8px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.82rem !important;
+    color: var(--text-primary) !important;
+    box-sizing: border-box !important;
+}
 /* ==========================================================================
     MODERN AMORTIZATION TABLE STYLING
    ========================================================================== */
