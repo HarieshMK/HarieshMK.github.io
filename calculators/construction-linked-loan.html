@@ -144,14 +144,26 @@ permalink: /calculators/clhl/
             </summary>
             <div class="section-card-content">
                 <div class="table-wrapper">
-                    <table>
+                    <table class="finance-table" style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr><th>Date</th><th>Type</th><th>Amount</th></tr>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">S.No</th>
+                                <th style="text-align: left; padding: 10px;">Date</th>
+                                <th style="text-align: left; padding: 10px;">Days</th>
+                                <th style="text-align: left; padding: 10px;">Interest Rate (%)</th>
+                                <th style="text-align: left; padding: 10px;">Interest Accrued</th>
+                                <th style="text-align: left; padding: 10px;">Transaction Type</th>
+                                <th style="text-align: left; padding: 10px;">Transaction Amount (₹)</th>
+                                <th style="text-align: left; padding: 10px;">Interest Paid</th>
+                                <th style="text-align: left; padding: 10px;">Principal Paid</th>
+                                <th style="text-align: left; padding: 10px;">Closing Balance (₹)</th>
+                                <th style="text-align: center; padding: 10px;">Actions</th>
+                            </tr>
                         </thead>
                         <tbody id="transactionBody"></tbody>
                     </table>
                 </div>
-                <button id="addRowBtn" class="premium-btn-base btn-secondary-outline">+ Add Transaction</button>
+                <button type="button" id="addRowBtn" onclick="addRow()" class="premium-btn-base btn-secondary-outline" style="width: 100%; margin-top: 15px;">+ Add Transaction</button>
             </div>
         </details>
     </div>
