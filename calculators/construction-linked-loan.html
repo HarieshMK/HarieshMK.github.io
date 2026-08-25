@@ -146,18 +146,19 @@ permalink: /calculators/clhl/
                 <div class="table-wrapper">
                     <table class="finance-table" style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr>
-                                <th style="text-align: left; padding: 10px;">Date</th>
-                                <th style="text-align: left; padding: 10px;">Days</th>
-                                <th style="text-align: left; padding: 10px;">Interest Rate (%)</th>
-                                <th style="text-align: left; padding: 10px;">Interest Accrued</th>
-                                <th style="text-align: left; padding: 10px;">Transaction Type</th>
-                                <th style="text-align: left; padding: 10px;">Transaction Amount (₹)</th>
-                                <th style="text-align: left; padding: 10px;">Interest Paid</th>
-                                <th style="text-align: left; padding: 10px;">Principal Paid</th>
-                                <th style="text-align: left; padding: 10px;">Closing Balance (₹)</th>
-                                <th style="text-align: center; padding: 10px;">Actions</th>
-                            </tr>
+                          <tr>
+                            <th>S.No</th>
+                            <th>Date</th>
+                            <th>Days</th>
+                            <th>Interest<br>Rate (%)</th>
+                            <th>Interest<br>Accrued</th>
+                            <th>Transaction<br>Type</th>
+                            <th>Transaction<br>Amount (₹)</th>
+                            <th>Interest<br>Paid</th>
+                            <th>Principal<br>Paid</th>
+                            <th>Closing<br>Balance (₹)</th>
+                            <th>Actions</th>
+                          </tr>
                         </thead>
                         <tbody id="transactionBody"></tbody>
                     </table>
@@ -787,31 +788,30 @@ input[readonly] {
 }
 
 /* Explicit column sizing for all 11 columns */
-.ledger-table th:nth-child(1), .ledger-table td:nth-child(1) { width: 55px !important; }   /* S.No */
-.ledger-table th:nth-child(2), .ledger-table td:nth-child(2) { width: 135px !important; }  /* Date */
-.ledger-table th:nth-child(3), .ledger-table td:nth-child(3) { width: 65px !important; }   /* Days */
-.ledger-table th:nth-child(4), .ledger-table td:nth-child(4) { width: 105px !important; }  /* Interest Rate (%) */
-.ledger-table th:nth-child(5), .ledger-table td:nth-child(5) { width: 120px !important; }  /* Interest Accrued */
-.ledger-table th:nth-child(6), .ledger-table td:nth-child(6) { width: 180px !important; }  /* Transaction Type */
-.ledger-table th:nth-child(7), .ledger-table td:nth-child(7) { width: 145px !important; }  /* Transaction Amount */
-.ledger-table th:nth-child(8), .ledger-table td:nth-child(8) { width: 115px !important; }  /* Interest Paid */
-.ledger-table th:nth-child(9), .ledger-table td:nth-child(9) { width: 115px !important; }  /* Principal Paid */
-.ledger-table th:nth-child(10), .ledger-table td:nth-child(10) { width: 145px !important; } /* Closing Balance */
-.ledger-table th:nth-child(11), .ledger-table td:nth-child(11) { width: 70px !important; text-align: center; } /* Actions */
+.ledger-table th:nth-child(2), .ledger-table td:nth-child(2) { width: 115px !important; }  /* Date */
+.ledger-table th:nth-child(3), .ledger-table td:nth-child(3) { width: 55px !important; }   /* Days */
+.ledger-table th:nth-child(4), .ledger-table td:nth-child(4) { width: 85px !important; }   /* Interest Rate (%) */
+.ledger-table th:nth-child(5), .ledger-table td:nth-child(5) { width: 105px !important; }  /* Interest Accrued */
+.ledger-table th:nth-child(6), .ledger-table td:nth-child(6) { width: 140px !important; }  /* Transaction Type */
+.ledger-table th:nth-child(7), .ledger-table td:nth-child(7) { width: 115px !important; }  /* Transaction Amount */
+.ledger-table th:nth-child(8), .ledger-table td:nth-child(8) { width: 95px !important; }   /* Interest Paid */
+.ledger-table th:nth-child(9), .ledger-table td:nth-child(9) { width: 95px !important; }   /* Principal Paid */
+.ledger-table th:nth-child(10), .ledger-table td:nth-child(10) { width: 115px !important; }/* Closing Balance */
+.ledger-table th:nth-child(11), .ledger-table td:nth-child(11) { width: 60px !important; text-align: center; } /* Actions */
 
 .ledger-table th {
     background: var(--bg-offset) !important;
     color: var(--text-primary) !important;
     font-weight: 700 !important;
-    font-size: 0.75rem !important;
+    font-size: 0.72rem !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    padding: 12px 8px !important;
+    letter-spacing: 0.3px !important;
+    padding: 10px 6px !important;
     border-bottom: 2px solid var(--border-base) !important;
     border-right: 1px solid var(--border-base) !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
+    white-space: normal !important; 
+    line-height: 1.2 !important;
+    text-align: center !important;
 }
 
 .ledger-table td {
@@ -821,6 +821,10 @@ input[readonly] {
     vertical-align: middle !important;
     color: var(--text-primary) !important;
     overflow: visible !important; /* Ensures dropdowns/inputs don't clip */
+}
+.ledger-table th:nth-child(2),
+.ledger-table th:nth-child(6) {
+    text-align: left !important;
 }
 
 /* Compact input controls inside the widened table */
