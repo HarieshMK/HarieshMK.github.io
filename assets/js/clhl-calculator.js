@@ -596,6 +596,11 @@ function runActualLedgerCalculation() {
                 const prevDateObj = new Date(previousDate);
                 const diffTime = currDateObj - prevDateObj;
                 days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                
+                // 💡 Add + 1 inclusive of the start day specifically for the 2nd row (index 1)
+                if (index === 1) {
+                    days += 1;
+                }
             }
             interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
 
@@ -621,7 +626,6 @@ function runActualLedgerCalculation() {
         if (dateInput) previousDate = dateInput;
     });
 }
-
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     const amortizationContainer = document.getElementById('loanPlanContainer') || loanPlanBody?.parentElement; 
