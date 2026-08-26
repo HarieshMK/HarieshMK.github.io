@@ -279,6 +279,9 @@ function calculateTotalPropertyCost() {
     const basicCost = document.getElementById('basicCost');
     const gstDisplay = document.getElementById('gstDisplay');
     
+    // --- NEW: Target your popup/display element here ---
+    const propertyCostDisplay = document.getElementById('propertyCostDisplay'); 
+    
     const basic = parseFloat(basicCost?.value) || 0;
     let extraChargesTotal = 0;
     document.querySelectorAll('.charge-row').forEach(row => {
@@ -292,6 +295,13 @@ function calculateTotalPropertyCost() {
     const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
 
     if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;    
+    if (propertyCostDisplay) {
+        propertyCostDisplay.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
+        // Optional visual pop/animation effect
+        propertyCostDisplay.classList.add('pop-animation');
+        setTimeout(() => propertyCostDisplay.classList.remove('pop-animation'), 300);
+    }
+
     updateOverallLoanAmount();
     return totalWithGST;
 }
