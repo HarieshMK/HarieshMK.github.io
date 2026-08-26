@@ -291,11 +291,7 @@ function calculateTotalPropertyCost() {
     const finalBasic = basic + extraChargesTotal;
     const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
 
-    if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;
-    
-    const totalPropCost = document.getElementById('totalPropertyCost');
-    if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
-    
+    if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;    
     updateOverallLoanAmount();
     return totalWithGST;
 }
@@ -752,23 +748,13 @@ function runCalculation() {
                 </tr>
             `;
         }
-        
-        // Clear summary output numbers
-        const closingPrincipalEl = document.getElementById('closingPrincipal');
-        const unpaidInterestEl = document.getElementById('unpaidInterest');
-        if (closingPrincipalEl) closingPrincipalEl.innerText = `₹0`;
-        if (unpaidInterestEl) unpaidInterestEl.innerText = `₹0`;
-        
-        return; // Halt calculation completely
+        return;
     }
 
     const basicCost = document.getElementById('basicCost');
     if (!basicCost) return;
 
-    const totalWithGST = getTotalPropertyCostValue();
-    const totalPropCost = document.getElementById('totalPropertyCost');
-    if (totalPropCost) totalPropCost.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
-    
+    const totalWithGST = getTotalPropertyCostValue();    
     let cumulativePct = 0;
     let cumulativeLoanAmt = 0;
     const today = new Date();
@@ -1062,17 +1048,6 @@ function runCalculation() {
         openingBalance = Math.max(0, closingBalance);
         previousClosingBalance = closingBalance;
     }
-
-    const closingPrincipalEl = document.getElementById('closingPrincipal');
-    const unpaidInterestEl = document.getElementById('unpaidInterest');
-    
-    const finalRow = loanPlanBody.lastElementChild;
-    const finalClosingBal = finalRow ? parseFloat(finalRow.querySelector('.closing-balance-cell').innerText.replace(/[₹,]/g, '')) || 0 : 0;
-
-    if (closingPrincipalEl) closingPrincipalEl.innerText = `₹${Math.round(finalClosingBal).toLocaleString()}`;
-    if (Math.abs(cumulativeUnpaidInterest) < 0.01) cumulativeUnpaidInterest = 0;
-    if (unpaidInterestEl) unpaidInterestEl.innerText = `₹${Math.round(cumulativeUnpaidInterest).toLocaleString()}`;
-
     // --- 📊 AUTOMATED AUDIT TRIGGER ---
     const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
         openingBalance: parseFloat(r.children[1]?.innerText.replace(/[₹,]/g, '')) || 0, // <--- Add this
@@ -1486,8 +1461,6 @@ async function loadCalculatorDataFromSupabase() {
             });
         }
     }
-
-    // 3. Load Custom Planned EMIs
     // 3. Load Custom Planned EMIs
     console.log("TRACE [9]: Fetching planned EMIs for profile_id:", profile.id);
     const { data: savedEmis, error: emiError } = await activeSupabase
