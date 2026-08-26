@@ -537,7 +537,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
                 <option value="Bank Disbursement" ${transType === 'Bank Disbursement' ? 'selected' : ''}>Bank Disbursement</option>
                 <option value="Charges" ${transType === 'Charges' ? 'selected' : ''}>Charges</option>
                 <option value="Interest Deposit" ${transType === 'Interest Deposit' ? 'selected' : ''}>Interest Deposit</option>
-                <option value="Rate Change" ${transType === 'Rate Change' ? 'selected' : ''}>Rate Change</option>
+                <option value="Interest Rate Change" ${transType === 'Interest Rate Change' ? 'selected' : ''}>Interest Rate Change</option>
             </select>
         </td>
         <td><input type="number" step="any" class="trans-amount" value="${amount}" placeholder="₹"></td>
@@ -618,7 +618,7 @@ function runActualLedgerCalculation() {
                 closingBalance = previousClosingBalance - principalPaid - interestPaid; 
             } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
                 closingBalance = previousClosingBalance + amountInput;
-            } else if (typeSelect === 'Rate Change') {
+            } else if (typeSelect === 'Interest Rate Change') {
                 closingBalance = previousClosingBalance;
             }
         }
