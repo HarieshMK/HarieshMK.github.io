@@ -509,7 +509,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
     const tableBody = document.getElementById('transactionBody');
     if (!tableBody) return;
 
-    // 💡 Carry forward the interest rate from the previous row if none is explicitly provided
+    // Carry forward the interest rate from the previous row if none is explicitly provided
     let finalRate = interestRate;
     if (finalRate === '' || finalRate === null || finalRate === undefined) {
         const existingRows = tableBody.querySelectorAll('tr');
@@ -537,6 +537,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
                 <option value="Bank Disbursement" ${transType === 'Bank Disbursement' ? 'selected' : ''}>Bank Disbursement</option>
                 <option value="Charges" ${transType === 'Charges' ? 'selected' : ''}>Charges</option>
                 <option value="Interest Deposit" ${transType === 'Interest Deposit' ? 'selected' : ''}>Interest Deposit</option>
+                <option value="Rate Change" ${transType === 'Rate Change' ? 'selected' : ''}>Rate Change</option>
             </select>
         </td>
         <td><input type="number" step="any" class="trans-amount" value="${amount}" placeholder="₹"></td>
