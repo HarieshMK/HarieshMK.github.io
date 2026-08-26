@@ -605,7 +605,7 @@ function runActualLedgerCalculation() {
                 const currDateObj = new Date(dateInput);
                 const prevDateObj = new Date(previousDate);
                 const diffTime = currDateObj - prevDateObj;
-                days = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                days = Math.abs(Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24))));
                 if (index === 1) {
                     days += 1;
                 }
@@ -616,17 +616,19 @@ function runActualLedgerCalculation() {
                 interestPaid = Math.min(amountInput, interestAccrued);
                 principalPaid = Math.max(0, amountInput - interestPaid);
                 closingBalance = previousClosingBalance - principalPaid - interestPaid; 
-            } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
+            } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
                 closingBalance = previousClosingBalance + amountInput;
-            } else if (typeSelect === 'Interest Deposit') {
-                closingBalance = previousClosingBalance + amountInput;
+            } else if (typeSelect === 'Rate Change') {
+                closingBalance = previousClosingBalance;
             }
         }
+
         daysCell.innerText = days;
         accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
         interestPaidCell.innerText = `₹${Math.round(interestPaid).toLocaleString()}`;
         principalPaidCell.innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         closingCell.innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
+
         previousClosingBalance = closingBalance;
         if (dateInput) previousDate = dateInput;
     });
