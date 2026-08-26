@@ -218,6 +218,7 @@ if (clearRangeBtn) {
         }
     });
 });
+// Cleaned up updateGSTRateAuto function
 function updateGSTRateAuto() {
     const gstRateInput = document.getElementById('gstRateInput');
     const superAreaInput = document.getElementById('superArea');
@@ -225,13 +226,11 @@ function updateGSTRateAuto() {
     
     if (!gstRateInput) return;
     
-    // If user manually edited the GST rate, don't auto-overwrite it
     if (gstRateInput.dataset.manual === 'true') return;
 
     const area = parseFloat(superAreaInput?.value) || 0;
     const basic = parseFloat(basicCostInput?.value) || 0;
     
-    // Include checked extra charges in total property value check
     let extraChargesTotal = 0;
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
@@ -242,16 +241,26 @@ function updateGSTRateAuto() {
     });
     
     const totalPropertyValue = basic + extraChargesTotal;
-
-    // Affordable housing criteria: Area <= 645 sq.ft AND Value <= 45,00,000
     const AFFORDABLE_AREA_LIMIT = 645;
     const AFFORDABLE_VALUE_LIMIT = 4500000;
 
     if (area > 0 && area <= AFFORDABLE_AREA_LIMIT && totalPropertyValue > 0 && totalPropertyValue <= AFFORDABLE_VALUE_LIMIT) {
-        gstRateInput.value = 1; // 1% Affordable housing
+        gstRateInput.value = 1; 
     } else {
-        gstRateInput.value = 5; // 5% Standard
+        gstRateInput.value = 5; 
     }
+}
+
+// ---> STANDALONE GLOBAL FUNCTION <---
+function updateDefaultGST() {
+    const isMetro = document.getElementById('isMetroToggle')?.checked;
+    const gstInput = document.getElementById('gstRateInput');
+    if (!gstInput) return;
+    
+    gstInput.value = isMetro ? 5.0 : 1.0;
+    gstInput.dataset.manual = 'true';
+    calculateTotalPropertyCost();
+    runCalculation();
 }
 
 function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
@@ -1243,7 +1252,8 @@ async function saveCalculatorDataToSupabase() {
         emi_start_date: document.getElementById('emiStartDate')?.value || null,
         moro_type: document.querySelector('input[name="moroType"]:checked')?.value || '18',
         custom_moro_months: parseInt(document.getElementById('customMoroMonths')?.value) || null,
-        gst_rate: parseFloat(document.getElementById('gstRateInput')?.value) || 5, // <--- Added
+        gst_rate: parseFloat(document.getElementById('gstRateInput')?.value) || 5,
+        is_metro: document.getElementById('isMetroToggle')?.checked || false, // <--- Add this
         updated_at: new Date().toISOString()
     };
 
@@ -1398,8 +1408,25 @@ async function saveCalculatorDataToSupabase() {
             console.error('Error saving actual transactions:', transError);
         }
     }
-
     alert('Calculator progress successfully saved! 🚀');
+}
+async function saveProfileToSupabase(userId) {
+    const gstRate = parseFloat(document.getElementById('gstRateInput').value);
+    const isMetro = document.getElementById('isMetroToggle').checked;
+
+    const { data, error } = await supabase
+        .from('clhl_profiles')
+        .update({ 
+            gst_rate: gstRate, 
+            is_metro: isMetro 
+        })
+        .eq('id', userId);
+
+    if (error) {
+        console.error('Error saving GST preference:', error);
+    } else {
+        console.log('GST preference saved successfully!');
+    }
 }
 
 async function loadCalculatorDataFromSupabase() {
@@ -1465,7 +1492,13 @@ async function loadCalculatorDataFromSupabase() {
     setValue('loanStartDate', profile.loan_start_date);
     setValue('emiStartDate', profile.emi_start_date);
     setValue('customMoroMonths', profile.custom_moro_months);
-    setValue('gstRateInput', profile.gst_rate); // <--- Added
+    setValue('gstRateInput', profile.gst_rate);
+
+    // Restore Metro Toggle state from Supabase
+    const metroToggle = document.getElementById('isMetroToggle');
+    if (metroToggle && profile.is_metro !== null && profile.is_metro !== undefined) {
+        metroToggle.checked = profile.is_metro;
+    }
 
     // Lock manual flag if loaded from DB
     const gstRateInput = document.getElementById('gstRateInput');
