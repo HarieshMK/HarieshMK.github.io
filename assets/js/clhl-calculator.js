@@ -275,15 +275,13 @@ function updateOverallLoanAmount() {
 }
 
 function calculateTotalPropertyCost() {
-    const totalWithGST = getTotalPropertyCostValue();
     const basicCost = document.getElementById('basicCost');
     const gstDisplay = document.getElementById('gstDisplay');
-    
-    // --- NEW: Target your popup/display element here ---
     const propertyCostDisplay = document.getElementById('propertyCostDisplay'); 
     
     const basic = parseFloat(basicCost?.value) || 0;
     let extraChargesTotal = 0;
+    
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
         const addToCost = row.querySelector('.add-to-cost-check');
@@ -291,18 +289,33 @@ function calculateTotalPropertyCost() {
             extraChargesTotal += parseFloat(amountInput.value) || 0;
         }
     });
+    
     const finalBasic = basic + extraChargesTotal;
     const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
+    
+    // Calculate total dynamically to prevent sync issues
+    const totalWithGST = finalBasic + gstAmount;
 
-    if (gstDisplay) gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString()}`;    
+    // Update GST Display (using en-IN for Indian currency formatting)
+    if (gstDisplay) {
+        gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString('en-IN')}`;
+    }  
+    
+    // Update Property Cost Display with animation
     if (propertyCostDisplay) {
-        propertyCostDisplay.innerText = `₹${Math.round(totalWithGST).toLocaleString()}`;
-        // Optional visual pop/animation effect
+        propertyCostDisplay.innerText = `₹${Math.round(totalWithGST).toLocaleString('en-IN')}`;
+        
+        // Robust animation reset (handles rapid toggling)
+        propertyCostDisplay.classList.remove('pop-animation');
+        void propertyCostDisplay.offsetWidth; // Force DOM reflow
         propertyCostDisplay.classList.add('pop-animation');
         setTimeout(() => propertyCostDisplay.classList.remove('pop-animation'), 300);
     }
 
-    updateOverallLoanAmount();
+    if (typeof updateOverallLoanAmount === 'function') {
+        updateOverallLoanAmount();
+    }
+    
     return totalWithGST;
 }
 
