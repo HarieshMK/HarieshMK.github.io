@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
             input.addEventListener('input', updateToolbarButtonStates);
         }
     });
+    const gstRateInput = document.getElementById('gstRateInput');
+    if (gstRateInput) {
+        gstRateInput.addEventListener('input', () => {
+            gstRateInput.dataset.manual = 'true';
+            calculateTotalPropertyCost();
+            runCalculation();
+        });
+    }
 
     updateToolbarButtonStates();
 
@@ -210,6 +218,41 @@ if (clearRangeBtn) {
         }
     });
 });
+function updateGSTRateAuto() {
+    const gstRateInput = document.getElementById('gstRateInput');
+    const superAreaInput = document.getElementById('superArea');
+    const basicCostInput = document.getElementById('basicCost');
+    
+    if (!gstRateInput) return;
+    
+    // If user manually edited the GST rate, don't auto-overwrite it
+    if (gstRateInput.dataset.manual === 'true') return;
+
+    const area = parseFloat(superAreaInput?.value) || 0;
+    const basic = parseFloat(basicCostInput?.value) || 0;
+    
+    // Include checked extra charges in total property value check
+    let extraChargesTotal = 0;
+    document.querySelectorAll('.charge-row').forEach(row => {
+        const amountInput = row.querySelector('.charge-amount');
+        const addToCost = row.querySelector('.add-to-cost-check');
+        if (amountInput && addToCost && addToCost.checked) {
+            extraChargesTotal += parseFloat(amountInput.value) || 0;
+        }
+    });
+    
+    const totalPropertyValue = basic + extraChargesTotal;
+
+    // Affordable housing criteria: Area <= 645 sq.ft AND Value <= 45,00,000
+    const AFFORDABLE_AREA_LIMIT = 645;
+    const AFFORDABLE_VALUE_LIMIT = 4500000;
+
+    if (area > 0 && area <= AFFORDABLE_AREA_LIMIT && totalPropertyValue > 0 && totalPropertyValue <= AFFORDABLE_VALUE_LIMIT) {
+        gstRateInput.value = 1; // 1% Affordable housing
+    } else {
+        gstRateInput.value = 5; // 5% Standard
+    }
+}
 
 function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
     let totalPrincipalPaidSum = 0;
@@ -249,7 +292,11 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
 }
 
 function getTotalPropertyCostValue() {
+    updateGSTRateAuto(); // Run prefill check first
+    
     const basicCost = document.getElementById('basicCost');
+    const gstRateInput = document.getElementById('gstRateInput');
+    
     let extraChargesTotal = 0;
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
@@ -258,26 +305,23 @@ function getTotalPropertyCostValue() {
             extraChargesTotal += parseFloat(amountInput.value) || 0;
         }
     });
+    
     const basic = parseFloat(basicCost?.value) || 0;
     const finalBasic = basic + extraChargesTotal;
-    const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
+    
+    const gstRate = gstRateInput ? (parseFloat(gstRateInput.value) || 0) / 100 : 0.05;
+    const gstAmount = finalBasic * gstRate;
+    
     return finalBasic + gstAmount;
 }
 
-function updateOverallLoanAmount() {
-    const loanAmountInput = document.getElementById('loanAmount');
-    const ltvRatioInput = document.getElementById('ltvRatio');
-    if (loanAmountInput && !loanAmountInput.dataset.manual) {
-        const totalCost = getTotalPropertyCostValue();
-        const ltv = (parseFloat(ltvRatioInput ? ltvRatioInput.value : 80) || 0) / 100;
-        loanAmountInput.value = Math.round(totalCost * ltv);
-    }
-}
-
 function calculateTotalPropertyCost() {
+    updateGSTRateAuto(); // Run prefill check first
+    
     const basicCost = document.getElementById('basicCost');
     const gstDisplay = document.getElementById('gstDisplay');
     const propertyCostDisplay = document.getElementById('propertyCostDisplay'); 
+    const gstRateInput = document.getElementById('gstRateInput');
     
     const basic = parseFloat(basicCost?.value) || 0;
     let extraChargesTotal = 0;
@@ -291,23 +335,20 @@ function calculateTotalPropertyCost() {
     });
     
     const finalBasic = basic + extraChargesTotal;
-    const gstAmount = (typeof FinanceEngine !== 'undefined') ? FinanceEngine.GSTHelper.calculateGST(finalBasic) : 0;
+    const gstRate = gstRateInput ? (parseFloat(gstRateInput.value) || 0) / 100 : 0.05;
+    const gstAmount = finalBasic * gstRate;
     
-    // Calculate total dynamically to prevent sync issues
     const totalWithGST = finalBasic + gstAmount;
 
-    // Update GST Display (using en-IN for Indian currency formatting)
     if (gstDisplay) {
         gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString('en-IN')}`;
     }  
     
-    // Update Property Cost Display with animation
     if (propertyCostDisplay) {
         propertyCostDisplay.innerText = `₹${Math.round(totalWithGST).toLocaleString('en-IN')}`;
         
-        // Robust animation reset (handles rapid toggling)
         propertyCostDisplay.classList.remove('pop-animation');
-        void propertyCostDisplay.offsetWidth; // Force DOM reflow
+        void propertyCostDisplay.offsetWidth; 
         propertyCostDisplay.classList.add('pop-animation');
         setTimeout(() => propertyCostDisplay.classList.remove('pop-animation'), 300);
     }
@@ -327,6 +368,7 @@ function updateBasicCost() {
     if(superArea && pricePerSqft && basicCost) {
         basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
     }
+    updateGSTRateAuto(); // <--- Add this here
     calculateTotalPropertyCost();
     runCalculation();
 }
@@ -1201,6 +1243,7 @@ async function saveCalculatorDataToSupabase() {
         emi_start_date: document.getElementById('emiStartDate')?.value || null,
         moro_type: document.querySelector('input[name="moroType"]:checked')?.value || '18',
         custom_moro_months: parseInt(document.getElementById('customMoroMonths')?.value) || null,
+        gst_rate: parseFloat(document.getElementById('gstRateInput')?.value) || 5, // <--- Added
         updated_at: new Date().toISOString()
     };
 
@@ -1422,6 +1465,13 @@ async function loadCalculatorDataFromSupabase() {
     setValue('loanStartDate', profile.loan_start_date);
     setValue('emiStartDate', profile.emi_start_date);
     setValue('customMoroMonths', profile.custom_moro_months);
+    setValue('gstRateInput', profile.gst_rate); // <--- Added
+
+    // Lock manual flag if loaded from DB
+    const gstRateInput = document.getElementById('gstRateInput');
+    if (gstRateInput && profile.gst_rate !== null && profile.gst_rate !== undefined) {
+        gstRateInput.dataset.manual = 'true';
+    }
 
     if (profile.moro_type) {
         const radio = document.querySelector(`input[name="moroType"][value="${profile.moro_type}"]`);
