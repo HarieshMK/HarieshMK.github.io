@@ -163,6 +163,7 @@ permalink: /calculators/clhl/
                     </table>
                 </div>
                 <button type="button" id="addRowBtn" class="premium-btn-base btn-secondary-outline" style="width: 100%; margin-top: 15px;">+ Add Transaction</button>
+                <button type="button" id="toggleHistoryBtn" onclick="toggleHistoryCollapse()" class="btn-secondary">📂 Minimize History</button>
             </div>
         </details>
     </div>
@@ -948,6 +949,10 @@ details summary::after {
 }
 details[open] summary::after {
     transform: rotate(180deg);
+}
+/* Style for collapsed/minimized historical rows */
+tr.row-minimized {
+    display: none !important;
 }
 
 
