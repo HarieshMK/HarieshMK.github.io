@@ -505,11 +505,43 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
 
 // --- UPGRADED ACTUAL TRANSACTION LEDGER ENGINE ---
 
+// State tracker for history collapse
+let isHistoryCollapsed = false;
+
+function toggleHistoryCollapse() {
+    isHistoryCollapsed = !isHistoryCollapsed;
+    const rows = document.querySelectorAll('#transactionBody tr');
+    const toggleBtn = document.getElementById('toggleHistoryBtn');
+
+    if (rows.length <= 1) {
+        alert("Not enough history to minimize yet!");
+        isHistoryCollapsed = false;
+        return;
+    }
+
+    rows.forEach((row, index) => {
+        if (index < rows.length - 1) {
+            if (isHistoryCollapsed) {
+                row.classList.add('row-minimized');
+            } else {
+                row.classList.remove('row-minimized');
+            }
+        }
+    });
+
+    // Update button text and icon
+    if (isHistoryCollapsed) {
+        toggleBtn.innerHTML = "📖 Expand History";
+        toggleBtn.classList.add('active');
+    } else {
+        toggleBtn.innerHTML = "📂 Minimize History";
+        toggleBtn.classList.remove('active');
+    }
+}
+
 function addRow(date = '', transType = 'EMI payment', interestRate = '', amount = '') {
     const tableBody = document.getElementById('transactionBody');
     if (!tableBody) return;
-
-    // Carry forward the interest rate from the previous row if none is explicitly provided
     let finalRate = interestRate;
     if (finalRate === '' || finalRate === null || finalRate === undefined) {
         const existingRows = tableBody.querySelectorAll('tr');
@@ -525,6 +557,14 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
     const rowCount = tableBody.querySelectorAll('tr').length + 1;
     const row = document.createElement('tr');
     row.className = 'actual-ledger-row';
+
+    if (isHistoryCollapsed) {
+        const currentRows = tableBody.querySelectorAll('tr');
+        if (currentRows.length > 0) {
+            // Minimize the old last row
+            currentRows[currentRows.length - 1].classList.add('row-minimized');
+        }
+    }
     
     row.innerHTML = `
         <td><input type="date" class="trans-date" value="${date}"></td>
@@ -537,7 +577,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
                 <option value="Bank Disbursement" ${transType === 'Bank Disbursement' ? 'selected' : ''}>Bank Disbursement</option>
                 <option value="Charges" ${transType === 'Charges' ? 'selected' : ''}>Charges</option>
                 <option value="Interest Deposit" ${transType === 'Interest Deposit' ? 'selected' : ''}>Interest Deposit</option>
-                <option value="Interest Rate Change" ${transType === 'Interest Rate Change' ? 'selected' : ''}>Interest Rate Change</option>
+                <option value="Rate Change" ${transType === 'Rate Change' ? 'selected' : ''}>Rate Change</option>
             </select>
         </td>
         <td><input type="number" step="any" class="trans-amount" value="${amount}" placeholder="₹"></td>
