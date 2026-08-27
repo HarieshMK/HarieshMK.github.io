@@ -21,20 +21,26 @@ permalink: /calculators/clhl/
             <div class="section-card-content">
                 <div class="calc-grid-layout" id="propertyProfileContainer">
                     <div class="charge-row">
-                        <label>Super Built-up Area (sq.ft)</label>
+                    <label>Super Built-up Area (sq.ft)</label>
+                    <div class="input-with-icon">
                         <input type="number" id="superArea" placeholder="e.g. 500">
-                        <div></div> <div>🔒</div> 
+                        <span class="row-icon">🔒</span>
                     </div>
-                    <div class="charge-row">
-                        <label>Price per sq.ft (₹)</label>
+                </div>
+                <div class="charge-row">
+                    <label>Price per sq.ft (₹)</label>
+                    <div class="input-with-icon">
                         <input type="number" id="pricePerSqft" placeholder="e.g. 5000">
-                        <div></div> <div>🔒</div> 
+                        <span class="row-icon">🔒</span>
                     </div>
-                    <div class="charge-row">
-                        <label>Basic Cost of property</label>
+                </div>
+                <div class="charge-row">
+                    <label>Basic Cost of property</label>
+                    <div class="input-with-icon">
                         <input type="number" id="basicCost" readonly>
-                        <div></div> <div>🔒</div> 
+                        <span class="row-icon">🔒</span>
                     </div>
+                </div>
 <!-- PREMIUM TAX & LOCATION SUB-PANEL -->
                     <div class="metro-sub-panel">         
                         <!-- Metro Toggle Row -->
@@ -61,10 +67,12 @@ permalink: /calculators/clhl/
                     
                     <!-- Total Property Cost Row -->
                     <div class="charge-row total-cost-row">
-                        <label>Total Property Cost</label>
+                    <label>Total Property Cost</label>
+                    <div class="input-with-icon">
                         <input type="text" id="totalPropertyCost" readonly placeholder="₹ 0">
-                        <div></div> <div>📊</div> 
+                        <span class="row-icon">📊</span>
                     </div>
+                </div>
 
                     <div id="extraChargesContainer"></div>
                 </div>
@@ -503,10 +511,17 @@ permalink: /calculators/clhl/
 
 .charge-row { 
     display: grid !important; 
-    grid-template-columns: 2fr 1.2fr 0.5fr !important; 
+    grid-template-columns: 1.5fr 1fr !important; 
     gap: 12px !important; 
     align-items: center !important; 
     margin-bottom: 14px !important; 
+}
+
+.charge-row .input-with-icon {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
 }
 
 .charge-row input { 
@@ -518,10 +533,9 @@ permalink: /calculators/clhl/
     box-sizing: border-box !important;
 }
 
-.charge-row .action-col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.row-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
 }
     
 /* Readonly Styling for Locked Rows */
