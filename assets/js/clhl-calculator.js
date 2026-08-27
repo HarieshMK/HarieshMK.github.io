@@ -567,19 +567,23 @@ function toggleHistoryCollapse() {
     const rows = document.querySelectorAll('#transactionBody tr');
     const toggleBtn = document.getElementById('toggleHistoryBtn');
 
-    if (rows.length <= 1) {
+    if (rows.length <= 2) {
         alert("Not enough history to minimize yet!");
         isHistoryCollapsed = false;
         return;
     }
 
     rows.forEach((row, index) => {
-        if (index < rows.length - 1) {
+        // Hide all rows except the last two (rows.length - 1 and rows.length - 2)
+        if (index < rows.length - 2) {
             if (isHistoryCollapsed) {
                 row.classList.add('row-minimized');
             } else {
                 row.classList.remove('row-minimized');
             }
+        } else {
+            // Ensure the last two rows are always visible when collapsed
+            row.classList.remove('row-minimized');
         }
     });
 
@@ -615,8 +619,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
     if (isHistoryCollapsed) {
         const currentRows = tableBody.querySelectorAll('tr');
         if (currentRows.length > 0) {
-            // Minimize the old last row
-            currentRows[currentRows.length - 1].classList.add('row-minimized');
+            currentRows[currentRows.length - 1].classList.remove('row-minimized');
         }
     }
     
