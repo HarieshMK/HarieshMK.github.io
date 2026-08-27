@@ -298,11 +298,119 @@ permalink: /calculators/clhl/
 
 <style>
 /* ==========================================================================
-   LOAN CALCULATOR - INTEGRATED DESIGN SYSTEM STYLING (CONSOLIDATED)
+   LOAN CALCULATOR - UNIFIED DESIGN SYSTEM STYLING (GLOBAL)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. GLOBAL & CONTAINER LAYOUTS
+   1. GLOBAL TYPOGRAPHY SYSTEM (UNIFORMITY ACROSS SITE)
+   -------------------------------------------------------------------------- */
+:root {
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-serif: 'Lora', serif;
+}
+
+/* Enforce uniform font family for all labels, headings, and body elements */
+body, .calculator-container, label, span, button, th, td, p {
+    font-family: var(--font-ui) !important;
+}
+
+/* Enforce uniform styling for ALL input fields, numbers, and dates site-wide */
+input[type="number"],
+input[type="text"],
+input[type="date"],
+select,
+.calc-custom-row input,
+.charge-row input,
+.plan-toolbar input,
+.finance-table input,
+.plan-table input,
+.milestone-table input {
+    font-family: var(--font-mono) !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--brand-primary) !important;
+    background-color: var(--bg-container) !important;
+    border: 2px solid var(--border-base) !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+    height: 46px !important;
+    padding: 0 14px !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Global Input Focus States */
+input:focus, select:focus {
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary) 18%, transparent) !important;
+    outline: none !important;
+}
+
+/* Uniform Label Styling Site-Wide */
+label, .toolbar-group label, .calc-custom-row label, .charge-row label {
+    font-family: var(--font-ui) !important;
+    font-size: 0.98rem !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.01em;
+}
+
+
+/* --------------------------------------------------------------------------
+   2. CUSTOM PREMIUM CHECKBOXES & RADIOS (SITE-WIDE)
+   -------------------------------------------------------------------------- */
+/* Hide native checkboxes and radios completely */
+input[type="checkbox"], input[type="radio"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-color: var(--bg-container);
+    border: 2px solid var(--border-base);
+    margin: 0;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: all 0.2s ease;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 6px !important;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+input[type="checkbox"]:checked::before {
+    content: "";
+    width: 10px;
+    height: 6px;
+    border-left: 2px solid var(--text-on-brand, #ffffff);
+    border-bottom: 2px solid var(--text-on-brand, #ffffff);
+    transform: rotate(-45deg) translate(1px, -1px);
+}
+
+/* Radio Button Styling */
+input[type="radio"] {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+}
+
+input[type="radio"]:checked {
+    border-color: var(--brand-primary) !important;
+    border-width: 5px !important;
+    background-color: var(--bg-container) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. CONTAINERS & LAYOUT GRIDS
    -------------------------------------------------------------------------- */
 .calculator-container { 
     display: flex !important; 
@@ -310,11 +418,8 @@ permalink: /calculators/clhl/
     gap: 25px !important; 
     padding: 35px !important; 
     border-radius: 24px !important; 
-    margin-top: 20px !important; 
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 20px auto !important;
     align-items: start !important; 
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important; 
     box-sizing: border-box !important; 
     width: 100% !important; 
     max-width: 1440px !important;
@@ -322,7 +427,6 @@ permalink: /calculators/clhl/
     border: 1px solid var(--border-base) !important; 
 }
 
-/* Card Styling - Expanded Padding to Eliminate Dead Space */
 .post-card.calculation-card { 
     background: var(--bg-container) !important; 
     border: 1px solid var(--border-base) !important; 
@@ -332,95 +436,29 @@ permalink: /calculators/clhl/
     flex: 1 1 46%;
     min-width: 420px;
 }
+
 .section-card-header { 
     padding: 24px 28px !important; 
     border-bottom: 1px solid var(--border-base); 
 }
+
 .section-card-header h3 { 
-    font-family: 'Lora', serif; 
+    font-family: var(--font-serif) !important; 
     font-size: 1.45rem !important; 
     margin: 0 !important; 
     color: var(--text-primary); 
 }
+
 .section-card-content { 
     padding: 24px 28px !important; 
 }
-.sidebar-panel-header-accent { 
-    border-bottom: 1px solid var(--border-base); 
-    margin-bottom: 20px; 
-    padding-bottom: 5px; 
-}
-.sidebar-panel-heading { 
-    font-size: 0.9rem !important; 
-    font-weight: 800 !important; 
-    text-transform: uppercase !important; 
-    letter-spacing: 0.1em !important; 
-    color: var(--text-muted); 
-    margin: 0 !important; 
-    font-family: 'Inter', -apple-system, sans-serif !important;
-}
-.regime-row-card { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    padding: 15px 0; 
-    border-radius: 12px; 
-    border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important; 
-    background: transparent !important; 
-    margin-bottom: 15px; 
-}
-.regime-row-title { 
-    font-size: 0.9rem; 
-    color: var(--text-muted); 
-    margin-bottom: 5px; 
-    text-transform: none;
-}
-.regime-row-value { 
-    font-family: 'JetBrains Mono', monospace !important; 
-    font-size: 1.6rem; 
-    font-weight: 700; 
-    color: var(--text-primary); 
-}
 
-
-/* --------------------------------------------------------------------------
-   2. COMMONIZED INPUTS, CONTROLS & FORMS (SCALED UP FOR PREMIUM FEEL)
-   -------------------------------------------------------------------------- */
-/* Global Base Inputs & Selects Commonization - No More Forced Tiny Widths */
-.calc-custom-row input,
-.charge-row input,
-.plan-toolbar input,
-.finance-table input[type="date"],
-.finance-table input[type="number"],
-.finance-table select,
-.plan-table input[type="number"] {
-    font-family: 'JetBrains Mono', monospace !important;
-    background-color: var(--bg-container) !important;
-    color: var(--text-primary) !important;
-    border: 2px solid var(--border-base) !important;
-    border-radius: 10px !important;
-    box-sizing: border-box !important;
-    transition: all 0.2s ease !important;
-    width: 100% !important;
-    max-width: none !important;
-}
-
-/* Focus States Commonization */
-.calc-custom-row input:focus,
-.plan-toolbar input:focus,
-.plan-table input[type="number"]:focus,
-.charge-row input:focus {
-    border-color: var(--brand-primary) !important;
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary) 18%, transparent) !important;
-    outline: none; 
-}
-
-/* Specific Context Sizing & Overrides */
 .calc-grid-layout { 
     display: flex !important; 
     flex-direction: column !important; 
     gap: 18px !important; 
 }
+
 .calc-custom-row { 
     display: flex !important; 
     flex-direction: row !important; 
@@ -429,30 +467,16 @@ permalink: /calculators/clhl/
     gap: 15px !important; 
     padding: 4px 0 !important;
 }
+
 .calc-custom-row label { 
     flex: 0 0 45% !important; 
-    font-size: 1.02rem !important; 
-    font-weight: 600 !important; 
-    color: var(--text-primary); 
-    margin: 0 !important; 
 }
+
 .calc-custom-row input { 
     flex: 1 !important; 
-    height: 48px !important; 
-    padding: 0 16px !important; 
-    border-radius: 10px !important; 
-    font-size: 1.05rem !important; 
-    font-weight: 700 !important; 
-    color: var(--brand-primary) !important; 
-    border-width: 2px !important;
 }
 
 /* Extra Charges - Row Grid Layout */
-#extraChargesContainer { 
-    margin-top: 20px; 
-    padding-top: 15px; 
-    border-top: 1px solid var(--border-base); 
-}
 .charge-row { 
     display: grid !important; 
     grid-template-columns: 2fr 1.6fr 0.8fr 0.4fr !important; 
@@ -460,22 +484,12 @@ permalink: /calculators/clhl/
     align-items: center !important; 
     margin-bottom: 14px !important; 
 }
+
 .charge-row input { 
     height: 46px !important; 
-    padding: 0 12px !important; 
-    font-size: 1.02rem !important;
-    font-weight: 600 !important;
 }
-.charge-row label { 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    cursor: pointer; 
-    font-size: 1rem; 
-    color: var(--text-primary);
-    font-weight: 600;
-}
-/* Readonly Styling for Locked Rows */
+
+/* Readonly Styling */
 input[readonly] { 
     background-color: var(--bg-offset) !important; 
     cursor: not-allowed !important; 
@@ -484,149 +498,58 @@ input[readonly] {
 
 
 /* --------------------------------------------------------------------------
-   3. UNIFIED TABLES & LEDGERS
+   4. MORATORIUM PERIOD - SIDE-BY-SIDE LAYOUT FIX
    -------------------------------------------------------------------------- */
-.table-wrapper, 
-.milestone-table, 
-.milestone-table tr, 
-.milestone-table td {
-    overflow: visible !important;
+.moro-options-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 20px !important;
+    flex: 1 !important;
+    flex-wrap: nowrap !important;
 }
 
-.milestone-table input {
-    width: 100%;
-    height: 40px;
-    padding: 8px;
-    border: 1px solid var(--border-base);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: var(--bg-container);
-    color: var(--text-primary);
-}
-
-/* Expanded Transaction Ledger Table Styling */
-.finance-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    table-layout: fixed !important; 
-    font-size: 0.9rem !important;
-    background: var(--bg-container);
-}
-
-.finance-table th:nth-child(1), .finance-table td:nth-child(1) { width: 110px !important; }  
-.finance-table th:nth-child(2), .finance-table td:nth-child(2) { width: 55px !important; }    
-.finance-table th:nth-child(3), .finance-table td:nth-child(3) { width: 85px !important; }    
-.finance-table th:nth-child(4), .finance-table td:nth-child(4) { width: 100px !important; } 
-.finance-table th:nth-child(5), .finance-table td:nth-child(5) { width: 140px !important; } 
-.finance-table th:nth-child(6), .finance-table td:nth-child(6) { width: 120px !important; } 
-.finance-table th:nth-child(7), .finance-table td:nth-child(7) { width: 90px !important; }    
-.finance-table th:nth-child(8), .finance-table td:nth-child(8) { width: 90px !important; }    
-.finance-table th:nth-child(9), .finance-table td:nth-child(9) { width: 110px !important; } 
-.finance-table th:nth-child(10), .finance-table td:nth-child(10) { width: 60px !important; text-align: center !important; } 
-
-.finance-table th {
-    background: var(--bg-offset) !important;
-    color: var(--text-primary) !important;
-    font-weight: 700 !important;
-    font-size: 0.78rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.3px !important;
-    padding: 12px 8px !important;
-    border-bottom: 2px solid var(--border-base) !important;
-    border-right: 1px solid var(--border-base) !important;
-    white-space: normal !important; 
-    line-height: 1.2 !important;
-    text-align: center !important;
-}
-
-.finance-table td {
-    padding: 10px 8px !important;
-    border-bottom: 1px solid var(--border-base) !important;
-    border-right: 1px solid var(--border-base) !important;
-    vertical-align: middle !important;
-    color: var(--text-primary) !important;
-    overflow: visible !important; 
-}
-.finance-table th:nth-child(2),
-.finance-table th:nth-child(6) {
-    text-align: left !important;
-}
-
-.finance-table input[type="date"],
-.finance-table input[type="number"],
-.finance-table select {
-    width: 100% !important;
-    height: 40px !important;
-    padding: 0 8px !important;
-    font-size: 0.9rem !important;
-}
-
-/* Modern Amortization Table Styling */
-.plan-table-wrapper {
-    background: var(--bg-container);
-    border: 1px solid var(--border-base);
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-}
-
-.plan-table {
-    width: 100% !important;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 0.95rem;
-    background: var(--bg-container);
-    table-layout: fixed !important;
-}
-
-.plan-table .plan-sticky-header th {
-    position: sticky;
-    top: 0;
-    background: var(--bg-offset);
-    color: var(--text-primary);
-    font-weight: 700;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 14px 18px;
-    border: 1px solid var(--border-base);
-    border-bottom: 2px solid var(--border-base);
-    z-index: 10;
+.moro-option-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer;
     white-space: nowrap;
 }
 
-.plan-table td {
-    padding: 14px 18px;
-    border: 1px solid var(--border-base);
-    color: var(--text-primary);
-    vertical-align: middle;
-}
-
-.plan-table tbody tr:nth-child(even) {
-    background-color: var(--bg-offset);
-}
-
-.plan-table tbody tr:hover {
-    background-color: color-mix(in srgb, var(--brand-primary) 5%, var(--bg-offset));
-    transition: background-color 0.15s ease;
-}
-
-.plan-table .col-left { text-align: left; }
-.plan-table .col-right { text-align: right; font-family: 'JetBrains Mono', monospace; }
-
-.plan-table input[type="number"] {
-    width: 100% !important;
-    height: 40px;
-    padding: 0 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-align: right;
+#customMoroMonths {
+    width: 90px !important;
+    height: 38px !important;
 }
 
 
 /* --------------------------------------------------------------------------
-   4. TOOLBARS & BUTTONS
+   5. TABLES, LEDGERS & TOOLBARS
    -------------------------------------------------------------------------- */
+.finance-table, .plan-table, .milestone-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background: var(--bg-container);
+}
+
+.finance-table th, .plan-table th, .milestone-table th {
+    background: var(--bg-offset) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-ui) !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 14px !important;
+    border: 1px solid var(--border-base) !important;
+}
+
+.finance-table td, .plan-table td, .milestone-table td {
+    padding: 12px 14px !important;
+    border: 1px solid var(--border-base) !important;
+    vertical-align: middle !important;
+}
+
 .plan-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -637,42 +560,13 @@ input[readonly] {
     background: var(--bg-offset);
     border-radius: 16px;
     border: 1.5px solid color-mix(in srgb, var(--brand-primary) 20%, var(--border-base));
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
-}
-.toolbar-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-.toolbar-group label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-.plan-toolbar input {
-    height: 46px;
-    padding: 0 14px;
-    font-size: 0.95rem;
-}
-
-#fillStartMonth, #fillEndMonth {
-    width: 110px;
-}
-#fillEmiAmount {
-    width: 160px;
-}
-
-.toolbar-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
 }
 
 .toolbar-btn {
     height: 46px;
     padding: 0 22px;
     border-radius: 10px;
+    font-family: var(--font-ui);
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
@@ -680,354 +574,20 @@ input[readonly] {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
     border: none;
+    transition: all 0.2s ease;
 }
 
 .btn-primary-solid {
     background-color: var(--brand-primary);
     color: var(--text-on-brand);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 25%, transparent);
-}
-.btn-primary-solid:hover:not(:disabled) {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-}
-
-.toolbar-btn.btn-secondary-outline {
-    background-color: transparent;
-    color: var(--brand-primary);
-    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 40%, var(--border-base));
-}
-.toolbar-btn.btn-secondary-outline:hover:not(:disabled) {
-    background-color: var(--brand-primary);
-    color: var(--text-on-brand);
-    border-color: var(--brand-primary);
-    transform: translateY(-1px);
-}
-
-.toolbar-btn:disabled, 
-.plan-toolbar input:disabled ~ .toolbar-actions .toolbar-btn {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-    filter: grayscale(30%);
-}
-
-.sticky-toolbar-wrapper {
-    position: sticky;
-    top: 15px;
-    z-index: 20; 
-    background-color: var(--bg-container);
-    padding-top: 5px;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-    transition: box-shadow 0.2s ease;
-}
-
-.sticky-toolbar-wrapper.is-stuck {
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
 }
 
 
 /* --------------------------------------------------------------------------
-   5. MENUS, ACTIONS & FLOATING COMPONENTS
-   -------------------------------------------------------------------------- */
-.milestone-actions { 
-    position: relative; 
-    text-align: right;
-    padding-right: 10px;
-}
-
-.btn-dots {
-    background: none;
-    border: none;
-    font-size: 1.6rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    padding: 0 10px;
-}
-
-.btn-dots:hover {
-    color: var(--brand-primary);
-    transform: scale(1.1);
-}
-
-.action-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 5px;
-    background: var(--bg-container);
-    border: 1px solid var(--border-base);
-    border-radius: 12px;
-    padding: 6px 0;
-    z-index: 10000;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    min-width: 140px;
-    display: none;
-    overflow: hidden;
-}
-
-.action-menu button {
-    display: flex;
-    align-items: center;
-    gap: 10px; 
-    width: 100%;
-    text-align: left;
-    padding: 12px 18px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    color: var(--text-primary);
-    transition: background 0.2s ease;
-}
-.action-menu .btn-menu-delete {
-    color: var(--color-danger) !important;
-}
-
-.action-menu button:hover { 
-    background: var(--bg-offset); 
-}
-
-/* Bottom-Right Floating Save Icon */
-.bottom-right-save-wrapper {
-    position: sticky; 
-    float: right;      
-    bottom: 30px;      
-    margin-right: -20px; 
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.br-save-btn {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: var(--brand-primary);
-    color: var(--text-on-brand);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    opacity: 0.4; 
-    transition: all 0.3s ease;
-}
-
-.bottom-right-save-wrapper:hover .br-save-btn {
-    opacity: 1; 
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.save-tooltip {
-    background: var(--bg-container);
-    color: var(--text-primary);
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border-base);
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(10px);
-    transition: all 0.3s ease;
-    pointer-events: none;
-}
-
-.bottom-right-save-wrapper:hover .save-tooltip {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-}
-
-.unsaved-dot {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    width: 12px;
-    height: 12px;
-    background-color: #f59e0b;
-    border: 2px solid var(--bg-container);
-    border-radius: 50%;
-}
-
-
-/* --------------------------------------------------------------------------
-   6. MISC OPTIONS & COLLAPSIBLES
-   -------------------------------------------------------------------------- */
-.moro-options-wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    flex-wrap: wrap;
-}
-
-.moro-option-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    font-size: 0.95rem;
-    cursor: pointer;
-    color: var(--text-primary);
-}
-
-.moro-option-item input[type="radio"] {
-    appearance: auto !important;
-    -webkit-appearance: radio !important;
-    width: 16px !important;
-    height: 16px !important;
-    margin: 0;
-    accent-color: var(--accent-primary, #3b82f6);
-}
-
-#customMoroMonths {
-    width: 90px !important;
-    height: 38px !important;
-    border-radius: 8px !important;
-    border: 1.5px solid var(--border-base) !important;
-    padding: 0 8px !important;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.95rem;
-}
-
-details summary::-webkit-details-marker {
-    display: none; 
-}
-details {
-    width: 100%;
-}
-details summary {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    cursor: pointer;
-    list-style: none;
-    padding: inherit;
-    box-sizing: border-box;
-    transition: background-color 0.2s ease;
-}
-details summary:hover {
-    background-color: var(--bg-offset);
-    border-radius: 8px;
-}
-details summary::after {
-    content: ' ▼';
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    transition: transform 0.2s ease;
-    margin-left: auto;
-}
-details[open] summary::after {
-    transform: rotate(180deg);
-}
-tr.row-minimized {
-    display: none !important;
-}
-
-
-/* --------------------------------------------------------------------------
-   7. FOOTER SUMMARY BAR & UTILITY TEXT
-   -------------------------------------------------------------------------- */
-.loan-summary-footer-bar {
-    margin-top: 25px;
-    background: var(--bg-offset);
-    border: 1.5px solid color-mix(in srgb, var(--brand-primary) 25%, var(--border-base));
-    border-radius: 16px;
-    padding: 24px 28px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    position: sticky;
-    bottom: 15px; 
-    z-index: 15;
-}
-
-.summary-grid-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.summary-metric {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-    min-width: 160px;
-}
-
-.metric-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-}
-
-.metric-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.summary-divider {
-    height: 1px;
-    background-color: var(--border-base);
-    width: 100%;
-}
-
-.highlight-tier {
-    background: color-mix(in srgb, var(--brand-primary) 4%, var(--bg-offset));
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1.5px dashed color-mix(in srgb, var(--brand-primary) 30%, var(--border-base));
-}
-
-.text-success {
-    color: #10b981 !important; 
-}
-
-.text-primary {
-    color: var(--brand-primary) !important;
-}
-
-
-/* --------------------------------------------------------------------------
-   8. MEDIA QUERIES (RESPONSIVE)
+   6. RESPONSIVE MEDIA QUERIES
    -------------------------------------------------------------------------- */
 @media (max-width: 992px) {
-    .plan-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .plan-toolbar input, .toolbar-btn {
-        width: 100% !important;
-    }
-    .toolbar-actions {
-        flex-direction: column;
-        width: 100%;
-    }
     .post-card.calculation-card {
         min-width: 100%;
     }
@@ -1036,9 +596,7 @@ tr.row-minimized {
 @media (max-width: 768px) {
     .calculator-container { 
         flex-direction: column !important; 
-        width: 100% !important; 
         padding: 18px !important;
-        overflow-x: hidden !important;
     }
     .calc-custom-row, .charge-row { 
         flex-direction: column !important; 
@@ -1049,15 +607,9 @@ tr.row-minimized {
         flex: 0 0 100% !important; 
         margin-bottom: 6px !important; 
     }
-    .calc-custom-row input {
-        width: 100% !important;
-    }
-    .summary-grid-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .summary-metric {
-        width: 100%;
+    .moro-options-wrapper {
+        flex-direction: column !important;
+        align-items: flex-start !important;
     }
 }
 </style>
