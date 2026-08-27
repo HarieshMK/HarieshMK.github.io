@@ -303,7 +303,7 @@ permalink: /calculators/clhl/
 
 /* --------------------------------------------------------------------------
    1. GLOBAL & CONTAINER LAYOUTS
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 .calculator-container { 
     display: flex !important; 
     flex-wrap: wrap !important; 
@@ -385,7 +385,7 @@ permalink: /calculators/clhl/
 
 /* --------------------------------------------------------------------------
    2. COMMONIZED INPUTS, CONTROLS & FORMS (SCALED UP FOR PREMIUM FEEL)
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 /* Global Base Inputs & Selects Commonization - No More Forced Tiny Widths */
 .calc-custom-row input,
 .charge-row input,
@@ -393,10 +393,11 @@ permalink: /calculators/clhl/
 .finance-table input[type="date"],
 .finance-table input[type="number"],
 .finance-table select,
-.plan-table input[type="number"] {
+.plan-table input[type="number"],
+.milestone-table input {
     font-family: 'JetBrains Mono', monospace !important;
     background-color: var(--bg-container) !important;
-    color: var(--text-primary) !important;
+    color: var(--brand-primary) !important; /* UPDATED: Uniform text color for inputs */
     border: 2px solid var(--border-base) !important;
     border-radius: 10px !important;
     box-sizing: border-box !important;
@@ -485,7 +486,7 @@ input[readonly] {
 
 /* --------------------------------------------------------------------------
    3. UNIFIED TABLES & LEDGERS
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 .table-wrapper, 
 .milestone-table, 
 .milestone-table tr, 
@@ -626,7 +627,7 @@ input[readonly] {
 
 /* --------------------------------------------------------------------------
    4. TOOLBARS & BUTTONS
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 .plan-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -735,7 +736,7 @@ input[readonly] {
 
 /* --------------------------------------------------------------------------
    5. MENUS, ACTIONS & FLOATING COMPONENTS
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 .milestone-actions { 
     position: relative; 
     text-align: right;
@@ -866,34 +867,78 @@ input[readonly] {
 
 
 /* --------------------------------------------------------------------------
-   6. MISC OPTIONS & COLLAPSIBLES
-   -------------------------------------------------------------------------- */
+   6. MISC OPTIONS & COLLAPSIBLES (UPDATED CHECKBOXES, RADIOS & MORATORIUM LAYOUT)
+  -------------------------------------------------------------------------- */
+
+/* UPDATED: Sleek Custom Checkboxes (Smaller, Premium Look) Site-Wide */
+input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 5px !important;
+    background-color: var(--bg-container) !important;
+    border: 2px solid var(--border-base) !important;
+    margin: 0 !important;
+    cursor: pointer;
+    display: inline-grid;
+    place-content: center;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+input[type="checkbox"]:checked::before {
+    content: "";
+    width: 9px;
+    height: 5px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translate(1px, -1px);
+}
+
+/* UPDATED: Moratorium Period - Forced Side-by-Side Row Layout */
 .moro-options-wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    flex-wrap: wrap;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 20px !important;
+    flex: 1 !important;
+    flex-wrap: nowrap !important;
 }
 
 .moro-option-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
     font-weight: 500;
     font-size: 0.95rem;
     cursor: pointer;
     color: var(--text-primary);
+    white-space: nowrap !important;
 }
 
+/* UPDATED: Sleek Custom Radio Buttons */
 .moro-option-item input[type="radio"] {
-    appearance: auto !important;
-    -webkit-appearance: radio !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
     width: 16px !important;
     height: 16px !important;
-    margin: 0;
-    accent-color: var(--accent-primary, #3b82f6);
+    border-radius: 50% !important;
+    background-color: var(--bg-container) !important;
+    border: 2px solid var(--border-base) !important;
+    margin: 0 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.moro-option-item input[type="radio"]:checked {
+    border-color: var(--brand-primary) !important;
+    border-width: 4px !important;
+    background-color: var(--bg-container) !important;
 }
 
 #customMoroMonths {
@@ -944,7 +989,7 @@ tr.row-minimized {
 
 /* --------------------------------------------------------------------------
    7. FOOTER SUMMARY BAR & UTILITY TEXT
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 .loan-summary-footer-bar {
     margin-top: 25px;
     background: var(--bg-offset);
@@ -1015,7 +1060,7 @@ tr.row-minimized {
 
 /* --------------------------------------------------------------------------
    8. MEDIA QUERIES (RESPONSIVE)
-   -------------------------------------------------------------------------- */
+  -------------------------------------------------------------------------- */
 @media (max-width: 992px) {
     .plan-toolbar {
         flex-direction: column;
