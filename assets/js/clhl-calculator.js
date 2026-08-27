@@ -673,6 +673,12 @@ function runActualLedgerCalculation() {
     let previousClosingBalance = 0;
     let previousDate = null;
 
+    // --- ACCUMULATORS FOR THE SUMMARY BAR ---
+    let totalPrincipalPaidSum = 0;
+    let totalInterestPaidSum = 0;
+    let totalOutflowSum = 0;
+    let finalClosingBalance = 0;
+
     rows.forEach((row, index) => {
         const dateInput = row.querySelector('.trans-date').value;
         const rateInput = parseFloat(row.querySelector('.trans-rate').value) || 0;
@@ -696,7 +702,7 @@ function runActualLedgerCalculation() {
             interestAccrued = 0;
             interestPaid = 0;
             principalPaid = 0;
-            closingBalance = amountInput;
+            closingBalance = amountInput; // Initial loan amount disbursement
         } else {
             if (dateInput && previousDate) {
                 const currDateObj = new Date(dateInput);
@@ -713,12 +719,20 @@ function runActualLedgerCalculation() {
                 interestPaid = Math.min(amountInput, interestAccrued);
                 principalPaid = Math.max(0, amountInput - interestPaid);
                 closingBalance = previousClosingBalance - principalPaid - interestPaid; 
+                
+                // Track total cash outflow for EMIs
+                totalOutflowSum += amountInput;
             } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
                 closingBalance = previousClosingBalance + amountInput;
             } else if (typeSelect === 'Interest Rate Change') {
                 closingBalance = previousClosingBalance;
             }
         }
+
+        // Add to running totals
+        totalPrincipalPaidSum += principalPaid;
+        scriptInterestPaidSum = (totalInterestPaidSum || 0) + interestPaid;
+        totalInterestPaidSum += interestPaid;
 
         daysCell.innerText = days;
         accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
@@ -728,8 +742,22 @@ function runActualLedgerCalculation() {
 
         previousClosingBalance = closingBalance;
         if (dateInput) previousDate = dateInput;
+        
+        finalClosingBalance = closingBalance;
     });
+
+    // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
+    const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
+    const sumPrincipalEl = document.getElementById('actualSummaryPrincipal');
+    const sumInterestEl = document.getElementById('actualSummaryInterest');
+    const sumOutflowEl = document.getElementById('actualSummaryOutflow');
+
+    if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
+    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
+    if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
+    if (sumOutflowEl) sumOutflowEl.innerText = `₹ ${Math.round(totalOutflowSum).toLocaleString()}`;
 }
+
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     const amortizationContainer = document.getElementById('loanPlanContainer') || loanPlanBody?.parentElement; 
