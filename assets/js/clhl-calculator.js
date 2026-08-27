@@ -806,6 +806,21 @@ function runActualLedgerCalculation() {
             sumCloseDateEl.innerText = `Add more EMI history`;
         }
     }
+    let totalEmiPaidAmt = 0;
+let emiCount = 0;
+rows.forEach(r => {
+    const type = r.querySelector('.trans-type').value;
+    const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
+    
+    // ADD THIS LINE TO DEBUG:
+    console.log("Row Type:", type, "| Amount:", amt);
+
+    if (type === 'EMI payment' && amt > 0) {
+        totalEmiPaidAmt += amt;
+        emiCount++;
+    }
+});
+console.log("Total EMIs found:", emiCount, "| Avg Payment:", totalEmiPaidAmt / (emiCount || 1));
 }
 
 function runCalculation() {
