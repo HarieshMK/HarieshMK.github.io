@@ -225,7 +225,6 @@ function updateGSTRateAuto() {
     const basicCostInput = document.getElementById('basicCost');
     
     if (!gstRateInput) return;
-    
     if (gstRateInput.dataset.manual === 'true') return;
 
     const area = parseFloat(superAreaInput?.value) || 0;
@@ -234,8 +233,7 @@ function updateGSTRateAuto() {
     let extraChargesTotal = 0;
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
-        const addToCost = row.querySelector('.add-to-cost-check');
-        if (amountInput && addToCost && addToCost.checked) {
+        if (amountInput) {
             extraChargesTotal += parseFloat(amountInput.value) || 0;
         }
     });
@@ -301,7 +299,7 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
 }
 
 function getTotalPropertyCostValue() {
-    updateGSTRateAuto(); // Run prefill check first
+    updateGSTRateAuto(); 
     
     const basicCost = document.getElementById('basicCost');
     const gstRateInput = document.getElementById('gstRateInput');
@@ -309,8 +307,7 @@ function getTotalPropertyCostValue() {
     let extraChargesTotal = 0;
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
-        const addToCost = row.querySelector('.add-to-cost-check');
-        if (amountInput && addToCost && addToCost.checked) {
+        if (amountInput) {
             extraChargesTotal += parseFloat(amountInput.value) || 0;
         }
     });
@@ -326,44 +323,31 @@ function getTotalPropertyCostValue() {
 
 function calculateTotalPropertyCost() {
     if (typeof updateGSTRateAuto === 'function') {
-        updateGSTRateAuto(); // Run prefill check first if it exists
+        updateGSTRateAuto(); 
     }
     
-    // 1. Get Basic Property Cost
     const basicCostInput = document.getElementById('basicCost');
     const propertyCostInput = document.getElementById('totalPropertyCost');
-    const gstRateInput = document.getElementById('gstRateInput'); // or whatever your GST input ID is
+    const gstRateInput = document.getElementById('gstRateInput');
     
     const basic = parseFloat(basicCostInput?.value) || 0;
     
-    // 2. Loop through all extra charges and sum those with "Add to Cost" checked
+    // Sum all extra charge amounts directly
     let extraChargesTotal = 0;
-    
-    // Target each extra charge row container based on your UI layout
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
-        const addToCostCheck = row.querySelector('.add-to-cost-check');
-        
-        // Check if the amount exists and the "Add to Cost" checkbox is ticked
-        if (amountInput && addToCostCheck && addToCostCheck.checked) {
+        if (amountInput) {
             extraChargesTotal += parseFloat(amountInput.value) || 0;
         }
     });
     
-    // 3. Combine Basic Cost + Extra Charges to get the proper taxable base
     const finalBasic = basic + extraChargesTotal;
-    
-    // 4. Calculate GST on the combined subtotal
-    const gstRate = gstRateInput ? (parseFloat(gstRateInput.value) || 0) / 100 : 0.01; // defaults to 1% if not found
+    const gstRate = gstRateInput ? (parseFloat(gstRateInput.value) || 0) / 100 : 0.01;
     const gstAmount = finalBasic * gstRate;
-    
-    // 5. Total Property Cost = (Basic + Extra Charges) + GST
     const totalWithGST = finalBasic + gstAmount;
 
-    // 6. Update the UI input field
     if (propertyCostInput) {
         propertyCostInput.value = `₹ ${Math.round(totalWithGST).toLocaleString('en-IN')}`;
-        
         propertyCostInput.classList.remove('pop-animation');
         void propertyCostInput.offsetWidth; 
         propertyCostInput.classList.add('pop-animation');
@@ -467,18 +451,10 @@ function createRow(name = '', amount = '', isDefault = false) {
     row.innerHTML = `
         <input type="text" value="${name}" class="charge-name" placeholder="e.g. Clubhouse, Parking...">
         <input type="number" value="${amount}" class="charge-amount" placeholder="Amount (₹)">
-        <label class="action-col" style="display: flex; align-items: center; gap: 5px;">
-            <input type="checkbox" class="add-to-cost-check" checked ${isDefault ? 'disabled' : ''}>
-            <span style="font-size: 0.75rem; color: #64748b;">Add to Cost</span>
-        </label>
         <div class="action-col">${isDefault ? '🔒' : '<button type="button" class="btn-delete"><i class="fas fa-trash"></i></button>'}</div>
     `;
     
     row.querySelector('.charge-amount').addEventListener('input', () => {
-        calculateTotalPropertyCost();
-        runCalculation();
-    });
-    row.querySelector('.add-to-cost-check').addEventListener('change', () => {
         calculateTotalPropertyCost();
         runCalculation();
     });
@@ -1341,7 +1317,7 @@ async function saveCalculatorDataToSupabase() {
         profile_id: profileId,
         charge_name: row.querySelector('.charge-name')?.value || '',
         charge_amount: parseFloat(row.querySelector('.charge-amount')?.value) || 0,
-        add_to_cost: row.querySelector('.add-to-cost-check')?.checked ?? true,
+        add_to_cost: true,
         sort_order: index,
         updated_at: new Date().toISOString()
     })).filter(c => c.charge_name || c.charge_amount > 0);
@@ -1543,8 +1519,6 @@ async function loadCalculatorDataFromSupabase() {
             container.innerHTML = ''; 
             charges.forEach(c => {
                 const row = createRow(c.charge_name, c.charge_amount, false);
-                const check = row.querySelector('.add-to-cost-check');
-                if (check) check.checked = c.add_to_cost;
                 container.appendChild(row);
             });
         }
