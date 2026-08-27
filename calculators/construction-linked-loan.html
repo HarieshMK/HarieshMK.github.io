@@ -934,11 +934,16 @@ input[type="checkbox"]:checked::before {
     height: 16px !important;
     min-width: 16px !important;
     min-height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+    aspect-ratio: 1 / 1 !important;
     border-radius: 50% !important;
     background-color: var(--bg-container) !important;
     border: 2px solid var(--border-base) !important;
     margin: 0 !important;
     cursor: pointer;
+    display: inline-block !important;
+    box-sizing: border-box !important;
     transition: all 0.2s ease;
 }
 
