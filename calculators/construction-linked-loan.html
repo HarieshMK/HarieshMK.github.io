@@ -37,8 +37,7 @@ permalink: /calculators/clhl/
                         <div></div> <div>🔒</div> 
                     </div>
 <!-- PREMIUM TAX & LOCATION SUB-PANEL -->
-                    <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; margin: 6px 0 10px 0;">
-                        
+                    <div class="metro-sub-panel">         
                         <!-- Metro Toggle Row -->
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 0.88rem; color: var(--text-primary, #e2e8f0); font-weight: 500;">Metro City Property?</span>
@@ -402,23 +401,24 @@ permalink: /calculators/clhl/
     width: 100% !important;
     max-width: none !important;
 }
-/* --- METRO CITY PROPERTY BOX BACKGROUND --- */
-.calc-custom-row:has(#metroCityToggle),
-.calc-custom-row:has(input[type="checkbox"]) {
+/* --- PREMIUM TAX & LOCATION SUB-PANEL --- */
+.metro-sub-panel {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
     background-color: var(--bg-container) !important;
     border: 1px solid var(--border-base) !important;
     border-radius: 12px !important;
     padding: 14px 16px !important;
+    margin: 6px 0 10px 0 !important;
 }
 
-/* Ensure helper texts and labels inside this box use proper contrast */
-.calc-custom-row:has(#metroCityToggle) label,
-.calc-custom-row:has(input[type="checkbox"]) label {
+.metro-sub-panel label {
     color: var(--text-primary) !important;
 }
 
-.calc-custom-row:has(#metroCityToggle) small,
-.calc-custom-row:has(input[type="checkbox"]) small {
+.metro-sub-panel small {
     color: var(--text-muted) !important;
 }
 
