@@ -325,29 +325,42 @@ function getTotalPropertyCostValue() {
 }
 
 function calculateTotalPropertyCost() {
-    updateGSTRateAuto(); 
+    if (typeof updateGSTRateAuto === 'function') {
+        updateGSTRateAuto(); // Run prefill check first if it exists
+    }
     
-    const basicCost = document.getElementById('basicCost');
-    const propertyCostInput = document.getElementById('totalPropertyCost'); 
-    const gstRateInput = document.getElementById('gstRateInput');
+    // 1. Get Basic Property Cost
+    const basicCostInput = document.getElementById('basicCost');
+    const propertyCostInput = document.getElementById('totalPropertyCost');
+    const gstRateInput = document.getElementById('gstRateInput'); // or whatever your GST input ID is
     
-    const basic = parseFloat(basicCost?.value) || 0;
+    const basic = parseFloat(basicCostInput?.value) || 0;
+    
+    // 2. Loop through all extra charges and sum those with "Add to Cost" checked
     let extraChargesTotal = 0;
     
+    // Target each extra charge row container based on your UI layout
     document.querySelectorAll('.charge-row').forEach(row => {
         const amountInput = row.querySelector('.charge-amount');
-        const addToCost = row.querySelector('.add-to-cost-check');
-        if (amountInput && addToCost && addToCost.checked) {
+        const addToCostCheck = row.querySelector('.add-to-cost-check');
+        
+        // Check if the amount exists and the "Add to Cost" checkbox is ticked
+        if (amountInput && addToCostCheck && addToCostCheck.checked) {
             extraChargesTotal += parseFloat(amountInput.value) || 0;
         }
     });
     
+    // 3. Combine Basic Cost + Extra Charges to get the proper taxable base
     const finalBasic = basic + extraChargesTotal;
-    const gstRate = gstRateInput ? (parseFloat(gstRateInput.value) || 0) / 100 : 0.05;
+    
+    // 4. Calculate GST on the combined subtotal
+    const gstRate = gstRateInput ? (parseFloat(gstRateInput.value) || 0) / 100 : 0.01; // defaults to 1% if not found
     const gstAmount = finalBasic * gstRate;
     
+    // 5. Total Property Cost = (Basic + Extra Charges) + GST
     const totalWithGST = finalBasic + gstAmount;
 
+    // 6. Update the UI input field
     if (propertyCostInput) {
         propertyCostInput.value = `₹ ${Math.round(totalWithGST).toLocaleString('en-IN')}`;
         
