@@ -676,8 +676,10 @@ function runActualLedgerCalculation() {
     // --- ACCUMULATORS FOR THE SUMMARY BAR ---
     let totalPrincipalPaidSum = 0;
     let totalInterestPaidSum = 0;
-    let totalOutflowSum = 0;
+    let totalExtraPaidSum = 0;
     let finalClosingBalance = 0;
+    let latestInterestRate = 8.5;
+    let lastValidDateStr = null;
 
     rows.forEach((row, index) => {
         const dateInput = row.querySelector('.trans-date').value;
@@ -695,6 +697,7 @@ function runActualLedgerCalculation() {
         let interestAccrued = 0;
         let interestPaid = 0;
         let principalPaid = 0;
+        let partPayment = 0;
         let closingBalance = previousClosingBalance;
 
         if (index === 0) {
@@ -702,26 +705,22 @@ function runActualLedgerCalculation() {
             interestAccrued = 0;
             interestPaid = 0;
             principalPaid = 0;
-            closingBalance = amountInput; // Initial loan amount disbursement
+            closingBalance = amountInput; 
         } else {
             if (dateInput && previousDate) {
                 const currDateObj = new Date(dateInput);
                 const prevDateObj = new Date(previousDate);
                 const diffTime = currDateObj - prevDateObj;
                 days = Math.abs(Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24))));
-                if (index === 1) {
-                    days += 1;
-                }
+                if (index === 1) days += 1;
             }
             interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
 
             if (typeSelect === 'EMI payment') {
                 interestPaid = Math.min(amountInput, interestAccrued);
-                principalPaid = Math.max(0, amountInput - interestPaid);
+                const basePrincipal = Math.max(0, amountInput - interestPaid);
+                principalPaid = basePrincipal;
                 closingBalance = previousClosingBalance - principalPaid - interestPaid; 
-                
-                // Track total cash outflow for EMIs
-                totalOutflowSum += amountInput;
             } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
                 closingBalance = previousClosingBalance + amountInput;
             } else if (typeSelect === 'Interest Rate Change') {
@@ -729,10 +728,14 @@ function runActualLedgerCalculation() {
             }
         }
 
-        // Add to running totals
         totalPrincipalPaidSum += principalPaid;
-        scriptInterestPaidSum = (totalInterestPaidSum || 0) + interestPaid;
         totalInterestPaidSum += interestPaid;
+        
+        if (rateInput > 0) latestInterestRate = rateInput;
+        if (dateInput) {
+            lastValidDateStr = dateInput;
+            previousDate = dateInput;
+        }
 
         daysCell.innerText = days;
         accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
@@ -741,21 +744,68 @@ function runActualLedgerCalculation() {
         closingCell.innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
 
         previousClosingBalance = closingBalance;
-        if (dateInput) previousDate = dateInput;
-        
         finalClosingBalance = closingBalance;
     });
+
+    // --- 🔮 DATA-DRIVEN PROJECTION LOGIC ---
+    let projectedMonthsNeeded = 0;
+    if (finalClosingBalance > 0) {
+        let totalEmiPaidAmt = 0;
+        let emiCount = 0;
+        rows.forEach(r => {
+            const type = r.querySelector('.trans-type').value;
+            const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
+            if (type === 'EMI payment' && amt > 0) {
+                totalEmiPaidAmt += amt;
+                emiCount++;
+            }
+        });
+
+        const avgMonthlyPayment = emiCount > 0 ? (totalEmiPaidAmt / emiCount) : 0;
+        const monthlyRate = latestInterestRate / 12 / 100;
+
+        if (avgMonthlyPayment > 0 && monthlyRate > 0) {
+            let simBalance = finalClosingBalance;
+            let mCount = 0;
+            while (simBalance > 0 && mCount < 600) {
+                const monthInterest = simBalance * monthlyRate;
+                const principalReduction = avgMonthlyPayment - monthInterest;
+                if (principalReduction <= 0) {
+                    mCount = -1;
+                    break;
+                }
+                simBalance -= principalReduction;
+                mCount++;
+            }
+            if (mCount > 0) projectedMonthsNeeded = mCount;
+        }
+    }
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
     const sumPrincipalEl = document.getElementById('actualSummaryPrincipal');
     const sumInterestEl = document.getElementById('actualSummaryInterest');
-    const sumOutflowEl = document.getElementById('actualSummaryOutflow');
+    const sumExtraEl = document.getElementById('actualSummaryExtra');
+    const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
     if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
-    if (sumOutflowEl) sumOutflowEl.innerText = `₹ ${Math.round(totalOutflowSum).toLocaleString()}`;
+    if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
+
+    if (sumCloseDateEl) {
+        if (finalClosingBalance <= 0) {
+            sumCloseDateEl.innerText = `Already Closed 🎉`;
+        } else if (projectedMonthsNeeded > 0 && lastValidDateStr) {
+            let closureDate = new Date(lastValidDateStr);
+            closureDate.setMonth(closureDate.getMonth() + projectedMonthsNeeded);
+            const cMonth = closureDate.toLocaleString('en-US', { month: 'short' });
+            const cYear = closureDate.getFullYear();
+            sumCloseDateEl.innerText = `${cMonth} ${cYear} 🚀`;
+        } else {
+            sumCloseDateEl.innerText = `Add more EMI history`;
+        }
+    }
 }
 
 function runCalculation() {
