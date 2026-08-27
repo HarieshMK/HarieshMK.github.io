@@ -94,7 +94,8 @@ permalink: /calculators/clhl/
                         <label>Moratorium Period</label>
                         <div class="moro-options-wrapper">
                             <label class="moro-option-item">
-                                <input type="radio" name="moroType" value="milestone" checked> Until Last Milestone
+                                <input type="radio" name="moroType" value="milestone" checked>
+                                <span>Until Last Milestone</span>
                             </label>
                             <label class="moro-option-item">
                                 <input type="radio" name="moroType" value="custom"> Custom: 
@@ -936,9 +937,7 @@ input[type="checkbox"]:checked::before {
     min-height: 16px !important;
     max-width: 16px !important;
     max-height: 16px !important;
-    flex-grow: 0 !important;
-    flex-shrink: 0 !important;
-    aspect-ratio: 1 / 1 !important;
+    flex: 0 0 16px !important; /* Forces flex layout to ignore stretching */
     border-radius: 50% !important;
     background-color: var(--bg-container) !important;
     border: 2px solid var(--border-base) !important;
@@ -946,17 +945,15 @@ input[type="checkbox"]:checked::before {
     cursor: pointer;
     display: inline-block !important;
     box-sizing: border-box !important;
-    transition: all 0.2s ease;
 }
 
 .moro-option-item input[type="radio"]:checked {
+    background-color: var(--brand-primary) !important;
     border-color: var(--brand-primary) !important;
-    border-width: 4px !important;
-    background-color: var(--bg-container) !important;
 }
 
 #customMoroMonths {
-    width: 58px !important; /* Slightly optimized width to fit nicely */
+    width: 58px !important;
     height: 34px !important;
     border-radius: 8px !important;
     border: 1.5px solid var(--border-base) !important;
