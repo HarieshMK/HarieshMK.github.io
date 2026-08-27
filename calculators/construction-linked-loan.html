@@ -402,6 +402,14 @@ permalink: /calculators/clhl/
     width: 100% !important;
     max-width: none !important;
 }
+    /* ---  METRO CITY BOX --- */
+    .calc-custom-row:has(#metroCityToggle),
+.calc-custom-row:has(input[type="checkbox"]) {
+    background-color: var(--bg-offset) !important;
+    border: 1px solid var(--border-base) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+}
 
 /* Focus States Commonization */
 .calc-custom-row input:focus,
@@ -940,7 +948,7 @@ input[type="checkbox"]:checked::before {
     align-self: center !important;
     border-radius: 50% !important;
     background-color: var(--bg-container) !important;
-    border: 2px solid var(--border-base) !important;
+    border: 2px solid var(--text-muted) !important; 
     margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
