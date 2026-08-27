@@ -307,8 +307,8 @@ permalink: /calculators/clhl/
 .calculator-container { 
     display: flex !important; 
     flex-wrap: wrap !important; 
-    gap: 20px !important; 
-    padding: 40px !important; 
+    gap: 25px !important; 
+    padding: 35px !important; 
     border-radius: 24px !important; 
     margin-top: 20px !important; 
     margin-left: auto !important;
@@ -322,26 +322,28 @@ permalink: /calculators/clhl/
     border: 1px solid var(--border-base) !important; 
 }
 
-/* Card Styling */
+/* Card Styling - Expanded Padding to Eliminate Dead Space */
 .post-card.calculation-card { 
     background: var(--bg-container) !important; 
     border: 1px solid var(--border-base) !important; 
-    border-radius: 16px !important; 
+    border-radius: 18px !important; 
     padding: 0 !important; 
     margin-bottom: 25px !important; 
+    flex: 1 1 46%;
+    min-width: 420px;
 }
 .section-card-header { 
-    padding: 20px 25px; 
+    padding: 24px 28px !important; 
     border-bottom: 1px solid var(--border-base); 
 }
 .section-card-header h3 { 
     font-family: 'Lora', serif; 
-    font-size: 1.3rem !important; 
+    font-size: 1.45rem !important; 
     margin: 0 !important; 
     color: var(--text-primary); 
 }
 .section-card-content { 
-    padding: 20px 25px; 
+    padding: 24px 28px !important; 
 }
 .sidebar-panel-header-accent { 
     border-bottom: 1px solid var(--border-base); 
@@ -349,7 +351,7 @@ permalink: /calculators/clhl/
     padding-bottom: 5px; 
 }
 .sidebar-panel-heading { 
-    font-size: 0.85rem !important; 
+    font-size: 0.9rem !important; 
     font-weight: 800 !important; 
     text-transform: uppercase !important; 
     letter-spacing: 0.1em !important; 
@@ -368,23 +370,23 @@ permalink: /calculators/clhl/
     margin-bottom: 15px; 
 }
 .regime-row-title { 
-    font-size: 0.85rem; 
+    font-size: 0.9rem; 
     color: var(--text-muted); 
     margin-bottom: 5px; 
     text-transform: none;
 }
 .regime-row-value { 
     font-family: 'JetBrains Mono', monospace !important; 
-    font-size: 1.5rem; 
+    font-size: 1.6rem; 
     font-weight: 700; 
     color: var(--text-primary); 
 }
 
 
 /* --------------------------------------------------------------------------
-   2. COMMONIZED INPUTS, CONTROLS & FORMS
+   2. COMMONIZED INPUTS, CONTROLS & FORMS (SCALED UP FOR PREMIUM FEEL)
    -------------------------------------------------------------------------- */
-/* Global Base Inputs & Selects Commonization */
+/* Global Base Inputs & Selects Commonization - No More Forced Tiny Widths */
 .calc-custom-row input,
 .charge-row input,
 .plan-toolbar input,
@@ -396,18 +398,20 @@ permalink: /calculators/clhl/
     background-color: var(--bg-container) !important;
     color: var(--text-primary) !important;
     border: 2px solid var(--border-base) !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
-    max-width: 110px !important;
+    width: 100% !important;
+    max-width: none !important;
 }
 
 /* Focus States Commonization */
 .calc-custom-row input:focus,
 .plan-toolbar input:focus,
-.plan-table input[type="number"]:focus {
+.plan-table input[type="number"]:focus,
+.charge-row input:focus {
     border-color: var(--brand-primary) !important;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-primary) 15%, transparent) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary) 18%, transparent) !important;
     outline: none; 
 }
 
@@ -415,28 +419,29 @@ permalink: /calculators/clhl/
 .calc-grid-layout { 
     display: flex !important; 
     flex-direction: column !important; 
-    gap: 20px !important; 
+    gap: 18px !important; 
 }
 .calc-custom-row { 
     display: flex !important; 
     flex-direction: row !important; 
     align-items: center !important; 
     justify-content: space-between !important; 
-    gap: 20px !important; 
+    gap: 15px !important; 
+    padding: 4px 0 !important;
 }
 .calc-custom-row label { 
-    flex: 0 0 40% !important; 
-    font-size: 0.95rem !important; 
-    font-weight: 700 !important; 
+    flex: 0 0 45% !important; 
+    font-size: 1.02rem !important; 
+    font-weight: 600 !important; 
     color: var(--text-primary); 
     margin: 0 !important; 
 }
 .calc-custom-row input { 
     flex: 1 !important; 
-    height: 45px !important; 
-    padding: 0 12px !important; 
+    height: 48px !important; 
+    padding: 0 16px !important; 
     border-radius: 10px !important; 
-    font-size: 0.95rem !important; 
+    font-size: 1.05rem !important; 
     font-weight: 700 !important; 
     color: var(--brand-primary) !important; 
     border-width: 2px !important;
@@ -450,21 +455,23 @@ permalink: /calculators/clhl/
 }
 .charge-row { 
     display: grid !important; 
-    grid-template-columns: 2fr 1.5fr 1fr 0.5fr !important; 
-    gap: 10px !important; 
+    grid-template-columns: 2fr 1.6fr 0.8fr 0.4fr !important; 
+    gap: 12px !important; 
     align-items: center !important; 
-    margin-bottom: 12px !important; 
+    margin-bottom: 14px !important; 
 }
 .charge-row input { 
-    height: 40px !important; 
-    padding: 0 10px !important; 
+    height: 46px !important; 
+    padding: 0 12px !important; 
+    font-size: 1.02rem !important;
+    font-weight: 600 !important;
 }
 .charge-row label { 
     display: flex; 
     align-items: center; 
     gap: 8px; 
     cursor: pointer; 
-    font-size: 0.9rem; 
+    font-size: 1rem; 
     color: var(--text-primary);
     font-weight: 600;
 }
@@ -479,7 +486,6 @@ input[readonly] {
 /* --------------------------------------------------------------------------
    3. UNIFIED TABLES & LEDGERS
    -------------------------------------------------------------------------- */
-/* Common Table Wrapper / Overflows */
 .table-wrapper, 
 .milestone-table, 
 .milestone-table tr, 
@@ -489,11 +495,11 @@ input[readonly] {
 
 .milestone-table input {
     width: 100%;
-    height: 35px;
-    padding: 5px;
+    height: 40px;
+    padding: 8px;
     border: 1px solid var(--border-base);
-    border-radius: 6px;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
     background: var(--bg-container);
     color: var(--text-primary);
 }
@@ -503,29 +509,29 @@ input[readonly] {
     width: 100% !important;
     border-collapse: collapse !important;
     table-layout: fixed !important; 
-    font-size: 0.85rem !important;
+    font-size: 0.9rem !important;
     background: var(--bg-container);
 }
 
-.finance-table th:nth-child(1), .finance-table td:nth-child(1) { width: 110px !important; }  /* Date */
-.finance-table th:nth-child(2), .finance-table td:nth-child(2) { width: 55px !important; }    /* Days */
-.finance-table th:nth-child(3), .finance-table td:nth-child(3) { width: 85px !important; }    /* Interest Rate */
-.finance-table th:nth-child(4), .finance-table td:nth-child(4) { width: 100px !important; }  /* Interest Accrued */
-.finance-table th:nth-child(5), .finance-table td:nth-child(5) { width: 140px !important; }  /* Transaction Type */
-.finance-table th:nth-child(6), .finance-table td:nth-child(6) { width: 120px !important; }  /* Transaction Amount */
-.finance-table th:nth-child(7), .finance-table td:nth-child(7) { width: 90px !important; }    /* Interest Paid */
-.finance-table th:nth-child(8), .finance-table td:nth-child(8) { width: 90px !important; }    /* Principal Paid */
-.finance-table th:nth-child(9), .finance-table td:nth-child(9) { width: 110px !important; }  /* Closing Balance */
-.finance-table th:nth-child(10), .finance-table td:nth-child(10) { width: 60px !important; text-align: center !important; } /* Actions */
+.finance-table th:nth-child(1), .finance-table td:nth-child(1) { width: 110px !important; }  
+.finance-table th:nth-child(2), .finance-table td:nth-child(2) { width: 55px !important; }    
+.finance-table th:nth-child(3), .finance-table td:nth-child(3) { width: 85px !important; }    
+.finance-table th:nth-child(4), .finance-table td:nth-child(4) { width: 100px !important; } 
+.finance-table th:nth-child(5), .finance-table td:nth-child(5) { width: 140px !important; } 
+.finance-table th:nth-child(6), .finance-table td:nth-child(6) { width: 120px !important; } 
+.finance-table th:nth-child(7), .finance-table td:nth-child(7) { width: 90px !important; }    
+.finance-table th:nth-child(8), .finance-table td:nth-child(8) { width: 90px !important; }    
+.finance-table th:nth-child(9), .finance-table td:nth-child(9) { width: 110px !important; } 
+.finance-table th:nth-child(10), .finance-table td:nth-child(10) { width: 60px !important; text-align: center !important; } 
 
 .finance-table th {
     background: var(--bg-offset) !important;
     color: var(--text-primary) !important;
     font-weight: 700 !important;
-    font-size: 0.72rem !important;
+    font-size: 0.78rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.3px !important;
-    padding: 10px 6px !important;
+    padding: 12px 8px !important;
     border-bottom: 2px solid var(--border-base) !important;
     border-right: 1px solid var(--border-base) !important;
     white-space: normal !important; 
@@ -534,7 +540,7 @@ input[readonly] {
 }
 
 .finance-table td {
-    padding: 8px !important;
+    padding: 10px 8px !important;
     border-bottom: 1px solid var(--border-base) !important;
     border-right: 1px solid var(--border-base) !important;
     vertical-align: middle !important;
@@ -550,17 +556,9 @@ input[readonly] {
 .finance-table input[type="number"],
 .finance-table select {
     width: 100% !important;
-    height: 36px !important;
-    padding: 0 6px !important;
-    font-size: 0.82rem !important;
-}
-.finance-table td input[type="date"],
-.finance-table td input[type="number"],
-.finance-table td select,
-.finance-table input,
-.finance-table select {
-    max-width: 100% !important;
-    min-width: 0 !important;
+    height: 40px !important;
+    padding: 0 8px !important;
+    font-size: 0.9rem !important;
 }
 
 /* Modern Amortization Table Styling */
@@ -576,7 +574,7 @@ input[readonly] {
     width: 100% !important;
     border-collapse: collapse;
     text-align: left;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     background: var(--bg-container);
     table-layout: fixed !important;
 }
@@ -587,10 +585,10 @@ input[readonly] {
     background: var(--bg-offset);
     color: var(--text-primary);
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 12px 15px;
+    padding: 14px 18px;
     border: 1px solid var(--border-base);
     border-bottom: 2px solid var(--border-base);
     z-index: 10;
@@ -598,7 +596,7 @@ input[readonly] {
 }
 
 .plan-table td {
-    padding: 12px 15px;
+    padding: 14px 18px;
     border: 1px solid var(--border-base);
     color: var(--text-primary);
     vertical-align: middle;
@@ -617,44 +615,14 @@ input[readonly] {
 .plan-table .col-right { text-align: right; font-family: 'JetBrains Mono', monospace; }
 
 .plan-table input[type="number"] {
-    width: 110px !important;
-    height: 36px;
-    padding: 0 10px;
-    font-size: 0.9rem;
+    width: 100% !important;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 0.95rem;
     font-weight: 600;
     text-align: right;
 }
 
-.plan-table th:nth-child(1), 
-.plan-table td:nth-child(1) {
-    width: 110px !important;
-    min-width: 110px !important;
-    max-width: 110px !important;
-}
-
-.plan-table th:nth-child(2), 
-.plan-table td:nth-child(2) {
-    width: 160px !important;
-    min-width: 160px !important;
-}
-
-.plan-table th:nth-child(n+3):not(:last-child), 
-.plan-table td:nth-child(n+3):not(:last-child) {
-    width: 130px !important;
-    min-width: 130px !important;
-}
-
-.plan-table th:last-child, 
-.plan-table td:last-child {
-    width: 160px !important;
-    min-width: 160px !important;
-}
-
-.plan-table th, .plan-table td:not(:has(input)) {
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
 
 /* --------------------------------------------------------------------------
    4. TOOLBARS & BUTTONS
@@ -662,50 +630,50 @@ input[readonly] {
 .plan-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 18px;
     align-items: flex-end;
     margin-bottom: 20px;
-    padding: 24px;
+    padding: 26px;
     background: var(--bg-offset);
-    border-radius: 14px;
+    border-radius: 16px;
     border: 1.5px solid color-mix(in srgb, var(--brand-primary) 20%, var(--border-base));
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
 }
 .toolbar-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 .toolbar-group label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-secondary);
 }
 .plan-toolbar input {
-    height: 42px;
-    padding: 0 12px;
-    font-size: 0.9rem;
+    height: 46px;
+    padding: 0 14px;
+    font-size: 0.95rem;
 }
 
 #fillStartMonth, #fillEndMonth {
-    width: 90px;
+    width: 110px;
 }
 #fillEmiAmount {
-    width: 140px;
+    width: 160px;
 }
 
 .toolbar-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .toolbar-btn {
-    height: 42px;
-    padding: 0 18px;
+    height: 46px;
+    padding: 0 22px;
     border-radius: 10px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     display: inline-flex;
@@ -777,7 +745,7 @@ input[readonly] {
 .btn-dots {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     cursor: pointer;
     color: var(--text-secondary);
     padding: 0 10px;
@@ -799,7 +767,7 @@ input[readonly] {
     padding: 6px 0;
     z-index: 10000;
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    min-width: 130px;
+    min-width: 140px;
     display: none;
     overflow: hidden;
 }
@@ -810,11 +778,11 @@ input[readonly] {
     gap: 10px; 
     width: 100%;
     text-align: left;
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--text-primary);
     transition: background 0.2s ease;
 }
@@ -829,8 +797,8 @@ input[readonly] {
 /* Bottom-Right Floating Save Icon */
 .bottom-right-save-wrapper {
     position: sticky; 
-    float: right;     
-    bottom: 30px;     
+    float: right;      
+    bottom: 30px;      
     margin-right: -20px; 
     z-index: 50;
     display: flex;
@@ -840,8 +808,8 @@ input[readonly] {
 
 .br-save-btn {
     position: relative;
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background-color: var(--brand-primary);
     color: var(--text-on-brand);
@@ -849,7 +817,7 @@ input[readonly] {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     opacity: 0.4; 
@@ -865,10 +833,10 @@ input[readonly] {
 .save-tooltip {
     background: var(--bg-container);
     color: var(--text-primary);
-    padding: 6px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
     border: 1px solid var(--border-base);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     white-space: nowrap;
@@ -887,10 +855,10 @@ input[readonly] {
 
 .unsaved-dot {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 10px;
-    height: 10px;
+    top: 3px;
+    right: 3px;
+    width: 12px;
+    height: 12px;
     background-color: #f59e0b;
     border: 2px solid var(--bg-container);
     border-radius: 50%;
@@ -912,9 +880,9 @@ input[readonly] {
 .moro-option-item {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     cursor: pointer;
     color: var(--text-primary);
 }
@@ -922,20 +890,20 @@ input[readonly] {
 .moro-option-item input[type="radio"] {
     appearance: auto !important;
     -webkit-appearance: radio !important;
-    width: 14px !important;
-    height: 14px !important;
+    width: 16px !important;
+    height: 16px !important;
     margin: 0;
     accent-color: var(--accent-primary, #3b82f6);
 }
 
 #customMoroMonths {
-    width: 75px !important;
-    height: 32px !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--border-base) !important;
-    padding: 0 6px !important;
+    width: 90px !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+    border: 1.5px solid var(--border-base) !important;
+    padding: 0 8px !important;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
 }
 
 details summary::-webkit-details-marker {
@@ -961,7 +929,7 @@ details summary:hover {
 }
 details summary::after {
     content: ' ▼';
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     transition: transform 0.2s ease;
     margin-left: auto;
@@ -969,7 +937,6 @@ details summary::after {
 details[open] summary::after {
     transform: rotate(180deg);
 }
-/* Style for collapsed/minimized historical rows */
 tr.row-minimized {
     display: none !important;
 }
@@ -979,15 +946,15 @@ tr.row-minimized {
    7. FOOTER SUMMARY BAR & UTILITY TEXT
    -------------------------------------------------------------------------- */
 .loan-summary-footer-bar {
-    margin-top: 20px;
+    margin-top: 25px;
     background: var(--bg-offset);
     border: 1.5px solid color-mix(in srgb, var(--brand-primary) 25%, var(--border-base));
-    border-radius: 14px;
-    padding: 20px 24px;
+    border-radius: 16px;
+    padding: 24px 28px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
     position: sticky;
     bottom: 15px; 
     z-index: 15;
@@ -997,20 +964,20 @@ tr.row-minimized {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
 .summary-metric {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     flex: 1;
-    min-width: 140px;
+    min-width: 160px;
 }
 
 .metric-label {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1019,7 +986,7 @@ tr.row-minimized {
 
 .metric-value {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -1032,9 +999,9 @@ tr.row-minimized {
 
 .highlight-tier {
     background: color-mix(in srgb, var(--brand-primary) 4%, var(--bg-offset));
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px dashed color-mix(in srgb, var(--brand-primary) 30%, var(--border-base));
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px dashed color-mix(in srgb, var(--brand-primary) 30%, var(--border-base));
 }
 
 .text-success {
@@ -1061,13 +1028,16 @@ tr.row-minimized {
         flex-direction: column;
         width: 100%;
     }
+    .post-card.calculation-card {
+        min-width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
     .calculator-container { 
         flex-direction: column !important; 
         width: 100% !important; 
-        padding: 15px !important;
+        padding: 18px !important;
         overflow-x: hidden !important;
     }
     .calc-custom-row, .charge-row { 
@@ -1077,7 +1047,7 @@ tr.row-minimized {
     }
     .calc-custom-row label { 
         flex: 0 0 100% !important; 
-        margin-bottom: 8px !important; 
+        margin-bottom: 6px !important; 
     }
     .calc-custom-row input {
         width: 100% !important;
