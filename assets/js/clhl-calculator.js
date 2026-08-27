@@ -325,11 +325,10 @@ function getTotalPropertyCostValue() {
 }
 
 function calculateTotalPropertyCost() {
-    updateGSTRateAuto(); // Run prefill check first
+    updateGSTRateAuto(); 
     
     const basicCost = document.getElementById('basicCost');
-    const gstDisplay = document.getElementById('gstDisplay');
-    const propertyCostDisplay = document.getElementById('propertyCostDisplay'); 
+    const propertyCostInput = document.getElementById('totalPropertyCost'); 
     const gstRateInput = document.getElementById('gstRateInput');
     
     const basic = parseFloat(basicCost?.value) || 0;
@@ -349,17 +348,13 @@ function calculateTotalPropertyCost() {
     
     const totalWithGST = finalBasic + gstAmount;
 
-    if (gstDisplay) {
-        gstDisplay.innerText = `₹${Math.round(gstAmount).toLocaleString('en-IN')}`;
-    }  
-    
-    if (propertyCostDisplay) {
-        propertyCostDisplay.innerText = `₹${Math.round(totalWithGST).toLocaleString('en-IN')}`;
+    if (propertyCostInput) {
+        propertyCostInput.value = `₹ ${Math.round(totalWithGST).toLocaleString('en-IN')}`;
         
-        propertyCostDisplay.classList.remove('pop-animation');
-        void propertyCostDisplay.offsetWidth; 
-        propertyCostDisplay.classList.add('pop-animation');
-        setTimeout(() => propertyCostDisplay.classList.remove('pop-animation'), 300);
+        propertyCostInput.classList.remove('pop-animation');
+        void propertyCostInput.offsetWidth; 
+        propertyCostInput.classList.add('pop-animation');
+        setTimeout(() => propertyCostInput.classList.remove('pop-animation'), 300);
     }
 
     if (typeof updateOverallLoanAmount === 'function') {
