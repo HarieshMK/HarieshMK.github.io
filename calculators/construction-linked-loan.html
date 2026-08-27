@@ -927,7 +927,6 @@ input[type="checkbox"]:checked::before {
     white-space: nowrap !important;
 }
 
-/* UPDATED: Sleek Custom Radio Buttons */
 .moro-option-item input[type="radio"] {
     appearance: none !important;
     -webkit-appearance: none !important;
@@ -937,23 +936,23 @@ input[type="checkbox"]:checked::before {
     min-height: 16px !important;
     max-width: 16px !important;
     max-height: 16px !important;
-    border-radius: 50% !important; /* Absolute circle lock */
     flex: 0 0 16px !important;
+    align-self: center !important;
+    border-radius: 50% !important;
     background-color: var(--bg-container) !important;
     border: 2px solid var(--border-base) !important;
     margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
     cursor: pointer;
     display: inline-block !important;
-    position: relative;
 }
 
-/* Custom filled dot when checked */
 .moro-option-item input[type="radio"]:checked {
-    border-color: var(--brand-primary) !important;
     background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
     box-shadow: inset 0 0 0 3px var(--bg-container) !important;
 }
-
 #customMoroMonths {
     width: 58px !important;
     height: 34px !important;
