@@ -401,7 +401,7 @@ permalink: /calculators/clhl/
     width: 100% !important;
     max-width: none !important;
 }
-/* --- PREMIUM TAX & LOCATION SUB-PANEL --- */
+/* --- PREMIUM TAX & METRO LOCATION SUB-PANEL --- */
 .metro-sub-panel {
     grid-column: 1 / -1 !important;
     display: flex !important;
@@ -420,6 +420,38 @@ permalink: /calculators/clhl/
 
 .metro-sub-panel small {
     color: var(--text-muted) !important;
+}
+    
+    /* --- FIX GST RATE INPUT FILL & STYLING --- */
+.metro-sub-panel input[type="number"],
+.metro-sub-panel input {
+    background-color: var(--bg-container) !important;
+    color: var(--brand-primary) !important;
+    border: 2px solid var(--border-base) !important;
+    border-radius: 10px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    height: 44px !important;
+    padding: 0 14px !important;
+    box-sizing: border-box !important;
+}
+
+/* Optional: Keep readonly styling neutral if it's explicitly marked readonly */
+.metro-sub-panel input[readonly] {
+    background-color: var(--bg-container) !important;
+    color: var(--brand-primary) !important;
+}
+    /* Ensure the inner row inside the panel behaves like your clean calc rows */
+.metro-sub-panel > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 15px !important;
+}
+
+.metro-sub-panel input[type="number"],
+.metro-sub-panel input {
+    max-width: 120px !important; /* Keeps the GST input nicely sized instead of stretching full width */
 }
 
 /* Focus States Commonization */
