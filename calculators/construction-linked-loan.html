@@ -36,23 +36,29 @@ permalink: /calculators/clhl/
                         <input type="number" id="basicCost" readonly>
                         <div></div> <div>🔒</div> 
                     </div>
-                    
-                    <!-- Styled Metro Toggle Row -->
-                    <div class="charge-row" style="align-items: center;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" id="isMetroToggle" onchange="updateDefaultGST()" style="width: 16px; height: 16px; cursor: pointer;">
-                            <span>Is this property in a Metro City?</span>
-                        </label>
-                        <div></div><div></div>
-                    </div>
-
-                    <!-- Styled GST Rate Row -->
-                    <div class="charge-row" style="align-items: flex-start; flex-direction: column; gap: 4px; padding: 10px 0;">
-                        <div style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
-                            <label for="gstRateInput" style="font-weight: 500;">GST Rate (%)</label>
-                            <input type="number" id="gstRateInput" step="0.1" value="5.0" style="width: 100px; text-align: right;">
+<!-- PREMIUM TAX & LOCATION SUB-PANEL -->
+                    <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; margin: 6px 0 10px 0;">
+                        
+                        <!-- Metro Toggle Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.88rem; color: var(--text-primary, #e2e8f0); font-weight: 500;">Metro City Property?</span>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" id="isMetroToggle" onchange="updateDefaultGST()" style="width: 16px; height: 16px; accent-color: #6366f1; cursor: pointer;">
+                                <span style="font-size: 0.8rem; color: var(--text-secondary, #94a3b8);">Yes</span>
+                            </label>
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--text-secondary, #94a3b8); font-style: italic;">Auto-calculated based on area & value (editable)</span>
+                        
+                        <!-- Subtle Divider -->
+                        <div style="height: 1px; background: rgba(255, 255, 255, 0.05); width: 100%;"></div>
+
+                        <!-- GST Rate Input Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; flex-direction: column; gap: 2px; max-width: 65%;">
+                                <label for="gstRateInput" style="font-size: 0.88rem; color: var(--text-primary, #e2e8f0); font-weight: 500;">GST Rate (%)</label>
+                                <span style="font-size: 0.72rem; color: #64748b; font-style: italic; line-height: 1.2;">Auto-calculated based on area & value (editable)</span>
+                            </div>
+                            <input type="number" id="gstRateInput" step="0.1" value="5.0" style="width: 85px; padding: 6px 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; color: #fff; text-align: right; font-size: 0.95rem; font-weight: 600;">
+                        </div>
                     </div>
                     
                     <!-- Total Property Cost Row -->
