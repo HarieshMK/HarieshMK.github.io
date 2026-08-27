@@ -119,50 +119,6 @@ permalink: /calculators/clhl/
     <div class="post-card calculation-card">
         <details open>
             <summary class="section-card-header">
-                <h3>🏗️ Project Milestones</h3>
-            </summary>
-            <div class="section-card-content">
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.4;">
-                    💡 <strong>Note:</strong> Loan Amount auto-calculates from the Milestone % and your property value. Adjust it manually if your bank's disbursement differs. Uncheck <strong>"Part of Loan"</strong> for cash-paid milestones (e.g., booking/down payments) to exclude them from the loan plan.
-                </p>
-
-                <div class="milestone-totals-bar" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-offset); padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border-base); margin-bottom: 15px;">
-                    <div>
-                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Milestone % completed: </span>
-                        <strong id="totalMilestonePct" style="font-family: 'JetBrains Mono', monospace;">0%</strong>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Loan disbursed: </span>
-                        <strong id="totalMilestoneLoan" style="font-family: 'JetBrains Mono', monospace;">₹ 0</strong>
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table class="milestone-table" style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th style="text-align: left; padding: 10px;">Name</th>
-                                <th style="text-align: left; padding: 10px;">Date</th>
-                                <th style="text-align: left; padding: 10px;">Milestone %</th>
-                                <th style="text-align: left; padding: 10px;">Loan Amount (₹)</th>
-                                <th style="text-align: center; padding: 10px;">Part of Loan?</th>
-                                <th style="text-align: right; padding: 10px;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="milestoneBody">
-                        </tbody>
-                    </table>
-                </div>
-                <button id="addMilestoneBtn" class="btn-secondary-outline premium-btn-base" style="width: 100%; margin-top: 15px;">+ Add Milestone</button>
-            </div>
-        </details>
-    </div>
-</div>
-
-<div class="calculator-container full-width-section">
-    <div class="post-card calculation-card">
-        <details open>
-            <summary class="section-card-header">
                 <h3>Transaction Ledger</h3>
             </summary>
             <div class="section-card-content">
@@ -186,34 +142,47 @@ permalink: /calculators/clhl/
                     </table>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center; margin-top: 15px;">
-                <button type="button" id="addRowBtn" class="toolbar-btn btn-primary-solid" style="flex: 1;">+ Add Transaction</button>
-                <button type="button" id="toggleHistoryBtn" onclick="toggleHistoryCollapse()" class="toolbar-btn btn-secondary-outline">📂 Minimize History</button>
-            </div>
+                    <button type="button" id="addRowBtn" class="toolbar-btn btn-primary-solid" style="flex: 1;">+ Add Transaction</button>
+                    <button type="button" id="toggleHistoryBtn" onclick="toggleHistoryCollapse()" class="toolbar-btn btn-secondary-outline">📂 Minimize History</button>
+                </div>
+
+                <!-- 🚀 ACTUAL LEDGER STICKY SUMMARY FOOTER BAR -->
+                <div class="loan-summary-footer-bar" id="actualSummaryFooter">
+                    <!-- Top Tier: Core Financial Totals -->
+                    <div class="summary-grid-row">
+                        <div class="summary-metric">
+                            <span class="metric-label">Current Outstanding</span>
+                            <span class="metric-value" id="actualSummaryOutstanding">₹ 0</span>
+                        </div>
+                        <div class="summary-metric">
+                            <span class="metric-label">Principal Paid</span>
+                            <span class="metric-value" id="actualSummaryPrincipal">₹ 0</span>
+                        </div>
+                        <div class="summary-metric">
+                            <span class="metric-label">Interest Paid</span>
+                            <span class="metric-value" id="actualSummaryInterest">₹ 0</span>
+                        </div>
+                        <div class="summary-metric">
+                            <span class="metric-label">Extra Part-Paid</span>
+                            <span class="metric-value" id="actualSummaryExtra">₹ 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider Line -->
+                    <div class="summary-divider"></div>
+
+                    <!-- Bottom Tier: Estimated Loan Closure -->
+                    <div class="summary-grid-row highlight-tier">
+                        <div class="summary-metric hero-metric" style="flex: 1;">
+                            <span class="metric-label">🚀 Est. Loan Closure</span>
+                            <span class="metric-value text-primary" id="actualSummaryCloseDate">--</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- END OF ACTUAL LEDGER FOOTER BAR -->
+
             </div>
         </details>
-    </div>
-</div>
-
-<div class="actual-ledger-summary-bar">
-    <div class="summary-item">
-        <span class="summary-label">Current Outstanding</span>
-        <span id="actualSummaryOutstanding" class="summary-value">₹ 0</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">Principal Paid</span>
-        <span id="actualSummaryPrincipal" class="summary-value">₹ 0</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">Interest Paid</span>
-        <span id="actualSummaryInterest" class="summary-value">₹ 0</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">Extra Part-Paid</span>
-        <span id="actualSummaryExtra" class="summary-value">₹ 0</span>
-    </div>
-    <div class="summary-item">
-        <span class="summary-label">Est. Loan Closure</span>
-        <span id="actualSummaryCloseDate" class="summary-value">--</span>
     </div>
 </div>
 
@@ -1156,6 +1125,9 @@ tr.row-minimized {
     color: var(--brand-primary) !important;
 }
 
+#actualSummaryFooter .summary-grid-row:first-child .summary-metric {
+    min-width: 140px;
+}
 
 /* --------------------------------------------------------------------------
    8. MEDIA QUERIES (RESPONSIVE)
