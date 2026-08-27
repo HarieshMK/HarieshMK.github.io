@@ -297,10 +297,6 @@ permalink: /calculators/clhl/
 <script src="/assets/js/clhl-calculator.js"></script>
 
 <style>
-/* ==========================================================================
-   LOAN CALCULATOR - INTEGRATED DESIGN SYSTEM STYLING (CONSOLIDATED)
-   ========================================================================== */
-
 /* --------------------------------------------------------------------------
    1. GLOBAL & CONTAINER LAYOUTS
   -------------------------------------------------------------------------- */
@@ -899,23 +895,32 @@ input[type="checkbox"]:checked::before {
     border-bottom: 2px solid #fff;
     transform: rotate(-45deg) translate(1px, -1px);
 }
+    .calc-custom-row:has(#customMoroMonths) label {
+    flex: 0 0 35% !important; /* Shrinks the label width to pull the right side leftwards */
+}
+    .calc-custom-row:has(#customMoroMonths) {
+    justify-content: flex-start !important;
+    gap: 20px !important;
+}
 
 /* UPDATED: Moratorium Period - Forced Side-by-Side Row Layout */
 .moro-options-wrapper {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 12px !important;
+    gap: 14px !important;
     flex: 1 !important;
-    flex-wrap: wrap !important;
+    width: auto !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
 }
+
 .moro-option-item {
     display: flex !important;
     align-items: center !important;
     gap: 6px !important;
     font-weight: 500;
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
     cursor: pointer;
     color: var(--text-primary);
     white-space: nowrap !important;
@@ -942,13 +947,13 @@ input[type="checkbox"]:checked::before {
 }
 
 #customMoroMonths {
-    width: 65px !important;
-    height: 36px !important;
+    width: 58px !important; /* Slightly optimized width to fit nicely */
+    height: 34px !important;
     border-radius: 8px !important;
     border: 1.5px solid var(--border-base) !important;
-    padding: 0 6px !important;
+    padding: 0 4px !important;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
     text-align: center;
 }
 
@@ -986,8 +991,6 @@ details[open] summary::after {
 tr.row-minimized {
     display: none !important;
 }
-
-
 /* --------------------------------------------------------------------------
    7. FOOTER SUMMARY BAR & UTILITY TEXT
   -------------------------------------------------------------------------- */
