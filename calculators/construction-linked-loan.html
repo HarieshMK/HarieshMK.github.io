@@ -994,12 +994,23 @@ input[type="checkbox"]:checked::before {
     transform: rotate(-45deg) translate(1px, -1px);
 }
 
-.calc-custom-row:has(#customMoroMonths) label {
-    flex: 0 0 35% !important;
+.calc-custom-row label {
+    flex: 0 0 42% !important;
 }
-.calc-custom-row:has(#customMoroMonths) {
-    justify-content: flex-start !important;
+
+.calc-custom-row {
+    justify-content: space-between !important;
+}
+
+.moro-options-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
     gap: 20px !important;
+    flex: 1 !important;
+    width: auto !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
 }
 
 .moro-options-wrapper {
