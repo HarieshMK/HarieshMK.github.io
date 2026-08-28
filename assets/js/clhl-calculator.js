@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const fromInput = document.getElementById('fillStartMonth');
     const toInput = document.getElementById('fillEndMonth');
     const amtInput = document.getElementById('fillEmiAmount');
+    document.querySelectorAll('input[name="reductionType"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        lockedFullEmi = 0;
+        fullEmiLockedMonth = null;
+        runCalculation();
+    });
+});
 
     [fromInput, toInput, amtInput].forEach(input => {
         if (input) {
@@ -1085,17 +1092,18 @@ function runCalculation() {
         standardEmiForMonth = accruedInterest;
 
         // --- SEPARATE BASELINE VS USER FULL EMI ---
-        if (!isPreEmi) {
-            if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
-                if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                    lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                } else if (remainingTenureMonths > 0) {
-                    lockedFullEmi = openingBalance / remainingTenureMonths;
-                }
-                fullEmiLockedMonth = monthIdx;
+    if (!isPreEmi) {
+        const reductionStrategy = document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure';
+        if (reductionStrategy === 'emi' || lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+            if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+            } else if (remainingTenureMonths > 0) {
+                lockedFullEmi = openingBalance / remainingTenureMonths;
             }
-            standardEmiForMonth = lockedFullEmi;
+            fullEmiLockedMonth = monthIdx;
         }
+        standardEmiForMonth = lockedFullEmi;
+    }
 
         // --- INDEPENDENT BASELINE METRIC CALCULATION ---
         let stdDisbursement = milestoneDisbursement;
@@ -1333,7 +1341,8 @@ async function saveCalculatorDataToSupabase() {
         moro_type: document.querySelector('input[name="moroType"]:checked')?.value || '18',
         custom_moro_months: parseInt(document.getElementById('customMoroMonths')?.value) || null,
         gst_rate: parseFloat(document.getElementById('gstRateInput')?.value) || 5,
-        is_metro: document.getElementById('isMetroToggle')?.checked || false, // <--- Add this
+        is_metro: document.getElementById('isMetroToggle')?.checked || false,
+        reduction_type: document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure',
         updated_at: new Date().toISOString()
     };
 
@@ -1558,6 +1567,12 @@ async function loadCalculatorDataFromSupabase() {
     console.log("TRACE [7]: Profile loaded successfully:", profiles[0]);
     const profile = profiles[0];
 
+    // Restore Reduction Type Toggle state from Supabase
+    if (profile.reduction_type) {
+        const radio = document.querySelector(`input[name="reductionType"][value="${profile.reduction_type}"]`);
+        if (radio) radio.checked = true;
+    }
+
     const setValue = (id, val) => {
         const el = document.getElementById(id);
         if (el && val !== null && val !== undefined) el.value = val;
@@ -1597,7 +1612,7 @@ async function loadCalculatorDataFromSupabase() {
     updateBasicCost();
     const loanInput = document.getElementById('loanAmount');
     if (loanInput && profile.loan_amount !== null && profile.loan_amount !== undefined) {
-        loanInput.dataset.manual = 'true'; // Lock it so subsequent updates don't overwrite it immediately
+        loanInput.dataset.manual = 'true';
         loanInput.value = profile.loan_amount;
     }
 
@@ -1645,6 +1660,7 @@ async function loadCalculatorDataFromSupabase() {
             });
         }
     }
+
     // 3. Load Custom Planned EMIs
     console.log("TRACE [9]: Fetching planned EMIs for profile_id:", profile.id);
     const { data: savedEmis, error: emiError } = await activeSupabase
@@ -1664,7 +1680,7 @@ async function loadCalculatorDataFromSupabase() {
         console.log("TRACE [9e]: No saved EMIs found or error occurred.");
     }
 
-    // 4. Load Actual Transaction Ledger Rows (CORRECTLY PLACED HERE)
+    // 4. Load Actual Transaction Ledger Rows
     console.log("TRACE [10]: Fetching actual transaction ledger rows...");
     const { data: savedTransactions, error: transLoadError } = await activeSupabase
         .from('clhl_actual_transactions')
