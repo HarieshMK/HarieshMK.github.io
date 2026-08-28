@@ -988,7 +988,7 @@ function runCalculation() {
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
     
-    // --- ADD THESE VARIABLES TO CACHE FIXED FULL EMI ---
+    // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
     let lockedFullEmi = 0;
     let fullEmiLockedMonth = null;
 
@@ -1068,16 +1068,15 @@ function runCalculation() {
         let isPreEmi = monthIdx <= moratoriumMonths;
         const inputEl = row.querySelector('.planned-emi-input');
 
-        // --- SINGLE CLEAN ZERO-BALANCE GUARD (No 'continue') ---
         if (openingBalance <= 0 && milestoneDisbursement === 0) {
             openingBalance = 0; 
             row.children[0].innerText = displayLabel;
-            row.children[1].innerText = `₹0`; // Opening Balance
-            row.children[2].innerText = `₹0`; // EMI
-            row.children[4].innerText = `₹0`; // Interest component
-            row.children[5].innerText = `₹0`; // Principal component
-            row.children[6].innerText = `₹0`; // Part Payment
-            row.children[7].innerText = `₹0`; // Closing Balance
+            row.children[1].innerText = `₹0`; 
+            row.children[2].innerText = `₹0`; 
+            row.children[4].innerText = `₹0`; 
+            row.children[5].innerText = `₹0`; 
+            row.children[6].innerText = `₹0`; 
+            row.children[7].innerText = `₹0`; 
             
             if (loanClosureMonthIndex === null) {
                 loanClosureMonthIndex = monthIdx;
@@ -1085,25 +1084,39 @@ function runCalculation() {
 
             previousClosingBalance = 0;
             currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
+            continue;
         }
 
         accruedInterest = openingBalance * monthlyRate;
         let remainingTenureMonths = totalMonths - monthIdx + 1;
-        standardEmiForMonth = accruedInterest;
 
-        // --- SEPARATE BASELINE VS USER FULL EMI ---
-    if (!isPreEmi) {
-        const reductionStrategy = document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure';
-        if (reductionStrategy === 'emi' || lockedFullEmi === 0 || fullEmiLockedMonth === null) {
-            if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-            } else if (remainingTenureMonths > 0) {
-                lockedFullEmi = openingBalance / remainingTenureMonths;
+        // --- FIXED REDUCE TENURE VS REDUCE EMI LOGIC ---
+        if (isPreEmi) {
+            standardEmiForMonth = accruedInterest;
+            lockedFullEmi = 0; // Reset so full EMI recalculates fresh when moratorium ends
+        } else {
+            const reductionStrategy = document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure';
+
+            if (reductionStrategy === 'emi') {
+                // REDUCE EMI: Recalculate standard amortization EMI every month based on current balance and remaining tenure
+                if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                    standardEmiForMonth = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                } else {
+                    standardEmiForMonth = openingBalance / Math.max(1, remainingTenureMonths);
+                }
+            } else {
+                // REDUCE TENURE: Lock the full EMI the first month Full EMI starts, or if a part-payment/manual override forces a re-evaluation
+                if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+                    if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                        lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                    } else {
+                        lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
+                    }
+                    fullEmiLockedMonth = monthIdx;
+                }
+                standardEmiForMonth = lockedFullEmi;
             }
-            fullEmiLockedMonth = monthIdx;
         }
-        standardEmiForMonth = lockedFullEmi;
-    }
 
         // --- INDEPENDENT BASELINE METRIC CALCULATION ---
         let stdDisbursement = milestoneDisbursement;
