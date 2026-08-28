@@ -1053,15 +1053,20 @@ input[type="checkbox"]:checked::before {
 }
 
 /* Target row 6 (Moratorium Period) and row 7 (Part-Payment Strategy) explicitly */
-.calc-custom-row:nth-child(6) label,
-.calc-custom-row:nth-child(7) label {
-    flex: 0 0 35% !important;
-}
-
 .calc-custom-row:nth-child(6),
 .calc-custom-row:nth-child(7) {
-    justify-content: flex-start !important;
+    display: flex !important;
+    align-items: center !important;
     gap: 30px !important;
+    padding: 4px 0 !important;
+}
+
+.calc-custom-row:nth-child(6) label,
+.calc-custom-row:nth-child(7) label {
+    flex: 0 0 210px !important;
+    min-width: 210px !important;
+    text-align: left !important;
+    margin: 0 !important;
 }
 
 .calc-custom-row:nth-child(6) .moro-options-wrapper,
@@ -1071,8 +1076,6 @@ input[type="checkbox"]:checked::before {
     align-items: center !important;
     gap: 24px !important;
     flex: 1 !important;
-    width: auto !important;
-    flex-wrap: nowrap !important;
     justify-content: flex-start !important;
 }
 
