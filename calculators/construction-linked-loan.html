@@ -1052,16 +1052,20 @@ input[type="checkbox"]:checked::before {
     box-shadow: inset 0 0 0 3px var(--bg-container) !important;
 }
 
-.calc-custom-row:nth-child(2) label {
+/* Target row 6 (Moratorium Period) and row 7 (Part-Payment Strategy) explicitly */
+.calc-custom-row:nth-child(6) label,
+.calc-custom-row:nth-child(7) label {
     flex: 0 0 35% !important;
 }
 
-.calc-custom-row:nth-child(2) {
+.calc-custom-row:nth-child(6),
+.calc-custom-row:nth-child(7) {
     justify-content: flex-start !important;
     gap: 30px !important;
 }
 
-.calc-custom-row:nth-child(2) .moro-options-wrapper {
+.calc-custom-row:nth-child(6) .moro-options-wrapper,
+.calc-custom-row:nth-child(7) .moro-options-wrapper {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
