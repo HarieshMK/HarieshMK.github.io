@@ -106,6 +106,23 @@ permalink: /calculators/clhl/
                             <input type="radio" name="moroType" value="custom"> Custom: 
                             <input type="number" id="customMoroMonths" placeholder="Months">
                         </label>
+                        <!-- Part-Payment Strategy Row -->
+                        <div class="calc-custom-row">
+                            <label>Part-Payment Strategy</label>
+                            <div class="moro-options-wrapper">
+                                <label class="moro-option-item">
+                                    <input type="radio" name="partPaymentStrategy" value="tenure" checked>
+                                    <span>Reduce Tenure</span>
+                                </label>
+                                <label class="moro-option-item">
+                                    <input type="radio" name="partPaymentStrategy" value="emi">
+                                    <span>Reduce EMI</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary, #64748b); font-style: italic; margin-top: -4px; margin-bottom: 10px; padding-left: 2px;">
+                            💡 Tip: Tenure reduction is vastly superior because it cuts down total interest significantly.
+                        </div>
                     </div>
                 </div>
             </div>
