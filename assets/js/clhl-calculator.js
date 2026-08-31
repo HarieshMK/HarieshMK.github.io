@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', () => {
         lockedFullEmi = 0;
         fullEmiLockedMonth = null;
+        window.baselineLockedEmi = undefined;
         runCalculation();
     });
 });
@@ -380,9 +381,11 @@ function updateBasicCost() {
     calculateTotalPropertyCost();
     runCalculation();
 }
-// --- MULTI-STEP UNDO HISTORY SYSTEM (50 Steps Max) ---
+// --- CACHE STATE FOR REDUCE TENURE & CALCULATION ---
 let undoStack = [];
 const MAX_UNDO_STEPS = 50;
+let lockedFullEmi = 0;
+let fullEmiLockedMonth = null;
 
     function saveStateToUndoStack() {
         const currentState = {};
@@ -921,6 +924,10 @@ function runCalculation() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
+    const loanStartDateObj = loanStartDateVal2 ? new Date(loanStartDateVal2) : new Date();
+    loanStartDateObj.setHours(0, 0, 0, 0);
+
     const milestones = Array.from(milestoneRows).map(row => {
         const dateVal = row.querySelector('.milestone-date')?.value || '';
         const mData = {
@@ -935,7 +942,8 @@ function runCalculation() {
             const milestoneDate = new Date(mData.date);
             milestoneDate.setHours(0, 0, 0, 0);
 
-            if (milestoneDate <= today) {
+            // FIX: Compare against loan start date instead of 'today'
+            if (milestoneDate <= loanStartDateObj) {
                 cumulativePct += mData.pct; 
                 cumulativeLoanAmt += mData.loanAmount; 
             }
@@ -990,8 +998,6 @@ function runCalculation() {
     
     // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
     window.baselineLockedEmi = undefined;
-    let lockedFullEmi = 0;
-    let fullEmiLockedMonth = null;
 
     function getMilestoneDisbursementForMonth(yearMonthStr) {
         let addedAmt = 0;
