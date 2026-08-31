@@ -956,9 +956,9 @@ function runCalculation() {
     if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
     if (totalLoanEl) totalLoanEl.innerText = `₹${Math.round(cumulativeLoanAmt).toLocaleString()}`;
 
-    const loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
+    loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
     const moroTypeChecked2 = document.querySelector('input[name="moroType"]:checked');
-    const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
+    customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
     
     let moratoriumMonths = 18;
     if (moroTypeChecked2) {
