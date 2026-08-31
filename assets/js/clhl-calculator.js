@@ -859,7 +859,7 @@ function runCalculation() {
     if (!moroTypeChecked) {
         missingErrors.push("• Select or configure a Moratorium Period option.");
     } else if (moroTypeChecked.value === 'custom') {
-        const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
+        let customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
         if (customMoroMonthsVal === '' || parseInt(customMoroMonthsVal) < 0) {
             missingErrors.push("• Specify the custom moratorium duration in months.");
         }
@@ -924,7 +924,7 @@ function runCalculation() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
+    let loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
     const loanStartDateObj = loanStartDateVal2 ? new Date(loanStartDateVal2) : new Date();
     loanStartDateObj.setHours(0, 0, 0, 0);
 
