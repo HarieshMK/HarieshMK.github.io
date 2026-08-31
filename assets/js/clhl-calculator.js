@@ -989,6 +989,7 @@ function runCalculation() {
     let cumulativeUnpaidInterest = 0;
     
     // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
+    window.baselineLockedEmi = undefined;
     let lockedFullEmi = 0;
     let fullEmiLockedMonth = null;
 
@@ -1093,7 +1094,8 @@ function runCalculation() {
         // --- FIXED REDUCE TENURE VS REDUCE EMI LOGIC ---
         if (isPreEmi) {
             standardEmiForMonth = accruedInterest;
-            lockedFullEmi = 0; // Reset so full EMI recalculates fresh when moratorium ends
+            lockedFullEmi = 0; 
+            fullEmiLockedMonth = null;
         } else {
             const reductionStrategy = document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure';
 
@@ -1104,8 +1106,9 @@ function runCalculation() {
                 } else {
                     standardEmiForMonth = openingBalance / Math.max(1, remainingTenureMonths);
                 }
+                lockedFullEmi = 0; // Clear lock when in reduce-EMI mode
             } else {
-                // REDUCE TENURE: Lock the full EMI the first month Full EMI starts, or if a part-payment/manual override forces a re-evaluation
+                // REDUCE TENURE: Lock the full EMI the first month Full EMI starts
                 if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
                     if (monthlyRate > 0 && remainingTenureMonths > 0) {
                         lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
@@ -1117,6 +1120,18 @@ function runCalculation() {
                 standardEmiForMonth = lockedFullEmi;
             }
         }
+
+        // --- DEBUG HOOK ---
+console.log(`Month ${monthIdx}:`, {
+    date: formattedDate,
+    openingBalance: openingBalance,
+    milestoneDisbursement: milestoneDisbursement,
+    isPreEmi: isPreEmi,
+    remainingTenure: remainingTenureMonths,
+    standardEmi: standardEmiForMonth,
+    lockedFullEmi: lockedFullEmi,
+    monthlyRate: monthlyRate
+});
 
         // --- INDEPENDENT BASELINE METRIC CALCULATION ---
         let stdDisbursement = milestoneDisbursement;
