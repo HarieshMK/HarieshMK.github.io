@@ -928,28 +928,49 @@ function runCalculation() {
     const loanStartDateObj = loanStartDateVal2 ? new Date(loanStartDateVal2) : new Date();
     loanStartDateObj.setHours(0, 0, 0, 0);
 
+    const emiStartDateVal = document.getElementById('emiStartDate')?.value;
+    const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
+    const loanStartDateStr = loanStartDateVal2;
+
+    // Helper function to map any milestone date to its exact loan month index based on EMI due day
+    function getMilestoneMonthIndex(milestoneDateStr, loanStartDateStr, emiDueDay) {
+        if (!milestoneDateStr || !loanStartDateStr) return 1;
+        const mDate = new Date(milestoneDateStr);
+        const lStart = new Date(loanStartDateStr);
+        
+        let yearDiff = mDate.getFullYear() - lStart.getFullYear();
+        let monthDiff = mDate.getMonth() - lStart.getMonth();
+        let baseMonthIndex = (yearDiff * 12) + monthDiff + 1;
+        
+        if (baseMonthIndex < 1) return 1;
+        
+        // If the milestone day falls after the EMI due day, it rolls over to the next billing cycle
+        if (mDate.getDate() > emiDueDay) {
+            baseMonthIndex += 1;
+        }
+        
+        return baseMonthIndex;
+    }
     const milestones = Array.from(milestoneRows).map(row => {
         const dateVal = row.querySelector('.milestone-date')?.value || '';
-        const mData = {
+        return {
             name: row.querySelector('.milestone-name')?.value || '',
             date: dateVal,
             pct: parseFloat(row.querySelector('.milestone-pct')?.value) || 0,
             loanAmount: parseFloat(row.querySelector('.milestone-loan-amount')?.value) || 0,
             isPartOfLoan: row.querySelector('.part-of-loan-check')?.checked ?? true
         };
+    }).filter(m => m.date !== '');
 
-        if (mData.date && mData.isPartOfLoan) {
-            const milestoneDate = new Date(mData.date);
-            milestoneDate.setHours(0, 0, 0, 0);
-
-            // FIX: Compare against loan start date instead of 'today'
-            if (milestoneDate <= loanStartDateObj) {
-                cumulativePct += mData.pct; 
-                cumulativeLoanAmt += mData.loanAmount; 
+    milestones.forEach(m => {
+        if (m.date && m.isPartOfLoan) {
+            const mIdx = getMilestoneMonthIndex(m.date, loanStartDateStr, emiDueDay);
+            if (mIdx <= 1) {
+                cumulativePct += m.pct; 
+                cumulativeLoanAmt += m.loanAmount; 
             }
         }
-        return mData;
-    }).filter(m => m.date !== '');
+    });
 
     const totalPctEl = document.getElementById('totalMilestonePct');
     const totalLoanEl = document.getElementById('totalMilestoneLoan');
@@ -999,12 +1020,12 @@ function runCalculation() {
     // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
     window.baselineLockedEmi = undefined;
 
-    function getMilestoneDisbursementForMonth(yearMonthStr) {
+  function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
         let addedAmt = 0;
         milestones.forEach(m => {
             if (m.date && m.isPartOfLoan) {
-                const mYm = m.date.substring(0, 7); 
-                if (mYm === yearMonthStr) {
+                const mIdx = getMilestoneMonthIndex(m.date, loanStartDateStr, emiDueDay);
+                if (mIdx === targetMonthIdx) {
                     addedAmt += m.loanAmount;
                 }
             }
@@ -1029,7 +1050,7 @@ function runCalculation() {
         const displayLabel = `${monthIdx} (${formattedDate})`;
 
         const ymStr = currentMonthDate.toISOString().substring(0, 7);
-        const milestoneDisbursement = getMilestoneDisbursementForMonth(ymStr);
+        const milestoneDisbursement = getMilestoneDisbursementForMonthIndex(monthIdx);
         
         if (monthIdx === 1) {
             openingBalance = cumulativeLoanAmt;
