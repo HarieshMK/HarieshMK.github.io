@@ -411,17 +411,20 @@ let fullEmiLockedMonth = null;
             undoBtnEl.style.cursor = canUndo ? 'pointer' : 'not-allowed';
         }
     }
-// --- TOOLBAR RANGE-FILL LOGIC (Placed inside the main script scope) ---
+// --- TOOLBAR RANGE-FILL LOGIC  ---
     function handleApplyRange() {
-        saveStateToUndoStack(); // Now it can finally see this!
+        saveStateToUndoStack();
 
         const fromVal = parseInt(document.getElementById('fillStartMonth').value);
         const toVal = parseInt(document.getElementById('fillEndMonth').value);
         const amtVal = parseFloat(document.getElementById('fillEmiAmount').value);
 
         if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
+        const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
+        const maxMonths = tenureYears * 12;
+        const targetEnd = Math.min(toVal, maxMonths);
 
-        for (let m = fromVal; m <= toVal; m++) {
+        for (let m = fromVal; m <= targetEnd; m++) {
             window.loadedPlannedEmis[m] = amtVal;
         }
 
