@@ -1370,10 +1370,11 @@ function handleMoratoriumUI() {
     const customInput = document.getElementById('customMoroMonths');
     if (customInput) {
         customInput.disabled = !isCustom;
-        if (!isCustom) customInput.value = '';
+        if (isCustom) {
+            customInput.focus();
+        }
     }
 }
-
 async function saveCalculatorDataToSupabase() {
     const activeSupabase = window.supabaseClient || window.supabase;
     if (!activeSupabase) {
