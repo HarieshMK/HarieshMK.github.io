@@ -228,15 +228,13 @@ if (clearRangeBtn) {
 });
 // Cleaned up updateGSTRateAuto function
 function updateGSTRateAuto() {
-    const gstRateInput = document.getElementById('gstRateInput');
-    const superAreaInput = document.getElementById('superArea');
-    const basicCostInput = document.getElementById('basicCost');
-    
+    const gstRateInput = document.getElementById('gstRate');
     if (!gstRateInput) return;
     if (gstRateInput.dataset.manual === 'true') return;
 
-    const area = parseFloat(superAreaInput?.value) || 0;
-    const basic = parseFloat(basicCostInput?.value) || 0;
+    const carpetAreaSqFt = parseFloat(document.getElementById('carpetArea')?.value) || 0;
+    const carpetAreaSqMeters = carpetAreaSqFt / 10.764; // Convert sq ft to sq meters
+    const basic = parseFloat(document.getElementById('basicCost')?.value) || 0;
     
     let extraChargesTotal = 0;
     document.querySelectorAll('.charge-row').forEach(row => {
@@ -247,10 +245,10 @@ function updateGSTRateAuto() {
     });
     
     const totalPropertyValue = basic + extraChargesTotal;
-    const AFFORDABLE_AREA_LIMIT = 645;
+    const AFFORDABLE_AREA_LIMIT_SQM = 60; // 60 square meters
     const AFFORDABLE_VALUE_LIMIT = 4500000;
 
-    if (area > 0 && area <= AFFORDABLE_AREA_LIMIT && totalPropertyValue > 0 && totalPropertyValue <= AFFORDABLE_VALUE_LIMIT) {
+    if (carpetAreaSqMeters > 0 && carpetAreaSqMeters <= AFFORDABLE_AREA_LIMIT_SQM && totalPropertyValue > 0 && totalPropertyValue <= AFFORDABLE_VALUE_LIMIT) {
         gstRateInput.value = 1; 
     } else {
         gstRateInput.value = 5; 
@@ -934,23 +932,22 @@ function runCalculation() {
 
     // Helper function to map any milestone date to its exact loan month index based on EMI due day
     function getMilestoneMonthIndex(milestoneDateStr, loanStartDateStr, emiDueDay) {
-        if (!milestoneDateStr || !loanStartDateStr) return 1;
-        const mDate = new Date(milestoneDateStr);
-        const lStart = new Date(loanStartDateStr);
-        
-        let yearDiff = mDate.getFullYear() - lStart.getFullYear();
-        let monthDiff = mDate.getMonth() - lStart.getMonth();
-        let baseMonthIndex = (yearDiff * 12) + monthDiff + 1;
-        
-        if (baseMonthIndex < 1) return 1;
-        
-        // If the milestone day falls after the EMI due day, it rolls over to the next billing cycle
-        if (mDate.getDate() > emiDueDay) {
-            baseMonthIndex += 1;
-        }
-        
-        return baseMonthIndex;
+    if (!milestoneDateStr || !loanStartDateStr) return 1;
+    const mDate = new Date(milestoneDateStr);
+    const lStart = new Date(loanStartDateStr);
+    
+    let yearDiff = mDate.getFullYear() - lStart.getFullYear();
+    let monthDiff = mDate.getMonth() - lStart.getMonth();
+    let baseMonthIndex = (yearDiff * 12) + monthDiff + 1;
+    
+    if (baseMonthIndex < 1) return 1;
+    
+    if (mDate.getDate() > emiDueDay) {
+        baseMonthIndex += 1;
     }
+    
+    return baseMonthIndex;
+}
     const milestones = Array.from(milestoneRows).map(row => {
         const dateVal = row.querySelector('.milestone-date')?.value || '';
         return {
@@ -1018,6 +1015,15 @@ function runCalculation() {
     let cumulativeUnpaidInterest = 0;
     
     // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
+    // Clear baseline cache when loan amount, interest rate, or tenure changes
+['loanAmount', 'interestRate', 'tenureMonths'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', () => {
+            window.baselineLockedEmi = null;
+        });
+    }
+});
     window.baselineLockedEmi = undefined;
 
   function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
@@ -1267,7 +1273,7 @@ console.log(`Month ${monthIdx}:`, {
     }
     // --- 📊 AUTOMATED AUDIT TRIGGER ---
     const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
-        openingBalance: parseFloat(r.children[1]?.innerText.replace(/[₹,]/g, '')) || 0, // <--- Add this
+        openingBalance: parseFloat(r.children[1]?.innerText.replace(/[₹,]/g, '')) || 0,
         interest: parseFloat(r.querySelector('.interest-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
         principal: parseFloat(r.querySelector('.principal-paid-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
         partPayment: parseFloat(r.querySelector('.part-payment-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
@@ -1555,21 +1561,21 @@ async function saveCalculatorDataToSupabase() {
     alert('Calculator progress successfully saved! 🚀');
 }
 async function saveProfileToSupabase(userId) {
-    const gstRate = parseFloat(document.getElementById('gstRateInput').value);
-    const isMetro = document.getElementById('isMetroToggle').checked;
-
-    const { data, error } = await supabase
-        .from('clhl_profiles')
-        .update({ 
-            gst_rate: gstRate, 
-            is_metro: isMetro 
-        })
-        .eq('id', userId);
-
-    if (error) {
-        console.error('Error saving GST preference:', error);
-    } else {
-        console.log('GST preference saved successfully!');
+    const supabaseClient = window.supabaseClient || window.supabase;
+    if (!supabaseClient) {
+        console.error("Supabase client not initialized.");
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .upsert({ id: userId, updated_at: new Date() });
+            
+        if (error) throw error;
+        return data;
+    } catch (err) {
+        console.error("Error saving profile:", err.message);
     }
 }
 
