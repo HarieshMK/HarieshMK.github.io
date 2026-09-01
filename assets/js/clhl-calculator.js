@@ -1266,13 +1266,13 @@ console.log(`Month ${monthIdx}:`, {
         }
         let closingBalance = openingBalance - totalPrincipalReduction + capitalizedShortfall;
         if (Math.abs(closingBalance) < 0.01) closingBalance = 0;
-        if (closingBalance <= 0 && loanClosureMonthIndex === null && monthIdx > moratoriumMonths) {
+        if (closingBalance <= 0 && loanClosureMonthIndex === null) {
             loanClosureMonthIndex = monthIdx;
         }
+        
         totalPrincipalPaidSum += totalPrincipalReduction;
         totalInterestPaidSum += accruedInterest;
         totalExtraPaidSum += partPaymentColVal;
-        // --- PLACE THE TRACE HERE INSIDE THE LOOP ---
         if (monthIdx <= 15) {
             console.log(`Month ${monthIdx}: Opening=₹${Math.round(openingBalance)}, PlannedEMI=₹${effectivePlannedEmi}, PrincipalPaid=₹${Math.round(principalPaid)}, PartPaid=₹${Math.round(partPaymentColVal)}, RunningTotal=₹${Math.round(totalPrincipalPaidSum)}`);
         }
@@ -1285,7 +1285,6 @@ console.log(`Month ${monthIdx}:`, {
         openingBalance = Math.max(0, closingBalance);
         previousClosingBalance = closingBalance;
     }
-    // --- 📊 AUTOMATED AUDIT TRIGGER ---
     const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
         openingBalance: parseFloat(r.children[1]?.innerText.replace(/[₹,]/g, '')) || 0,
         interest: parseFloat(r.querySelector('.interest-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
