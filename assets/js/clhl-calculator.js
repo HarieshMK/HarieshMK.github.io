@@ -1119,28 +1119,6 @@ function runCalculation() {
         let isPreEmi = monthIdx <= moratoriumMonths;
         const inputEl = row.querySelector('.planned-emi-input');
 
-        if (openingBalance <= 0 && milestoneDisbursement === 0) {
-            openingBalance = 0; 
-            row.children[0].innerText = displayLabel;
-            row.children[1].innerText = `₹0`; 
-            row.children[2].innerText = `₹0`; 
-            row.children[4].innerText = `₹0`; 
-            row.children[5].innerText = `₹0`; 
-            row.children[6].innerText = `₹0`; 
-            row.children[7].innerText = `₹0`; 
-            
-            const inputEl = row.querySelector('.planned-emi-input');
-            if (inputEl) inputEl.value = '';
-
-            if (loanClosureMonthIndex === null) {
-                loanClosureMonthIndex = monthIdx;
-            }
-
-            previousClosingBalance = 0;
-            currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
-            continue;
-        }
-
         accruedInterest = openingBalance * monthlyRate;
         let remainingTenureMonths = totalMonths - monthIdx + 1;
 
@@ -1278,9 +1256,6 @@ console.log(`Month ${monthIdx}:`, {
                 loanClosureMonthIndex = monthIdx;
             }
             closingBalance = 0;
-            if (window.loadedPlannedEmis) {
-                window.loadedPlannedEmis[monthIdx] = '';
-            }
         }
         
         totalPrincipalPaidSum += totalPrincipalReduction;
