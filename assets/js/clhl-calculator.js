@@ -1016,7 +1016,7 @@ function runCalculation() {
     
     // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
     // Clear baseline cache when loan amount, interest rate, or tenure changes
-['loanAmount', 'interestRate', 'tenureMonths'].forEach(id => {
+['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
         el.addEventListener('input', () => {
@@ -1028,11 +1028,25 @@ function runCalculation() {
 
   function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
         let addedAmt = 0;
+        const isCustomMoro = moroTypeChecked2?.value === 'custom';
+        
         milestones.forEach(m => {
             if (m.date && m.isPartOfLoan) {
                 const mIdx = getMilestoneMonthIndex(m.date, loanStartDateStr, emiDueDay);
-                if (mIdx === targetMonthIdx) {
-                    addedAmt += m.loanAmount;
+                if (isCustomMoro) {
+                    if (mIdx <= moratoriumMonths) {
+                        if (mIdx === targetMonthIdx) {
+                            addedAmt += m.loanAmount;
+                        }
+                    } else {
+                        if (targetMonthIdx === moratoriumMonths + 1) {
+                            addedAmt += m.loanAmount;
+                        }
+                    }
+                } else {
+                    if (mIdx === targetMonthIdx) {
+                        addedAmt += m.loanAmount;
+                    }
                 }
             }
         });
