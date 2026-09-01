@@ -1266,8 +1266,12 @@ console.log(`Month ${monthIdx}:`, {
         }
         let closingBalance = openingBalance - totalPrincipalReduction + capitalizedShortfall;
         if (Math.abs(closingBalance) < 0.01) closingBalance = 0;
+        
         if (closingBalance <= 0 && loanClosureMonthIndex === null) {
             loanClosureMonthIndex = monthIdx;
+        }
+        if (closingBalance <= 0) {
+            break;
         }
         
         totalPrincipalPaidSum += totalPrincipalReduction;
