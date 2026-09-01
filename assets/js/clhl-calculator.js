@@ -976,7 +976,7 @@ function runCalculation() {
 
     loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
     const moroTypeChecked2 = document.querySelector('input[name="moroType"]:checked');
-    customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
+    const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
     
     let moratoriumMonths = 18;
     if (moroTypeChecked2) {
@@ -1762,10 +1762,8 @@ async function loadCalculatorDataFromSupabase() {
     runCalculation();
     console.log("TRACE [9]: Load complete. Hiding loader.");
     hideLoader();
-    if (typeof resetUndoStack === 'function') {
-        resetUndoStack();
-    } else if (typeof pushState === 'function') {
-        pushState(); 
+    if (typeof saveStateToUndoStack === 'function') {
+        saveStateToUndoStack();
     }
 }
 
