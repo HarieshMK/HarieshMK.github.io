@@ -1126,6 +1126,9 @@ function runCalculation() {
             row.children[6].innerText = `₹0`; 
             row.children[7].innerText = `₹0`; 
             
+            const inputEl = row.querySelector('.planned-emi-input');
+            if (inputEl) inputEl.value = '';
+
             if (loanClosureMonthIndex === null) {
                 loanClosureMonthIndex = monthIdx;
             }
@@ -1267,11 +1270,14 @@ console.log(`Month ${monthIdx}:`, {
         let closingBalance = openingBalance - totalPrincipalReduction + capitalizedShortfall;
         if (Math.abs(closingBalance) < 0.01) closingBalance = 0;
         
-        if (closingBalance <= 0 && loanClosureMonthIndex === null) {
-            loanClosureMonthIndex = monthIdx;
-        }
         if (closingBalance <= 0) {
-            break;
+            if (loanClosureMonthIndex === null) {
+                loanClosureMonthIndex = monthIdx;
+            }
+            closingBalance = 0;
+            if (window.loadedPlannedEmis) {
+                window.loadedPlannedEmis[monthIdx] = '';
+            }
         }
         
         totalPrincipalPaidSum += totalPrincipalReduction;
