@@ -692,6 +692,7 @@ function runActualLedgerCalculation() {
 
     // --- ACCUMULATORS FOR THE SUMMARY BAR ---
     let totalPrincipalPaidSum = 0;
+    let totalOriginalPrincipalPaid = 0;
     let totalInterestPaidSum = 0;
     let totalExtraPaidSum = 0;
     let finalClosingBalance = 0;
