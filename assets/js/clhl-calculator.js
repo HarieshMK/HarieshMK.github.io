@@ -781,13 +781,13 @@ function runActualLedgerCalculation() {
         daysCell.innerText = days;
         accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
         
-        // Show values only for EMI payment rows, keep others as ₹0
+       // Show values for EMI payment rows, use a clean dash (-) for others
         if (typeSelect === 'EMI payment') {
             interestPaidCell.innerText = `₹${Math.round(interestPaid).toLocaleString()}`;
             principalPaidCell.innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         } else {
-            interestPaidCell.innerText = `₹0`;
-            principalPaidCell.innerText = `₹0`;
+            interestPaidCell.innerText = `-`;
+            principalPaidCell.innerText = `-`;
         }
         
         closingCell.innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
