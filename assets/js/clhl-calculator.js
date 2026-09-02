@@ -1314,7 +1314,7 @@ console.log(`Month ${monthIdx}:`, {
     const sumSavedEl = document.getElementById('summaryInterestSaved');
     const sumCloseDateEl = document.getElementById('summaryCloseDate');
 
-    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
+  if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
     
