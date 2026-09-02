@@ -700,12 +700,14 @@ function runActualLedgerCalculation() {
 
     // --- ACCUMULATORS FOR THE SUMMARY BAR ---
     let totalPrincipalPaidSum = 0;
-    let totalOriginalPrincipalPaid = 0;
     let totalInterestPaidSum = 0;
     let totalExtraPaidSum = 0;
     let finalClosingBalance = 0;
     let latestInterestRate = 8.5;
     let lastValidDateStr = null;
+
+    // Running accumulator to track interest building up since the last EMI payment
+    let accruedInterestSinceLastEMI = 0;
 
     rows.forEach((row, index) => {
         const dateInput = row.querySelector('.trans-date').value;
@@ -741,15 +743,23 @@ function runActualLedgerCalculation() {
                 if (index === 1) days += 1;
             }
             interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
+            
+            // Accumulate interest into our span since the last EMI payment
+            accruedInterestSinceLastEMI += interestAccrued;
 
             if (typeSelect === 'EMI payment') {
-                interestPaid = Math.min(amountInput, interestAccrued);
+                // EMI covers all accumulated interest since the last EMI payment
+                interestPaid = Math.min(amountInput, accruedInterestSinceLastEMI);
                 const basePrincipal = Math.max(0, amountInput - interestPaid);
                 principalPaid = Math.min(basePrincipal, Math.max(0, previousClosingBalance));
                 partPayment = Math.max(0, basePrincipal - principalPaid);
                 
                 totalExtraPaidSum += partPayment;
-                closingBalance = previousClosingBalance - principalPaid - interestPaid - partPayment; 
+                
+                // Reduce the accumulator by what was paid off
+                accruedInterestSinceLastEMI = Math.max(0, accruedInterestSinceLastEMI - interestPaid);
+
+                closingBalance = previousClosingBalance + interestAccrued - interestPaid - principalPaid - partPayment; 
             } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
                 closingBalance = previousClosingBalance + amountInput;
             } else if (typeSelect === 'Rate Change') {
@@ -757,8 +767,10 @@ function runActualLedgerCalculation() {
             }
         }
 
-        totalPrincipalPaidSum += principalPaid;
-        totalInterestPaidSum += interestPaid;
+        if (typeSelect === 'EMI payment') {
+            totalPrincipalPaidSum += principalPaid;
+            totalInterestPaidSum += interestPaid;
+        }
         
         if (rateInput > 0) latestInterestRate = rateInput;
         if (dateInput) {
@@ -768,8 +780,16 @@ function runActualLedgerCalculation() {
 
         daysCell.innerText = days;
         accruedCell.innerText = `₹${Math.round(interestAccrued).toLocaleString()}`;
-        interestPaidCell.innerText = `₹${Math.round(interestPaid).toLocaleString()}`;
-        principalPaidCell.innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
+        
+        // Show values only for EMI payment rows, keep others as ₹0
+        if (typeSelect === 'EMI payment') {
+            interestPaidCell.innerText = `₹${Math.round(interestPaid).toLocaleString()}`;
+            principalPaidCell.innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
+        } else {
+            interestPaidCell.innerText = `₹0`;
+            principalPaidCell.innerText = `₹0`;
+        }
+        
         closingCell.innerText = `₹${Math.round(closingBalance).toLocaleString()}`;
 
         previousClosingBalance = closingBalance;
@@ -823,10 +843,12 @@ function runActualLedgerCalculation() {
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
     
-    // Calculate Interest Saved (ignoring sub-rupee floating-point drift)
+    // Calculate Interest Saved
     let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
+
+    // Update Estimated Loan Closure Date
     if (sumCloseDateEl) {
         if (finalClosingBalance <= 0) {
             sumCloseDateEl.innerText = `Already Closed 🎉`;
