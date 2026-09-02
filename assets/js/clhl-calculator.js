@@ -419,12 +419,18 @@ let fullEmiLockedMonth = null;
         const toVal = parseInt(document.getElementById('fillEndMonth').value);
         const amtVal = parseFloat(document.getElementById('fillEmiAmount').value);
 
+        if (isNaN(fromVal) || isNaN(toVal) || isNaN(amtVal)) {
+            alert("Please enter valid numbers for From Month, To Month, and Planned EMI.");
+            return;
+        }
+
         if (!window.loadedPlannedEmis) window.loadedPlannedEmis = {};
         const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
         const maxMonths = tenureYears * 12;
+        const startMonth = Math.max(1, fromVal);
         const targetEnd = Math.min(toVal, maxMonths);
 
-        for (let m = fromVal; m <= targetEnd; m++) {
+        for (let m = startMonth; m <= targetEnd; m++) {
             window.loadedPlannedEmis[m] = amtVal;
         }
 
@@ -1189,22 +1195,26 @@ console.log(`Month ${monthIdx}:`, {
         baselineInterestSum += stdAccruedInterest;
         stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
 
-        const defaultPlannedEmi = standardEmiForMonth;
         let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
-            userPlannedEmiVal = defaultPlannedEmi; 
+            userPlannedEmiVal = standardEmiForMonth; 
         } else if (window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] !== undefined) {
             const rawVal = window.loadedPlannedEmis[monthIdx];
             userPlannedEmiVal = (rawVal === "" ? "" : rawVal);
         } else {
-            userPlannedEmiVal = defaultPlannedEmi;
+            userPlannedEmiVal = standardEmiForMonth;
         }
 
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
+        
         if (document.activeElement !== inputEl) {
-            inputEl.value = (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) ? "" : Math.round(userPlannedEmiVal * 100) / 100;
+            if (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) {
+                inputEl.value = "";
+            } else {
+                inputEl.value = Math.round(userPlannedEmiVal * 100) / 100;
+            }
         }
         let effectivePlannedEmi = (inputEl.value === '') ? 0 : (userPlannedEmiVal !== undefined && userPlannedEmiVal !== "" ? userPlannedEmiVal : (parseFloat(inputEl.value) || 0));
 
