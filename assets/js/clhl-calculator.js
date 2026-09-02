@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
         runCalculation();
     });
 });
+    ['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', () => {
+            window.baselineLockedEmi = null;
+        });
+    }
+});
 
     [fromInput, toInput, amtInput].forEach(input => {
         if (input) {
@@ -814,7 +822,7 @@ function runActualLedgerCalculation() {
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
     
     // Calculate Interest Saved (ignoring sub-rupee floating-point drift)
-    let interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
+    let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
 
@@ -834,21 +842,6 @@ function runActualLedgerCalculation() {
             sumCloseDateEl.innerText = `Add more EMI history`;
         }
     }
-    let totalEmiPaidAmt = 0;
-let emiCount = 0;
-rows.forEach(r => {
-    const type = r.querySelector('.trans-type').value;
-    const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
-    
-    // ADD THIS LINE TO DEBUG:
-    console.log("Row Type:", type, "| Amount:", amt);
-
-    if (type === 'EMI payment' && amt > 0) {
-        totalEmiPaidAmt += amt;
-        emiCount++;
-    }
-});
-console.log("Total EMIs found:", emiCount, "| Avg Payment:", totalEmiPaidAmt / (emiCount || 1));
 }
 
 function runCalculation() {
@@ -1035,15 +1028,6 @@ function runCalculation() {
     let cumulativeUnpaidInterest = 0;
     let totalOriginalPrincipalPaid = 0;
     let totalCapitalizedInterestPaid = 0; 
-    
-['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-        el.addEventListener('input', () => {
-            window.baselineLockedEmi = null;
-        });
-    }
-});
     window.baselineLockedEmi = undefined;
 
   function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
@@ -1078,7 +1062,7 @@ function runCalculation() {
     let totalPrincipalPaidSum = 0;
     let totalInterestPaidSum = 0;
     let totalExtraPaidSum = 0;
-    let baselineInterestSum = 0;
+    window.baselineInterestSum = 0;
     let stdOpeningBalance = 0;
     let loanClosureMonthIndex = null;
     let previousClosingBalance = 0;
@@ -1324,7 +1308,6 @@ console.log(`Month ${monthIdx}:`, {
     }
     
     // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
-    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
     const sumInterestEl = document.getElementById('summaryTotalInterest');
     const sumExtraEl = document.getElementById('summaryExtraPaid');
     const sumSavedEl = document.getElementById('summaryInterestSaved');
