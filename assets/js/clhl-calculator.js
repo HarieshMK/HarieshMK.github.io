@@ -1022,9 +1022,9 @@ function runCalculation() {
 
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
+    let totalOriginalPrincipalPaid = 0;
+    let totalCapitalizedInterestPaid = 0; 
     
-    // --- CACHE STATE FOR REDUCE TENURE VS REDUCE EMI ---
-    // Clear baseline cache when loan amount, interest rate, or tenure changes
 ['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -1125,7 +1125,7 @@ function runCalculation() {
         let isPreEmi = monthIdx <= moratoriumMonths;
         const inputEl = row.querySelector('.planned-emi-input');
 
-        accruedInterest = openingBalance * monthlyRate;
+        accruedInterest = Math.round((openingBalance * monthlyRate) * 100) / 100;
         let remainingTenureMonths = totalMonths - monthIdx + 1;
 
         // --- FIXED REDUCE TENURE VS REDUCE EMI LOGIC ---
@@ -1259,6 +1259,7 @@ console.log(`Month ${monthIdx}:`, {
             totalPrincipalReduction = openingBalance;
         }
         let closingBalance = openingBalance - totalPrincipalReduction + capitalizedShortfall;
+        closingBalance = Math.round(closingBalance * 100) / 100;
         if (Math.abs(closingBalance) < 0.01) closingBalance = 0;
         
         if (closingBalance <= 0) {
@@ -1268,7 +1269,19 @@ console.log(`Month ${monthIdx}:`, {
             closingBalance = 0;
         }
         
-        totalPrincipalPaidSum += totalPrincipalReduction;
+        let baseLoanReduction = totalPrincipalReduction;
+        let paidCapitalizedInterest = 0;
+
+        if (cumulativeUnpaidInterest > 0 && totalPrincipalReduction > 0) {
+            paidCapitalizedInterest = Math.min(cumulativeUnpaidInterest, totalPrincipalReduction);
+            baseLoanReduction = totalPrincipalReduction - paidCapitalizedInterest;
+            cumulativeUnpaidInterest -= paidCapitalizedInterest;
+        }
+
+        totalOriginalPrincipalPaid += baseLoanReduction;
+        totalCapitalizedInterestPaid += paidCapitalizedInterest;
+        totalPrincipalPaidSum += totalPrincipalReduction; 
+        
         totalInterestPaidSum += accruedInterest;
         totalExtraPaidSum += partPaymentColVal;
         if (monthIdx <= 15) {
@@ -1300,7 +1313,7 @@ console.log(`Month ${monthIdx}:`, {
     }
     
     // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
-    const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
+    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
     const sumInterestEl = document.getElementById('summaryTotalInterest');
     const sumExtraEl = document.getElementById('summaryExtraPaid');
     const sumSavedEl = document.getElementById('summaryInterestSaved');
