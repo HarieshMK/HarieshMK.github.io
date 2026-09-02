@@ -745,11 +745,14 @@ function runActualLedgerCalculation() {
             if (typeSelect === 'EMI payment') {
                 interestPaid = Math.min(amountInput, interestAccrued);
                 const basePrincipal = Math.max(0, amountInput - interestPaid);
-                principalPaid = basePrincipal;
-                closingBalance = previousClosingBalance - principalPaid - interestPaid; 
+                principalPaid = Math.min(basePrincipal, Math.max(0, previousClosingBalance));
+                partPayment = Math.max(0, basePrincipal - principalPaid);
+                
+                totalExtraPaidSum += partPayment;
+                closingBalance = previousClosingBalance - principalPaid - interestPaid - partPayment; 
             } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
                 closingBalance = previousClosingBalance + amountInput;
-            } else if (typeSelect === 'Interest Rate Change') {
+            } else if (typeSelect === 'Rate Change') {
                 closingBalance = previousClosingBalance;
             }
         }
@@ -808,13 +811,12 @@ function runActualLedgerCalculation() {
     }
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
-   // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
-    const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
-    const sumInterestEl = document.getElementById('summaryTotalInterest');
-    const sumExtraEl = document.getElementById('summaryExtraPaid');
-    const sumSavedEl = document.getElementById('summaryInterestSaved');
-    const sumCloseDateEl = document.getElementById('summaryCloseDate');
+    const sumPrincipalEl = document.getElementById('actualSummaryPrincipal');
+    const sumInterestEl = document.getElementById('actualSummaryInterest');
+    const sumExtraEl = document.getElementById('actualSummaryExtra');
+    const sumSavedEl = document.getElementById('actualSummarySaved');
+    const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
     if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
@@ -825,10 +827,6 @@ function runActualLedgerCalculation() {
     let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
-
-    // Update Estimated Loan Closure Date
-    if (sumCloseDateEl) sumCloseDateEl.innerText = typeof estCloseDateStr !== 'undefined' ? estCloseDateStr : '--';
-
     if (sumCloseDateEl) {
         if (finalClosingBalance <= 0) {
             sumCloseDateEl.innerText = `Already Closed 🎉`;
