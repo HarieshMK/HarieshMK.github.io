@@ -800,16 +800,26 @@ function runActualLedgerCalculation() {
     }
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
+   // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
-    const sumPrincipalEl = document.getElementById('actualSummaryPrincipal');
-    const sumInterestEl = document.getElementById('actualSummaryInterest');
-    const sumExtraEl = document.getElementById('actualSummaryExtra');
-    const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
+    const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
+    const sumInterestEl = document.getElementById('summaryTotalInterest');
+    const sumExtraEl = document.getElementById('summaryExtraPaid');
+    const sumSavedEl = document.getElementById('summaryInterestSaved');
+    const sumCloseDateEl = document.getElementById('summaryCloseDate');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
-    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
+    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
+    
+    // Calculate Interest Saved (ignoring sub-rupee floating-point drift)
+    let interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
+    if (interestSaved < 1) interestSaved = 0;
+    if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
+
+    // Update Estimated Loan Closure Date
+    if (sumCloseDateEl) sumCloseDateEl.innerText = typeof estCloseDateStr !== 'undefined' ? estCloseDateStr : '--';
 
     if (sumCloseDateEl) {
         if (finalClosingBalance <= 0) {
