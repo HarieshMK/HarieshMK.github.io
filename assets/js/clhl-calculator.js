@@ -847,7 +847,7 @@ function runActualLedgerCalculation() {
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     const amortizationContainer = document.getElementById('loanPlanContainer') || loanPlanBody?.parentElement; 
-    const sumPrincipalEl = document.getElementById('sumPrincipal');
+    const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
     
     // --- 1. GATHER ALL INPUTS FOR VALIDATION ---
     let missingErrors = [];
