@@ -672,6 +672,7 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
     tableBody.appendChild(row);
     row.querySelectorAll('input, select').forEach(el => {
         el.addEventListener('input', runActualLedgerCalculation);
+        el.addEventListener('change', runActualLedgerCalculation);
     });
 
     row.querySelector('.btn-delete').addEventListener('click', () => {
@@ -714,6 +715,14 @@ function runActualLedgerCalculation() {
         const rateInput = parseFloat(row.querySelector('.trans-rate').value) || 0;
         const typeSelect = row.querySelector('.trans-type').value;
         const amountInput = parseFloat(row.querySelector('.trans-amount').value) || 0;
+        if (!dateInput && amountInput === 0 && index > 0) {
+            daysCell.innerText = '0';
+            accruedCell.innerText = '-';
+            interestPaidCell.innerText = '-';
+            principalPaidCell.innerText = '-';
+            closingCell.innerText = `₹${Math.round(previousClosingBalance).toLocaleString()}`;
+            return;
+        }
 
         const daysCell = row.querySelector('.col-days');
         const accruedCell = row.querySelector('.col-accrued');
@@ -818,38 +827,37 @@ function runActualLedgerCalculation() {
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
     
-    // --- 🔮 DATA-DRIVEN PROJECTION LOGIC (KEEP THIS!) ---
-    // --- 🔮 CLEAN FUTURE PROJECTION FROM CURRENT BALANCE ---
+    // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
-        // Grab the standard EMI amount from the input field or fallback to the latest valid EMI payment
-        let standardEmi = parseFloat(document.getElementById('emiAmount')?.value) || 0;
+        let standardEmi = 0;
         
-        if (standardEmi <= 0) {
-            // Fallback: grab the most recent valid EMI payment amount from rows if input is empty
-            rows.forEach(r => {
-                const type = r.querySelector('.trans-type').value;
-                const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
-                if (type === 'EMI payment' && amt > 0) standardEmi = amt;
-            });
-        }
+        // Find the most common or highest recent regular EMI amount
+        rows.forEach(r => {
+            const type = r.querySelector('.trans-type').value;
+            const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
+            if (type === 'EMI payment' && amt > standardEmi) standardEmi = amt;
+        });
 
         const monthlyRate = latestInterestRate / 12 / 100;
+        let monthInterestEstimation = finalClosingBalance * monthlyRate;
+
+        // Auto-correct if standard EMI is below monthly interest so the loop never breaks
+        if (standardEmi <= monthInterestEstimation) {
+            standardEmi = monthInterestEstimation + 1000; 
+        }
 
         if (standardEmi > 0 && monthlyRate > 0) {
             let simBalance = finalClosingBalance;
             let mCount = 0;
-            
-            // Ensure the EMI actually covers the monthly interest on the current balance
-            if (standardEmi > (simBalance * monthlyRate)) {
-                while (simBalance > 0 && mCount < 600) {
-                    const monthInterest = simBalance * monthlyRate;
-                    const principalReduction = standardEmi - monthInterest;
-                    simBalance -= principalReduction;
-                    mCount++;
-                }
-                if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
+            while (simBalance > 0 && mCount < 600) {
+                const monthInterest = simBalance * monthlyRate;
+                let principalReduction = standardEmi - monthInterest;
+                if (principalReduction <= 0) principalReduction = 500;
+                simBalance -= principalReduction;
+                mCount++;
             }
+            if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
         }
     }
 
@@ -884,8 +892,7 @@ function runActualLedgerCalculation() {
         } else {
             sumCloseDateEl.innerText = `Add more EMI history`;
         }
-    }
-    
+    } 
 }
 
 function runCalculation() {
