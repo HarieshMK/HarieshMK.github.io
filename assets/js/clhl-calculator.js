@@ -1234,18 +1234,6 @@ function runCalculation() {
             }
         }
 
-        // --- DEBUG HOOK ---
-console.log(`Month ${monthIdx}:`, {
-    date: formattedDate,
-    openingBalance: openingBalance,
-    milestoneDisbursement: milestoneDisbursement,
-    isPreEmi: isPreEmi,
-    remainingTenure: remainingTenureMonths,
-    standardEmi: standardEmiForMonth,
-    lockedFullEmi: lockedFullEmi,
-    monthlyRate: monthlyRate
-});
-
         // --- INDEPENDENT BASELINE METRIC CALCULATION ---
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
@@ -1361,9 +1349,6 @@ console.log(`Month ${monthIdx}:`, {
         
         totalInterestPaidSum += accruedInterest;
         totalExtraPaidSum += partPaymentColVal;
-        if (monthIdx <= 15) {
-            console.log(`Month ${monthIdx}: Opening=₹${Math.round(openingBalance)}, PlannedEMI=₹${effectivePlannedEmi}, PrincipalPaid=₹${Math.round(principalPaid)}, PartPaid=₹${Math.round(partPaymentColVal)}, RunningTotal=₹${Math.round(totalPrincipalPaidSum)}`);
-        }
         row.children[5].innerText = `₹${Math.round(principalPaid).toLocaleString()}`;
         row.children[6].innerText = `₹${Math.round(partPaymentColVal).toLocaleString()}`;
         row.children[4].innerText = `₹${Math.round(accruedInterest).toLocaleString()}`;
@@ -1681,7 +1666,6 @@ async function saveProfileToSupabase(userId) {
 }
 
 async function loadCalculatorDataFromSupabase() {
-    console.log("TRACE [1]: Starting loadCalculatorDataFromSupabase...");
     
     const activeSupabase = window.supabaseClient || window.supabase;
     if (!activeSupabase) {
@@ -1690,7 +1674,6 @@ async function loadCalculatorDataFromSupabase() {
         return;
     }
 
-    console.log("TRACE [2]: Fetching user auth...");
     const { data: { user }, error: userError } = await activeSupabase.auth.getUser();
     
     if (userError) {
@@ -1700,14 +1683,10 @@ async function loadCalculatorDataFromSupabase() {
     }
     
     if (!user) {
-        console.log("TRACE [3]: No user logged in. Aborting load.");
         hideLoader();
         return;
     }
 
-    console.log("TRACE [4]: User found:", user.id);
-
-    console.log("TRACE [5]: Fetching profiles from DB...");
     const { data: profiles, error: profileError } = await activeSupabase
         .from('clhl_profiles')
         .select('*')
@@ -1721,12 +1700,9 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     if (!profiles || profiles.length === 0) {
-        console.log("TRACE [6]: No profiles found for user.");
         hideLoader();
         return;
     }
-
-    console.log("TRACE [7]: Profile loaded successfully:", profiles[0]);
     const profile = profiles[0];
 
     // Restore Reduction Type Toggle state from Supabase
@@ -1779,7 +1755,6 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     // 1. Load Extra Charges
-    console.log("TRACE [7.5]: Fetching extra charges...");
     const { data: charges, error: chargeError } = await activeSupabase
         .from('clhl_extra_charges')
         .select('*')
@@ -1798,7 +1773,6 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     // 2. Load Milestones
-    console.log("TRACE [8]: Fetching milestones...");
     const { data: milestones, error: milestoneError } = await activeSupabase
         .from('clhl_milestones')
         .select('*')
@@ -1824,7 +1798,6 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     // 3. Load Custom Planned EMIs
-    console.log("TRACE [9]: Fetching planned EMIs for profile_id:", profile.id);
     const { data: savedEmis, error: emiError } = await activeSupabase
         .from('clhl_planned_emis')
         .select('*')
@@ -1836,14 +1809,11 @@ async function loadCalculatorDataFromSupabase() {
             emiMap[item.month_index] = item.planned_emi;
         });
         window.loadedPlannedEmis = emiMap;
-        console.log("TRACE [9d]: Built loadedPlannedEmis map successfully:", window.loadedPlannedEmis);
     } else {
         window.loadedPlannedEmis = {};
-        console.log("TRACE [9e]: No saved EMIs found or error occurred.");
     }
 
     // 4. Load Actual Transaction Ledger Rows
-    console.log("TRACE [10]: Fetching actual transaction ledger rows...");
     const { data: savedTransactions, error: transLoadError } = await activeSupabase
         .from('clhl_actual_transactions')
         .select('*')
@@ -1861,7 +1831,6 @@ async function loadCalculatorDataFromSupabase() {
     }
 
     runCalculation();
-    console.log("TRACE [9]: Load complete. Hiding loader.");
     hideLoader();
     if (typeof saveStateToUndoStack === 'function') {
         saveStateToUndoStack();
@@ -1872,6 +1841,5 @@ function hideLoader() {
     const loaders = document.querySelectorAll('#loadingScreen, #appLoader, .loading-overlay');
     loaders.forEach(loader => {
         loader.style.display = 'none';
-        console.log("Hidden loader element:", loader.id || loader.className);
     });
 }
