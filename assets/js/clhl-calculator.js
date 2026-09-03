@@ -26,6 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+    function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
 
     [fromInput, toInput, amtInput].forEach(input => {
         if (input) {
@@ -114,9 +121,11 @@ if (clearRangeBtn) {
         'loanStartDate', 'emiStartDate', 'customMoroMonths'
     ];
 
-    allInputs.forEach(id => {
+   allInputs.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('change', runCalculation);
+        if (el) {
+            el.addEventListener('input', debounce(runCalculation, 300));
+        }
     });
     
     if(addBtn) addBtn.addEventListener('click', () => addRow());
