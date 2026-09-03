@@ -189,6 +189,11 @@ if (clearRangeBtn) {
             hasUnsavedChanges = true;
             const dot = document.getElementById('unsavedDot');
             if (dot) dot.style.display = 'block';
+            if (e.target.closest('#transactionBody')) {
+                if (typeof runActualLedgerCalculation === 'function') {
+                    runActualLedgerCalculation();
+                }
+            }
         }
     });
 
