@@ -796,7 +796,29 @@ function runActualLedgerCalculation() {
         finalClosingBalance = closingBalance;
     });
 
-    // --- 🔮 DATA-DRIVEN PROJECTION LOGIC ---
+    / --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
+    let finalExpectedPrincipal = 0;
+    const emiStartDateVal = document.getElementById('emiStartDate')?.value;
+    const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
+    const loanStartDateVal = document.getElementById('loanStartDate')?.value;
+    const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
+    const totalMonths = tenureYears * 12;
+
+    if (lastValidDateStr && loanStartDateVal && window.baselineCumulativePrincipal) {
+        const tDate = new Date(lastValidDateStr);
+        const lStart = new Date(loanStartDateVal);
+        let yearDiff = tDate.getFullYear() - lStart.getFullYear();
+        let monthDiff = tDate.getMonth() - lStart.getMonth();
+        let mIdx = (yearDiff * 12) + monthDiff + 1;
+        if (mIdx < 1) mIdx = 1;
+        if (tDate.getDate() > emiDueDay) mIdx += 1;
+        if (mIdx > totalMonths) mIdx = totalMonths;
+        finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] || window.baselineCumulativePrincipal[totalMonths] || 0;
+    }
+
+    totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
+    
+    // --- 🔮 DATA-DRIVEN PROJECTION LOGIC (KEEP THIS!) ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
         let totalEmiPaidAmt = 0;
@@ -862,6 +884,7 @@ function runActualLedgerCalculation() {
             sumCloseDateEl.innerText = `Add more EMI history`;
         }
     }
+    
 }
 
 function runCalculation() {
@@ -1050,6 +1073,8 @@ function runCalculation() {
     let totalOriginalPrincipalPaid = 0;
     let totalCapitalizedInterestPaid = 0; 
     window.baselineLockedEmi = undefined;
+    let runningStdPrincipal = 0;
+    window.baselineCumulativePrincipal = {};
 
   function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
         let addedAmt = 0;
@@ -1207,9 +1232,10 @@ console.log(`Month ${monthIdx}:`, {
         }
         let stdStandardEmi = isPreEmi ? stdAccruedInterest : (window.baselineLockedEmi || stdAccruedInterest);
         let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
-        
         baselineInterestSum += stdAccruedInterest;
         stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
+        runningStdPrincipal += stdPrincipalPaid;
+        window.baselineCumulativePrincipal[monthIdx] = runningStdPrincipal;
 
         let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
