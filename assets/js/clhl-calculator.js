@@ -819,36 +819,37 @@ function runActualLedgerCalculation() {
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
     
     // --- 🔮 DATA-DRIVEN PROJECTION LOGIC (KEEP THIS!) ---
+    // --- 🔮 CLEAN FUTURE PROJECTION FROM CURRENT BALANCE ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
-        let totalEmiPaidAmt = 0;
-        let emiCount = 0;
-        rows.forEach(r => {
-            const type = r.querySelector('.trans-type').value;
-            const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
-            if (type === 'EMI payment' && amt > 0) {
-                totalEmiPaidAmt += amt;
-                emiCount++;
-            }
-        });
+        // Grab the standard EMI amount from the input field or fallback to the latest valid EMI payment
+        let standardEmi = parseFloat(document.getElementById('emiAmount')?.value) || 0;
+        
+        if (standardEmi <= 0) {
+            // Fallback: grab the most recent valid EMI payment amount from rows if input is empty
+            rows.forEach(r => {
+                const type = r.querySelector('.trans-type').value;
+                const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
+                if (type === 'EMI payment' && amt > 0) standardEmi = amt;
+            });
+        }
 
-        const avgMonthlyPayment = emiCount > 0 ? (totalEmiPaidAmt / emiCount) : 0;
         const monthlyRate = latestInterestRate / 12 / 100;
 
-        if (avgMonthlyPayment > 0 && monthlyRate > 0) {
+        if (standardEmi > 0 && monthlyRate > 0) {
             let simBalance = finalClosingBalance;
             let mCount = 0;
-            while (simBalance > 0 && mCount < 600) {
-                const monthInterest = simBalance * monthlyRate;
-                const principalReduction = avgMonthlyPayment - monthInterest;
-                if (principalReduction <= 0) {
-                    mCount = -1;
-                    break;
+            
+            // Ensure the EMI actually covers the monthly interest on the current balance
+            if (standardEmi > (simBalance * monthlyRate)) {
+                while (simBalance > 0 && mCount < 600) {
+                    const monthInterest = simBalance * monthlyRate;
+                    const principalReduction = standardEmi - monthInterest;
+                    simBalance -= principalReduction;
+                    mCount++;
                 }
-                simBalance -= principalReduction;
-                mCount++;
+                if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
             }
-            if (mCount > 0) projectedMonthsNeeded = mCount;
         }
     }
 
