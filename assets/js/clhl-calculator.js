@@ -842,6 +842,15 @@ function runActualLedgerCalculation() {
     if (isNaN(finalExpectedPrincipal) || finalExpectedPrincipal === undefined) {
         finalExpectedPrincipal = 0;
     }
+    // --- INSERT DEBUG BLOCK HERE ---
+    console.group("🛠️ LEDGER DEBUG AUDIT");
+    console.log("1. lastValidDateStr:", lastValidDateStr);
+    console.log("2. loanStartDateVal:", loanStartDateVal);
+    console.log("3. window.baselineCumulativePrincipal exists?", !!window.baselineCumulativePrincipal);
+    console.log("4. computed finalExpectedPrincipal:", finalExpectedPrincipal);
+    console.log("5. totalPrincipalPaidSum:", totalPrincipalPaidSum);
+    console.log("6. Raw math (totalPrincipalPaidSum - finalExpectedPrincipal):", totalPrincipalPaidSum - finalExpectedPrincipal);
+    console.groupEnd();
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
     
