@@ -26,6 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+    // Global listener for date inputs to restrict year length to 4 digits
+    document.addEventListener('input', (event) => {
+        if (event.target && event.target.type === 'date') {
+            const parts = event.target.value.split('-');
+            if (parts[0] && parts[0].length > 4) {
+                parts[0] = parts[0].slice(0, 4);
+                event.target.value = parts.join('-');
+            }
+        }
+    });
+    
     function debounce(func, wait) {
     let timeout;
     return function(...args) {
