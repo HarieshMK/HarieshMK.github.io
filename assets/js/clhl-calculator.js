@@ -796,7 +796,7 @@ function runActualLedgerCalculation() {
         finalClosingBalance = closingBalance;
     });
 
-    / --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
+    // --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
     let finalExpectedPrincipal = 0;
     const emiStartDateVal = document.getElementById('emiStartDate')?.value;
     const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
