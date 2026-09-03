@@ -832,8 +832,8 @@ function runActualLedgerCalculation() {
             if (tDate.getDate() > emiDueDay) mIdx += 1;
             if (mIdx > totalMonths) mIdx = totalMonths;
             finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] 
-                || window.baselineCumulativePrincipal[totalMonths] 
-                || Object.values(window.baselineCumulativePrincipal).pop() 
+                || window.baselineCumulativePrincipal[mIdx.toString()] 
+                || (mIdx > 1 ? window.baselineCumulativePrincipal[mIdx - 1] : 0) 
                 || 0;
         }
     }
