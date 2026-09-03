@@ -116,7 +116,7 @@ if (clearRangeBtn) {
 
     allInputs.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('input', runCalculation);
+        if (el) el.addEventListener('change', runCalculation);
     });
     
     if(addBtn) addBtn.addEventListener('click', () => addRow());
