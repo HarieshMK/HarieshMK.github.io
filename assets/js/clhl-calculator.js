@@ -719,7 +719,7 @@ function runActualLedgerCalculation() {
         const dateInput = row.querySelector('.trans-date').value;
         const rateInput = parseFloat(row.querySelector('.trans-rate').value) || 0;
         const typeSelect = row.querySelector('.trans-type').value;
-        const amountInput = parseFloat(row.querySelector('.trans-amount').value) || 0;
+        const amountInput = row.querySelector('.trans-amount').value === '' ? 0 : parseFloat(row.querySelector('.trans-amount').value) || 0;
         if (!dateInput && amountInput === 0 && index > 0) {
             daysCell.innerText = '0';
             accruedCell.innerText = '-';
@@ -828,6 +828,7 @@ function runActualLedgerCalculation() {
             if (mIdx < 1) mIdx = 1;
             if (tDate.getDate() > emiDueDay) mIdx += 1;
             if (mIdx > totalMonths) mIdx = totalMonths;
+            
             finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] 
                 || window.baselineCumulativePrincipal[totalMonths] 
                 || window.baselineCumulativePrincipal[window.baselineCumulativePrincipal.length - 1] 
