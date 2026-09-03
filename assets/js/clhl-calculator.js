@@ -698,6 +698,9 @@ function reindexLedgerRows() {
 }
 
 function runActualLedgerCalculation() {
+    if (typeof runCalculation === 'function') {
+        runCalculation();
+    }
     const rows = document.querySelectorAll('#transactionBody tr');
     if (rows.length === 0) return;
 
@@ -828,10 +831,9 @@ function runActualLedgerCalculation() {
             if (mIdx < 1) mIdx = 1;
             if (tDate.getDate() > emiDueDay) mIdx += 1;
             if (mIdx > totalMonths) mIdx = totalMonths;
-            
             finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] 
                 || window.baselineCumulativePrincipal[totalMonths] 
-                || window.baselineCumulativePrincipal[window.baselineCumulativePrincipal.length - 1] 
+                || Object.values(window.baselineCumulativePrincipal).pop() 
                 || 0;
         }
     }
