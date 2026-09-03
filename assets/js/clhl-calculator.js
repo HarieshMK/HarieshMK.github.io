@@ -820,14 +820,24 @@ function runActualLedgerCalculation() {
 
     if (lastValidDateStr && loanStartDateVal && window.baselineCumulativePrincipal) {
         const tDate = new Date(lastValidDateStr);
-        const lStart = new Date(loanStartDateVal);
-        let yearDiff = tDate.getFullYear() - lStart.getFullYear();
-        let monthDiff = tDate.getMonth() - lStart.getMonth();
-        let mIdx = (yearDiff * 12) + monthDiff + 1;
-        if (mIdx < 1) mIdx = 1;
-        if (tDate.getDate() > emiDueDay) mIdx += 1;
-        if (mIdx > totalMonths) mIdx = totalMonths;
-        finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] || window.baselineCumulativePrincipal[totalMonths] || 0;
+        if (!isNaN(tDate.getTime())) {
+            const lStart = new Date(loanStartDateVal);
+            let yearDiff = tDate.getFullYear() - lStart.getFullYear();
+            let monthDiff = tDate.getMonth() - lStart.getMonth();
+            let mIdx = (yearDiff * 12) + monthDiff + 1;
+            if (mIdx < 1) mIdx = 1;
+            if (tDate.getDate() > emiDueDay) mIdx += 1;
+            if (mIdx > totalMonths) mIdx = totalMonths;
+            finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] 
+                || window.baselineCumulativePrincipal[totalMonths] 
+                || window.baselineCumulativePrincipal[window.baselineCumulativePrincipal.length - 1] 
+                || 0;
+        }
+    }
+
+    // Ultimate safeguard: never let finalExpectedPrincipal be anything other than a safe number
+    if (isNaN(finalExpectedPrincipal) || finalExpectedPrincipal === undefined) {
+        finalExpectedPrincipal = 0;
     }
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
