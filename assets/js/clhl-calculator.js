@@ -27,6 +27,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+    document.querySelectorAll('input[name="reductionType"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        showLoadingOverlay("Recalculating schedule...");
+        
+        // Give the browser a microtask tick to render the loading screen
+        setTimeout(() => {
+            try {
+                if (typeof runCalculation === 'function') {
+                    runCalculation();
+                }
+            } finally {
+                hideLoadingOverlay();
+            }
+        }, 20);
+    });
+});
+
+function showLoadingOverlay(message) {
+    let overlay = document.getElementById('calc-loading-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'calc-loading-overlay';
+        overlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3); display: flex; justify-content: center;
+            align-items: center; z-index: 9999; color: #fff; font-family: sans-serif;
+            font-size: 1rem; backdrop-filter: blur(2px);
+        `;
+        document.body.appendChild(overlay);
+    }
+    overlay.innerHTML = `<div style="background: #1e293b; padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">${message}</div>`;
+    overlay.style.display = 'flex';
+}
+
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('calc-loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+
     // Global listener for date inputs to restrict year length to 4 digits
     document.addEventListener('input', (event) => {
         if (event.target && event.target.type === 'date') {
