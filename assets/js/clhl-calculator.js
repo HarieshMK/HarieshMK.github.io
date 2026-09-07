@@ -11,63 +11,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const toInput = document.getElementById('fillEndMonth');
     const amtInput = document.getElementById('fillEmiAmount');
     document.querySelectorAll('input[name="partPaymentStrategy"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        lockedFullEmi = 0;
-        fullEmiLockedMonth = null;
-        window.baselineLockedEmi = undefined;
-        runCalculation();
-    });
-});
-    ['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-        el.addEventListener('input', () => {
-            window.baselineLockedEmi = null;
-        });
-    }
-});
-
-    document.querySelectorAll('input[name="partPaymentStrategy"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        showLoadingOverlay("Recalculating schedule...");
-        
-        // Give the browser a microtask tick to render the loading screen
-        setTimeout(() => {
-            try {
-                if (typeof runCalculation === 'function') {
-                    runCalculation();
-                }
-            } finally {
-                hideLoadingOverlay();
+        radio.addEventListener('change', () => {
+            showLoadingOverlay("Recalculating schedule...");
+    
+            // Reset tracking states
+            lockedFullEmi = 0;
+            fullEmiLockedMonth = null;
+            window.baselineLockedEmi = undefined;
+            
+            if (radio.value === 'emi') {
+                window.loadedPlannedEmis = {}; 
             }
-        }, 20);
+            
+            // Give the browser a microtask tick to render the loading screen
+            setTimeout(() => {
+                try {
+                    if (typeof runCalculation === 'function') {
+                        runCalculation();
+                    }
+                } finally {
+                    hideLoadingOverlay();
+                }
+            }, 20);
+        });
     });
-});
-
-function showLoadingOverlay(message) {
-    let overlay = document.getElementById('calc-loading-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'calc-loading-overlay';
-        overlay.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3); display: flex; justify-content: center;
-            align-items: center; z-index: 9999; color: #fff; font-family: sans-serif;
-            font-size: 1rem; backdrop-filter: blur(2px);
-        `;
-        document.body.appendChild(overlay);
+    
+    ['loanAmount', 'interestRate', 'tenureYears'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => {
+                window.baselineLockedEmi = null;
+            });
+        }
+    });
+    
+    function showLoadingOverlay(message) {
+        let overlay = document.getElementById('calc-loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'calc-loading-overlay';
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.3); display: flex; justify-content: center;
+                align-items: center; z-index: 9999; color: #fff; font-family: sans-serif;
+                font-size: 1rem; backdrop-filter: blur(2px);
+            `;
+            document.body.appendChild(overlay);
+        }
+        overlay.innerHTML = `<div style="background: #1e293b; padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">${message}</div>`;
+        overlay.style.display = 'flex';
     }
-    overlay.innerHTML = `<div style="background: #1e293b; padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">${message}</div>`;
-    overlay.style.display = 'flex';
+    
+    function hideLoadingOverlay() {
+        const overlay = document.getElementById('calc-loading-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
 }
-
-function hideLoadingOverlay() {
-    const overlay = document.getElementById('calc-loading-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-}
-
     // Global listener for date inputs to restrict year length to 4 digits
     document.addEventListener('input', (event) => {
         if (event.target && event.target.type === 'date') {
@@ -1267,30 +1267,31 @@ function runCalculation() {
             lockedFullEmi = 0; 
             fullEmiLockedMonth = null;
         } else {
-            const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
-
-    if (reductionStrategy === 'emi') {
-        // Recalculate the reduced EMI every month based on the current opening balance and remaining tenure
-        if (monthlyRate > 0 && remainingTenureMonths > 0) {
-            window.currentReducedEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+        const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
+        
+        if (isPreEmi) {
+            standardEmiForMonth = accruedInterest;
         } else {
-            window.currentReducedEmi = openingBalance / Math.max(1, remainingTenureMonths);
-        }
-        standardEmiForMonth = window.currentReducedEmi;
-        lockedFullEmi = 0;
-    } else {
-        if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
-            if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+            if (reductionStrategy === 'emi') {
+                // Under Reduce EMI, recalculate fresh based on current opening balance and remaining months
+                if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                    standardEmiForMonth = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                } else {
+                    standardEmiForMonth = openingBalance / Math.max(1, remainingTenureMonths);
+                }
             } else {
-                lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
+                // Under Reduce Tenure, lock the EMI at the point of full EMI start (or post-moratorium start)
+                if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+                    if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                        lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+                    } else {
+                        lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
+                    }
+                    fullEmiLockedMonth = monthIdx;
+                }
+                standardEmiForMonth = lockedFullEmi;
             }
-            fullEmiLockedMonth = monthIdx;
         }
-        standardEmiForMonth = lockedFullEmi;
-    }
-        }
-
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
             stdOpeningBalance = cumulativeLoanAmt;
