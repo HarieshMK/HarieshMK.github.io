@@ -183,9 +183,6 @@ if (clearRangeBtn) {
     
     if(addBtn) addBtn.addEventListener('click', () => addRow());
     if(addMilestoneBtn) addMilestoneBtn.addEventListener('click', () => createMilestoneRow());
-    
-
-    
 
     // 1. Hook Undo Button Click
     const undoBtn = document.getElementById('undoBtn');
@@ -1291,6 +1288,7 @@ function runCalculation() {
                 }
                 standardEmiForMonth = lockedFullEmi;
             }
+        }
         }
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
