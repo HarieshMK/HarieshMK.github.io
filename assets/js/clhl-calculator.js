@@ -1269,38 +1269,26 @@ function runCalculation() {
         } else {
             const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
 
-            if (reductionStrategy === 'emi') {
-                // Check if a part payment was entered/loaded for this specific month
-                const userEnteredPart = window.loadedPlannedEmis && window.loadedPlannedEmis[monthIdx] ? 
-                    Math.max(0, window.loadedPlannedEmis[monthIdx] - (monthlyRate > 0 ? openingBalance * monthlyRate : 0)) : 0;
-                
-                // If it's month 1, or if a part-payment was just made, recalculate the permanent reduced EMI for the remaining tenure
-                if (window.currentReducedEmi === undefined || monthIdx === 1 || userEnteredPart > 0) {
-                    let balForEmiCalc = openingBalance;
-                    if (userEnteredPart > 0 && monthIdx > 1) {
-                        balForEmiCalc = Math.max(0, openingBalance - userEnteredPart);
-                    }
-                    if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                        window.currentReducedEmi = (balForEmiCalc * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                    } else {
-                        window.currentReducedEmi = balForEmiCalc / Math.max(1, remainingTenureMonths);
-                    }
-                }
-                
-                standardEmiForMonth = window.currentReducedEmi;
-                lockedFullEmi = 0;
-            } else {
-                if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
-                    if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                        lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                    } else {
-                        lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
-                    }
-                    fullEmiLockedMonth = monthIdx;
-                }
-                standardEmiForMonth = lockedFullEmi;
-            }
+    if (reductionStrategy === 'emi') {
+        // Recalculate the reduced EMI every month based on the current opening balance and remaining tenure
+        if (monthlyRate > 0 && remainingTenureMonths > 0) {
+            window.currentReducedEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+        } else {
+            window.currentReducedEmi = openingBalance / Math.max(1, remainingTenureMonths);
         }
+        standardEmiForMonth = window.currentReducedEmi;
+        lockedFullEmi = 0;
+    } else {
+        if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+            if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+            } else {
+                lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
+            }
+            fullEmiLockedMonth = monthIdx;
+        }
+        standardEmiForMonth = lockedFullEmi;
+    }
 
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
