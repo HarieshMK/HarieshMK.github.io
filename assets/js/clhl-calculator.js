@@ -978,8 +978,11 @@ rows.forEach((row, index) => {
 
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
-    const amortizationContainer = document.getElementById('loanPlanContainer') || loanPlanBody?.parentElement; 
     const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
+    
+    // Global lock trackers scoped locally to the calculation run
+    let lockedFullEmi = 0;
+    let fullEmiLockedMonth = null;
     
     // --- 1. GATHER ALL INPUTS FOR VALIDATION ---
     let missingErrors = [];
@@ -1059,10 +1062,6 @@ function runCalculation() {
         return;
     }
 
-    const basicCost = document.getElementById('basicCost');
-    if (!basicCost) return;
-
-    const totalWithGST = getTotalPropertyCostValue();    
     let cumulativePct = 0;
     let cumulativeLoanAmt = 0;
     const today = new Date();
@@ -1078,22 +1077,23 @@ function runCalculation() {
 
     // Helper function to map any milestone date to its exact loan month index based on EMI due day
     function getMilestoneMonthIndex(milestoneDateStr, loanStartDateStr, emiDueDay) {
-    if (!milestoneDateStr || !loanStartDateStr) return 1;
-    const mDate = new Date(milestoneDateStr);
-    const lStart = new Date(loanStartDateStr);
-    
-    let yearDiff = mDate.getFullYear() - lStart.getFullYear();
-    let monthDiff = mDate.getMonth() - lStart.getMonth();
-    let baseMonthIndex = (yearDiff * 12) + monthDiff + 1;
-    
-    if (baseMonthIndex < 1) return 1;
-    
-    if (mDate.getDate() > emiDueDay) {
-        baseMonthIndex += 1;
+        if (!milestoneDateStr || !loanStartDateStr) return 1;
+        const mDate = new Date(milestoneDateStr);
+        const lStart = new Date(loanStartDateStr);
+        
+        let yearDiff = mDate.getFullYear() - lStart.getFullYear();
+        let monthDiff = mDate.getMonth() - lStart.getMonth();
+        let baseMonthIndex = (yearDiff * 12) + monthDiff + 1;
+        
+        if (baseMonthIndex < 1) return 1;
+        
+        if (mDate.getDate() > emiDueDay) {
+            baseMonthIndex += 1;
+        }
+        
+        return baseMonthIndex;
     }
-    
-    return baseMonthIndex;
-}
+
     const milestones = Array.from(milestoneRows).map(row => {
         const dateVal = row.querySelector('.milestone-date')?.value || '';
         return {
@@ -1120,7 +1120,6 @@ function runCalculation() {
     if (totalPctEl) totalPctEl.innerText = `${cumulativePct}%`;
     if (totalLoanEl) totalLoanEl.innerText = `₹${Math.round(cumulativeLoanAmt).toLocaleString()}`;
 
-    loanStartDateVal2 = document.getElementById('loanStartDate')?.value;
     const moroTypeChecked2 = document.querySelector('input[name="moroType"]:checked');
     const customMoroMonthsVal = document.getElementById('customMoroMonths')?.value;
     
@@ -1156,8 +1155,6 @@ function runCalculation() {
     if (!isTableBuilt) {
         loanPlanBody.innerHTML = '';
     }
-    const activeMode = document.querySelector('input[name="reductionType"]:checked')?.value;
-console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
 
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
@@ -1167,7 +1164,7 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
     let runningStdPrincipal = 0;
     window.baselineCumulativePrincipal = {};
 
-  function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
+    function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
         let addedAmt = 0;
         const isCustomMoro = moroTypeChecked2?.value === 'custom';
         
@@ -1210,7 +1207,6 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
         const formattedDate = `${monthName} '${yearShort}`; 
         const displayLabel = `${monthIdx} (${formattedDate})`;
 
-        const ymStr = currentMonthDate.toISOString().substring(0, 7);
         const milestoneDisbursement = getMilestoneDisbursementForMonthIndex(monthIdx);
         
         if (monthIdx === 1) {
@@ -1260,24 +1256,20 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
         accruedInterest = Math.round((openingBalance * monthlyRate) * 100) / 100;
         let remainingTenureMonths = totalMonths - monthIdx + 1;
 
-        // --- FIXED REDUCE TENURE VS REDUCE EMI LOGIC ---
         if (isPreEmi) {
             standardEmiForMonth = accruedInterest;
             lockedFullEmi = 0; 
             fullEmiLockedMonth = null;
         } else {
             const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
-            console.log(`1 & 2. 🎛️ Month ${monthIdx} | Strategy found: "${reductionStrategy}" | Opening Bal: ${openingBalance}`);
             if (reductionStrategy === 'emi') {
-                // REDUCE EMI: Recalculate standard amortization EMI every month based on current balance and remaining tenure
                 if (monthlyRate > 0 && remainingTenureMonths > 0) {
                     standardEmiForMonth = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
                 } else {
                     standardEmiForMonth = openingBalance / Math.max(1, remainingTenureMonths);
                 }
-                lockedFullEmi = 0; // Clear lock when in reduce-EMI mode
+                lockedFullEmi = 0;
             } else {
-                // REDUCE TENURE: Lock the full EMI the first month Full EMI starts
                 if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
                     if (monthlyRate > 0 && remainingTenureMonths > 0) {
                         lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
@@ -1290,7 +1282,6 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
             }
         }
 
-        // --- INDEPENDENT BASELINE METRIC CALCULATION ---
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
             stdOpeningBalance = cumulativeLoanAmt;
@@ -1301,7 +1292,6 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
         let stdAccruedInterest = stdOpeningBalance * monthlyRate;
         let stdRemainingTenure = totalMonths - monthIdx + 1;
         
-        // Use the clean standard opening balance to lock baseline EMI once
         if (!isPreEmi && window.baselineLockedEmi === undefined) {
             if (monthlyRate > 0 && stdRemainingTenure > 0) {
                 window.baselineLockedEmi = (stdOpeningBalance * monthlyRate * Math.pow(1 + monthlyRate, stdRemainingTenure)) / (Math.pow(1 + monthlyRate, stdRemainingTenure) - 1);
@@ -1414,6 +1404,7 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
         openingBalance = Math.max(0, closingBalance);
         previousClosingBalance = closingBalance;
     }
+
     const rowsArray = Array.from(loanPlanBody.querySelectorAll('tr')).map(r => ({
         openingBalance: parseFloat(r.children[1]?.innerText.replace(/[₹,]/g, '')) || 0,
         interest: parseFloat(r.querySelector('.interest-cell')?.innerText.replace(/[₹,]/g, '')) || 0,
@@ -1422,31 +1413,28 @@ console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
         closingBalance: parseFloat(r.querySelector('.closing-balance-cell')?.innerText.replace(/[₹,]/g, '')) || 0
     }));
 
-    const initialLoan = parseFloat(document.getElementById('loanAmount')?.value) || 0;
+    const initialLoan = cumulativeLoanAmt;
     const loaderEl = document.getElementById('appLoader');
     const isLoaderHidden = !loaderEl || loaderEl.style.display === 'none';
 
-    if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden) {
+    if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
     
-    // --- 🚀 UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
+    // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumInterestEl = document.getElementById('summaryTotalInterest');
     const sumExtraEl = document.getElementById('summaryExtraPaid');
     const sumSavedEl = document.getElementById('summaryInterestSaved');
     const sumCloseDateEl = document.getElementById('summaryCloseDate');
-    console.log("3. 💰 Final Calculated Interest Sum:", totalInterestPaidSum);
 
-  if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
+    if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
     
-    // Calculate Interest Saved (ignoring sub-rupee floating-point drift)
     let interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
 
-    // Determine Est. Loan Closure Date
     if (loanClosureMonthIndex !== null) {
         if (loanStartDateVal) {
             let closureDate = new Date(loanStartDateVal);
