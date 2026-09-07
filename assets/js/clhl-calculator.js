@@ -874,6 +874,9 @@ rows.forEach((row, index) => {
     const loanStartDateVal = document.getElementById('loanStartDate')?.value;
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
     const totalMonths = tenureYears * 12;
+    // --- TEMPORARY DEBUG AUDIT ---
+    const activeStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value;
+    console.log(`--- RUN START --- Strategy Selected: "${activeStrategy}"`);
 
     if (lastValidDateStr && loanStartDateVal && window.baselineCumulativePrincipal) {
         const tDate = new Date(lastValidDateStr);
@@ -1250,6 +1253,9 @@ function runCalculation() {
                 runCalculation();
             });
         }
+        if (monthIdx <= 3) {
+        console.log(`Month ${monthIdx} | Opening: ${openingBalance} | standardEmi: ${standardEmiForMonth} | effectivePlannedEmi: ${effectivePlannedEmi} | loadedEmis state:`, window.loadedPlannedEmis?.[monthIdx]);
+    }
 
         let accruedInterest = 0;
         let principalPaid = 0;
