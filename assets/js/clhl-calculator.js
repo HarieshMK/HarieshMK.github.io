@@ -1289,6 +1289,7 @@ function runCalculation() {
         }
         standardEmiForMonth = lockedFullEmi;
     }
+        }
 
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
