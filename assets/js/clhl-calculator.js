@@ -1061,8 +1061,6 @@ function runCalculation() {
         }
         return;
     }
-    
-    if (document.activeElement && document.activeElement.classList.contains('planned-emi-input')) {
 
     let cumulativePct = 0;
     let cumulativeLoanAmt = 0;
@@ -1153,7 +1151,12 @@ function runCalculation() {
 
     if (!loanPlanBody) return;
     const existingRows = loanPlanBody.querySelectorAll('tr');
-    const isTableBuilt = existingRows.length === totalMonths;
+    let isTableBuilt = existingRows.length === totalMonths;
+
+    if (document.activeElement && document.activeElement.classList.contains('planned-emi-input')) {
+        isTableBuilt = true;
+    }
+
     if (!isTableBuilt) {
         loanPlanBody.innerHTML = '';
     }
