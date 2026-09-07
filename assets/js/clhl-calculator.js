@@ -874,7 +874,9 @@ rows.forEach((row, index) => {
     const loanStartDateVal = document.getElementById('loanStartDate')?.value;
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
     const totalMonths = tenureYears * 12;
-
+    // --- TEMPORARY DEBUG AUDIT ---
+    const activeStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value;
+    console.log(`--- RUN START --- Strategy Selected: "${activeStrategy}"`);
 
     if (lastValidDateStr && loanStartDateVal && window.baselineCumulativePrincipal) {
         const tDate = new Date(lastValidDateStr);
@@ -1041,10 +1043,6 @@ function runCalculation() {
             missingErrors.push(`• Milestone #${index + 1} (${name || 'Unnamed'}): Loan amount cannot be negative.`);
         }
     });
-
-        // --- TEMPORARY DEBUG AUDIT ---
-    const activeStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value;
-    console.log(`--- RUN START --- Strategy Selected: "${activeStrategy}"`);
 
     if (milestoneRows.length > 0 && Math.abs(totalMilestonePct - 100) > 0.01) {
         missingErrors.push(`• Project milestone percentages total ${totalMilestonePct.toFixed(2)}%. They must equal exactly 100%.`);
@@ -1255,6 +1253,9 @@ function runCalculation() {
                 runCalculation();
             });
         }
+        if (monthIdx <= 3) {
+            console.log(`Month ${monthIdx} | Opening: ${openingBalance} | standardEmi: ${standardEmiForMonth} | effectivePlannedEmi: ${effectivePlannedEmi} | loadedEmis state:`, window.loadedPlannedEmis?.[monthIdx]);
+        }
 
         let accruedInterest = 0;
         let principalPaid = 0;
@@ -1295,7 +1296,30 @@ function runCalculation() {
             }
         }
 
-        // Handle user planned input evaluation here...
+        let stdDisbursement = milestoneDisbursement;
+        if (monthIdx === 1) {
+            stdOpeningBalance = cumulativeLoanAmt;
+        } else {
+            stdOpeningBalance = stdOpeningBalance + stdDisbursement;
+        }
+        
+        let stdAccruedInterest = stdOpeningBalance * monthlyRate;
+        let stdRemainingTenure = totalMonths - monthIdx + 1;
+        
+        if (!isPreEmi && window.baselineLockedEmi === undefined) {
+            if (monthlyRate > 0 && stdRemainingTenure > 0) {
+                window.baselineLockedEmi = (stdOpeningBalance * monthlyRate * Math.pow(1 + monthlyRate, stdRemainingTenure)) / (Math.pow(1 + monthlyRate, stdRemainingTenure) - 1);
+            } else {
+                window.baselineLockedEmi = stdOpeningBalance / Math.max(1, stdRemainingTenure);
+            }
+        }
+        let stdStandardEmi = isPreEmi ? stdAccruedInterest : (window.baselineLockedEmi || stdAccruedInterest);
+        let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
+        baselineInterestSum += stdAccruedInterest;
+        stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
+        runningStdPrincipal += stdPrincipalPaid;
+        window.baselineCumulativePrincipal[monthIdx] = runningStdPrincipal;
+
         let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
             userPlannedEmiVal = standardEmiForMonth; 
@@ -1306,12 +1330,18 @@ function runCalculation() {
             userPlannedEmiVal = standardEmiForMonth;
         }
 
-        let effectivePlannedEmi = (inputEl.value === '') ? 0 : (userPlannedEmiVal !== undefined && userPlannedEmiVal !== "" ? userPlannedEmiVal : (parseFloat(inputEl.value) || 0));
-
-        // --- CORRECTED LOG PLACEMENT (NOW VALUES EXIST) ---
-        if (monthIdx <= 3) {
-            console.log(`Month ${monthIdx} | Opening: ${openingBalance} | standardEmi: ${standardEmiForMonth} | effectivePlannedEmi: ${effectivePlannedEmi} | loadedEmis state:`, window.loadedPlannedEmis?.[monthIdx]);
+        row.children[0].innerText = displayLabel;
+        row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
+        row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
+        
+        if (document.activeElement !== inputEl) {
+            if (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) {
+                inputEl.value = "";
+            } else {
+                inputEl.value = Math.round(userPlannedEmiVal * 100) / 100;
+            }
         }
+        let effectivePlannedEmi = (inputEl.value === '') ? 0 : (userPlannedEmiVal !== undefined && userPlannedEmiVal !== "" ? userPlannedEmiVal : (parseFloat(inputEl.value) || 0));
 
         if (isPreEmi) {
             principalPaid = 0;
@@ -1442,7 +1472,7 @@ function runCalculation() {
             if (sumCloseDateEl) sumCloseDateEl.innerText = `--`;
         }
     }
-}
+
 
 // --- TOOLBAR RANGE-FILL LOGIC ---
 
@@ -1461,16 +1491,12 @@ function updateToolbarButtonStates() {
     const toVal = parseInt(toInput.value);
     const amtVal = parseFloat(amtInput?.value);
 
-    // Validate range: integers, from > 0, and to >= from
     const isRangeValid = !isNaN(fromVal) && !isNaN(toVal) && fromVal > 0 && toVal >= fromVal;
     const isAmtValid = !isNaN(amtVal) && amtVal >= 0;
 
-    // 5. Enablement rules:
-    // Copy Accrued and Clear Range require valid 'From' and 'To' months
     if (copyBtn) copyBtn.disabled = !isRangeValid;
     if (clearBtn) clearBtn.disabled = !isRangeValid;
 
-    // Apply to Range requires valid 'From', 'To', and an amount
     if (applyBtn) {
         applyBtn.disabled = !(isRangeValid && isAmtValid);
     }
