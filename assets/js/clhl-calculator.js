@@ -1254,8 +1254,8 @@ function runCalculation() {
             });
         }
         if (monthIdx <= 3) {
-            console.log(`Month ${monthIdx} | Opening: ${openingBalance} | standardEmi: ${standardEmiForMonth} | effectivePlannedEmi: ${effectivePlannedEmi} | loadedEmis state:`, window.loadedPlannedEmis?.[monthIdx]);
-        }
+        console.log(`Month ${monthIdx} | Opening: ${openingBalance} | standardEmi: ${standardEmiForMonth} | effectivePlannedEmi: ${effectivePlannedEmi} | loadedEmis state:`, window.loadedPlannedEmis?.[monthIdx]);
+    }
 
         let accruedInterest = 0;
         let principalPaid = 0;
@@ -1275,25 +1275,26 @@ function runCalculation() {
         } else {
             const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
 
-            if (reductionStrategy === 'emi') {
-                if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                    window.currentReducedEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                } else {
-                    window.currentReducedEmi = openingBalance / Math.max(1, remainingTenureMonths);
-                }
-                standardEmiForMonth = window.currentReducedEmi;
-                lockedFullEmi = 0;
+    if (reductionStrategy === 'emi') {
+        // Recalculate the reduced EMI every month based on the current opening balance and remaining tenure
+        if (monthlyRate > 0 && remainingTenureMonths > 0) {
+            window.currentReducedEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
+        } else {
+            window.currentReducedEmi = openingBalance / Math.max(1, remainingTenureMonths);
+        }
+        standardEmiForMonth = window.currentReducedEmi;
+        lockedFullEmi = 0;
+    } else {
+        if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
+            if (monthlyRate > 0 && remainingTenureMonths > 0) {
+                lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
             } else {
-                if (lockedFullEmi === 0 || fullEmiLockedMonth === null) {
-                    if (monthlyRate > 0 && remainingTenureMonths > 0) {
-                        lockedFullEmi = (openingBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingTenureMonths)) / (Math.pow(1 + monthlyRate, remainingTenureMonths) - 1);
-                    } else {
-                        lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
-                    }
-                    fullEmiLockedMonth = monthIdx;
-                }
-                standardEmiForMonth = lockedFullEmi;
+                lockedFullEmi = openingBalance / Math.max(1, remainingTenureMonths);
             }
+            fullEmiLockedMonth = monthIdx;
+        }
+        standardEmiForMonth = lockedFullEmi;
+    }
         }
 
         let stdDisbursement = milestoneDisbursement;
@@ -1472,7 +1473,7 @@ function runCalculation() {
             if (sumCloseDateEl) sumCloseDateEl.innerText = `--`;
         }
     }
-
+}
 
 // --- TOOLBAR RANGE-FILL LOGIC ---
 
@@ -1491,12 +1492,16 @@ function updateToolbarButtonStates() {
     const toVal = parseInt(toInput.value);
     const amtVal = parseFloat(amtInput?.value);
 
+    // Validate range: integers, from > 0, and to >= from
     const isRangeValid = !isNaN(fromVal) && !isNaN(toVal) && fromVal > 0 && toVal >= fromVal;
     const isAmtValid = !isNaN(amtVal) && amtVal >= 0;
 
+    // 5. Enablement rules:
+    // Copy Accrued and Clear Range require valid 'From' and 'To' months
     if (copyBtn) copyBtn.disabled = !isRangeValid;
     if (clearBtn) clearBtn.disabled = !isRangeValid;
 
+    // Apply to Range requires valid 'From', 'To', and an amount
     if (applyBtn) {
         applyBtn.disabled = !(isRangeValid && isAmtValid);
     }
