@@ -1156,6 +1156,8 @@ function runCalculation() {
     if (!isTableBuilt) {
         loanPlanBody.innerHTML = '';
     }
+    const activeMode = document.querySelector('input[name="reductionType"]:checked')?.value;
+console.log("1. 🎛️ Active Reduction Mode detected by script:", activeMode);
 
     let openingBalance = 0;
     let cumulativeUnpaidInterest = 0;
@@ -1265,7 +1267,7 @@ function runCalculation() {
             fullEmiLockedMonth = null;
         } else {
             const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
-
+            console.log(`1 & 2. 🎛️ Month ${monthIdx} | Strategy found: "${reductionStrategy}" | Opening Bal: ${openingBalance}`);
             if (reductionStrategy === 'emi') {
                 // REDUCE EMI: Recalculate standard amortization EMI every month based on current balance and remaining tenure
                 if (monthlyRate > 0 && remainingTenureMonths > 0) {
@@ -1433,6 +1435,7 @@ function runCalculation() {
     const sumExtraEl = document.getElementById('summaryExtraPaid');
     const sumSavedEl = document.getElementById('summaryInterestSaved');
     const sumCloseDateEl = document.getElementById('summaryCloseDate');
+    console.log("3. 💰 Final Calculated Interest Sum:", totalInterestPaidSum);
 
   if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalOriginalPrincipalPaid).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
