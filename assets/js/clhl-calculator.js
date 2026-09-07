@@ -768,37 +768,34 @@ function runActualLedgerCalculation() {
 
     let previousClosingBalance = 0;
     let previousDate = null;
-
-    // --- ACCUMULATORS FOR THE SUMMARY BAR ---
     let totalPrincipalPaidSum = 0;
     let totalInterestPaidSum = 0;
     let totalExtraPaidSum = 0;
     let finalClosingBalance = 0;
     let latestInterestRate = 8.5;
     let lastValidDateStr = null;
-
-    // Running accumulator to track interest building up since the last EMI payment
     let accruedInterestSinceLastEMI = 0;
 
-    rows.forEach((row, index) => {
-        const dateInput = row.querySelector('.trans-date').value;
-        const rateInput = parseFloat(row.querySelector('.trans-rate').value) || 0;
-        const typeSelect = row.querySelector('.trans-type').value;
-        const amountInput = row.querySelector('.trans-amount').value === '' ? 0 : parseFloat(row.querySelector('.trans-amount').value) || 0;
-        if (!dateInput && amountInput === 0 && index > 0) {
-            daysCell.innerText = '0';
-            accruedCell.innerText = '-';
-            interestPaidCell.innerText = '-';
-            principalPaidCell.innerText = '-';
-            closingCell.innerText = `₹${Math.round(previousClosingBalance).toLocaleString()}`;
-            return;
-        }
+rows.forEach((row, index) => {
+    const dateInput = row.querySelector('.trans-date').value;
+    const rateInput = parseFloat(row.querySelector('.trans-rate').value) || 0;
+    const typeSelect = row.querySelector('.trans-type').value;
+    const amountInput = row.querySelector('.trans-amount').value === '' ? 0 : parseFloat(row.querySelector('.trans-amount').value) || 0;
+    const daysCell = row.querySelector('.col-days');
+    const accruedCell = row.querySelector('.col-accrued');
+    const interestPaidCell = row.querySelector('.col-interest-paid');
+    const principalPaidCell = row.querySelector('.col-principal-paid');
+    const closingCell = row.querySelector('.col-closing-balance');
 
-        const daysCell = row.querySelector('.col-days');
-        const accruedCell = row.querySelector('.col-accrued');
-        const interestPaidCell = row.querySelector('.col-interest-paid');
-        const principalPaidCell = row.querySelector('.col-principal-paid');
-        const closingCell = row.querySelector('.col-closing-balance');
+    // Now it's safe to use them in guards
+    if (!dateInput && amountInput === 0 && index > 0) {
+        daysCell.innerText = '0';
+        accruedCell.innerText = '-';
+        interestPaidCell.innerText = '-';
+        principalPaidCell.innerText = '-';
+        closingCell.innerText = `₹${Math.round(previousClosingBalance).toLocaleString()}`;
+        return;
+    }
 
         let days = 0;
         let interestAccrued = 0;
@@ -822,20 +819,15 @@ function runActualLedgerCalculation() {
                 if (index === 1) days += 1;
             }
             interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
-            
-            // Accumulate interest into our span since the last EMI payment
             accruedInterestSinceLastEMI += interestAccrued;
 
             if (typeSelect === 'EMI payment') {
-                // EMI covers all accumulated interest since the last EMI payment
                 interestPaid = Math.min(amountInput, accruedInterestSinceLastEMI);
                 const basePrincipal = Math.max(0, amountInput - interestPaid);
                 principalPaid = Math.min(basePrincipal, Math.max(0, previousClosingBalance));
                 partPayment = Math.max(0, basePrincipal - principalPaid);
                 
                 totalExtraPaidSum += partPayment;
-                
-                // Reduce the accumulator by what was paid off
                 accruedInterestSinceLastEMI = Math.max(0, accruedInterestSinceLastEMI - interestPaid);
 
                 closingBalance = previousClosingBalance + interestAccrued - interestPaid - principalPaid - partPayment; 
