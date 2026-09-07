@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fromInput = document.getElementById('fillStartMonth');
     const toInput = document.getElementById('fillEndMonth');
     const amtInput = document.getElementById('fillEmiAmount');
-    document.querySelectorAll('input[name="reductionType"]').forEach(radio => {
+    document.querySelectorAll('input[name="partPaymentStrategy"]').forEach(radio => {
     radio.addEventListener('change', () => {
         lockedFullEmi = 0;
         fullEmiLockedMonth = null;
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-    document.querySelectorAll('input[name="reductionType"]').forEach(radio => {
+    document.querySelectorAll('input[name="partPaymentStrategy"]').forEach(radio => {
     radio.addEventListener('change', () => {
         showLoadingOverlay("Recalculating schedule...");
         
@@ -1272,7 +1272,7 @@ function runCalculation() {
             lockedFullEmi = 0; 
             fullEmiLockedMonth = null;
         } else {
-            const reductionStrategy = document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure';
+            const reductionStrategy = document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure';
 
             if (reductionStrategy === 'emi') {
                 // REDUCE EMI: Recalculate standard amortization EMI every month based on current balance and remaining tenure
@@ -1551,7 +1551,7 @@ async function saveCalculatorDataToSupabase() {
         custom_moro_months: parseInt(document.getElementById('customMoroMonths')?.value) || null,
         gst_rate: parseFloat(document.getElementById('gstRateInput')?.value) || 5,
         is_metro: document.getElementById('isMetroToggle')?.checked || false,
-        reduction_type: document.querySelector('input[name="reductionType"]:checked')?.value || 'tenure',
+        reduction_type: document.querySelector('input[name="partPaymentStrategy"]:checked')?.value || 'tenure',
         updated_at: new Date().toISOString()
     };
 
@@ -1769,7 +1769,7 @@ async function loadCalculatorDataFromSupabase() {
 
     // Restore Reduction Type Toggle state from Supabase
     if (profile.reduction_type) {
-        const radio = document.querySelector(`input[name="reductionType"][value="${profile.reduction_type}"]`);
+        const radio = document.querySelector(`input[name="partPaymentStrategy"][value="${profile.reduction_type}"]`);
         if (radio) radio.checked = true;
     }
 
