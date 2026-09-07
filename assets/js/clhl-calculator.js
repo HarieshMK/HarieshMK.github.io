@@ -1061,6 +1061,8 @@ function runCalculation() {
         }
         return;
     }
+    
+    if (document.activeElement && document.activeElement.classList.contains('planned-emi-input')) {
 
     let cumulativePct = 0;
     let cumulativeLoanAmt = 0;
