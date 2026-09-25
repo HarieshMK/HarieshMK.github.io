@@ -831,6 +831,7 @@ rows.forEach((row, index) => {
         } else if (typeSelect === 'Rate Change') {
             closingBalance = previousClosingBalance;
         }
+        }
         if (typeSelect === 'EMI payment') {
             totalPrincipalPaidSum += principalPaid;
             totalInterestPaidSum += interestPaid;
