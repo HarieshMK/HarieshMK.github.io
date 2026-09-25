@@ -819,15 +819,17 @@ rows.forEach((row, index) => {
             accruedInterestSinceLastEMI += interestAccrued;
 
             if (typeSelect === 'EMI payment') {
-            closingBalance =
-                Math.max(0, previousClosingBalance - amountInput);
-            principalPaid = amountInput;
-            interestPaid = 0;
+            closingBalance = Math.max(0, previousClosingBalance - amountInput);
+            interestPaid = Math.min(amountInput,accruedInterestSinceLastEMI );
+            principalPaid = Math.max(0,amountInput - interestPaid);
+            accruedInterestSinceLastEMI = Math.max(0,accruedInterestSinceLastEMI - interestPaid);
+        }
         } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
             closingBalance = previousClosingBalance + amountInput;
         } else if (typeSelect === 'Interest Deposit') {
-            closingBalance = previousClosingBalance + amountInput;
+            closingBalance =previousClosingBalance + amountInput;
             accruedInterestSinceLastEMI = 0;
+        }
         } else if (typeSelect === 'Rate Change') {
             closingBalance = previousClosingBalance;
         }
