@@ -798,7 +798,6 @@ rows.forEach((row, index) => {
         let interestAccrued = 0;
         let interestPaid = 0;
         let principalPaid = 0;
-        let partPayment = 0;
         let closingBalance = previousClosingBalance;
 
         if (index === 0) {
