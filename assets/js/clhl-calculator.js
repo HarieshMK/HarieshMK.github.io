@@ -819,20 +819,21 @@ rows.forEach((row, index) => {
             accruedInterestSinceLastEMI += interestAccrued;
 
             if (typeSelect === 'EMI payment') {
-                interestPaid = Math.min(amountInput, accruedInterestSinceLastEMI);
-                const basePrincipal = Math.max(0, amountInput - interestPaid);
-                principalPaid = Math.min(basePrincipal, Math.max(0, previousClosingBalance));
-                partPayment = Math.max(0, basePrincipal - principalPaid);
-                
-                totalExtraPaidSum += partPayment;
-                accruedInterestSinceLastEMI = Math.max(0, accruedInterestSinceLastEMI - interestPaid);
-
-                closingBalance = previousClosingBalance + interestAccrued - interestPaid - principalPaid - partPayment; 
-            } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges' || typeSelect === 'Interest Deposit') {
-                closingBalance = previousClosingBalance + amountInput;
-            } else if (typeSelect === 'Rate Change') {
-                closingBalance = previousClosingBalance;
-            }
+            interestPaid = Math.min(amountInput, accruedInterestSinceLastEMI);
+            const basePrincipal = Math.max(0, amountInput - interestPaid);
+            principalPaid = Math.min(basePrincipal, Math.max(0, previousClosingBalance));
+            partPayment = Math.max(0, basePrincipal - principalPaid);            
+            totalExtraPaidSum += partPayment;
+            accruedInterestSinceLastEMI = Math.max(0, accruedInterestSinceLastEMI - interestPaid);
+            closingBalance = previousClosingBalance - principalPaid - partPayment + accruedInterestSinceLastEMI;
+            
+        } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
+            closingBalance = previousClosingBalance + amountInput;
+        } else if (typeSelect === 'Interest Deposit') {
+            closingBalance = previousClosingBalance + accruedInterestSinceLastEMI + amountInput;
+            accruedInterestSinceLastEMI = 0;
+        } else if (typeSelect === 'Rate Change') {
+            closingBalance = previousClosingBalance;
         }
 
         if (typeSelect === 'EMI payment') {
