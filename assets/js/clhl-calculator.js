@@ -824,13 +824,14 @@ rows.forEach((row, index) => {
             principalPaid = Math.max(0,amountInput - interestPaid);
             accruedInterestSinceLastEMI = Math.max(0,accruedInterestSinceLastEMI - interestPaid);
         }
-        } else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
+        else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
             closingBalance = previousClosingBalance + amountInput;
-        } else if (typeSelect === 'Interest Deposit') {
+        } 
+        else if (typeSelect === 'Interest Deposit') {
             closingBalance =previousClosingBalance + amountInput;
             accruedInterestSinceLastEMI = 0;
         }
-        } else if (typeSelect === 'Rate Change') {
+        else if (typeSelect === 'Rate Change') {
             closingBalance = previousClosingBalance;
         }
         }
