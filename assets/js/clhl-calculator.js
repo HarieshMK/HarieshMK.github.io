@@ -1782,8 +1782,6 @@ async function loadCalculatorDataFromSupabase() {
             handleMoratoriumUI();
         }
     }
-
-    updateBasicCost();
     const loanInput = document.getElementById('loanAmount');
     if (loanInput && profile.loan_amount !== null && profile.loan_amount !== undefined) {
         loanInput.dataset.manual = 'true';
@@ -1866,8 +1864,13 @@ async function loadCalculatorDataFromSupabase() {
         }
     }
 
+    updateBasicCost();
+    calculateTotalPropertyCost();
+    
     runCalculation();
+    
     hideLoader();
+    
     if (typeof saveStateToUndoStack === 'function') {
         saveStateToUndoStack();
     }
