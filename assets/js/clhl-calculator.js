@@ -1514,6 +1514,7 @@ async function saveCalculatorDataToSupabase() {
         user_id: user.id,
         profile_name: 'My Property Loan',
         super_area: parseFloat(document.getElementById('superArea')?.value) || null,
+        carpet_area:parseFloat(document.getElementById('carpetArea')?.value) || null,
         price_per_sqft: parseFloat(document.getElementById('pricePerSqft')?.value) || null,
         loan_amount: parseFloat(document.getElementById('loanAmount')?.value) || null,
         interest_rate: parseFloat(document.getElementById('interestRate')?.value) || null,
@@ -1752,6 +1753,7 @@ async function loadCalculatorDataFromSupabase() {
     };
 
     setValue('superArea', profile.super_area);
+    setValue('carpetArea', profile.carpet_area);
     setValue('pricePerSqft', profile.price_per_sqft);
     setValue('loanAmount', profile.loan_amount);
     setValue('interestRate', profile.interest_rate);
