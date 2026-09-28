@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const pricePerSqft = document.getElementById('pricePerSqft');
     const basicCost = document.getElementById('basicCost');
     const loanAmountInput = document.getElementById('loanAmount');
-    const ltvRatioInput = document.getElementById('ltvRatio');
     const customMonthsInput = document.getElementById('customMoroMonths');
     const customRadio = document.querySelector('input[name="moroType"][value="custom"]');
     const fromInput = document.getElementById('fillStartMonth');
@@ -117,14 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(superArea && pricePerSqft) {
         [superArea, pricePerSqft].forEach(el => el.addEventListener('input', updateBasicCost));
     }
-
-    if(ltvRatioInput) {
-        ltvRatioInput.addEventListener('input', () => {
-            updateOverallLoanAmount();
-            runCalculation();
-        });
-    }
-
+    
     if(loanAmountInput) {
         loanAmountInput.addEventListener('input', () => {
             loanAmountInput.dataset.manual = 'true';
@@ -300,7 +292,7 @@ if (clearRangeBtn) {
 });
 // Cleaned up updateGSTRateAuto function
 function updateGSTRateAuto() {
-    const gstRateInput = document.getElementById('gstRate');
+    const gstRateInput = document.getElementById('gstRateInput');
     if (!gstRateInput) return;
     if (gstRateInput.dataset.manual === 'true') return;
 
@@ -431,11 +423,6 @@ function calculateTotalPropertyCost() {
         propertyCostInput.classList.add('pop-animation');
         setTimeout(() => propertyCostInput.classList.remove('pop-animation'), 300);
     }
-
-    if (typeof updateOverallLoanAmount === 'function') {
-        updateOverallLoanAmount();
-    }
-    
     return totalWithGST;
 }
 
@@ -757,9 +744,7 @@ function reindexLedgerRows() {
 }
 
 function runActualLedgerCalculation() {
-    if (typeof runCalculation === 'function') {
-        runCalculation();
-    }
+    console.count('LEDGER RUN');
     const rows = document.querySelectorAll('#transactionBody tr');
     if (rows.length === 0) return;
 
@@ -811,7 +796,7 @@ rows.forEach((row, index) => {
                 const currDateObj = new Date(dateInput);
                 const prevDateObj = new Date(previousDate);
                 const diffTime = currDateObj - prevDateObj;
-                days = Math.abs(Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24))));
+                days = Math.max(0,Math.ceil(diffTime /(1000 * 60 * 60 * 24)));
                 if (index === 1) days += 1;
             }
             interestAccrued = previousClosingBalance * (rateInput / 100) * (days / 365);
@@ -1530,7 +1515,6 @@ async function saveCalculatorDataToSupabase() {
         profile_name: 'My Property Loan',
         super_area: parseFloat(document.getElementById('superArea')?.value) || null,
         price_per_sqft: parseFloat(document.getElementById('pricePerSqft')?.value) || null,
-        ltv_ratio: parseFloat(document.getElementById('ltvRatio')?.value) || 80,
         loan_amount: parseFloat(document.getElementById('loanAmount')?.value) || null,
         interest_rate: parseFloat(document.getElementById('interestRate')?.value) || null,
         tenure_years: parseInt(document.getElementById('tenureYears')?.value) || null,
@@ -1769,7 +1753,6 @@ async function loadCalculatorDataFromSupabase() {
 
     setValue('superArea', profile.super_area);
     setValue('pricePerSqft', profile.price_per_sqft);
-    setValue('ltvRatio', profile.ltv_ratio);
     setValue('loanAmount', profile.loan_amount);
     setValue('interestRate', profile.interest_rate);
     setValue('tenureYears', profile.tenure_years);
