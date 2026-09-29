@@ -240,11 +240,6 @@ if (clearRangeBtn) {
             hasUnsavedChanges = true;
             const dot = document.getElementById('unsavedDot');
             if (dot) dot.style.display = 'block';
-            if (e.target.closest('#transactionBody')) {
-                if (typeof runActualLedgerCalculation === 'function') {
-                    runActualLedgerCalculation();
-                }
-            }
         }
     });
 
@@ -434,7 +429,7 @@ function updateBasicCost() {
     if(superArea && pricePerSqft && basicCost) {
         basicCost.value = (parseFloat(superArea.value) || 0) * (parseFloat(pricePerSqft.value) || 0);
     }
-    updateGSTRateAuto(); // <--- Add this here
+    updateGSTRateAuto();
     calculateTotalPropertyCost();
     runCalculation();
 }
@@ -579,7 +574,10 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
             const totalCost = getTotalPropertyCostValue();
             
             if (pct > 0 && totalCost > 0 && !loanAmtInput.dataset.manual) {
-                loanAmtInput.value = Math.round((pct / 100) * totalCost);
+                console.log('MILESTONE CALC',pct,totalCost,Math.round((pct / 100) * totalCost));
+                const newValue = Math.round((pct / 100) * totalCost);
+                console.trace('SETTING MILESTONE',pct,totalCost,newValue);
+                loanAmtInput.value = newValue;
             }
         }
     }
@@ -598,6 +596,7 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
     });
 
     loanAmtInput.addEventListener('input', () => {
+        console.trace('MILESTONE INPUT CHANGED TO',loanAmtInput.value);
         loanAmtInput.dataset.manual = 'true';
         runCalculation();
     });
@@ -1866,7 +1865,11 @@ async function loadCalculatorDataFromSupabase() {
 
     updateBasicCost();
     calculateTotalPropertyCost();
-    
+    document
+        .querySelectorAll('#milestoneBody .milestone-pct')
+        .forEach(el => {
+        el.dispatchEvent(new Event('input'));
+        });
     runCalculation();
     
     hideLoader();
