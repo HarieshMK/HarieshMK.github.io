@@ -222,7 +222,6 @@ if (clearRangeBtn) {
     }
 
     if (typeof handleMoratoriumUI === 'function') handleMoratoriumUI();
-    if (typeof updateBasicCost === 'function') updateBasicCost();
     if (typeof loadCalculatorDataFromSupabase === 'function') loadCalculatorDataFromSupabase();
 
     document.addEventListener('click', (e) => {
@@ -581,9 +580,6 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
             }
         }
     }
-
-    updateMilestoneLoanAmount();
-
     pctInput.addEventListener('input', () => {
         loanAmtInput.dataset.manual = ''; 
         updateMilestoneLoanAmount();
@@ -657,7 +653,6 @@ function toggleHistoryCollapse() {
                 row.classList.remove('row-minimized');
             }
         } else {
-            // Ensure the last two rows are always visible when collapsed
             row.classList.remove('row-minimized');
         }
     });
@@ -672,7 +667,7 @@ function toggleHistoryCollapse() {
     }
 }
 
-function addRow(date = '', transType = 'EMI payment', interestRate = '', amount = '') {
+function addRow(date = '',transType = 'EMI payment',interestRate = '',amount = '',skipCalculation = false) {
     const tableBody = document.getElementById('transactionBody');
     if (!tableBody) return;
     let finalRate = interestRate;
@@ -730,8 +725,9 @@ function addRow(date = '', transType = 'EMI payment', interestRate = '', amount 
         reindexLedgerRows();
         runActualLedgerCalculation();
     });
-
-    runActualLedgerCalculation();
+    if (!skipCalculation) {
+        runActualLedgerCalculation();
+    }
 }
 
 function reindexLedgerRows() {
@@ -1291,7 +1287,7 @@ function runCalculation() {
         }
         let stdStandardEmi = isPreEmi ? stdAccruedInterest : (window.baselineLockedEmi || stdAccruedInterest);
         let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
-        baselineInterestSum += stdAccruedInterest;
+        window.baselineInterestSum += stdAccruedInterest;
         stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
         runningStdPrincipal += stdPrincipalPaid;
         window.baselineCumulativePrincipal[monthIdx] = runningStdPrincipal;
@@ -1421,7 +1417,7 @@ function runCalculation() {
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
     
-    let interestSaved = Math.max(0, baselineInterestSum - totalInterestPaidSum);
+    let interestSaved = Math.max(0, window.baselineInterestSum - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
 
@@ -1858,8 +1854,8 @@ async function loadCalculatorDataFromSupabase() {
         if (tableBody) {
             tableBody.innerHTML = ''; 
             savedTransactions.forEach(t => {
-                addRow(t.trans_date, t.trans_type, t.interest_rate, t.amount);
-            });
+            addRow(t.trans_date,t.trans_type,t.interest_rate,t.amount,true);
+        });
         }
     }
 
@@ -1871,7 +1867,7 @@ async function loadCalculatorDataFromSupabase() {
         el.dispatchEvent(new Event('input'));
         });
     runCalculation();
-    
+    runActualLedgerCalculation();
     hideLoader();
     
     if (typeof saveStateToUndoStack === 'function') {
