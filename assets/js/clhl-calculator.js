@@ -906,6 +906,10 @@ rows.forEach((row, index) => {
     console.log("MONTHLY COMPARISON:",monthlyComparison);
     Object.entries(monthlyComparison).forEach(([month, data]) => {
     console.log(month,"MonthIdx:", data.monthIndex,"Planned:", Math.round(data.plannedEmi),"Actual:", Math.round(data.actualPaid),"Extra:", Math.round(data.extraPaid));});
+    let cumulativeExtraPrincipal = 0;
+    Object.values(monthlyComparison).forEach(item => {
+    cumulativeExtraPrincipal
+    console.log("CUMULATIVE EXTRA PRINCIPAL:",Math.round(cumulativeExtraPrincipal));
     console.groupEnd();
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
