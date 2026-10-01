@@ -1144,6 +1144,8 @@ function runCalculation() {
     window.currentReducedEmi = undefined;
     let runningStdPrincipal = 0;
     window.baselineCumulativePrincipal = {};
+    window.baselineMonthlyEmi = {};
+    window.baselineClosingBalance = {};
 
     function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
         let addedAmt = 0;
@@ -1285,13 +1287,15 @@ function runCalculation() {
                 window.baselineLockedEmi = stdOpeningBalance / Math.max(1, stdRemainingTenure);
             }
         }
-        let stdStandardEmi = isPreEmi ? stdAccruedInterest : (window.baselineLockedEmi || stdAccruedInterest);
-        let stdPrincipalPaid = Math.max(0, stdStandardEmi - stdAccruedInterest);
+        let stdStandardEmi = isPreEmi? stdAccruedInterest: (window.baselineLockedEmi || stdAccruedInterest);
+        let stdPrincipalPaid =Math.max(0, stdStandardEmi - stdAccruedInterest);
         window.baselineInterestSum += stdAccruedInterest;
-        stdOpeningBalance = Math.max(0, stdOpeningBalance - stdPrincipalPaid);
+        stdOpeningBalance =Math.max(0, stdOpeningBalance - stdPrincipalPaid);
         runningStdPrincipal += stdPrincipalPaid;
-        window.baselineCumulativePrincipal[monthIdx] = runningStdPrincipal;
-
+        window.baselineCumulativePrincipal[monthIdx] =runningStdPrincipal;
+        window.baselineMonthlyEmi[monthIdx] =stdStandardEmi;
+        window.baselineClosingBalance[monthIdx] =stdOpeningBalance;
+       
         let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
             userPlannedEmiVal = standardEmiForMonth; 
@@ -1406,6 +1410,11 @@ function runCalculation() {
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
+    console.group("SHADOW SCHEDULE CHECK");
+    console.log("BASELINE EMI MONTH 20",window.baselineMonthlyEmi?.[20]);
+    console.log("BASELINE BALANCE MONTH 20",window.baselineClosingBalance?.[20]);
+    console.log("BASELINE PRINCIPAL MONTH 20",window.baselineCumulativePrincipal?.[20]);
+    console.groupEnd();
     
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumInterestEl = document.getElementById('summaryTotalInterest');
