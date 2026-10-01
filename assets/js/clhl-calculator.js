@@ -844,6 +844,7 @@ rows.forEach((row, index) => {
 
     // --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
     let finalExpectedPrincipal = 0;
+    let currentLoanMonthIndex = 1;
     const emiStartDateVal = document.getElementById('emiStartDate')?.value;
     const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
     const loanStartDateVal = document.getElementById('loanStartDate')?.value;
@@ -860,6 +861,7 @@ rows.forEach((row, index) => {
             if (mIdx < 1) mIdx = 1;
             if (tDate.getDate() > emiDueDay) mIdx += 1;
             if (mIdx > totalMonths) mIdx = totalMonths;
+            currentLoanMonthIndex = mIdx;
             finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] 
                 || window.baselineCumulativePrincipal[mIdx.toString()] 
                 || (mIdx > 1 ? window.baselineCumulativePrincipal[mIdx - 1] : 0) 
@@ -886,14 +888,8 @@ rows.forEach((row, index) => {
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
-        let standardEmi = 0;
-        
-        // Find the most common or highest recent regular EMI amount
-        rows.forEach(r => {
-            const type = r.querySelector('.trans-type').value;
-            const amt = parseFloat(r.querySelector('.trans-amount').value) || 0;
-            if (type === 'EMI payment' && amt > standardEmi) standardEmi = amt;
-        });
+        let standardEmi =
+        window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
 
         const monthlyRate = latestInterestRate / 12 / 100;
         let monthInterestEstimation = finalClosingBalance * monthlyRate;
