@@ -902,9 +902,10 @@ rows.forEach((row, index) => {
     const shadow = window.shadowSchedule?.[monthIndex];
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
-    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid: Math.max(0, actualPaid - plannedEmi)};
-});
+    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid: Math.max(0, actualPaid - plannedEmi)};});
     console.log("MONTHLY COMPARISON:",monthlyComparison);
+    Object.entries(monthlyComparison).forEach(([month, data]) => {
+    console.log(month,"MonthIdx:", data.monthIndex,"Planned:", Math.round(data.plannedEmi),"Actual:", Math.round(data.actualPaid),"Extra:", Math.round(data.extraPaid));});
     console.groupEnd();
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
