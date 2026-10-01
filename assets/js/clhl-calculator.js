@@ -911,6 +911,7 @@ rows.forEach((row, index) => {
     cumulativeExtraPrincipal
     console.log("CUMULATIVE EXTRA PRINCIPAL:",Math.round(cumulativeExtraPrincipal));
     console.groupEnd();
+    }
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
     
