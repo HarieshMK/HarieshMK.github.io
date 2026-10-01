@@ -891,6 +891,20 @@ rows.forEach((row, index) => {
     console.log("5. totalPrincipalPaidSum:", totalPrincipalPaidSum);
     console.log("6. Raw math (totalPrincipalPaidSum - finalExpectedPrincipal):", totalPrincipalPaidSum - finalExpectedPrincipal);
     console.log("ACTUAL PAID BY MONTH:",actualPaidByMonth);
+    const monthlyComparison = {};
+    Object.entries(actualPaidByMonth).forEach(([monthKey, actualPaid]) => {
+    const [year, month] = monthKey.split('-');
+    const loanStartDate = document.getElementById('loanStartDate')?.value;
+    if (!loanStartDate) return;
+    const startDate = new Date(loanStartDate);
+    const currentDate = new Date(parseInt(year),parseInt(month) - 1,1);
+    let monthIndex =(currentDate.getFullYear() - startDate.getFullYear()) * 12+ (currentDate.getMonth() - startDate.getMonth())+ 1;
+    const shadow = window.shadowSchedule?.[monthIndex];
+    if (!shadow) return;
+    const plannedEmi = shadow.emi || 0;
+    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid: Math.max(0, actualPaid - plannedEmi)};
+});
+    console.log("MONTHLY COMPARISON:",monthlyComparison);
     console.groupEnd();
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
