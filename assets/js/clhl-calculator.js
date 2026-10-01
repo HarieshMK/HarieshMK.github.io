@@ -911,9 +911,7 @@ rows.forEach((row, index) => {
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     console.log("CUMULATIVE EXTRA PRINCIPAL:",Math.round(cumulativeExtraPrincipal));
     console.groupEnd();
-
-    totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
-    
+    totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
@@ -942,6 +940,22 @@ rows.forEach((row, index) => {
                 simBalance -= principalReduction;
                 mCount++;
             }
+            let shadowProjectionMonths = 0;
+            let shadowBalance =Math.max(0,finalClosingBalance - cumulativeExtraPrincipal);
+            console.log("Shadow Projection Start Balance:",Math.round(shadowBalance));
+            for (let futureMonth = currentLoanMonthIndex + 1;futureMonth <= totalMonths;futureMonth++) {
+                const shadow =window.shadowSchedule?.[futureMonth];
+                if (!shadow) continue;
+                shadowBalance +=(shadow.disbursement || 0);
+                shadowBalance -=(shadow.principal || 0);
+                shadowProjectionMonths++;
+                if (shadowBalance <= 0) {
+                    console.log("Shadow Schedule Loan Closure Month:",futureMonth);
+                    break;
+                }
+            
+            }
+            console.log("Shadow Projection Months:",shadowProjectionMonths);
             if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
             console.log("Projected Months Needed:",projectedMonthsNeeded);
             console.groupEnd();
@@ -985,10 +999,6 @@ rows.forEach((row, index) => {
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
-    
-    // Global lock trackers scoped locally to the calculation run
-    let lockedFullEmi = 0;
-    let fullEmiLockedMonth = null;
     
     // --- 1. GATHER ALL INPUTS FOR VALIDATION ---
     let missingErrors = [];
