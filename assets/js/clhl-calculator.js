@@ -740,6 +740,7 @@ function reindexLedgerRows() {
 
 function runActualLedgerCalculation() {
     console.count('LEDGER RUN');
+    console.log(actualPaidByMonth);
     const rows = document.querySelectorAll('#transactionBody tr');
     if (rows.length === 0) return;
 
