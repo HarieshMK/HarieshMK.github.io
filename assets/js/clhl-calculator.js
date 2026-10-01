@@ -1142,6 +1142,7 @@ function runCalculation() {
     window.baselineCumulativePrincipal = {};
     window.baselineMonthlyEmi = {};
     window.baselineClosingBalance = {};
+    window.shadowSchedule = {};
 
     function getMilestoneDisbursementForMonthIndex(targetMonthIdx) {
         let addedAmt = 0;
@@ -1291,6 +1292,16 @@ function runCalculation() {
         window.baselineCumulativePrincipal[monthIdx] =runningStdPrincipal;
         window.baselineMonthlyEmi[monthIdx] =stdStandardEmi;
         window.baselineClosingBalance[monthIdx] =stdOpeningBalance;
+        if (!window.shadowSchedule) {window.shadowSchedule = {};}
+        window.shadowSchedule[monthIdx] = {
+            monthIdx,
+            emi: stdStandardEmi,
+            interest: stdAccruedInterest,
+            principal: stdPrincipalPaid,
+            disbursement: stdDisbursement,
+            closingBalance: stdOpeningBalance,
+            isPreEmi
+        };
        
         let userPlannedEmiVal;
         if (window.forceDefaultEmis) {
@@ -1407,9 +1418,7 @@ function runCalculation() {
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }
     console.group("SHADOW SCHEDULE CHECK");
-    console.log("BASELINE EMI MONTH 20",window.baselineMonthlyEmi?.[20]);
-    console.log("BASELINE BALANCE MONTH 20",window.baselineClosingBalance?.[20]);
-    console.log("BASELINE PRINCIPAL MONTH 20",window.baselineCumulativePrincipal?.[20]);
+    console.log("MONTH 20 SHADOW",window.shadowSchedule?.[20]);
     console.groupEnd();
     
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
