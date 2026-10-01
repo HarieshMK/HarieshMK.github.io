@@ -917,6 +917,9 @@ rows.forEach((row, index) => {
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
+        console.group("FUTURE PROJECTION");
+        console.log("Current Actual Balance:",Math.round(finalClosingBalance));
+        console.log("Cumulative Extra Principal:",Math.round(cumulativeExtraPrincipal));
         let standardEmi =
         window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
 
@@ -929,7 +932,8 @@ rows.forEach((row, index) => {
         }
 
         if (standardEmi > 0 && monthlyRate > 0) {
-            let simBalance = finalClosingBalance;
+            let simBalance =Math.max(0,finalClosingBalance - cumulativeExtraPrincipal);
+            console.log("Starting Projection Balance:",Math.round(simBalance));
             let mCount = 0;
             while (simBalance > 0 && mCount < 600) {
                 const monthInterest = simBalance * monthlyRate;
@@ -939,6 +943,8 @@ rows.forEach((row, index) => {
                 mCount++;
             }
             if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
+            console.log("Projected Months Needed:",projectedMonthsNeeded);
+            console.groupEnd();
         }
     }
 
