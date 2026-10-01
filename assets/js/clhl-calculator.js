@@ -752,6 +752,7 @@ function runActualLedgerCalculation() {
     let latestInterestRate = 8.5;
     let lastValidDateStr = null;
     let accruedInterestSinceLastEMI = 0;
+    const actualPaidByMonth = {};
 
 rows.forEach((row, index) => {
     const dateInput = row.querySelector('.trans-date').value;
@@ -817,6 +818,14 @@ rows.forEach((row, index) => {
         if (typeSelect === 'EMI payment') {
             totalPrincipalPaidSum += principalPaid;
             totalInterestPaidSum += interestPaid;
+            if (dateInput) {
+                const dt = new Date(dateInput);
+                const monthKey =
+                    `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+                actualPaidByMonth[monthKey] =
+                    (actualPaidByMonth[monthKey] || 0)
+                    + amountInput;
+            }
         }
         if (rateInput > 0) latestInterestRate = rateInput;
         if (dateInput) {
@@ -881,6 +890,7 @@ rows.forEach((row, index) => {
     console.log("4. computed finalExpectedPrincipal:", finalExpectedPrincipal);
     console.log("5. totalPrincipalPaidSum:", totalPrincipalPaidSum);
     console.log("6. Raw math (totalPrincipalPaidSum - finalExpectedPrincipal):", totalPrincipalPaidSum - finalExpectedPrincipal);
+    console.log("ACTUAL PAID BY MONTH:",actualPaidByMonth);
     console.groupEnd();
 
     totalExtraPaidSum = Math.max(0, totalPrincipalPaidSum - finalExpectedPrincipal);
