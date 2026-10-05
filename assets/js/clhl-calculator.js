@@ -883,14 +883,7 @@ rows.forEach((row, index) => {
         finalExpectedPrincipal = 0;
     }
     // --- INSERT DEBUG BLOCK HERE ---
-    console.group("🛠️ LEDGER DEBUG AUDIT");
-    console.log("1. lastValidDateStr:", lastValidDateStr);
-    console.log("2. loanStartDateVal:", loanStartDateVal);
-    console.log("3. window.baselineCumulativePrincipal exists?", !!window.baselineCumulativePrincipal);
-    console.log("4. computed finalExpectedPrincipal:", finalExpectedPrincipal);
-    console.log("5. totalPrincipalPaidSum:", totalPrincipalPaidSum);
-    console.log("6. Raw math (totalPrincipalPaidSum - finalExpectedPrincipal):", totalPrincipalPaidSum - finalExpectedPrincipal);
-    console.log("ACTUAL PAID BY MONTH:",actualPaidByMonth);
+
     const monthlyComparison = {};
     Object.entries(actualPaidByMonth).forEach(([monthKey, actualPaid]) => {
     const [year, month] = monthKey.split('-');
@@ -903,14 +896,9 @@ rows.forEach((row, index) => {
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
     monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid: Math.max(0, actualPaid - plannedEmi)};});
-    console.log("MONTHLY COMPARISON:",monthlyComparison);
-    Object.entries(monthlyComparison).forEach(([month, data]) => {
-    console.log(month,"MonthIdx:", data.monthIndex,"Planned:", Math.round(data.plannedEmi),"Actual:", Math.round(data.actualPaid),"Extra:", Math.round(data.extraPaid));});
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => {cumulativeExtraPrincipal += item.extraPaid;});
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
-    console.log("CUMULATIVE EXTRA PRINCIPAL:",Math.round(cumulativeExtraPrincipal));
-    console.groupEnd();
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
@@ -1462,11 +1450,7 @@ function runCalculation() {
 
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         auditLoanMath(rowsArray, initialLoan, annualRate);
-    }
-    console.group("SHADOW SCHEDULE CHECK");
-    console.log("MONTH 20 SHADOW",window.shadowSchedule?.[20]);
-    console.groupEnd();
-    
+    }    
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumInterestEl = document.getElementById('summaryTotalInterest');
     const sumExtraEl = document.getElementById('summaryExtraPaid');
