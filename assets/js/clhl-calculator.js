@@ -918,8 +918,8 @@ rows.forEach((row, index) => {
         console.group("FUTURE PROJECTION");
         console.log("Current Actual Balance:",Math.round(finalClosingBalance));
         console.log("Cumulative Extra Principal:",Math.round(cumulativeExtraPrincipal));
-        let standardEmi =
-        window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
+        console.log("Projection EMI used:",Math.round(standardEmi));
+        let standardEmi = window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
 
         const monthlyRate = latestInterestRate / 12 / 100;
         let monthInterestEstimation = finalClosingBalance * monthlyRate;
@@ -930,7 +930,7 @@ rows.forEach((row, index) => {
         }
 
         if (standardEmi > 0 && monthlyRate > 0) {
-            let simBalance =Math.max(0,finalClosingBalance - cumulativeExtraPrincipal);
+            let simBalance = finalClosingBalance;
             console.log("Starting Projection Balance:",Math.round(simBalance));
             let mCount = 0;
             while (simBalance > 0 && mCount < 600) {
@@ -941,9 +941,10 @@ rows.forEach((row, index) => {
                 mCount++;
             }
             let shadowProjectionMonths = 0;
-            let shadowBalance =Math.max(0,finalClosingBalance - cumulativeExtraPrincipal);
+            let shadowBalance = finalClosingBalance;
             console.log("Shadow Projection Start Balance:",Math.round(shadowBalance));
             for (let futureMonth = currentLoanMonthIndex + 1;futureMonth <= totalMonths;futureMonth++) {
+                console.log("FUTURE",futureMonth,"Opening:",Math.round(shadowBalance),"Disb:",Math.round(shadow.disbursement || 0),"Principal:",Math.round(shadow.principal || 0));
                 const shadow =window.shadowSchedule?.[futureMonth];
                 if (!shadow) continue;
                 shadowBalance +=(shadow.disbursement || 0);
