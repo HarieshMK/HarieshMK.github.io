@@ -918,7 +918,8 @@ rows.forEach((row, index) => {
         console.group("FUTURE PROJECTION");
         console.log("Current Actual Balance:",Math.round(finalClosingBalance));
         console.log("Cumulative Extra Principal:",Math.round(cumulativeExtraPrincipal));
-        let standardEmi = window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
+        console.log("Current Loan Month Index:",currentLoanMonthIndex);
+        let standardEmi = window.baselineMonthlyEmi?.[20] || 0;
         console.log("Projection EMI used:",Math.round(standardEmi));
 
         const monthlyRate = latestInterestRate / 12 / 100;
