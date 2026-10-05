@@ -944,20 +944,17 @@ rows.forEach((row, index) => {
             let shadowBalance = finalClosingBalance;
             console.log("Shadow Projection Start Balance:",Math.round(shadowBalance));
             for (let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++) {
-                const shadow = window.shadowSchedule?.[futureMonth];
-                if (!shadow) continue;
-                console.log("FUTURE",futureMonth,"Opening:",Math.round(shadowBalance),"Disb:",Math.round(shadow.disbursement || 0),"Principal:",Math.round(shadow.principal || 0));
-                const shadow =window.shadowSchedule?.[futureMonth];
-                if (!shadow) continue;
-                shadowBalance +=(shadow.disbursement || 0);
-                shadowBalance -=(shadow.principal || 0);
-                shadowProjectionMonths++;
-                if (shadowBalance <= 0) {
-                    console.log("Shadow Schedule Loan Closure Month:",futureMonth);
-                    break;
-                }
-            
+
+            const shadow = window.shadowSchedule?.[futureMonth];
+            if (!shadow) continue;
+            console.log("FUTURE",futureMonth,"Opening:",Math.round(shadowBalance),"Disb:",Math.round(shadow.disbursement || 0),"Principal:",Math.round(shadow.principal || 0));
+            shadowBalance += (shadow.disbursement || 0);
+            shadowBalance -= (shadow.principal || 0);
+            shadowProjectionMonths++;
+            if (shadowBalance <= 0) {console.log("Shadow Schedule Loan Closure Month:",futureMonth);
+                break;
             }
+        }
             console.log("Shadow Projection Months:",shadowProjectionMonths);
             if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
             console.log("Projected Months Needed:",projectedMonthsNeeded);
