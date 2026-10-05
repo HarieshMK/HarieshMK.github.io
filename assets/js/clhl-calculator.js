@@ -943,7 +943,9 @@ rows.forEach((row, index) => {
             let shadowProjectionMonths = 0;
             let shadowBalance = finalClosingBalance;
             console.log("Shadow Projection Start Balance:",Math.round(shadowBalance));
-            for (let futureMonth = currentLoanMonthIndex + 1;futureMonth <= totalMonths;futureMonth++) {
+            for (let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++) {
+                const shadow = window.shadowSchedule?.[futureMonth];
+                if (!shadow) continue;
                 console.log("FUTURE",futureMonth,"Opening:",Math.round(shadowBalance),"Disb:",Math.round(shadow.disbursement || 0),"Principal:",Math.round(shadow.principal || 0));
                 const shadow =window.shadowSchedule?.[futureMonth];
                 if (!shadow) continue;
