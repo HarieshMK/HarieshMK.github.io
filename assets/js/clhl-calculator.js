@@ -800,6 +800,7 @@ rows.forEach((row, index) => {
             interestPaid = Math.min(amountInput,accruedInterestSinceLastEMI );
             principalPaid = Math.max(0,amountInput - interestPaid);
             accruedInterestSinceLastEMI = Math.max(0,accruedInterestSinceLastEMI - interestPaid);
+                console.log({amountInput,interestPaid,principalPaid,currentLoanMonthIndex});
         }
         else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
             closingBalance = previousClosingBalance + amountInput;
