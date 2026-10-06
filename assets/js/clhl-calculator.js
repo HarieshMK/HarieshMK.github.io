@@ -573,9 +573,7 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
             const totalCost = getTotalPropertyCostValue();
             
             if (pct > 0 && totalCost > 0 && !loanAmtInput.dataset.manual) {
-                console.log('MILESTONE CALC',pct,totalCost,Math.round((pct / 100) * totalCost));
                 const newValue = Math.round((pct / 100) * totalCost);
-                console.trace('SETTING MILESTONE',pct,totalCost,newValue);
                 loanAmtInput.value = newValue;
             }
         }
@@ -592,7 +590,6 @@ function createMilestoneRow(name = '', date = '', pct = '', loanAmt = '', isPart
     });
 
     loanAmtInput.addEventListener('input', () => {
-        console.trace('MILESTONE INPUT CHANGED TO',loanAmtInput.value);
         loanAmtInput.dataset.manual = 'true';
         runCalculation();
     });
@@ -852,38 +849,24 @@ rows.forEach((row, index) => {
     });
 
     // --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
-    let finalExpectedPrincipal = 0;
     let currentLoanMonthIndex = 1;
     const emiStartDateVal = document.getElementById('emiStartDate')?.value;
     const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
     const loanStartDateVal = document.getElementById('loanStartDate')?.value;
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
     const totalMonths = tenureYears * 12;
-
-    if (lastValidDateStr && loanStartDateVal && window.baselineCumulativePrincipal) {
-        const tDate = new Date(lastValidDateStr);
-        if (!isNaN(tDate.getTime())) {
-            const lStart = new Date(loanStartDateVal);
-            let yearDiff = tDate.getFullYear() - lStart.getFullYear();
-            let monthDiff = tDate.getMonth() - lStart.getMonth();
-            let mIdx = (yearDiff * 12) + monthDiff + 1;
-            if (mIdx < 1) mIdx = 1;
-            if (tDate.getDate() > emiDueDay) mIdx += 1;
-            if (mIdx > totalMonths) mIdx = totalMonths;
-            currentLoanMonthIndex = mIdx;
-            finalExpectedPrincipal = window.baselineCumulativePrincipal[mIdx] 
-                || window.baselineCumulativePrincipal[mIdx.toString()] 
-                || (mIdx > 1 ? window.baselineCumulativePrincipal[mIdx - 1] : 0) 
-                || 0;
-        }
-    }
-
-    // Ultimate safeguard: never let finalExpectedPrincipal be anything other than a safe number
-    if (isNaN(finalExpectedPrincipal) || finalExpectedPrincipal === undefined) {
-        finalExpectedPrincipal = 0;
+    if (lastValidDateStr && loanStartDateVal) {
+    const tDate = new Date(lastValidDateStr);
+    const lStart = new Date(loanStartDateVal);
+    let yearDiff =tDate.getFullYear() - lStart.getFullYear();
+    let monthDiff =tDate.getMonth() - lStart.getMonth();
+    let mIdx =(yearDiff * 12) + monthDiff + 1;
+    if (mIdx < 1) mIdx = 1;
+    if (tDate.getDate() > emiDueDay) mIdx++;
+    if (mIdx > totalMonths) mIdx = totalMonths;
+    currentLoanMonthIndex = mIdx;
     }
     // --- INSERT DEBUG BLOCK HERE ---
-
     const monthlyComparison = {};
     Object.entries(actualPaidByMonth).forEach(([monthKey, actualPaid]) => {
     const [year, month] = monthKey.split('-');
@@ -903,13 +886,7 @@ rows.forEach((row, index) => {
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
     if (finalClosingBalance > 0) {
-        console.group("FUTURE PROJECTION");
-        console.log("Current Actual Balance:",Math.round(finalClosingBalance));
-        console.log("Cumulative Extra Principal:",Math.round(cumulativeExtraPrincipal));
-        console.log("Current Loan Month Index:",currentLoanMonthIndex);
-        let standardEmi = window.baselineMonthlyEmi?.[20] || 0;
-        console.log("Projection EMI used:",Math.round(standardEmi));
-
+        let standardEmi = window.baselineMonthlyEmi?.[currentLoanMonthIndex + 1] || window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
         const monthlyRate = latestInterestRate / 12 / 100;
         let monthInterestEstimation = finalClosingBalance * monthlyRate;
 
@@ -920,7 +897,6 @@ rows.forEach((row, index) => {
 
         if (standardEmi > 0 && monthlyRate > 0) {
             let simBalance = finalClosingBalance;
-            console.log("Starting Projection Balance:",Math.round(simBalance));
             let mCount = 0;
             while (simBalance > 0 && mCount < 600) {
                 const monthInterest = simBalance * monthlyRate;
@@ -929,25 +905,19 @@ rows.forEach((row, index) => {
                 simBalance -= principalReduction;
                 mCount++;
             }
-            let shadowProjectionMonths = 0;
             let shadowBalance = finalClosingBalance;
-            console.log("Shadow Projection Start Balance:",Math.round(shadowBalance));
             for (let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++) {
 
             const shadow = window.shadowSchedule?.[futureMonth];
             if (!shadow) continue;
-            console.log("FUTURE",futureMonth,"Opening:",Math.round(shadowBalance),"Disb:",Math.round(shadow.disbursement || 0),"Principal:",Math.round(shadow.principal || 0));
             shadowBalance += (shadow.disbursement || 0);
             shadowBalance -= (shadow.principal || 0);
-            shadowProjectionMonths++;
             if (shadowBalance <= 0) {console.log("Shadow Schedule Loan Closure Month:",futureMonth);
                 break;
             }
         }
-            console.log("Shadow Projection Months:",shadowProjectionMonths);
             if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
             console.log("Projected Months Needed:",projectedMonthsNeeded);
-            console.groupEnd();
         }
     }
 
