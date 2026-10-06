@@ -885,41 +885,22 @@ rows.forEach((row, index) => {
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let projectedMonthsNeeded = 0;
-    if (finalClosingBalance > 0) {
-        let standardEmi = window.baselineMonthlyEmi?.[currentLoanMonthIndex + 1] || window.baselineMonthlyEmi?.[currentLoanMonthIndex] || 0;
-        const monthlyRate = latestInterestRate / 12 / 100;
-        let monthInterestEstimation = finalClosingBalance * monthlyRate;
-
-        // Auto-correct if standard EMI is below monthly interest so the loop never breaks
-        if (standardEmi <= monthInterestEstimation) {
-            standardEmi = monthInterestEstimation + 1000; 
-        }
-
-        if (standardEmi > 0 && monthlyRate > 0) {
-            let simBalance = finalClosingBalance;
-            let mCount = 0;
-            while (simBalance > 0 && mCount < 600) {
-                const monthInterest = simBalance * monthlyRate;
-                let principalReduction = standardEmi - monthInterest;
-                if (principalReduction <= 0) principalReduction = 500;
-                simBalance -= principalReduction;
-                mCount++;
-            }
-            let shadowBalance = finalClosingBalance;
-            for (let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++) {
-
-            const shadow = window.shadowSchedule?.[futureMonth];
-            if (!shadow) continue;
-            shadowBalance += (shadow.disbursement || 0);
-            shadowBalance -= (shadow.principal || 0);
-            if (shadowBalance <= 0) {console.log("Shadow Schedule Loan Closure Month:",futureMonth);
-                break;
-            }
-        }
-            if (mCount > 0 && mCount < 600) projectedMonthsNeeded = mCount;
-            console.log("Projected Months Needed:",projectedMonthsNeeded);
+    let shadowProjectionMonths = 0;
+    console.log("Current Loan Month Index:", currentLoanMonthIndex);
+    console.log("Actual Closing Balance:",finalClosingBalance);
+    console.log("Shadow Month Closing Balance:",window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance);
+    let shadowBalance = finalClosingBalance;
+    for (let futureMonth = currentLoanMonthIndex + 1;futureMonth <= totalMonths;futureMonth++) {
+        const shadow =window.shadowSchedule?.[futureMonth];
+        if (!shadow) continue;
+        shadowBalance += (shadow.disbursement || 0);
+        shadowBalance -= (shadow.principal || 0);
+        if (shadowBalance <= 0) {shadowProjectionMonths =futureMonth - currentLoanMonthIndex;
+            break;
         }
     }
+    if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
+
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
