@@ -800,7 +800,7 @@ rows.forEach((row, index) => {
             interestPaid = Math.min(amountInput,accruedInterestSinceLastEMI );
             principalPaid = Math.max(0,amountInput - interestPaid);
             accruedInterestSinceLastEMI = Math.max(0,accruedInterestSinceLastEMI - interestPaid);
-                console.log({amountInput,interestPaid,principalPaid,currentLoanMonthIndex});
+                console.log({amountInput,interestPaid,principalPaid,dateInput});
         }
         else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
             closingBalance = previousClosingBalance + amountInput;
@@ -912,6 +912,9 @@ rows.forEach((row, index) => {
     const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
+    console.log("Ledger Principal Paid Sum:",totalPrincipalPaidSum);
+    console.log("Ledger Extra Paid Sum:",totalExtraPaidSum);
+    console.log("Current Loan Month Index:",currentLoanMonthIndex);
     if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
