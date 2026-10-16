@@ -1404,6 +1404,8 @@ function runCalculation() {
     const isLoaderHidden = !loaderEl || loaderEl.style.display === 'none';
 
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
+        console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
+        console.log("Total Loan Amount From Milestones:",milestones.filter(m => m.isPartOfLoan).reduce((sum, m) => sum + (m.loanAmount || 0),0));
         auditLoanMath(rowsArray, initialLoan, annualRate);
     }    
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
