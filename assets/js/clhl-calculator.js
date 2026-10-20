@@ -749,6 +749,7 @@ function runActualLedgerCalculation() {
     let lastValidDateStr = null;
     let accruedInterestSinceLastEMI = 0;
     const actualPaidByMonth = {};
+    const monthlyLedgerPrincipal = {};
 
 rows.forEach((row, index) => {
     const dateInput = row.querySelector('.trans-date').value;
@@ -817,12 +818,9 @@ rows.forEach((row, index) => {
             totalInterestPaidSum += interestPaid;
             if (dateInput) {
                 const dt = new Date(dateInput);
-                const monthKey =
-                    `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
-                actualPaidByMonth[monthKey] =
-                    (actualPaidByMonth[monthKey] || 0)
-                    + amountInput;
-            }
+                const monthKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+                actualPaidByMonth[monthKey] = (actualPaidByMonth[monthKey] || 0) + amountInput;
+                monthlyLedgerPrincipal[monthKey] = (monthlyLedgerPrincipal[monthKey] || 0) + principalPaid; }
         }
         if (rateInput > 0) latestInterestRate = rateInput;
         if (dateInput) {
@@ -889,30 +887,29 @@ rows.forEach((row, index) => {
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
    let extraPaid = 0;
-    if (monthIndex <= moratoriumMonths) {extraPaid = actualPaid - (shadow.interest || 0);
+    if (monthIndex <= moratoriumMonths) {extraPaid = monthlyLedgerPrincipal[monthKey] || 0;
     } else {extraPaid = actualPaid -(shadow.emi || 0);}
     extraPaid = Math.max(0, extraPaid);
     monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid};
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
-    let adjustedShadowBalance = finalClosingBalance;
-    for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
-        const shadow = window.shadowSchedule?.[futureMonth];
-        if (!shadow) continue;
-        const interest = adjustedShadowBalance * (latestInterestRate / 100) / 12;
-        adjustedShadowBalance += (shadow.disbursement || 0);
-        adjustedShadowBalance += interest;
-        adjustedShadowBalance -= (shadow.emi || 0);
-        if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
-    }
-    if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}});
     let cumulativeExtraPrincipal = 0;
-    Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });   
+    Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
+           let adjustedShadowBalance = finalClosingBalance;
+            for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
+            const shadow = window.shadowSchedule?.[futureMonth];
+            if (!shadow) continue;
+            const interest = adjustedShadowBalance * (latestInterestRate / 100) / 12;
+            adjustedShadowBalance += (shadow.disbursement || 0);
+            adjustedShadowBalance += interest;
+            adjustedShadowBalance -= (shadow.emi || 0);
+            if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
+    }
+    if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
     console.log("Current Loan Month Index:", currentLoanMonthIndex);
     console.log("Actual Closing Balance:",finalClosingBalance);
     console.log("Shadow Month Closing Balance:",window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance);
-    let adjustedShadowBalance = finalClosingBalance;
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
