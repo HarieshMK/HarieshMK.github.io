@@ -1421,7 +1421,7 @@ function runCalculation() {
     console.log("rowsArray.length =", rowsArray.length);
     console.log("initialLoan =", totalLoanAmount);
     console.log("isLoaderHidden =", isLoaderHidden);
-    if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
+    if (rowsArray.length > 0 && totalLoanAmount > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
         console.log("Total Loan Amount From Milestones:",milestones.filter(m => m.isPartOfLoan).reduce((sum, m) => sum + (m.loanAmount || 0),0));
         auditLoanMath(rowsArray, totalLoanAmount, annualRate);
