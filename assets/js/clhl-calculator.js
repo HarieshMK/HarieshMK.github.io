@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[name="partPaymentStrategy"]').forEach(radio => {
         radio.addEventListener('change', () => {
             showLoadingOverlay("Recalculating schedule...");
-    
             // Reset tracking states
             lockedFullEmi = 0;
             fullEmiLockedMonth = null;
