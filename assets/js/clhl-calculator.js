@@ -886,6 +886,7 @@ rows.forEach((row, index) => {
     const currentDate = new Date(parseInt(year),parseInt(month) - 1,1);
     let monthIndex =(currentDate.getFullYear() - startDate.getFullYear()) * 12+ (currentDate.getMonth() - startDate.getMonth())+ 1;
     const shadow = window.shadowSchedule?.[monthIndex];
+        console.log("MONTH MAP",monthKey,"=>",monthIndex,shadow?.closingBalance);
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
    let extraPaid = 0;
