@@ -851,6 +851,13 @@ rows.forEach((row, index) => {
 
     // --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
     let currentLoanMonthIndex = 1;
+    const moroTypeChecked =document.querySelector('input[name="moroType"]:checked');
+    const customMoroMonthsVal =document.getElementById('customMoroMonths')?.value;
+    let moratoriumMonths = 18;
+    if (moroTypeChecked) {
+    if (moroTypeChecked.value === 'custom') {moratoriumMonths =parseInt(customMoroMonthsVal) || 0;
+    } else if (moroTypeChecked.value === 'milestone') {
+    } else { moratoriumMonths =parseInt(moroTypeChecked.value) || 18;}}
     const emiStartDateVal = document.getElementById('emiStartDate')?.value;
     const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
     const loanStartDateVal = document.getElementById('loanStartDate')?.value;
@@ -868,6 +875,8 @@ rows.forEach((row, index) => {
     currentLoanMonthIndex = mIdx;
     }
     // --- INSERT DEBUG BLOCK HERE ---
+    let projectedMonthsNeeded = 0;
+    let shadowProjectionMonths = 0;
     const monthlyComparison = {};
     Object.entries(actualPaidByMonth).forEach(([monthKey, actualPaid]) => {
     const [year, month] = monthKey.split('-');
@@ -879,14 +888,16 @@ rows.forEach((row, index) => {
     const shadow = window.shadowSchedule?.[monthIndex];
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
-    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid: Math.max(0, actualPaid - plannedEmi)};});
+   let extraPaid = 0;
+    if (monthIndex <= moratoriumMonths) {extraPaid = actualPaid - (shadow.interest || 0);
+    } else {extraPaid = actualPaid -(shadow.emi || 0);}
+    extraPaid = Math.max(0, extraPaid);
+    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid};
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => {cumulativeExtraPrincipal += item.extraPaid;});
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
-    let projectedMonthsNeeded = 0;
-    let shadowProjectionMonths = 0;
     console.log("Current Loan Month Index:", currentLoanMonthIndex);
     console.log("Actual Closing Balance:",finalClosingBalance);
     console.log("Shadow Month Closing Balance:",window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance);
@@ -900,7 +911,7 @@ rows.forEach((row, index) => {
             break;
         }
     }
-    if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
+    if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}});
 
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
@@ -1400,17 +1411,20 @@ function runCalculation() {
         closingBalance: parseFloat(r.querySelector('.closing-balance-cell')?.innerText.replace(/[₹,]/g, '')) || 0
     }));
 
-    const initialLoan = cumulativeLoanAmt;
+    const totalLoanAmount =
+    milestones
+        .filter(m => m.isPartOfLoan)
+        .reduce((sum, m) => sum + (m.loanAmount || 0),0);
     const loaderEl = document.getElementById('appLoader');
     const isLoaderHidden = !loaderEl || loaderEl.style.display === 'none';
 
     console.log("rowsArray.length =", rowsArray.length);
-    console.log("initialLoan =", initialLoan);
+    console.log("initialLoan =", totalLoanAmount);
     console.log("isLoaderHidden =", isLoaderHidden);
     if (rowsArray.length > 0 && initialLoan > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
         console.log("Total Loan Amount From Milestones:",milestones.filter(m => m.isPartOfLoan).reduce((sum, m) => sum + (m.loanAmount || 0),0));
-        auditLoanMath(rowsArray, initialLoan, annualRate);
+        auditLoanMath(rowsArray, totalLoanAmount, annualRate);
     }    
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumInterestEl = document.getElementById('summaryTotalInterest');
