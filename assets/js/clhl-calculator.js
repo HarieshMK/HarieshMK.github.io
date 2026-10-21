@@ -1098,8 +1098,25 @@ function runCalculation() {
     }
 
     const interestEl = document.getElementById('interestRate');
-    const annualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
-    const monthlyRate = annualRate / 12 / 100;
+    const defaultAnnualRate = interestEl ? parseFloat(interestEl.value) || 0 : 0;
+    function getInterestRateForMonth(monthIdx) {
+        let effectiveRate = defaultAnnualRate;
+        const loanStartDate = document.getElementById('loanStartDate')?.value;
+        if (!loanStartDate) { return effectiveRate;}
+        const loanStart = new Date(loanStartDate);
+        document.querySelectorAll('#transactionBody tr').forEach(row => {
+            const transType = row.querySelector('.trans-type')?.value;
+            if (transType !== 'Rate Change') {return;}
+            const rate = parseFloat( row.querySelector('.trans-rate')?.value );
+            const dateStr = row.querySelector('.trans-date')?.value;
+            if (!dateStr || isNaN(rate)) { return; }
+            const changeDate = new Date(dateStr);
+            let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
+            changeMonthIndex++;
+            if (monthIdx >= changeMonthIndex) { effectiveRate = rate;}
+        });
+        return effectiveRate;
+    }
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
     const totalMonths = tenureYears * 12;
 
@@ -1163,8 +1180,9 @@ function runCalculation() {
     let stdOpeningBalance = 0;
     let loanClosureMonthIndex = null;
     let previousClosingBalance = 0;
-
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
+        const annualRate = getInterestRateForMonth(monthIdx);
+        const monthlyRate = annualRate / 12 / 100;
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
         const formattedDate = `${monthName} '${yearShort}`; 
@@ -1298,8 +1316,8 @@ function runCalculation() {
 
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
-        row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);">(${isPreEmi ? 'Pre-EMI' : 'Full EMI'})</span>`;
-        
+        row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);"> (${isPreEmi ? 'Pre-EMI' : 'Full EMI'} | ${annualRate.toFixed(2)}%) </span>`;
+       
         if (document.activeElement !== inputEl) {
             if (userPlannedEmiVal === "" || isNaN(userPlannedEmiVal)) {
                 inputEl.value = "";
@@ -1406,7 +1424,7 @@ function runCalculation() {
     if (rowsArray.length > 0 && totalLoanAmount > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
         console.log("Total Loan Amount From Milestones:",milestones.filter(m => m.isPartOfLoan).reduce((sum, m) => sum + (m.loanAmount || 0),0));
-        auditLoanMath(rowsArray, totalLoanAmount, annualRate);
+        auditLoanMath(rowsArray, totalLoanAmount, defaultAnnualRate);
     }    
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumInterestEl = document.getElementById('summaryTotalInterest');
