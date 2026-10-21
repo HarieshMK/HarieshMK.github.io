@@ -740,6 +740,7 @@ function addRow(date = '',transType = 'EMI payment',interestRate = '',amount = '
         row.remove();
         reindexLedgerRows();
         runActualLedgerCalculation();
+        runCalculation();
     });
     if (!skipCalculation) {
         runActualLedgerCalculation();
