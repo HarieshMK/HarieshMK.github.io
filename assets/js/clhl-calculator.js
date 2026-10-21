@@ -1118,8 +1118,9 @@ function runCalculation() {
             const dateStr = row.querySelector('.trans-date')?.value;
             if (!dateStr || isNaN(rate)) { return; }
             const changeDate = new Date(dateStr);
-            let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
-            changeMonthIndex++;
+        let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
+        const changeDay = changeDate.getDate();
+        if (changeDay > emiDueDay) { changeMonthIndex++; }
             if (monthIdx >= changeMonthIndex) {
             console.log( '[RATE APPLIED]', 'Planner Month:', monthIdx, 'Change Month:', changeMonthIndex, 'New Rate:', rate,'Date:', dateStr); 
             effectiveRate = rate;
