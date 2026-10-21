@@ -16,11 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
             lockedFullEmi = 0;
             fullEmiLockedMonth = null;
             window.baselineLockedEmi = undefined;
-            
-            if (radio.value === 'emi') {
-                window.loadedPlannedEmis = {}; 
-            }
-            
             // Give the browser a microtask tick to render the loading screen
             setTimeout(() => {
                 try {
@@ -343,8 +338,6 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
         if (opening <= 0 && interest > 0) {
             console.warn(`⚠️ Month ${monthNum}: Interest (₹${interest}) charged even though opening balance was ₹${opening}`);
             hasAnomalies = true;
-        }
-        if ((principal + partPayment) > (opening + interest) && opening > 0) {
         }
     });
 
@@ -677,8 +670,7 @@ function addRow(date = '',transType = 'EMI payment',interestRate = '',amount = '
             }
         }
     }
-
-    const rowCount = tableBody.querySelectorAll('tr').length + 1;
+    
     const row = document.createElement('tr');
     row.className = 'actual-ledger-row';
 
@@ -735,7 +727,6 @@ function reindexLedgerRows() {
 }
 
 function runActualLedgerCalculation() {
-    console.count('LEDGER RUN');
     const rows = document.querySelectorAll('#transactionBody tr');
     if (rows.length === 0) return;
 
@@ -883,7 +874,6 @@ rows.forEach((row, index) => {
     const currentDate = new Date(parseInt(year),parseInt(month) - 1,1);
     let monthIndex =(currentDate.getFullYear() - startDate.getFullYear()) * 12+ (currentDate.getMonth() - startDate.getMonth())+ 1;
     const shadow = window.shadowSchedule?.[monthIndex];
-        console.log("MONTH MAP",monthKey,"=>",monthIndex,shadow?.closingBalance);
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
    let extraPaid = 0;
@@ -907,9 +897,6 @@ rows.forEach((row, index) => {
     if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
-    console.log("Current Loan Month Index:", currentLoanMonthIndex);
-    console.log("Actual Closing Balance:",finalClosingBalance);
-    console.log("Shadow Month Closing Balance:",window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance);
         });
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
@@ -921,9 +908,6 @@ rows.forEach((row, index) => {
     const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
-    console.log("Ledger Principal Paid Sum:",totalPrincipalPaidSum);
-    console.log("Ledger Extra Paid Sum:",totalExtraPaidSum);
-    console.log("Current Loan Month Index:",currentLoanMonthIndex);
     if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
     if (sumInterestEl) sumInterestEl.innerText = `₹ ${Math.round(totalInterestPaidSum).toLocaleString()}`;
     if (sumExtraEl) sumExtraEl.innerText = `₹ ${Math.round(totalExtraPaidSum).toLocaleString()}`;
