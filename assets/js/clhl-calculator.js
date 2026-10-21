@@ -1120,10 +1120,15 @@ function runCalculation() {
             const changeDate = new Date(dateStr);
             let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
             changeMonthIndex++;
-            if (monthIdx >= changeMonthIndex) { effectiveRate = rate;}
+            if (monthIdx >= changeMonthIndex) {
+            console.log( '[RATE APPLIED]', 'Planner Month:', monthIdx, 'Change Month:', changeMonthIndex,m 'New Rate:', rate,'Date:', dateStr); 
+            effectiveRate = rate;
+        }
             console.log( "RATE ROW", transType, dateStr, rate);
             console.log( "Month", monthIdx, "Rate", effectiveRate );
         });
+        if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36) {
+        console.log( '[RATE CHECK]', 'Month:', monthIdx, 'Effective Rate:', effectiveRate );}
         return effectiveRate;
     }
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
@@ -1191,6 +1196,8 @@ function runCalculation() {
     let previousClosingBalance = 0;
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
         const annualRate = getInterestRateForMonth(monthIdx);
+        if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36 ) {
+        console.log( '[MONTH LOOP]', 'Month:', monthIdx, 'Annual Rate:', annualRate);}
         const monthlyRate = annualRate / 12 / 100;
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
@@ -1326,6 +1333,8 @@ function runCalculation() {
 
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
+        if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36) {
+        console.log( '[EMI BUILD]', 'Month:', monthIdx, Rate:', annualRate,'EMI:', Math.round(standardEmiForMonth)); }
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);"> (${isPreEmi ? 'Pre-EMI' : 'Full EMI'} | ${annualRate.toFixed(2)}%) </span>`;
        
         if (document.activeElement !== inputEl) {
