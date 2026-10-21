@@ -910,6 +910,7 @@ rows.forEach((row, index) => {
     console.log("Current Loan Month Index:", currentLoanMonthIndex);
     console.log("Actual Closing Balance:",finalClosingBalance);
     console.log("Shadow Month Closing Balance:",window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance);
+        });
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
