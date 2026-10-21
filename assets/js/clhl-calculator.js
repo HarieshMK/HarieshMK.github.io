@@ -715,6 +715,27 @@ function addRow(date = '',transType = 'EMI payment',interestRate = '',amount = '
         });
     });
 
+    const transTypeSelect = row.querySelector('.trans-type');
+    const amountInputField = row.querySelector('.trans-amount');
+    function updateLedgerRowUI() {
+        if (transTypeSelect.value === 'Rate Change') {
+        amountInputField.disabled = true;
+        amountInputField.style.backgroundColor = '#e5e7eb';
+        amountInputField.style.cursor = 'not-allowed';
+        amountInputField.placeholder = 'Not Required';
+        amountInputField.title = 'This row is only for Interest rate change';
+    } else {
+        amountInputField.disabled = false;
+        amountInputField.style.backgroundColor = '';
+        amountInputField.style.cursor = '';
+        amountInputField.placeholder = '₹';
+        amountInputField.removeAttribute('title');
+        }
+    }
+    transTypeSelect.addEventListener('change', updateLedgerRowUI);
+    // Initial load
+    updateLedgerRowUI();
+
     row.querySelector('.btn-delete').addEventListener('click', () => {
         row.remove();
         reindexLedgerRows();
@@ -1543,7 +1564,15 @@ async function saveCalculatorDataToSupabase() {
         alert("Please sign in first so we know where to save your data! 🏠✍️");
         return;
     }
-
+    const ledgerRows = document.querySelectorAll('#transactionBody tr');
+    for (const row of ledgerRows) {
+        const transType = row.querySelector('.trans-type')?.value;
+        const rate = row.querySelector('.trans-rate')?.value;
+        if ( transType === 'Rate Change' && ( rate === '' || isNaN(parseFloat(rate)) || parseFloat(rate) <= 0 ) ) {
+            alert( 'One or more Rate Change rows do not have an Interest Rate entered. Please enter a valid rate before saving.' );
+            return;
+        }
+    }
     const profilePayload = {
         user_id: user.id,
         profile_name: 'My Property Loan',
