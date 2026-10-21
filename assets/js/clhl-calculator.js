@@ -704,8 +704,15 @@ function addRow(date = '',transType = 'EMI payment',interestRate = '',amount = '
 
     tableBody.appendChild(row);
     row.querySelectorAll('input, select').forEach(el => {
-        el.addEventListener('input', runActualLedgerCalculation);
-        el.addEventListener('change', runActualLedgerCalculation);
+        el.addEventListener('input', () => {
+            runActualLedgerCalculation();
+            runCalculation();
+        });
+    
+        el.addEventListener('change', () => {
+            runActualLedgerCalculation();
+            runCalculation();
+        });
     });
 
     row.querySelector('.btn-delete').addEventListener('click', () => {
@@ -1114,6 +1121,8 @@ function runCalculation() {
             let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
             changeMonthIndex++;
             if (monthIdx >= changeMonthIndex) { effectiveRate = rate;}
+            console.log( "RATE ROW", transType, dateStr, rate);
+            console.log( "Month", monthIdx, "Rate", effectiveRate );
         });
         return effectiveRate;
     }
@@ -1296,6 +1305,7 @@ function runCalculation() {
         if (!window.shadowSchedule) {window.shadowSchedule = {};}
         window.shadowSchedule[monthIdx] = {
             monthIdx,
+            rate: annualRate,
             emi: stdStandardEmi,
             interest: stdAccruedInterest,
             principal: stdPrincipalPaid,
