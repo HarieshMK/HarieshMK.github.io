@@ -1121,7 +1121,7 @@ function runCalculation() {
             let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
             changeMonthIndex++;
             if (monthIdx >= changeMonthIndex) {
-            console.log( '[RATE APPLIED]', 'Planner Month:', monthIdx, 'Change Month:', changeMonthIndex,m 'New Rate:', rate,'Date:', dateStr); 
+            console.log( '[RATE APPLIED]', 'Planner Month:', monthIdx, 'Change Month:', changeMonthIndex, 'New Rate:', rate,'Date:', dateStr); 
             effectiveRate = rate;
         }
             console.log( "RATE ROW", transType, dateStr, rate);
@@ -1334,7 +1334,7 @@ function runCalculation() {
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
         if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36) {
-        console.log( '[EMI BUILD]', 'Month:', monthIdx, Rate:', annualRate,'EMI:', Math.round(standardEmiForMonth)); }
+        console.log( '[EMI BUILD]', 'Month:', monthIdx, 'Rate:', annualRate,'EMI:', Math.round(standardEmiForMonth)); }
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);"> (${isPreEmi ? 'Pre-EMI' : 'Full EMI'} | ${annualRate.toFixed(2)}%) </span>`;
        
         if (document.activeElement !== inputEl) {
