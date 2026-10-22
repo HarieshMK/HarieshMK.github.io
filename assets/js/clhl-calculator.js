@@ -945,8 +945,14 @@ rows.forEach((row, index) => {
     let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
-    if (closureTooltipEl) { closureTooltipEl.innerHTML = ` Loading projection details... `; }
-
+    if (closureTooltipEl)
+    closureTooltipEl.innerHTML = ` <strong>Estimated Closure Calculation</strong><br><br>
+        Current Outstanding: ₹${Math.round(finalClosingBalance).toLocaleString()}<br>
+        Extra Principal Paid: ₹${Math.round(totalExtraPaidSum).toLocaleString()}<br>
+        Interest Saved: ₹${Math.round(interestSaved).toLocaleString()}<br>
+        Current Interest Rate: ${latestInterestRate.toFixed(2)}%<br>
+        Remaining Projection: ${projectedMonthsNeeded || 0} months<br><br>
+        This closure date is an estimate based on your current repayment history and projected future EMI schedule. Future EMI changes, part-payments, loan disbursements, or interest-rate changes may move this date earlier or later. `; }
     // Update Estimated Loan Closure Date
     if (sumCloseDateEl) {
         if (finalClosingBalance <= 0) {
