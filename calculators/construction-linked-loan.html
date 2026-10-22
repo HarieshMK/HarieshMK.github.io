@@ -239,9 +239,9 @@ permalink: /calculators/clhl/
                         </div>
                     </div>
                     <div class="summary-divider"></div>
-                    <div class="summary-grid-row highlight-tier">
-                        <div class="summary-metric hero-metric" style="flex: 1;">
-                            <span class="metric-label">🚀 Est. Loan Closure</span>
+                        <div class="summary-grid-row highlight-tier">
+                            <div class="summary-metric hero-metric" style="flex: 1;">
+                            <span class="metric-label metric-label-with-info"> 🚀 Est. Loan Closure <span class="info-tooltip"> ⓘ <span id="closureTooltip" class="tooltip-text"> Loading projection details... </span> </span> </span>
                             <span class="metric-value text-primary" id="actualSummaryCloseDate">--</span>
                         </div>
                     </div>
@@ -1202,6 +1202,79 @@ tr.row-minimized {
     color: var(--brand-primary) !important;
 }
 
+    /* --------------------------------------------------------------------------
+       Closure Date Tooltip
+    -------------------------------------------------------------------------- */
+    
+    .metric-label-with-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .info-tooltip {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    
+        width: 16px;
+        height: 16px;
+    
+        border-radius: 50%;
+        border: 1px solid var(--border-base);
+    
+        font-size: 0.7rem;
+        font-weight: 700;
+    
+        color: var(--brand-primary);
+        background: var(--bg-container);
+    
+        cursor: help;
+        flex-shrink: 0;
+    }
+    
+    .tooltip-text {
+        visibility: hidden;
+        opacity: 0;
+    
+        position: absolute;
+        bottom: 130%;
+        left: 50%;
+        transform: translateX(-50%);
+    
+        min-width: 320px;
+        max-width: 420px;
+    
+        padding: 12px 14px;
+    
+        background: var(--bg-container);
+        color: var(--text-primary);
+    
+        border: 1px solid var(--border-base);
+        border-radius: 10px;
+    
+        text-align: left;
+        line-height: 1.55;
+    
+        font-size: 0.8rem;
+        font-weight: 400;
+    
+        white-space: normal;
+    
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    
+        z-index: 99999;
+    
+        transition: opacity 0.2s ease;
+    
+        pointer-events: none;
+    }
+    
+    .info-tooltip:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
 
 /* --------------------------------------------------------------------------
    8. MEDIA QUERIES (RESPONSIVE)
