@@ -967,7 +967,6 @@ rows.forEach((row, index) => {
             sumCloseDateEl.innerText = `Add more EMI history`;
         }
     } 
-}
 
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
