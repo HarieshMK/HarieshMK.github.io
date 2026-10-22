@@ -934,6 +934,7 @@ rows.forEach((row, index) => {
     const sumExtraEl = document.getElementById('actualSummaryExtra');
     const sumSavedEl = document.getElementById('actualSummarySaved');
     const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
+    const closureTooltipEl = document.getElementById('closureTooltip');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
     if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
@@ -944,6 +945,7 @@ rows.forEach((row, index) => {
     let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
+    if (closureTooltipEl) { closureTooltipEl.innerHTML = ` Loading projection details... `; }
 
     // Update Estimated Loan Closure Date
     if (sumCloseDateEl) {
