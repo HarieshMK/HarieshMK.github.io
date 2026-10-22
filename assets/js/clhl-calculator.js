@@ -1088,15 +1088,11 @@ function runCalculation() {
     }).filter(m => m.date !== '');
     console.log("Milestone Loan Total:",milestones.reduce((sum, m) => sum + (m.loanAmount || 0),0));
     console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
-    milestones.forEach(m => {
-        if (m.date && m.isPartOfLoan) {
-            const mIdx = getMilestoneMonthIndex(m.date, loanStartDateStr, emiDueDay);
-            if (mIdx <= 1) {
-                cumulativePct += m.pct; 
-                cumulativeLoanAmt += m.loanAmount; 
-            }
-        }
-    });
+    milestones.forEach(m => { if (!m.date) return;
+        const milestoneDate = new Date(m.date);
+        milestoneDate.setHours(0, 0, 0, 0);
+        if (milestoneDate <= today) { cumulativePct += m.pct;
+            if (m.isPartOfLoan) { cumulativeLoanAmt += m.loanAmount; } } });
 
     const totalPctEl = document.getElementById('totalMilestonePct');
     const totalLoanEl = document.getElementById('totalMilestoneLoan');
