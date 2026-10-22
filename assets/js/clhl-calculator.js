@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.baselineLockedEmi = undefined;
             // Give the browser a microtask tick to render the loading screen
             setTimeout(() => {
-                try {
-                    if (typeof runCalculation === 'function') {
+                try { if (typeof runCalculation === 'function') {
                         runCalculation();
                     }
                 } finally {
