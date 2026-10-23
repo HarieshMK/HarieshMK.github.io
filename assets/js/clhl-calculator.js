@@ -889,7 +889,7 @@ rows.forEach((row, index) => {
     if (mIdx > totalMonths) mIdx = totalMonths;
     currentLoanMonthIndex = mIdx;
     }
-    // --- INSERT DEBUG BLOCK HERE ---
+
     let projectedMonthsNeeded = 0;
     let shadowProjectionMonths = 0;
     const monthlyComparison = {};
@@ -922,9 +922,7 @@ rows.forEach((row, index) => {
             adjustedShadowBalance -= (shadow.emi || 0);
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
-        if ( futureMonth === 18 || futureMonth === 19 || futureMonth === 20 || futureMonth === 24) {
-    console.log( "[BALANCE TRACE]", futureMonth, "Balance", Math.round(adjustedShadowBalance), "EMI", Math.round(shadow.emi || 0), "Disb", Math.round(shadow.disbursement || 0) );}
-    if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
+        if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
         console.log("[LEDGER PROJECTION]");
         console.log("Current Loan Month =", currentLoanMonthIndex);
         console.log("Current Balance =", finalClosingBalance);
