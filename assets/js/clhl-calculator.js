@@ -1147,7 +1147,6 @@ function runCalculation() {
         if (changeDay > emiDueDay) { changeMonthIndex++; }
             if (monthIdx >= changeMonthIndex) {effectiveRate = rate; }
         });
-        if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36) {
         return effectiveRate;
     }
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
