@@ -914,6 +914,7 @@ rows.forEach((row, index) => {
            let adjustedShadowBalance = finalClosingBalance;
             for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
             const shadow = window.shadowSchedule?.[futureMonth];
+                if (futureMonth <= 30) { console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(shadow?.emi || 0) ); }
             if (!shadow) continue;
             const interest = adjustedShadowBalance * (latestInterestRate / 100) / 12;
             adjustedShadowBalance += (shadow.disbursement || 0);
