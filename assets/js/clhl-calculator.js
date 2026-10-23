@@ -1226,16 +1226,10 @@ function runCalculation() {
         milestones.forEach(m => { console.log( m.name, m.date, m.loanAmount,m.isPartOfLoan); });
         console.log( "Month-1 Disbursement =", getMilestoneDisbursementForMonthIndex(1));}
 
-        if (monthIdx === 1) {
-            openingBalance = cumulativeLoanAmt;
-        } else {
-            openingBalance = previousClosingBalance + milestoneDisbursement;
-        }
-
+        if (monthIdx === 1) { openingBalance = milestoneDisbursement;}
+        else { openingBalance = previousClosingBalance + milestoneDisbursement;}
         let row;
-        if (isTableBuilt) {
-            row = loanPlanBody.querySelector(`tr[data-month="${monthIdx}"]`);
-        }
+        if (isTableBuilt) { row = loanPlanBody.querySelector(`tr[data-month="${monthIdx}"]`); }
 
         if (!row) {
             row = document.createElement('tr');
@@ -1306,7 +1300,7 @@ function runCalculation() {
         }
         let stdDisbursement = milestoneDisbursement;
         if (monthIdx === 1) {
-            stdOpeningBalance = cumulativeLoanAmt;
+            stdOpeningBalance = stdDisbursement;
         } else {
             stdOpeningBalance = stdOpeningBalance + stdDisbursement;
         }
