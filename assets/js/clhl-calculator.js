@@ -922,6 +922,11 @@ rows.forEach((row, index) => {
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
     if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
+        console.log("[LEDGER PROJECTION]");
+        console.log("Current Loan Month =", currentLoanMonthIndex);
+        console.log("Current Balance =", finalClosingBalance);
+        console.log("Projected Months Needed =", projectedMonthsNeeded);
+        console.log("Projected Closure Month Index =", currentLoanMonthIndex + projectedMonthsNeeded);
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
         });
@@ -1488,6 +1493,8 @@ function runCalculation() {
             if (sumCloseDateEl) sumCloseDateEl.innerText = `--`;
         }
     }
+            console.log("[PLANNER PROJECTION]");
+            console.log("loanClosureMonthIndex =", loanClosureMonthIndex);
 }
 
 // --- TOOLBAR RANGE-FILL LOGIC ---
