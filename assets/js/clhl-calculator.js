@@ -819,7 +819,6 @@ rows.forEach((row, index) => {
             interestPaid = Math.min(amountInput,accruedInterestSinceLastEMI );
             principalPaid = Math.max(0,amountInput - interestPaid);
             accruedInterestSinceLastEMI = Math.max(0,accruedInterestSinceLastEMI - interestPaid);
-                console.log({amountInput,interestPaid,principalPaid,dateInput});
         }
         else if (typeSelect === 'Bank Disbursement' || typeSelect === 'Charges') {
             closingBalance = previousClosingBalance + amountInput;
@@ -1146,15 +1145,9 @@ function runCalculation() {
         let changeMonthIndex = (changeDate.getFullYear() - loanStart.getFullYear()) * 12 + (changeDate.getMonth() - loanStart.getMonth()) + 1;
         const changeDay = changeDate.getDate();
         if (changeDay > emiDueDay) { changeMonthIndex++; }
-            if (monthIdx >= changeMonthIndex) {
-            console.log( '[RATE APPLIED]', 'Planner Month:', monthIdx, 'Change Month:', changeMonthIndex, 'New Rate:', rate,'Date:', dateStr); 
-            effectiveRate = rate;
-        }
-            console.log( "RATE ROW", transType, dateStr, rate);
-            console.log( "Month", monthIdx, "Rate", effectiveRate );
+            if (monthIdx >= changeMonthIndex) {effectiveRate = rate; }
         });
         if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36) {
-        console.log( '[RATE CHECK]', 'Month:', monthIdx, 'Effective Rate:', effectiveRate );}
         return effectiveRate;
     }
     const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
@@ -1222,8 +1215,6 @@ function runCalculation() {
     let previousClosingBalance = 0;
     for (let monthIdx = 1; monthIdx <= totalMonths; monthIdx++) {
         const annualRate = getInterestRateForMonth(monthIdx);
-        if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36 ) {
-        console.log( '[MONTH LOOP]', 'Month:', monthIdx, 'Annual Rate:', annualRate);}
         const monthlyRate = annualRate / 12 / 100;
         const monthName = currentMonthDate.toLocaleString('en-US', { month: 'short' });
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
@@ -1362,8 +1353,6 @@ function runCalculation() {
 
         row.children[0].innerText = displayLabel;
         row.children[1].innerText = `₹${Math.round(openingBalance).toLocaleString()}`;
-        if ( monthIdx === 1 || monthIdx === 12 || monthIdx === 24 || monthIdx === 36) {
-        console.log( '[EMI BUILD]', 'Month:', monthIdx, 'Rate:', annualRate,'EMI:', Math.round(standardEmiForMonth)); }
         row.children[2].innerHTML = `₹${Math.round(standardEmiForMonth).toLocaleString()} <span style="font-size:0.75rem; color:var(--text-secondary);"> (${isPreEmi ? 'Pre-EMI' : 'Full EMI'} | ${annualRate.toFixed(2)}%) </span>`;
        
         if (document.activeElement !== inputEl) {
@@ -1465,13 +1454,7 @@ function runCalculation() {
         .reduce((sum, m) => sum + (m.loanAmount || 0),0);
     const loaderEl = document.getElementById('appLoader');
     const isLoaderHidden = !loaderEl || loaderEl.style.display === 'none';
-
-    console.log("rowsArray.length =", rowsArray.length);
-    console.log("initialLoan =", totalLoanAmount);
-    console.log("isLoaderHidden =", isLoaderHidden);
     if (rowsArray.length > 0 && totalLoanAmount > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
-        console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
-        console.log("Total Loan Amount From Milestones:",milestones.filter(m => m.isPartOfLoan).reduce((sum, m) => sum + (m.loanAmount || 0),0));
         auditLoanMath(rowsArray, totalLoanAmount, defaultAnnualRate);
     }    
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
