@@ -1221,9 +1221,10 @@ function runCalculation() {
         const displayLabel = `${monthIdx} (${formattedDate})`;
 
         const milestoneDisbursement = getMilestoneDisbursementForMonthIndex(monthIdx);
-        console.log("Month-1 cumulativeLoanAmt =", cumulativeLoanAmt);
+        
+        if (monthIdx === 1) {console.log("Month-1 cumulativeLoanAmt =", cumulativeLoanAmt);
         milestones.forEach(m => { console.log( m.name, m.date, m.loanAmount,m.isPartOfLoan); });
-        console.log( "Month-1 Disbursement =", getMilestoneDisbursementForMonthIndex(1));
+        console.log( "Month-1 Disbursement =", getMilestoneDisbursementForMonthIndex(1));}
 
         if (monthIdx === 1) {
             openingBalance = cumulativeLoanAmt;
