@@ -241,7 +241,7 @@ permalink: /calculators/clhl/
                     <div class="summary-divider"></div>
                         <div class="summary-grid-row highlight-tier">
                             <div class="summary-metric hero-metric" style="flex: 1;">
-                            <span class="metric-label metric-label-with-info"> 🚀 Est. Loan Closure <span class="info-tooltip"> ⓘ <span id="closureTooltip" class="tooltip-text"> Loading projection details... </span> </span> </span>
+                            <span class="metric-label metric-label-with-info"> 🚀 Est. Loan Closure <span class="info-tooltip"> i <span id="closureTooltip" class="tooltip-text"> Loading projection details... </span> </span> </span>
                             <span class="metric-value text-primary" id="actualSummaryCloseDate">--</span>
                         </div>
                     </div>
@@ -1214,25 +1214,37 @@ tr.row-minimized {
     
     .info-tooltip {
         position: relative;
+    
         display: inline-flex;
         align-items: center;
         justify-content: center;
     
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
     
-        border-radius: 50%;
-        border: 1px solid var(--border-base);
+        border-radius: 999px;
     
-        font-size: 0.7rem;
-        font-weight: 700;
+        background: color-mix(
+            in srgb,
+            var(--brand-primary) 15%,
+            transparent
+        );
+    
+        border: 1px solid color-mix(
+            in srgb,
+            var(--brand-primary) 40%,
+            transparent
+        );
     
         color: var(--brand-primary);
-        background: var(--bg-container);
+    
+        font-size: 0.8rem;
+        font-weight: 700;
     
         cursor: help;
-        flex-shrink: 0;
-    }
+    
+        transition: all 0.2s ease;
+}
     
     .tooltip-text {
         visibility: hidden;
@@ -1271,9 +1283,21 @@ tr.row-minimized {
         pointer-events: none;
     }
     
-    .info-tooltip:hover .tooltip-text {
-        visibility: visible;
-        opacity: 1;
+    .info-tooltip:hover {
+        transform: scale(1.08);
+    
+        background: color-mix(
+            in srgb,
+            var(--brand-primary) 25%,
+            transparent
+        );
+    
+        box-shadow: 0 0 8px
+            color-mix(
+                in srgb,
+                var(--brand-primary) 40%,
+                transparent
+            );
     }
 
 /* --------------------------------------------------------------------------
