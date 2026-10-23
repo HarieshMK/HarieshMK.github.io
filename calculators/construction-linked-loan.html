@@ -1219,10 +1219,10 @@ tr.row-minimized {
         align-items: center;
         justify-content: center;
     
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
     
-        border-radius: 999px;
+        border-radius: 50%;
     
         background: color-mix(
             in srgb,
@@ -1238,49 +1238,13 @@ tr.row-minimized {
     
         color: var(--brand-primary);
     
-        font-size: 0.8rem;
-        font-weight: 700;
+        font-size: 0.85rem;
+        font-weight: 500;
+        line-height: 1;
     
         cursor: help;
     
         transition: all 0.2s ease;
-}
-    
-    .tooltip-text {
-        visibility: hidden;
-        opacity: 0;
-    
-        position: absolute;
-        bottom: 130%;
-        left: 50%;
-        transform: translateX(-50%);
-    
-        min-width: 320px;
-        max-width: 420px;
-    
-        padding: 12px 14px;
-    
-        background: var(--bg-container);
-        color: var(--text-primary);
-    
-        border: 1px solid var(--border-base);
-        border-radius: 10px;
-    
-        text-align: left;
-        line-height: 1.55;
-    
-        font-size: 0.8rem;
-        font-weight: 400;
-    
-        white-space: normal;
-    
-        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-    
-        z-index: 99999;
-    
-        transition: opacity 0.2s ease;
-    
-        pointer-events: none;
     }
     
     .info-tooltip:hover {
@@ -1298,6 +1262,11 @@ tr.row-minimized {
                 var(--brand-primary) 40%,
                 transparent
             );
+    }
+    
+    .info-tooltip:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
     }
 
 /* --------------------------------------------------------------------------
