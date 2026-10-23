@@ -952,7 +952,7 @@ rows.forEach((row, index) => {
         Interest Saved: ₹${Math.round(interestSaved).toLocaleString()}<br>
         Current Interest Rate: ${latestInterestRate.toFixed(2)}%<br>
         Remaining Projection: ${projectedMonthsNeeded || 0} months<br><br>
-        This closure date is an estimate based on your current repayment history and projected future EMI schedule. Future EMI changes, part-payments, loan disbursements, or interest-rate changes may move this date earlier or later. `; }
+        This closure date is an estimate based on your current repayment history and projected future EMI schedule. Future EMI changes, part-payments, loan disbursements, or interest-rate changes may move this date earlier or later. `;
     // Update Estimated Loan Closure Date
     if (sumCloseDateEl) {
         if (finalClosingBalance <= 0) {
@@ -967,6 +967,7 @@ rows.forEach((row, index) => {
             sumCloseDateEl.innerText = `Add more EMI history`;
         }
     } 
+}
 
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
