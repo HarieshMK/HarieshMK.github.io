@@ -924,6 +924,10 @@ rows.forEach((row, index) => {
                 console.log( futureMonth, shadow.isPreEmi, Math.round(adjustedShadowBalance), Math.round(shadow.emi || 0) );
                 if (futureMonth <= 30) { console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(shadow?.emi || 0) ); }
             if (!shadow) continue;
+                    if (futureMonth === 19) {
+                console.log("Month19 Fixed EMI =", shadow.emi);
+                console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
+            }
             const interest = adjustedShadowBalance * (latestInterestRate / 100) / 12;
             adjustedShadowBalance += (shadow.disbursement || 0);
             adjustedShadowBalance += interest;
