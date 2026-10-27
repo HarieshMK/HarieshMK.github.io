@@ -928,6 +928,13 @@ rows.forEach((row, index) => {
         console.log( "Ledger Balance =", finalClosingBalance ); 
         let adjustedShadowBalance = finalClosingBalance;
         let fixedProjectionEmi = null;
+        const fullEmiStartMonth = moratoriumMonths + 1;
+        const month19Shadow = window.shadowSchedule?.[fullEmiStartMonth];
+        if (month19Shadow) {const monthlyRate = (latestInterestRate / 100) / 12;
+            const revisedMonth19Balance = Math.max( 0, month19Shadow.openingBalance - cumulativeExtraPrincipal );
+            const remainingMonths = totalMonths - fullEmiStartMonth + 1; 
+            fixedProjectionEmi = (revisedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths )) / ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
+            console.log( "LOCKED EMI FROM MONTH", fullEmiStartMonth, "=", fixedProjectionEmi ); }
         for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
         const shadow = window.shadowSchedule?.[futureMonth];
         if (!shadow) continue;
@@ -984,12 +991,7 @@ if (futureMonth === 360) {
     );
 }
             if (shadow.isPreEmi) { emiToUse = interest; }
-        else { 
-            if (fixedProjectionEmi === null) {  const remainingMonths = totalMonths - futureMonth + 1;
-                if (monthlyRate > 0 && remainingMonths > 0) {  fixedProjectionEmi = (adjustedShadowBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths)) / (Math.pow(1 + monthlyRate, remainingMonths) - 1); 
-                } else {  fixedProjectionEmi = adjustedShadowBalance / Math.max(1, remainingMonths); } }
-            emiToUse = fixedProjectionEmi;
-        }
+        else {emiToUse = fixedProjectionEmi;}
                 if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
@@ -1430,6 +1432,7 @@ function runCalculation() {
         if (!window.shadowSchedule) {window.shadowSchedule = {};}
         window.shadowSchedule[monthIdx] = {
             monthIdx,
+            openingBalance: openingBalance,
             rate: annualRate,
             emi: stdStandardEmi,
             interest: stdAccruedInterest,
