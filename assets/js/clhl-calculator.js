@@ -908,6 +908,15 @@ rows.forEach((row, index) => {
     } else {extraPaid = actualPaid -(shadow.emi || 0);}
     extraPaid = Math.max(0, extraPaid);
     monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid};
+        console.log(
+    monthKey,
+    {
+        monthIndex,
+        plannedEmi,
+        actualPaid,
+        extraPaid
+    }
+);
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
@@ -918,6 +927,10 @@ rows.forEach((row, index) => {
         console.log("=================================");
         console.log( "Ledger Balance =", finalClosingBalance ); 
            let adjustedShadowBalance = finalClosingBalance;
+        console.log(
+    "Difference if Extra Principal Applied =",
+    finalClosingBalance - cumulativeExtraPrincipal
+);
         console.log(
     "Projection Start Balance =",
     adjustedShadowBalance
