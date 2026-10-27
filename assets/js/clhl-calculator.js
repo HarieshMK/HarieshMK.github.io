@@ -926,27 +926,15 @@ rows.forEach((row, index) => {
         console.log("Cumulative Extra Principal =", cumulativeExtraPrincipal);
         console.log("=================================");
         console.log( "Ledger Balance =", finalClosingBalance ); 
-           let adjustedShadowBalance = finalClosingBalance;
-        console.log(
-    "Difference if Extra Principal Applied =",
-    finalClosingBalance - cumulativeExtraPrincipal
-);
-        console.log(
-    "Projection Start Balance =",
-    adjustedShadowBalance
-);
-
-console.log(
-    "Ledger Closing Balance =",
-    finalClosingBalance
-);
-            for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
-            const shadow = window.shadowSchedule?.[futureMonth];
-            if (!shadow) continue;
-            adjustedShadowBalance += (shadow.disbursement || 0);
-            const monthlyRate = (latestInterestRate / 100) / 12;
-            const interest = adjustedShadowBalance * monthlyRate;
-            let emiToUse = 0;
+        let adjustedShadowBalance = finalClosingBalance;
+        let fixedProjectionEmi = null;
+        for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
+        const shadow = window.shadowSchedule?.[futureMonth];
+        if (!shadow) continue;
+        adjustedShadowBalance += (shadow.disbursement || 0);
+        const monthlyRate = (latestInterestRate / 100) / 12;
+        const interest = adjustedShadowBalance * monthlyRate;
+        let emiToUse = 0;
 
                 if (futureMonth === 19) {
     console.log("========== MONTH 19 ==========");
@@ -970,10 +958,14 @@ if (futureMonth === 360) {
         adjustedShadowBalance
     );
 }
-            if (shadow.isPreEmi) { emiToUse = interest;
-            } else { const remainingMonths = totalMonths - futureMonth + 1; 
-                if (monthlyRate > 0 && remainingMonths > 0) { emiToUse = ( adjustedShadowBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) ) / ( Math.pow(1 + monthlyRate, remainingMonths) - 1 );
-                } else { emiToUse = adjustedShadowBalance / Math.max(1, remainingMonths); }}
+                
+            if (shadow.isPreEmi) { emiToUse = interest; }
+        else { 
+            if (fixedProjectionEmi === null) {  const remainingMonths = totalMonths - futureMonth + 1;
+                if (monthlyRate > 0 && remainingMonths > 0) {  fixedProjectionEmi = (adjustedShadowBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths)) / (Math.pow(1 + monthlyRate, remainingMonths) - 1); 
+                } else {  fixedProjectionEmi = adjustedShadowBalance / Math.max(1, remainingMonths); } }
+            emiToUse = fixedProjectionEmi;
+        }
                 if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
