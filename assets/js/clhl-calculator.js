@@ -951,8 +951,6 @@ rows.forEach((row, index) => {
         shadow.disbursement || 0
     );
 }
-            adjustedShadowBalance += (shadow.disbursement || 0);
-
 if (futureMonth === 56) {
     console.log(
         "Month 56 AFTER DISBURSEMENT",
@@ -995,8 +993,40 @@ if (futureMonth === 360) {
                 if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
-                if (adjustedShadowBalance === 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break;}
-            if (Math.abs(adjustedShadowBalance) < 1) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
+            if (futureMonth >= 55 && futureMonth <= 70) {
+                console.log(
+                    "Month",
+                    futureMonth,
+                    "Balance After EMI =",
+                    adjustedShadowBalance,
+                    "EMI =",
+                    emiToUse
+                );
+            }
+                            if (adjustedShadowBalance === 0) {
+                console.log(
+                    "LOAN CLOSED EXACTLY",
+                    futureMonth
+                );
+            
+                shadowProjectionMonths =
+                    futureMonth - currentLoanMonthIndex;
+            
+                break;
+            }
+            
+            if (Math.abs(adjustedShadowBalance) < 1) {
+                console.log(
+                    "LOAN CLOSED TOLERANCE",
+                    futureMonth,
+                    adjustedShadowBalance
+                );
+            
+                shadowProjectionMonths =
+                    futureMonth - currentLoanMonthIndex;
+            
+                break;
+            }
     }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
         console.log("[LEDGER PROJECTION]");
