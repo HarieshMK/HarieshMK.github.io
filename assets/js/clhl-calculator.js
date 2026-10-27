@@ -924,24 +924,13 @@ rows.forEach((row, index) => {
             if (!shadow) continue;
             if (futureMonth === 19) {
                     console.log("Month19 Fixed EMI =", shadow.emi); 
-                    console.log("Month19 Source Variables:",{ adjustedShadowBalance, shadowBalance, cumulativeLoanAmt,finalClosingBalance } );
+                    console.log("Month19 Source Variables:",{ shadowBalance, cumulativeLoanAmt } );
                     console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
                     console.log("Month19 Remaining Tenure =", totalMonths - futureMonth + 1);}
-            }
             adjustedShadowBalance += (shadow.disbursement || 0);
             const monthlyRate = (latestInterestRate / 100) / 12;
             const interest = adjustedShadowBalance * monthlyRate;
             let emiToUse = 0;
-                if (futureMonth >= 19 && futureMonth <= 25) {
-    console.log(
-        "Month",
-        futureMonth,
-        "Shadow EMI =",
-        shadow.emi,
-        "Projection EMI =",
-        emiToUse
-    );
-}
 
 if (futureMonth === 360) {
     console.log(
@@ -953,6 +942,16 @@ if (futureMonth === 360) {
             } else { const remainingMonths = totalMonths - futureMonth + 1; 
                 if (monthlyRate > 0 && remainingMonths > 0) { emiToUse = ( adjustedShadowBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) ) / ( Math.pow(1 + monthlyRate, remainingMonths) - 1 );
                 } else { emiToUse = adjustedShadowBalance / Math.max(1, remainingMonths); }}
+                if (futureMonth >= 19 && futureMonth <= 25) {
+    console.log(
+        "Month",
+        futureMonth,
+        "Shadow EMI =",
+        shadow.emi,
+        "Projection EMI =",
+        emiToUse
+    );
+}
             console.log( futureMonth, shadow.isPreEmi, Math.round(adjustedShadowBalance), Math.round(emiToUse || 0) );
             if (futureMonth <= 30) {console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(emiToUse || 0));}
             if (futureMonth >= 355) {
