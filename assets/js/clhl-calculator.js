@@ -967,7 +967,8 @@ if (futureMonth === 360) {
         }
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
-            if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
+                if (futureMonth >= 358) { console.log( "Month", futureMonth, "RAW BALANCE AFTER EMI =", adjustedShadowBalance );}
+            if (Math.abs(adjustedShadowBalance) < 1) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
         console.log("[LEDGER PROJECTION]");
