@@ -911,9 +911,13 @@ rows.forEach((row, index) => {
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
+                console.log("Moratorium Months =", moratoriumMonths);
+                console.log( "Current Loan Month =", currentLoanMonthIndex );
+                console.log( "Last Valid Transaction Date =", lastValidDateStr );
            let adjustedShadowBalance = finalClosingBalance;
             for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
             const shadow = window.shadowSchedule?.[futureMonth];
+                console.log( futureMonth, shadow.isPreEmi, Math.round(adjustedShadowBalance), Math.round(shadow.emi || 0) );
                 if (futureMonth <= 30) { console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(shadow?.emi || 0) ); }
             if (!shadow) continue;
             const interest = adjustedShadowBalance * (latestInterestRate / 100) / 12;
