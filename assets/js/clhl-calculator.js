@@ -959,8 +959,10 @@ if (futureMonth === 360) {
                 "\nExpected Closing =", Math.round(adjustedShadowBalance + interest - emiToUse)
             );
         }
+                if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
+                if (adjustedShadowBalance === 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break;}
                 if (futureMonth >= 358) { console.log( "Month", futureMonth, "RAW BALANCE AFTER EMI =", adjustedShadowBalance );}
             if (Math.abs(adjustedShadowBalance) < 1) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
