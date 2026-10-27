@@ -914,6 +914,10 @@ rows.forEach((row, index) => {
                 console.log("Moratorium Months =", moratoriumMonths);
                 console.log( "Current Loan Month =", currentLoanMonthIndex );
                 console.log( "Last Valid Transaction Date =", lastValidDateStr );
+        console.log( "Ledger Balance =", finalClosingBalance ); 
+        console.log( "Shadow Month Balance =", window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance );
+        console.log( "Shadow Month 18 Balance =", window.shadowSchedule?.[18]?.closingBalance );
+        console.log( "Shadow Month 19 Opening Equivalent =", window.shadowSchedule?.[19]?.closingBalance );
            let adjustedShadowBalance = finalClosingBalance;
             for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
             const shadow = window.shadowSchedule?.[futureMonth];
