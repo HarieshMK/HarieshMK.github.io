@@ -918,6 +918,9 @@ rows.forEach((row, index) => {
         console.log( "Shadow Month Balance =", window.shadowSchedule?.[currentLoanMonthIndex]?.closingBalance );
         console.log( "Shadow Month 18 Balance =", window.shadowSchedule?.[18]?.closingBalance );
         console.log( "Shadow Month 19 Opening Equivalent =", window.shadowSchedule?.[19]?.closingBalance );
+        if (futureMonth >= 19 && futureMonth <= 25) { console.log( "Month", futureMonth, "Shadow EMI =", shadow.emi, "Projection EMI =", emiToUse );}
+        if (futureMonth === 360) { console.log("Final raw balance =", adjustedShadowBalance); }
+
            let adjustedShadowBalance = finalClosingBalance;
             for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
             const shadow = window.shadowSchedule?.[futureMonth];
@@ -940,6 +943,16 @@ rows.forEach((row, index) => {
             if (futureMonth <= 30) {console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(emiToUse || 0));}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
+                if (futureMonth >= 355) {
+            console.log(
+                "Month", futureMonth,
+                "\nOpening =", Math.round(adjustedShadowBalance),
+                "\nInterest =", Math.round(interest),
+                "\nEMI =", Math.round(emiToUse),
+                "\nPrincipal =", Math.round(emiToUse - interest),
+                "\nExpected Closing =", Math.round(adjustedShadowBalance + interest - emiToUse)
+            );
+        }
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
