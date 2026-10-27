@@ -958,7 +958,6 @@ if (futureMonth === 360) {
         adjustedShadowBalance
     );
 }
-                
             if (shadow.isPreEmi) { emiToUse = interest; }
         else { 
             if (fixedProjectionEmi === null) {  const remainingMonths = totalMonths - futureMonth + 1;
