@@ -923,7 +923,6 @@ rows.forEach((row, index) => {
             const shadow = window.shadowSchedule?.[futureMonth];
             if (!shadow) continue;
             if (futureMonth === 19) {
-                if (futureMonth === 19) {
                     console.log("Month19 Fixed EMI =", shadow.emi); 
                     console.log("Month19 Source Variables:",{ adjustedShadowBalance, shadowBalance, cumulativeLoanAmt,finalClosingBalance } );
                     console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
