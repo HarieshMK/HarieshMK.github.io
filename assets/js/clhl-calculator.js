@@ -923,8 +923,10 @@ rows.forEach((row, index) => {
             const shadow = window.shadowSchedule?.[futureMonth];
             if (!shadow) continue;
             if (futureMonth === 19) {
-                console.log("Month19 Fixed EMI =", shadow.emi);
-                console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
+                if (futureMonth === 19) {
+                    console.log("Month19 Fixed EMI =", shadow.emi); 
+                    console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
+                    console.log("Month19 Remaining Tenure =", totalMonths - futureMonth + 1);}
             }
             adjustedShadowBalance += (shadow.disbursement || 0);
             const monthlyRate = (latestInterestRate / 100) / 12;
