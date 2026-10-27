@@ -1142,8 +1142,6 @@ function runCalculation() {
             isPartOfLoan: row.querySelector('.part-of-loan-check')?.checked ?? true
         };
     }).filter(m => m.date !== '');
-    console.log("Milestone Loan Total:",milestones.reduce((sum, m) => sum + (m.loanAmount || 0),0));
-    console.log("Month-1 Loan Amount:",cumulativeLoanAmt);
     milestones.forEach(m => { if (!m.date) return;
         const milestoneDate = new Date(m.date);
         milestoneDate.setHours(0, 0, 0, 0);
@@ -1269,13 +1267,7 @@ function runCalculation() {
         const yearShort = currentMonthDate.toLocaleString('en-US', { year: '2-digit' });
         const formattedDate = `${monthName} '${yearShort}`; 
         const displayLabel = `${monthIdx} (${formattedDate})`;
-
         const milestoneDisbursement = getMilestoneDisbursementForMonthIndex(monthIdx);
-        
-        if (monthIdx === 1) {console.log("Month-1 cumulativeLoanAmt =", cumulativeLoanAmt);
-        milestones.forEach(m => { console.log( m.name, m.date, m.loanAmount,m.isPartOfLoan); });
-        console.log( "Month-1 Disbursement =", getMilestoneDisbursementForMonthIndex(1));}
-
         if (monthIdx === 1) { openingBalance = milestoneDisbursement;}
         else { openingBalance = previousClosingBalance + milestoneDisbursement;}
         let row;
