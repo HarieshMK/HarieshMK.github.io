@@ -974,21 +974,10 @@ if (futureMonth === 360) {
             } else { const remainingMonths = totalMonths - futureMonth + 1; 
                 if (monthlyRate > 0 && remainingMonths > 0) { emiToUse = ( adjustedShadowBalance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) ) / ( Math.pow(1 + monthlyRate, remainingMonths) - 1 );
                 } else { emiToUse = adjustedShadowBalance / Math.max(1, remainingMonths); }}
-            if (futureMonth >= 355) {
-            console.log(
-                "Month", futureMonth,
-                "\nOpening =", Math.round(adjustedShadowBalance),
-                "\nInterest =", Math.round(interest),
-                "\nEMI =", Math.round(emiToUse),
-                "\nPrincipal =", Math.round(emiToUse - interest),
-                "\nExpected Closing =", Math.round(adjustedShadowBalance + interest - emiToUse)
-            );
-        }
                 if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
                 if (adjustedShadowBalance === 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break;}
-                if (futureMonth >= 358) { console.log( "Month", futureMonth, "RAW BALANCE AFTER EMI =", adjustedShadowBalance );}
             if (Math.abs(adjustedShadowBalance) < 1) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
