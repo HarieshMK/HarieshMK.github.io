@@ -925,6 +925,7 @@ rows.forEach((row, index) => {
             if (futureMonth === 19) {
                 if (futureMonth === 19) {
                     console.log("Month19 Fixed EMI =", shadow.emi); 
+                    console.log(n"Month19 Source Variables:",{ adjustedShadowBalance, shadowBalance, cumulativeLoanAmt,finalClosingBalance } );
                     console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
                     console.log("Month19 Remaining Tenure =", totalMonths - futureMonth + 1);}
             }
