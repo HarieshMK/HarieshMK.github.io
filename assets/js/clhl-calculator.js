@@ -931,7 +931,34 @@ rows.forEach((row, index) => {
         for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
         const shadow = window.shadowSchedule?.[futureMonth];
         if (!shadow) continue;
+                if (futureMonth >= 55 && futureMonth <= 80) {
+        console.log(
+            "Month",
+            futureMonth,
+            "Disbursement =",
+            shadow.disbursement || 0
+        );
+    }
         adjustedShadowBalance += (shadow.disbursement || 0);
+            if (futureMonth === 56) {
+    console.log(
+        "Month 56 BEFORE DISBURSEMENT",
+        adjustedShadowBalance
+    );
+
+    console.log(
+        "Month 56 SHADOW DISBURSEMENT",
+        shadow.disbursement || 0
+    );
+}
+            adjustedShadowBalance += (shadow.disbursement || 0);
+
+if (futureMonth === 56) {
+    console.log(
+        "Month 56 AFTER DISBURSEMENT",
+        adjustedShadowBalance
+    );
+}
         const monthlyRate = (latestInterestRate / 100) / 12;
         const interest = adjustedShadowBalance * monthlyRate;
         let emiToUse = 0;
