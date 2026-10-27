@@ -921,17 +921,26 @@ rows.forEach((row, index) => {
            let adjustedShadowBalance = finalClosingBalance;
             for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
             const shadow = window.shadowSchedule?.[futureMonth];
-                console.log( futureMonth, shadow.isPreEmi, Math.round(adjustedShadowBalance), Math.round(shadow.emi || 0) );
-                if (futureMonth <= 30) { console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(shadow?.emi || 0) ); }
+                console.log( futureMonth, shadow.isPreEmi, Math.round(adjustedShadowBalance), Math.round(emiToUse || 0) );
+                if (futureMonth <= 30) { 
+                    console.log( "Future Month", futureMonth, "Disbursement", shadow?.disbursement || 0, "EMI", Math.round(emiToUse || 0));
             if (!shadow) continue;
                     if (futureMonth === 19) {
                 console.log("Month19 Fixed EMI =", shadow.emi);
                 console.log("Month19 Balance BEFORE Calc =", adjustedShadowBalance);
             }
-            const interest = adjustedShadowBalance * (latestInterestRate / 100) / 12;
             adjustedShadowBalance += (shadow.disbursement || 0);
-            adjustedShadowBalance += interest;
-            adjustedShadowBalance -= (shadow.emi || 0);
+        const monthlyRate = (latestInterestRate / 100) / 12;
+        const interest = adjustedShadowBalance * monthlyRate;
+        let emiToUse = 0;
+        if (shadow.isPreEmi) {
+            emiToUse = interest;
+        } else {
+            const remainingMonths = totalMonths - futureMonth + 1;
+            if ( monthlyRate > 0 && remainingMonths > 0 ) { emiToUse = ( adjustedShadowBalance * monthlyRate * Math.pow( 1 + monthlyRate,remainingMonths ) ) / ( Math.pow( 1 + monthlyRate, remainingMonths) - 1 );
+            } else { emiToUse = adjustedShadowBalance / Math.max(1, remainingMonths);}}
+        adjustedShadowBalance += interest;
+        adjustedShadowBalance -= emiToUse;
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; break; }
     }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
