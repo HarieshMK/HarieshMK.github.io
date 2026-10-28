@@ -996,31 +996,22 @@ if (futureMonth === 360) {
                     emiToUse
                 );
             }
-                            if (adjustedShadowBalance === 0) {
+            if (adjustedShadowBalance <= 0) {
+            
                 console.log(
-                    "LOAN CLOSED EXACTLY",
+                    "LOAN CLOSED",
                     futureMonth
                 );
             
                 shadowProjectionMonths =
-                    futureMonth - currentLoanMonthIndex;
+                    futureMonth -
+                    currentLoanMonthIndex;
+            
+                adjustedShadowBalance = 0;
             
                 break;
             }
-            
-            if (Math.abs(adjustedShadowBalance) < 1) {
-                console.log(
-                    "LOAN CLOSED TOLERANCE",
-                    futureMonth,
-                    adjustedShadowBalance
-                );
-            
-                shadowProjectionMonths =
-                    futureMonth - currentLoanMonthIndex;
-            
-                break;
-            }
-    }
+        }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
         console.log("[LEDGER PROJECTION]");
         console.log("Current Loan Month =", currentLoanMonthIndex);
