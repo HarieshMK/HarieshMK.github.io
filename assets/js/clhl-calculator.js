@@ -945,70 +945,15 @@ rows.forEach((row, index) => {
         for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
         const shadow = window.shadowSchedule?.[futureMonth];
         if (!shadow) continue;
-                if (futureMonth >= 55 && futureMonth <= 80) {
-        console.log( "Month", futureMonth, "Disbursement =", shadow.disbursement || 0 ); }
-        adjustedShadowBalance += (shadow.disbursement || 0);
-            if (futureMonth === 56) {
-    console.log( "Month 56 BEFORE DISBURSEMENT", adjustedShadowBalance );
-    console.log( "Month 56 SHADOW DISBURSEMENT", shadow.disbursement || 0 );
-}
-if (futureMonth === 56) {
-    console.log( "Month 56 AFTER DISBURSEMENT", adjustedShadowBalance );
-}
-        const monthlyRate = (latestInterestRate / 100) / 12;
-        const interest = adjustedShadowBalance * monthlyRate;
-        let emiToUse = 0;
-
-                if (futureMonth === 19) {
-    console.log("========== MONTH 19 ==========");
-    console.log("Opening Balance =", adjustedShadowBalance);
-    console.log("Shadow EMI =", shadow.emi);
-    console.log("Remaining Months =", totalMonths - futureMonth + 1);
-    console.log("Monthly Rate =", monthlyRate);
-}
-if (futureMonth === 55) {
-    console.log("========== MONTH 55 ==========");
-    console.log("Opening Balance =", adjustedShadowBalance);
-    console.log("Shadow EMI =", shadow.emi);
-    console.log("Remaining Months =", totalMonths - futureMonth + 1);
-    console.log("Monthly Rate =", monthlyRate);
-}
-
-
-if (futureMonth === 360) {
-    console.log(
-        "Final raw balance BEFORE update =",
-        adjustedShadowBalance
-    );
-}
             if (shadow.isPreEmi) { emiToUse = interest; }
         else {emiToUse = fixedProjectionEmi;}
                 if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
             adjustedShadowBalance += interest;
             adjustedShadowBalance -= emiToUse;
-            if (futureMonth >= 55 && futureMonth <= 70) {
-                console.log(
-                    "Month",
-                    futureMonth,
-                    "Balance After EMI =",
-                    adjustedShadowBalance,
-                    "EMI =",
-                    emiToUse
-                );
-            }
-            if (adjustedShadowBalance <= 0) {
-            
-                console.log(
-                    "LOAN CLOSED",
-                    futureMonth
-                );
-            
                 shadowProjectionMonths =
                     futureMonth -
-                    currentLoanMonthIndex;
-            
+                    currentLoanMonthIndex;  
                 adjustedShadowBalance = 0;
-            
                 break;
             }
         }
