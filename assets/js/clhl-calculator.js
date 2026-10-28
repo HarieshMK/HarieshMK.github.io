@@ -917,6 +917,7 @@ rows.forEach((row, index) => {
         extraPaid
     }
 );
+        });
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
@@ -929,56 +930,30 @@ rows.forEach((row, index) => {
         let adjustedShadowBalance = finalClosingBalance;
         let fixedProjectionEmi = null;
         const fullEmiStartMonth = moratoriumMonths + 1;
-        const month19Shadow = window.shadowSchedule?.[fullEmiStartMonth];
-        if (month19Shadow) {const monthlyRate = (latestInterestRate / 100) / 12;
-                            console.log(
-    "Month19 Opening Balance",
-    month19Shadow.openingBalance
-);
-
-console.log(
-    "Cumulative Extra Principal",
-    cumulativeExtraPrincipal
-);
-
-console.log(
-    "Revised Balance",
-    month19Shadow.openingBalance -
-    cumulativeExtraPrincipal
-);
-
-            const revisedMonth19Balance = Math.max( 0, month19Shadow.openingBalance - cumulativeExtraPrincipal );
-            const remainingMonths = totalMonths - fullEmiStartMonth + 1; 
-            fixedProjectionEmi = (revisedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths )) / ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
-            console.log( "LOCKED EMI FROM MONTH", fullEmiStartMonth, "=", fixedProjectionEmi ); }
+        const monthlyRate = (latestInterestRate / 100) / 12; 
+        let projectedMonth19Balance = finalClosingBalance;
+        for ( let m = currentLoanMonthIndex + 1; m <= fullEmiStartMonth; m++ ) {
+            const shadowMonth = window.shadowSchedule?.[m]; 
+            if (!shadowMonth) continue;
+            projectedMonth19Balance += (shadowMonth.disbursement || 0); 
+            projectedMonth19Balance += projectedMonth19Balance * monthlyRate; }
+        console.log( "PROJECTED MONTH19 BALANCE =", projectedMonth19Balance );
+        const remainingMonths = totalMonths - fullEmiStartMonth + 1;
+        if ( monthlyRate > 0 && remainingMonths > 0 ) { fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths ) )/ ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
+        } else { fixedProjectionEmi = projectedMonth19Balance / remainingMonths; } 
+        console.log( "LOCKED EMI FROM MONTH", fullEmiStartMonth, "=", fixedProjectionEmi );
         for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
         const shadow = window.shadowSchedule?.[futureMonth];
         if (!shadow) continue;
                 if (futureMonth >= 55 && futureMonth <= 80) {
-        console.log(
-            "Month",
-            futureMonth,
-            "Disbursement =",
-            shadow.disbursement || 0
-        );
-    }
+        console.log( "Month", futureMonth, "Disbursement =", shadow.disbursement || 0 ); }
         adjustedShadowBalance += (shadow.disbursement || 0);
             if (futureMonth === 56) {
-    console.log(
-        "Month 56 BEFORE DISBURSEMENT",
-        adjustedShadowBalance
-    );
-
-    console.log(
-        "Month 56 SHADOW DISBURSEMENT",
-        shadow.disbursement || 0
-    );
+    console.log( "Month 56 BEFORE DISBURSEMENT", adjustedShadowBalance );
+    console.log( "Month 56 SHADOW DISBURSEMENT", shadow.disbursement || 0 );
 }
 if (futureMonth === 56) {
-    console.log(
-        "Month 56 AFTER DISBURSEMENT",
-        adjustedShadowBalance
-    );
+    console.log( "Month 56 AFTER DISBURSEMENT", adjustedShadowBalance );
 }
         const monthlyRate = (latestInterestRate / 100) / 12;
         const interest = adjustedShadowBalance * monthlyRate;
@@ -1054,7 +1029,6 @@ if (futureMonth === 360) {
         console.log("Projected Closure Month Index =", currentLoanMonthIndex + projectedMonthsNeeded);
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
-        });
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
