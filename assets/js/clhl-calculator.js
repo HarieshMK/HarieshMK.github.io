@@ -931,12 +931,12 @@ rows.forEach((row, index) => {
         let fixedProjectionEmi = null;
         const fullEmiStartMonth = moratoriumMonths + 1;
         const monthlyRate = (latestInterestRate / 100) / 12; 
-        let projectedMonth19Balance = finalClosingBalance;
-        for ( let m = currentLoanMonthIndex + 1; m <= fullEmiStartMonth; m++ ) {
-            const shadowMonth = window.shadowSchedule?.[m]; 
+        let projectedMonth19Balance =
+        finalClosingBalance;
+        for ( let m = currentLoanMonthIndex + 1; m <= moratoriumMonths; m++ ) {
+            const shadowMonth = window.shadowSchedule?.[m];
             if (!shadowMonth) continue;
-            projectedMonth19Balance += (shadowMonth.disbursement || 0); 
-            projectedMonth19Balance += projectedMonth19Balance * monthlyRate; }
+            projectedMonth19Balance += (shadowMonth.disbursement || 0); }
         console.log( "PROJECTED MONTH19 BALANCE =", projectedMonth19Balance );
         const remainingMonths = totalMonths - fullEmiStartMonth + 1;
         if ( monthlyRate > 0 && remainingMonths > 0 ) { fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths ) )/ ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
