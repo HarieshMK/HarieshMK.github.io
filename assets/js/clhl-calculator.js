@@ -1446,6 +1446,17 @@ function runCalculation() {
         window.baselineMonthlyEmi[monthIdx] =stdStandardEmi;
         window.baselineClosingBalance[monthIdx] =stdOpeningBalance;
         if (!window.shadowSchedule) {window.shadowSchedule = {};}
+    if (monthIdx >= 18 && monthIdx <= 20) {
+    console.log(
+        "SHADOW",
+        monthIdx,
+        {
+            stdOpeningBalance,
+            stdDisbursement,
+            stdPrincipalPaid
+        }
+    );
+}
         window.shadowSchedule[monthIdx] = {
             monthIdx,
             openingBalance: openingBalance,
