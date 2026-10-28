@@ -931,6 +931,22 @@ rows.forEach((row, index) => {
         const fullEmiStartMonth = moratoriumMonths + 1;
         const month19Shadow = window.shadowSchedule?.[fullEmiStartMonth];
         if (month19Shadow) {const monthlyRate = (latestInterestRate / 100) / 12;
+                            console.log(
+    "Month19 Opening Balance",
+    month19Shadow.openingBalance
+);
+
+console.log(
+    "Cumulative Extra Principal",
+    cumulativeExtraPrincipal
+);
+
+console.log(
+    "Revised Balance",
+    month19Shadow.openingBalance -
+    cumulativeExtraPrincipal
+);
+
             const revisedMonth19Balance = Math.max( 0, month19Shadow.openingBalance - cumulativeExtraPrincipal );
             const remainingMonths = totalMonths - fullEmiStartMonth + 1; 
             fixedProjectionEmi = (revisedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths )) / ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
