@@ -933,7 +933,7 @@ rows.forEach((row, index) => {
         const monthlyRate = (latestInterestRate / 100) / 12; 
         let projectedMonth19Balance =
         finalClosingBalance;
-        for ( let m = currentLoanMonthIndex + 1; m <= moratoriumMonths; m++ ) {
+        for ( let m = currentLoanMonthIndex + 1; m <= moratoriumMonths + 1; m++ ) {
             const shadowMonth = window.shadowSchedule?.[m];
             if (!shadowMonth) continue;
             projectedMonth19Balance += (shadowMonth.disbursement || 0); }
