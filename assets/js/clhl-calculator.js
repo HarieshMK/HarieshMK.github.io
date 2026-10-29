@@ -942,19 +942,15 @@ rows.forEach((row, index) => {
         if ( monthlyRate > 0 && remainingMonths > 0 ) { fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths ) )/ ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
         } else { fixedProjectionEmi = projectedMonth19Balance / remainingMonths; } 
         console.log( "LOCKED EMI FROM MONTH", fullEmiStartMonth, "=", fixedProjectionEmi );
-        for ( let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++ ) {
-        const shadow = window.shadowSchedule?.[futureMonth];
-        if (!shadow) continue;
-            if (shadow.isPreEmi) { emiToUse = interest; }
-        else {emiToUse = fixedProjectionEmi;}
-                if (Math.abs(adjustedShadowBalance) < 1) { adjustedShadowBalance = 0;}
-            adjustedShadowBalance += interest;
+        for (let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++) {
+            const shadow = window.shadowSchedule?.[futureMonth];
+            if (!shadow) continue;
+            let emiToUse;
+            if (shadow.isPreEmi) { emiToUse = shadow.interest;
+            } else { emiToUse = fixedProjectionEmi; }
+            adjustedShadowBalance += shadow.interest;
             adjustedShadowBalance -= emiToUse;
-                shadowProjectionMonths =
-                    futureMonth -
-                    currentLoanMonthIndex;  
-                adjustedShadowBalance = 0;
-                break;
+            if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
             }
         }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
