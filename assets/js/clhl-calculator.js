@@ -907,26 +907,10 @@ rows.forEach((row, index) => {
     if (monthIndex <= moratoriumMonths) {extraPaid = monthlyLedgerPrincipal[monthKey] || 0;
     } else {extraPaid = actualPaid -(shadow.emi || 0);}
     extraPaid = Math.max(0, extraPaid);
-    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid};
-        console.log(
-    monthKey,
-    {
-        monthIndex,
-        plannedEmi,
-        actualPaid,
-        extraPaid
-    }
-);
-        });
+    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid}; });
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
-        console.log("=================================");
-        console.log("MONTHLY COMPARISON");
-        console.log(monthlyComparison);
-        console.log("Cumulative Extra Principal =", cumulativeExtraPrincipal);
-        console.log("=================================");
-        console.log( "Ledger Balance =", finalClosingBalance ); 
         let adjustedShadowBalance = finalClosingBalance;
         let fixedProjectionEmi = null;
         const fullEmiStartMonth = moratoriumMonths + 1;
@@ -937,11 +921,9 @@ rows.forEach((row, index) => {
             const shadowMonth = window.shadowSchedule?.[m];
             if (!shadowMonth) continue;
             projectedMonth19Balance += (shadowMonth.disbursement || 0); }
-        console.log( "PROJECTED MONTH19 BALANCE =", projectedMonth19Balance );
         const remainingMonths = totalMonths - fullEmiStartMonth + 1;
         if ( monthlyRate > 0 && remainingMonths > 0 ) { fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths ) )/ ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
         } else { fixedProjectionEmi = projectedMonth19Balance / remainingMonths; } 
-        console.log( "LOCKED EMI FROM MONTH", fullEmiStartMonth, "=", fixedProjectionEmi );
         for (let futureMonth = currentLoanMonthIndex + 1; futureMonth <= totalMonths; futureMonth++) {
             const shadow = window.shadowSchedule?.[futureMonth];
             if (!shadow) continue;
@@ -954,16 +936,6 @@ rows.forEach((row, index) => {
             }
         }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
-    console.log("FULL EMI START MONTH =", fullEmiStartMonth);
-    console.log("MORATORIUM MONTHS =", moratoriumMonths);
-    console.log("PROJECTED FULL EMI START BALANCE =", projectedMonth19Balance);
-    console.log("FIXED PROJECTION EMI =", fixedProjectionEmi);
-    console.log("ENDING BALANCE AFTER PROJECTION =", adjustedShadowBalance);
-    console.log("[LEDGER PROJECTION]");
-    console.log("Current Loan Month =", currentLoanMonthIndex);
-    console.log("Current Balance =", finalClosingBalance);
-    console.log("Projected Months Needed =", projectedMonthsNeeded);
-    console.log("Projected Closure Month Index =", currentLoanMonthIndex + projectedMonthsNeeded);
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
 
@@ -1358,17 +1330,6 @@ function runCalculation() {
         window.baselineMonthlyEmi[monthIdx] =stdStandardEmi;
         window.baselineClosingBalance[monthIdx] =stdOpeningBalance;
         if (!window.shadowSchedule) {window.shadowSchedule = {};}
-    if (monthIdx >= 18 && monthIdx <= 20) {
-    console.log(
-        "SHADOW",
-        monthIdx,
-        {
-            stdOpeningBalance,
-            stdDisbursement,
-            stdPrincipalPaid
-        }
-    );
-}
         window.shadowSchedule[monthIdx] = {
             monthIdx,
             openingBalance: shadowOpeningBalance,
@@ -1494,9 +1455,9 @@ function runCalculation() {
         .reduce((sum, m) => sum + (m.loanAmount || 0),0);
     const loaderEl = document.getElementById('appLoader');
     const isLoaderHidden = !loaderEl || loaderEl.style.display === 'none';
-    if (rowsArray.length > 0 && totalLoanAmount > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
+    /*if (rowsArray.length > 0 && totalLoanAmount > 0 && isLoaderHidden && typeof auditLoanMath === 'function') {
         auditLoanMath(rowsArray, totalLoanAmount, defaultAnnualRate);
-    }    
+    }*/
     // --- UPDATE SUMMARY FOOTER BAR DOM ELEMENTS ---
     const sumInterestEl = document.getElementById('summaryTotalInterest');
     const sumExtraEl = document.getElementById('summaryExtraPaid');
@@ -1534,8 +1495,6 @@ function runCalculation() {
             if (sumCloseDateEl) sumCloseDateEl.innerText = `--`;
         }
     }
-            console.log("[PLANNER PROJECTION]");
-            console.log("loanClosureMonthIndex =", loanClosureMonthIndex);
 }
 
 // --- TOOLBAR RANGE-FILL LOGIC ---
