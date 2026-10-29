@@ -954,11 +954,16 @@ rows.forEach((row, index) => {
             }
         }
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
-        console.log("[LEDGER PROJECTION]");
-        console.log("Current Loan Month =", currentLoanMonthIndex);
-        console.log("Current Balance =", finalClosingBalance);
-        console.log("Projected Months Needed =", projectedMonthsNeeded);
-        console.log("Projected Closure Month Index =", currentLoanMonthIndex + projectedMonthsNeeded);
+    console.log("FULL EMI START MONTH =", fullEmiStartMonth);
+    console.log("MORATORIUM MONTHS =", moratoriumMonths);
+    console.log("PROJECTED FULL EMI START BALANCE =", projectedMonth19Balance);
+    console.log("FIXED PROJECTION EMI =", fixedProjectionEmi);
+    console.log("ENDING BALANCE AFTER PROJECTION =", adjustedShadowBalance);
+    console.log("[LEDGER PROJECTION]");
+    console.log("Current Loan Month =", currentLoanMonthIndex);
+    console.log("Current Balance =", finalClosingBalance);
+    console.log("Projected Months Needed =", projectedMonthsNeeded);
+    console.log("Projected Closure Month Index =", currentLoanMonthIndex + projectedMonthsNeeded);
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
 
