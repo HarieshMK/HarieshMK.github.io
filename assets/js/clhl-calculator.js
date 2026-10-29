@@ -1366,7 +1366,7 @@ function runCalculation() {
 }
         window.shadowSchedule[monthIdx] = {
             monthIdx,
-            openingBalance: stdOpeningBalanceBeforeReduction,
+            openingBalance: shadowOpeningBalance,
             rate: annualRate,
             emi: stdStandardEmi,
             interest: stdAccruedInterest,
