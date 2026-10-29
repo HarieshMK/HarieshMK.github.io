@@ -1346,6 +1346,7 @@ function runCalculation() {
         let stdStandardEmi = isPreEmi? stdAccruedInterest: (window.baselineLockedEmi || stdAccruedInterest);
         let stdPrincipalPaid =Math.max(0, stdStandardEmi - stdAccruedInterest);
         window.baselineInterestSum += stdAccruedInterest;
+        const shadowOpeningBalance = stdOpeningBalance;
         stdOpeningBalance =Math.max(0, stdOpeningBalance - stdPrincipalPaid);
         runningStdPrincipal += stdPrincipalPaid;
         window.baselineCumulativePrincipal[monthIdx] =runningStdPrincipal;
@@ -1365,7 +1366,7 @@ function runCalculation() {
 }
         window.shadowSchedule[monthIdx] = {
             monthIdx,
-            openingBalance: openingBalance,
+            openingBalance: stdOpeningBalanceBeforeReduction,
             rate: annualRate,
             emi: stdStandardEmi,
             interest: stdAccruedInterest,
