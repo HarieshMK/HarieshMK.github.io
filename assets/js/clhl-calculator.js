@@ -904,8 +904,8 @@ rows.forEach((row, index) => {
     if (!shadow) return;
     const plannedEmi = shadow.emi || 0;
    let extraPaid = 0;
-    if (monthIndex <= moratoriumMonths) {extraPaid = monthlyLedgerPrincipal[monthKey] || 0;
-    } else {extraPaid = actualPaid -(shadow.emi || 0);}
+    if (monthIndex <= moratoriumMonths) { extraPaid = 0;} 
+    else { extraPaid = actualPaid - (shadow.emi || 0); }
     extraPaid = Math.max(0, extraPaid);
     monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid}; });
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
