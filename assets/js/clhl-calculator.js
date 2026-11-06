@@ -933,8 +933,9 @@ rows.forEach((row, index) => {
             let emiToUse;
             if (shadow.isPreEmi) { emiToUse = shadow.interest;
             } else { emiToUse = fixedProjectionEmi; }
-            adjustedShadowBalance += shadow.interest;
-            adjustedShadowBalance -= emiToUse;
+        const projectedInterest =adjustedShadowBalance * monthlyRate;
+        adjustedShadowBalance += projectedInterest;
+        adjustedShadowBalance -= emiToUse;
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
             }
         }
