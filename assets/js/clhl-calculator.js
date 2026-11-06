@@ -936,9 +936,29 @@ rows.forEach((row, index) => {
         const projectedInterest =adjustedShadowBalance * monthlyRate;
         adjustedShadowBalance += projectedInterest;
         adjustedShadowBalance -= emiToUse;
+if (
+    futureMonth === fullEmiStartMonth ||
+    futureMonth === 60 ||
+    futureMonth === 120 ||
+    futureMonth === 180 ||
+    futureMonth === 240 ||
+    futureMonth === 300 ||
+    futureMonth === 360
+) {
+    console.log({
+        futureMonth,
+        adjustedShadowBalance: Math.round(adjustedShadowBalance),
+        emiToUse: Math.round(emiToUse)
+    });
+}
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
             }
         }
+console.log({
+FINAL_adjustedShadowBalance: Math.round(adjustedShadowBalance),
+shadowProjectionMonths,
+projectedMonthsNeeded
+});
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
