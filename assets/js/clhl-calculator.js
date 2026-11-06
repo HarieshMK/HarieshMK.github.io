@@ -428,8 +428,6 @@ let undoStack = [];
 const MAX_UNDO_STEPS = 50;
 let lockedFullEmi = 0;
 let fullEmiLockedMonth = null;
-window.lockedProjectionEmi = null;
-
     function saveStateToUndoStack() {
         const currentState = {};
         document.querySelectorAll('#loanPlanBody tr').forEach((row, idx) => {
@@ -768,8 +766,6 @@ function runActualLedgerCalculation() {
     let latestInterestRate = 8.5;
     let lastValidDateStr = null;
     let accruedInterestSinceLastEMI = 0;
-    const actualPaidByMonth = {};
-    const monthlyLedgerPrincipal = {};
 
 rows.forEach((row, index) => {
     const dateInput = row.querySelector('.trans-date').value;
@@ -835,11 +831,6 @@ rows.forEach((row, index) => {
         if (typeSelect === 'EMI payment') {
             totalPrincipalPaidSum += principalPaid;
             totalInterestPaidSum += interestPaid;
-            if (dateInput) {
-                const dt = new Date(dateInput);
-                const monthKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
-                actualPaidByMonth[monthKey] = (actualPaidByMonth[monthKey] || 0) + amountInput;
-                monthlyLedgerPrincipal[monthKey] = (monthlyLedgerPrincipal[monthKey] || 0) + principalPaid; }
         }
         if (rateInput > 0) latestInterestRate = rateInput;
         if (dateInput) {
@@ -865,126 +856,12 @@ rows.forEach((row, index) => {
         finalClosingBalance = closingBalance;
     });
 
-    // --- 🔮 CALCULATE ACCURATE EXTRA PART-PAID USING SHADOW BASELINE ---
-    let currentLoanMonthIndex = 1;
-    const moroTypeChecked =document.querySelector('input[name="moroType"]:checked');
-    const customMoroMonthsVal =document.getElementById('customMoroMonths')?.value;
-    let moratoriumMonths = 18;
-    if (moroTypeChecked) {
-    if (moroTypeChecked.value === 'custom') {moratoriumMonths =parseInt(customMoroMonthsVal) || 0;
-    } else if (moroTypeChecked.value === 'milestone') {
-    } else { moratoriumMonths =parseInt(moroTypeChecked.value) || 18;}}
-    const emiStartDateVal = document.getElementById('emiStartDate')?.value;
-    const emiDueDay = emiStartDateVal ? new Date(emiStartDateVal).getDate() : 1;
-    const loanStartDateVal = document.getElementById('loanStartDate')?.value;
-    const tenureYears = parseInt(document.getElementById('tenureYears')?.value) || 20;
-    const totalMonths = tenureYears * 12;
-    if (lastValidDateStr && loanStartDateVal) {
-    const tDate = new Date(lastValidDateStr);
-    const lStart = new Date(loanStartDateVal);
-    let yearDiff =tDate.getFullYear() - lStart.getFullYear();
-    let monthDiff =tDate.getMonth() - lStart.getMonth();
-    let mIdx =(yearDiff * 12) + monthDiff + 1;
-    if (mIdx < 1) mIdx = 1;
-    if (tDate.getDate() > emiDueDay) mIdx++;
-    if (mIdx > totalMonths) mIdx = totalMonths;
-    currentLoanMonthIndex = mIdx;
-    }
-
-    let projectedMonthsNeeded = 0;
-    let shadowProjectionMonths = 0;
-    const monthlyComparison = {};
-    Object.entries(actualPaidByMonth).forEach(([monthKey, actualPaid]) => {
-    const [year, month] = monthKey.split('-');
-    const loanStartDate = document.getElementById('loanStartDate')?.value;
-    if (!loanStartDate) return;
-    const startDate = new Date(loanStartDate);
-    const currentDate = new Date(parseInt(year),parseInt(month) - 1,1);
-    let monthIndex =(currentDate.getFullYear() - startDate.getFullYear()) * 12+ (currentDate.getMonth() - startDate.getMonth())+ 1;
-    const shadow = window.shadowSchedule?.[monthIndex];
-    if (!shadow) return;
-    const plannedEmi = shadow.emi || 0;
-   let extraPaid = 0;
-    if (monthIndex <= moratoriumMonths) { extraPaid = 0;} 
-    else { extraPaid = actualPaid - (shadow.emi || 0); }
-    extraPaid = Math.max(0, extraPaid);
-    monthlyComparison[monthKey] = {monthIndex,plannedEmi,actualPaid,extraPaid}; });
-    // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
-    let cumulativeExtraPrincipal = 0;
-    Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
-        let adjustedShadowBalance = 0;
-        let fixedProjectionEmi = null;
-        const fullEmiStartMonth = moratoriumMonths + 1;
-        const monthlyRate = (latestInterestRate / 100) / 12; 
-        let projectedMonth19Balance =
-        finalClosingBalance;
-        for ( let m = currentLoanMonthIndex + 1; m <= moratoriumMonths + 1; m++ ) {
-            const shadowMonth = window.shadowSchedule?.[m];
-            if (!shadowMonth) continue;
-            projectedMonth19Balance += (shadowMonth.disbursement || 0); }
-    adjustedShadowBalance = projectedMonth19Balance;
-    const remainingMonths = totalMonths - fullEmiStartMonth + 1; 
-    if (currentLoanMonthIndex < fullEmiStartMonth) {
-        if ( monthlyRate > 0 && remainingMonths > 0 ) {  fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) ) / ( Math.pow(1 + monthlyRate, remainingMonths) - 1 ); 
-        } else {  fixedProjectionEmi = projectedMonth19Balance / remainingMonths; }  
-        window.lockedProjectionEmi = fixedProjectionEmi;
-    } else {  fixedProjectionEmi = window.lockedProjectionEmi;
-    }
-    console.log({ projectedMonth19Balance, fixedProjectionEmi, currentLoanMonthIndex, moratoriumMonths});
-        for (let futureMonth = fullEmiStartMonth; futureMonth <= totalMonths; futureMonth++) {
-            const shadow = window.shadowSchedule?.[futureMonth];
-            if (!shadow) continue;
-            let emiToUse;
-            if (shadow.isPreEmi) { emiToUse = shadow.interest;
-            } else { emiToUse = fixedProjectionEmi; }
-        const projectedInterest =adjustedShadowBalance * monthlyRate;
-        adjustedShadowBalance += projectedInterest;
-        adjustedShadowBalance -= emiToUse;
-if (
-    futureMonth === fullEmiStartMonth ||
-    futureMonth === 60 ||
-    futureMonth === 120 ||
-    futureMonth === 180 ||
-    futureMonth === 240 ||
-    futureMonth === 300 ||
-    futureMonth === 360
-) {
-    console.log({
-        futureMonth,
-        adjustedShadowBalance: (adjustedShadowBalance),
-        emiToUse: (emiToUse)
-    });
-}
-            if (Math.abs(adjustedShadowBalance) < 10) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
-            }
-        }
-console.log({
-    FINAL_adjustedShadowBalance: adjustedShadowBalance,
-    shadowProjectionMonths,
-    projectedMonthsNeeded
-});
-    console.log(
-    "BEFORE ASSIGNMENT",
-    shadowProjectionMonths,
-    projectedMonthsNeeded
-);
-        if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
-    console.log(
-    "AFTER ASSIGNMENT",
-    shadowProjectionMonths,
-    projectedMonthsNeeded
-);
-    window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
-    totalExtraPaidSum = (cumulativeExtraPrincipal);
-
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
     const sumPrincipalEl = document.getElementById('actualSummaryPrincipal');
     const sumInterestEl = document.getElementById('actualSummaryInterest');
     const sumExtraEl = document.getElementById('actualSummaryExtra');
     const sumSavedEl = document.getElementById('actualSummarySaved');
-    const sumCloseDateEl = document.getElementById('actualSummaryCloseDate');
-    const closureTooltipEl = document.getElementById('closureTooltip');
 
     if (sumOutstandingEl) sumOutstandingEl.innerText = `₹ ${Math.round(finalClosingBalance).toLocaleString()}`;
     if (sumPrincipalEl) sumPrincipalEl.innerText = `₹ ${Math.round(totalPrincipalPaidSum).toLocaleString()}`;
@@ -995,30 +872,7 @@ console.log({
     let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
-    if (closureTooltipEl)
-    closureTooltipEl.innerHTML = ` <strong>Estimated Closure Calculation</strong><br><br>
-        Current Outstanding: ₹${Math.round(finalClosingBalance).toLocaleString()}<br>
-        Extra Principal Paid: ₹${Math.round(totalExtraPaidSum).toLocaleString()}<br>
-        Interest Saved: ₹${Math.round(interestSaved).toLocaleString()}<br>
-        Current Interest Rate: ${latestInterestRate.toFixed(2)}%<br>
-        Remaining Projection: ${projectedMonthsNeeded || 0} months<br><br>
-        This closure date is an estimate based on your current repayment history and projected future EMI schedule. Future EMI changes, part-payments, loan disbursements, or interest-rate changes may move this date earlier or later. `;
-    // Update Estimated Loan Closure Date
-    if (sumCloseDateEl) {
-        if (finalClosingBalance <= 0) {
-            sumCloseDateEl.innerText = `Already Closed 🎉`;
-        } else if (projectedMonthsNeeded > 0 && lastValidDateStr) {
-            let closureDate = new Date(lastValidDateStr);
-            closureDate.setMonth(closureDate.getMonth() + projectedMonthsNeeded);
-            const cMonth = closureDate.toLocaleString('en-US', { month: 'short' });
-            const cYear = closureDate.getFullYear();
-            sumCloseDateEl.innerText = `${cMonth} ${cYear} 🚀`;
-        } else {
-            sumCloseDateEl.innerText = `Add more EMI history`;
-        }
-    } 
-}
-
+    
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
