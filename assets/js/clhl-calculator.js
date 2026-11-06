@@ -911,7 +911,7 @@ rows.forEach((row, index) => {
     // --- 🔮 FINAL ROBUST FUTURE PROJECTION ---
     let cumulativeExtraPrincipal = 0;
     Object.values(monthlyComparison).forEach(item => { cumulativeExtraPrincipal += item.extraPaid; });
-        let adjustedShadowBalance = finalClosingBalance;
+        let adjustedShadowBalance = 0;
         let fixedProjectionEmi = null;
         const fullEmiStartMonth = moratoriumMonths + 1;
         const monthlyRate = (latestInterestRate / 100) / 12; 
@@ -921,6 +921,7 @@ rows.forEach((row, index) => {
             const shadowMonth = window.shadowSchedule?.[m];
             if (!shadowMonth) continue;
             projectedMonth19Balance += (shadowMonth.disbursement || 0); }
+    adjustedShadowBalance = projectedMonth19Balance;
         const remainingMonths = totalMonths - fullEmiStartMonth + 1;
         if ( monthlyRate > 0 && remainingMonths > 0 ) { fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths ) )/ ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
         } else { fixedProjectionEmi = projectedMonth19Balance / remainingMonths; } 
