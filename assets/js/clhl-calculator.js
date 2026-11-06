@@ -959,7 +959,17 @@ console.log({
     shadowProjectionMonths,
     projectedMonthsNeeded
 });
+    console.log(
+    "BEFORE ASSIGNMENT",
+    shadowProjectionMonths,
+    projectedMonthsNeeded
+);
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
+    console.log(
+    "AFTER ASSIGNMENT",
+    shadowProjectionMonths,
+    projectedMonthsNeeded
+);
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
     totalExtraPaidSum = (cumulativeExtraPrincipal);
 
