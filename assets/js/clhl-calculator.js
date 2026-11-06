@@ -341,8 +341,8 @@ function auditLoanMath(scheduleData, initialLoanAmount, annualInterestRate) {
     });
 
     const finalClosingBalance = scheduleData[scheduleData.length - 1].closingBalance;
-    console.log(`Sum of All Principal + Part Payments Paid: ₹${Math.round(totalPrincipalPaidSum)}`);
-    console.log(`Difference from Initial Loan: ₹${Math.round(totalPrincipalPaidSum - initialLoanAmount)}`);
+    console.log(`Sum of All Principal + Part Payments Paid: ₹${(totalPrincipalPaidSum)}`);
+    console.log(`Difference from Initial Loan: ₹${(totalPrincipalPaidSum - initialLoanAmount)}`);
 
     if (Math.abs(totalPrincipalPaidSum - initialLoanAmount) > 50) {
         console.error(`❌ CRITICAL BUG FOUND: The total principal paid across the schedule does not match the loan amount! There is a mismatch of ₹${totalPrincipalPaidSum - initialLoanAmount}.`);
@@ -947,21 +947,21 @@ if (
 ) {
     console.log({
         futureMonth,
-        adjustedShadowBalance: Math.round(adjustedShadowBalance),
-        emiToUse: Math.round(emiToUse)
+        adjustedShadowBalance: (adjustedShadowBalance),
+        emiToUse: (emiToUse)
     });
 }
             if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
             }
         }
 console.log({
-FINAL_adjustedShadowBalance: Math.round(adjustedShadowBalance),
-shadowProjectionMonths,
-projectedMonthsNeeded
+    FINAL_adjustedShadowBalance: adjustedShadowBalance,
+    shadowProjectionMonths,
+    projectedMonthsNeeded
 });
         if (shadowProjectionMonths > 0) {projectedMonthsNeeded =shadowProjectionMonths;}
     window.cumulativeExtraPrincipal = cumulativeExtraPrincipal;
-    totalExtraPaidSum = Math.round(cumulativeExtraPrincipal);
+    totalExtraPaidSum = (cumulativeExtraPrincipal);
 
     // --- UPDATE THE SUMMARY BAR DOM ELEMENTS ---
     const sumOutstandingEl = document.getElementById('actualSummaryOutstanding');
