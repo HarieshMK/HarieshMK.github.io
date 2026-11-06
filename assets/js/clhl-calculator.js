@@ -951,7 +951,7 @@ if (
         emiToUse: (emiToUse)
     });
 }
-            if (adjustedShadowBalance <= 0) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
+            if (Math.abs(adjustedShadowBalance) < 10) { shadowProjectionMonths = futureMonth - currentLoanMonthIndex; adjustedShadowBalance = 0; break;
             }
         }
 console.log({
