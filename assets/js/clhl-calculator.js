@@ -428,6 +428,7 @@ let undoStack = [];
 const MAX_UNDO_STEPS = 50;
 let lockedFullEmi = 0;
 let fullEmiLockedMonth = null;
+window.lockedProjectionEmi = null;
 
     function saveStateToUndoStack() {
         const currentState = {};
@@ -922,10 +923,13 @@ rows.forEach((row, index) => {
             if (!shadowMonth) continue;
             projectedMonth19Balance += (shadowMonth.disbursement || 0); }
     adjustedShadowBalance = projectedMonth19Balance;
-
-        const remainingMonths = totalMonths - fullEmiStartMonth + 1;
-        if ( monthlyRate > 0 && remainingMonths > 0 ) { fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow( 1 + monthlyRate, remainingMonths ) )/ ( Math.pow( 1 + monthlyRate, remainingMonths ) - 1 );
-        } else { fixedProjectionEmi = projectedMonth19Balance / remainingMonths; } 
+    const remainingMonths = totalMonths - fullEmiStartMonth + 1; 
+    if (currentLoanMonthIndex < fullEmiStartMonth) {
+        if ( monthlyRate > 0 && remainingMonths > 0 ) {  fixedProjectionEmi = ( projectedMonth19Balance * monthlyRate * Math.pow(1 + monthlyRate, remainingMonths) ) / ( Math.pow(1 + monthlyRate, remainingMonths) - 1 ); 
+        } else {  fixedProjectionEmi = projectedMonth19Balance / remainingMonths; }  
+        window.lockedProjectionEmi = fixedProjectionEmi;
+    } else {  fixedProjectionEmi = window.lockedProjectionEmi;
+    }
     console.log({ projectedMonth19Balance, fixedProjectionEmi, currentLoanMonthIndex, moratoriumMonths});
         for (let futureMonth = fullEmiStartMonth; futureMonth <= totalMonths; futureMonth++) {
             const shadow = window.shadowSchedule?.[futureMonth];
