@@ -872,7 +872,7 @@ rows.forEach((row, index) => {
     let interestSaved = Math.max(0, (window.baselineInterestSum || 0) - totalInterestPaidSum);
     if (interestSaved < 1) interestSaved = 0;
     if (sumSavedEl) sumSavedEl.innerText = `₹ ${Math.round(interestSaved).toLocaleString()}`;
-    
+}
 function runCalculation() {
     const loanPlanBody = document.getElementById('loanPlanBody');
     const sumPrincipalEl = document.getElementById('summaryTotalPrincipal');
